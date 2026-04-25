@@ -1,0 +1,42 @@
+{
+  "name": "fiberops",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "postinstall": "node scripts/patch-atomix-css.mjs"
+  },
+  "dependencies": {
+    "@phosphor-icons/react": "^2.1.10",
+    "@shohojdhara/atomix": "^0.5.9",
+    "@tanstack/react-query": "^5.100.4",
+    "gsap": "^3.15.0",
+    "lucide-react": "^1.11.0",
+    "mapbox-gl": "^3.22.0",
+    "next": "16.2.4",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
+    "react-hook-form": "^7.73.1",
+    "zod": "^4.3.6",
+    "zustand": "^5.0.12"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.2.4",
+    "msw": "^2.13.6",
+    "prettier": "^3.8.3",
+    "sass": "^1.99.0",
+    "typescript": "^5"
+  },
+  "msw": {
+    "workerDirectory": [
+      "public"
+    ]
+  }
+}
