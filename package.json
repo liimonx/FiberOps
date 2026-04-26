@@ -6,12 +6,11 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint",
-    "postinstall": "node scripts/patch-atomix-css.mjs"
+    "lint": "eslint"
   },
   "dependencies": {
     "@phosphor-icons/react": "^2.1.10",
-    "@shohojdhara/atomix": "^0.5.9",
+    "@shohojdhara/atomix": "0.6.0",
     "@tanstack/react-query": "^5.100.4",
     "gsap": "^3.15.0",
     "lucide-react": "^1.11.0",
