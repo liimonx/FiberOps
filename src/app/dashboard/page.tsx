@@ -79,7 +79,7 @@ export default function DashboardPage() {
             Overview of network health, active incidents, and operational metrics.
           </p>
         </div>
-        <Button variant="primary" iconName="arrows-clockwise">
+        <Button variant="primary" iconName="ArrowsClockwise">
           Refresh Data
         </Button>
       </div>
@@ -143,7 +143,7 @@ export default function DashboardPage() {
       <Grid className="u-mb-6">
         <GridCol xs={12} lg={8}>
           <Card className="u-h-100" title="Network Usage Trends">
-            <div style={{ height: "300px" }} className="u-w-100">
+            <div className="u-w-100" style={{ height: "300px" }}>
               <AreaChart
                 data={networkTrends}
                 variant="primary"

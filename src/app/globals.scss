@@ -1,4 +1,5 @@
 @use "@shohojdhara/atomix/scss" as *;
+@use "./accessibility.scss";
 
 :root {
   color-scheme: dark;
@@ -68,4 +69,20 @@ body::after {
   100% {
     transform: translate(6vw, 4vh) scale(1.05);
   }
+}
+
+/* Sidebar footer animations */
+@keyframes slide-down {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.u-animate-slide-down {
+  animation: slide-down 0.2s ease-out;
 }

@@ -32,7 +32,7 @@ function NetworkMapDataSync({ children }: NetworkMapDataProps) {
 
   // Real-time updates via WebSocket
   const { isConnected, connectionQuality } = useRealTimeUpdates({
-    enabled: true,
+    enabled: false, // Disabled until WebSocket server is configured
     onConnectionChange: (connected) => {
       console.log('[NetworkMap] WebSocket connection:', connected ? 'connected' : 'disconnected');
     },

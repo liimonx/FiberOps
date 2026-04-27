@@ -3,22 +3,17 @@ import type {
   CustomerRepository,
   IncidentRepository,
 } from "@/services/repositories";
-
-async function getJson<T>(path: string): Promise<T> {
-  const res = await fetch(path);
-  if (!res.ok) throw new Error(`Request failed: ${res.status} ${res.statusText}`);
-  return (await res.json()) as T;
-}
+import { mockAssets, mockCustomers, mockIncidents } from "./mockData";
 
 export const mockAssetRepository: AssetRepository = {
-  list: () => getJson("/api/assets"),
+  list: async () => ({ items: mockAssets }),
 };
 
 export const mockCustomerRepository: CustomerRepository = {
-  list: () => getJson("/api/customers"),
+  list: async () => ({ items: mockCustomers }),
 };
 
 export const mockIncidentRepository: IncidentRepository = {
-  list: () => getJson("/api/incidents"),
+  list: async () => ({ items: mockIncidents }),
 };
 

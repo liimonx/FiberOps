@@ -1,79 +1,99 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useState } from "react";
 import styles from "./Shell.module.css";
 import {
   Badge,
-  Card,
-  Navbar,
-  Nav,
-  NavItem,
+  Button,
+  Icon,
   SideMenu,
   SideMenuItem,
   SideMenuList,
-  ColorModeToggle,
 } from "@shohojdhara/atomix";
+import { SidebarFooter } from "@/components/SidebarFooter";
 
 const nav = [
-  { href: "/dashboard", label: "Dashboard" },
-  { href: "/network-map", label: "Network Map" },
-  { href: "/assets", label: "Assets" },
-  { href: "/customers", label: "Customers" },
-  { href: "/incidents", label: "Incidents" },
-  { href: "/work-orders", label: "Work Orders" },
-  { href: "/planning", label: "Planning" },
-  { href: "/reports", label: "Reports" },
-  { href: "/settings", label: "Settings" },
+  { href: "/", label: "Home", icon: "House" },
+  { href: "/dashboard", label: "Dashboard", icon: "SquaresFour" },
+  { href: "/network-map", label: "Network Map", icon: "MapPin" },
+  { href: "/assets", label: "Assets", icon: "Package" },
+  { href: "/customers", label: "Customers", icon: "Users" },
+  { href: "/incidents", label: "Incidents", icon: "Warning" },
+  { href: "/work-orders", label: "Work Orders", icon: "Clipboard" },
+  { href: "/planning", label: "Planning", icon: "Calendar" },
+  { href: "/reports", label: "Reports", icon: "ChartBar" },
+  { href: "/settings", label: "Settings", icon: "Gear" },
 ];
 
 export function Shell({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const isActive = (href: string) => {
+    if (href === "/") return pathname === "/";
+    return pathname.startsWith(href);
+  };
+
   return (
     <div className={styles.root}>
-      <Navbar
-        variant="brand"
-        brand={
-          <div className={styles.brand}>
-            BCN FiberOps <Badge variant="info" label="Mocked" />
-          </div>
-        }
-      >
-        <Nav alignment="end">
-          {nav.slice(0, 4).map((item) => (
-            <NavItem key={item.href} href={item.href} linkComponent={Link}>
-              {item.label}
-            </NavItem>
-          ))}
-          <ColorModeToggle defaultValue="dark" />
-        </Nav>
-      </Navbar>
+      {/* Mobile Header */}
+      <header className={styles.mobileHeader}>
+        <Button
+          variant="secondary"
+          size="sm"
+          iconName={sidebarOpen ? "X" : "List"}
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+          aria-label="Toggle navigation menu"
+        />
+        <div className={styles.mobileBrand}>
+          BCN FiberOps <Badge variant="info" label="Mocked" />
+        </div>
+      </header>
+
+      {/* Sidebar Overlay for Mobile */}
+      {sidebarOpen && (
+        <div
+          className={styles.overlay}
+          onClick={() => setSidebarOpen(false)}
+          aria-hidden="true"
+        />
+      )}
 
       <div className={styles.body}>
-        <aside className={styles.sidebar}>
-          <SideMenu title="Modules">
+        {/* Sidebar Navigation */}
+        <aside className={`${styles.sidebar} ${sidebarOpen ? styles.sidebarOpen : ""}`}>
+          <div className={styles.sidebarHeader}>
+            <div className={styles.brand}>BCN FiberOps</div>
+            <Badge variant="info" label="Mocked" />
+          </div>
+          
+          <SideMenu>
             <SideMenuList>
               {nav.map((item) => (
-                <SideMenuItem key={item.href} href={item.href} linkComponent={Link}>
-                  {item.label}
+                <SideMenuItem
+                  key={item.href}
+                  href={item.href}
+                  linkComponent={Link}
+                  className={`${styles.navItem} ${isActive(item.href) ? styles.navItemActive : ""}`}
+                  onClick={() => setSidebarOpen(false)}
+                >
+                  <Icon name={item.icon as any} className={styles.navIcon} />
+                  <span>{item.label}</span>
                 </SideMenuItem>
               ))}
             </SideMenuList>
           </SideMenu>
+
+          <SidebarFooter />
         </aside>
 
-        <main className={styles.main}>{children}</main>
-
-        <aside className={styles.inspector}>
-          <Card
-            appearance="outlined"
-            title="Inspector"
-            text="Select an asset to inspect."
-          />
-        </aside>
+        {/* Main Content Area */}
+        <main className={styles.main} id="main-content" tabIndex={-1}>
+          {children}
+        </main>
       </div>
-
-      <footer className={styles.activity}>
-        <Card appearance="ghost" title="Activity" text="No events." />
-      </footer>
     </div>
   );
 }

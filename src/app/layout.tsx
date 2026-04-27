@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.scss";
 import { Shell } from "@/patterns/Shell";
 import { Providers } from "./providers";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 export const metadata: Metadata = {
   title: "BCN FiberOps",
@@ -17,8 +18,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
+        <a href="#main-content" className="skip-to-main">
+          Skip to main content
+        </a>
         <Providers>
-          <Shell>{children}</Shell>
+          <ErrorBoundary>
+            <Shell>{children}</Shell>
+          </ErrorBoundary>
         </Providers>
       </body>
     </html>

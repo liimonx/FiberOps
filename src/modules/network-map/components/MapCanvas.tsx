@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
+import 'mapbox-gl/dist/mapbox-gl.css';
 import { Card } from "@shohojdhara/atomix";
 import { useNetworkMapStore, useViewport } from '../stores/useNetworkMapStore';
 import { MAPBOX_CONFIG } from '../constants';
