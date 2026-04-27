@@ -30,8 +30,8 @@ const kanbanData = {
 
 export default function WorkOrdersPage() {
   const renderCard = (task: any) => {
-    let badgeVariant: "danger" | "warning" | "success" | "secondary" = "secondary";
-    if (task.priority === "Critical") badgeVariant = "danger";
+    let badgeVariant: "error" | "warning" | "success" | "secondary" = "secondary";
+    if (task.priority === "Critical") badgeVariant = "error";
     if (task.priority === "High") badgeVariant = "warning";
     if (task.priority === "Medium") badgeVariant = "success";
 
@@ -42,8 +42,8 @@ export default function WorkOrdersPage() {
         className="u-mb-3 u-cursor-pointer u-border u-border-secondary-subtle"
       >
         <div className="u-flex u-justify-between u-items-start u-mb-2">
-          <Badge variant="secondary" label={task.priority} />
-          <Icon name="ThreeDots" className="u-text-secondary-subtle" />
+          <Badge variant={badgeVariant} label={task.priority} />
+          <Icon name="DotsThree" className="u-text-secondary-subtle" />
         </div>
         <h4 className="u-fs-base u-font-bold u-mb-1">{task.title}</h4>
         <div className="u-flex u-justify-between u-items-center u-mt-4">
@@ -64,10 +64,10 @@ export default function WorkOrdersPage() {
           </p>
         </div>
         <div className="u-flex u-gap-4">
-          <Button variant="outline-secondary" iconName="funnel">
+          <Button variant="outline-secondary" iconName="Funnel">
             Filter
           </Button>
-          <Button variant="primary" iconName="plus">
+          <Button variant="primary" iconName="Plus">
             New Order
           </Button>
         </div>

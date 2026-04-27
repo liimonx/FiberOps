@@ -12,19 +12,46 @@ import {
   DataTable,
   DataTableColumn,
   Input,
-  Tabs
+  Tabs,
 } from "@shohojdhara/atomix";
 
 const mockAssets = [
-  { id: "AST-001", type: "Node", location: "Sector 7G", status: "Active", lastMaintenance: "2026-03-15" },
-  { id: "AST-002", type: "Splitter", location: "Oak Street", status: "Warning", lastMaintenance: "2025-11-20" },
-  { id: "AST-003", type: "ONT", location: "123 Main St", status: "Active", lastMaintenance: "2026-04-01" },
-  { id: "AST-004", type: "Distribution Hub", location: "Downtown", status: "Critical", lastMaintenance: "2024-08-10" },
+  {
+    id: "AST-001",
+    type: "Node",
+    location: "Sector 7G",
+    status: "Active",
+    lastMaintenance: "2026-03-15",
+  },
+  {
+    id: "AST-002",
+    type: "Splitter",
+    location: "Oak Street",
+    status: "Warning",
+    lastMaintenance: "2025-11-20",
+  },
+  {
+    id: "AST-003",
+    type: "ONT",
+    location: "123 Main St",
+    status: "Active",
+    lastMaintenance: "2026-04-01",
+  },
+  {
+    id: "AST-004",
+    type: "Distribution Hub",
+    location: "Downtown",
+    status: "Critical",
+    lastMaintenance: "2024-08-10",
+  },
 ];
 
 export default function AssetsPage() {
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedAsset, setSelectedAsset] = useState<typeof mockAssets[0] | null>(mockAssets[0]);
+  const [selectedAsset, setSelectedAsset] = useState<(typeof mockAssets)[0] | null>(
+    mockAssets[0]
+  );
+  const [activeTab, setActiveTab] = useState(0);
 
   const filteredAssets = mockAssets.filter(
     (a) =>
@@ -34,24 +61,32 @@ export default function AssetsPage() {
   );
 
   const columns: DataTableColumn[] = [
-    { key: "id", title: "Asset ID", render: (val) => <span className="u-font-bold">{val}</span> },
+    {
+      key: "id",
+      title: "Asset ID",
+      render: (val) => <span className="u-font-bold">{val}</span>,
+    },
     { key: "type", title: "Type" },
     { key: "location", title: "Location" },
     {
       key: "status",
       title: "Status",
       render: (val) => {
-        let variant: "success" | "warning" | "danger" = "success";
+        let variant: "success" | "warning" | "error" = "success";
         if (val === "Warning") variant = "warning";
-        if (val === "Critical") variant = "danger";
-        return <Badge variant={variant}>{val}</Badge>;
+        if (val === "Critical") variant = "error";
+        return <Badge variant={variant} label={val} />;
       },
     },
     {
       key: "actions",
       title: "Actions",
       render: (_, row) => (
-        <Button variant="outline-secondary" size="sm" onClick={() => setSelectedAsset(row)}>
+        <Button
+          variant="outline-secondary"
+          size="sm"
+          onClick={() => setSelectedAsset(row)}
+        >
           Details
         </Button>
       ),
@@ -67,10 +102,12 @@ export default function AssetsPage() {
             Manage infrastructure assets, connection graphs, and maintenance logs.
           </p>
         </div>
-        <Button variant="primary" iconName="plus">Register Asset</Button>
+        <Button variant="primary" iconName="Plus">
+          Register Asset
+        </Button>
       </div>
 
-      <Grid className="u-mb-6" gap={6}>
+      <Grid className="u-mb-6">
         <GridCol xs={12} lg={selectedAsset ? 7 : 12}>
           <Card appearance="elevated" glass={true} className="u-h-100">
             <div className="u-mb-4">
@@ -78,16 +115,12 @@ export default function AssetsPage() {
                 placeholder="Search assets by ID, type, or location..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                icon="magnifying-glass"
+                prefixIcon={<Icon name="MagnifyingGlass" />}
                 fullWidth
               />
             </div>
             <div className="u-overflow-x-auto">
-              <DataTable
-                columns={columns}
-                data={filteredAssets}
-                rowKey="id"
-              />
+              <DataTable columns={columns} data={filteredAssets} rowKey="id" />
             </div>
           </Card>
         </GridCol>
@@ -98,65 +131,117 @@ export default function AssetsPage() {
               <div className="u-flex u-justify-between u-items-start u-mb-6">
                 <div>
                   <h2 className="u-fs-lg u-font-bold u-mb-1">{selectedAsset.id}</h2>
-                  <p className="u-text-secondary-subtle u-fs-sm u-mb-0">{selectedAsset.type} • {selectedAsset.location}</p>
+                  <p className="u-text-secondary-subtle u-fs-sm u-mb-0">
+                    {selectedAsset.type} • {selectedAsset.location}
+                  </p>
                 </div>
-                <Button variant="secondary" size="sm" iconName="x" onClick={() => setSelectedAsset(null)} />
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  iconName="X"
+                  onClick={() => setSelectedAsset(null)}
+                />
               </div>
 
-              <Tabs defaultValue="details">
+              <Tabs activeIndex={activeTab} onTabChange={setActiveTab}>
                 <Tabs.List className="u-mb-4">
-                  <Tabs.Trigger value="details">Details</Tabs.Trigger>
-                  <Tabs.Trigger value="maintenance">Maintenance</Tabs.Trigger>
-                  <Tabs.Trigger value="graph">Connection Graph</Tabs.Trigger>
+                  <Tabs.Trigger index={0}>Details</Tabs.Trigger>
+                  <Tabs.Trigger index={1}>Maintenance</Tabs.Trigger>
+                  <Tabs.Trigger index={2}>Connection Graph</Tabs.Trigger>
                 </Tabs.List>
                 <Tabs.Panels>
-                  <Tabs.Panel value="details">
+                  <Tabs.Panel index={0}>
                     <div className="u-flex u-flex-column u-gap-4">
                       <div className="u-p-4 u-bg-dark u-rounded u-border u-border-secondary-subtle">
                         <div className="u-flex u-justify-between u-mb-2">
                           <span className="u-text-secondary-subtle u-fs-sm">Status</span>
-                          <Badge variant={selectedAsset.status === "Active" ? "success" : selectedAsset.status === "Warning" ? "warning" : "danger"}>
-                            {selectedAsset.status}
-                          </Badge>
+                          <Badge
+                            variant={
+                              selectedAsset.status === "Active"
+                                ? "success"
+                                : selectedAsset.status === "Warning"
+                                  ? "warning"
+                                  : "error"
+                            }
+                            label={selectedAsset.status}
+                          />
                         </div>
                         <div className="u-flex u-justify-between u-mb-2">
-                          <span className="u-text-secondary-subtle u-fs-sm">Last Maintenance</span>
-                          <span className="u-font-mono u-fs-sm">{selectedAsset.lastMaintenance}</span>
+                          <span className="u-text-secondary-subtle u-fs-sm">
+                            Last Maintenance
+                          </span>
+                          <span className="u-font-mono u-fs-sm">
+                            {selectedAsset.lastMaintenance}
+                          </span>
                         </div>
                         <div className="u-flex u-justify-between">
-                          <span className="u-text-secondary-subtle u-fs-sm">Coordinates</span>
-                          <span className="u-font-mono u-fs-sm">40.7128° N, 74.0060° W</span>
+                          <span className="u-text-secondary-subtle u-fs-sm">
+                            Coordinates
+                          </span>
+                          <span className="u-font-mono u-fs-sm">
+                            40.7128° N, 74.0060° W
+                          </span>
                         </div>
                       </div>
-                      
+
                       <h3 className="u-fs-base u-font-bold u-mt-2 u-mb-2">Photos</h3>
-                      <div className="u-grid u-gap-2" style={{ gridTemplateColumns: '1fr 1fr' }}>
-                        <div className="u-bg-dark u-rounded u-border u-border-secondary-subtle u-flex u-items-center u-justify-center" style={{ height: '100px' }}>
-                          <Icon name="image" className="u-text-secondary-subtle" size="lg" />
+                      <div
+                        className="u-grid u-gap-2"
+                        style={{ gridTemplateColumns: "1fr 1fr" }}
+                      >
+                        <div
+                          className="u-bg-dark u-rounded u-border u-border-secondary-subtle u-flex u-items-center u-justify-center"
+                          style={{ height: "100px" }}
+                        >
+                          <Icon
+                            name="Image"
+                            className="u-text-secondary-subtle"
+                            size="lg"
+                          />
                         </div>
-                        <div className="u-bg-dark u-rounded u-border u-border-secondary-subtle u-flex u-items-center u-justify-center" style={{ height: '100px' }}>
-                          <Icon name="image" className="u-text-secondary-subtle" size="lg" />
+                        <div
+                          className="u-bg-dark u-rounded u-border u-border-secondary-subtle u-flex u-items-center u-justify-center"
+                          style={{ height: "100px" }}
+                        >
+                          <Icon
+                            name="Image"
+                            className="u-text-secondary-subtle"
+                            size="lg"
+                          />
                         </div>
                       </div>
                     </div>
                   </Tabs.Panel>
-                  <Tabs.Panel value="maintenance">
+                  <Tabs.Panel index={1}>
                     <div className="u-flex u-flex-column u-gap-4">
                       <div className="u-border-start u-border-primary u-ps-4 u-py-2">
                         <div className="u-font-bold u-fs-sm">Routine Inspection</div>
-                        <div className="u-text-secondary-subtle u-fs-xs u-mb-1">{selectedAsset.lastMaintenance}</div>
-                        <p className="u-fs-sm u-mb-0">Checked signal attenuation. Cleaned optical connectors.</p>
+                        <div className="u-text-secondary-subtle u-fs-xs u-mb-1">
+                          {selectedAsset.lastMaintenance}
+                        </div>
+                        <p className="u-fs-sm u-mb-0">
+                          Checked signal attenuation. Cleaned optical connectors.
+                        </p>
                       </div>
                       <div className="u-border-start u-border-secondary-subtle u-ps-4 u-py-2">
                         <div className="u-font-bold u-fs-sm">Firmware Update</div>
-                        <div className="u-text-secondary-subtle u-fs-xs u-mb-1">2023-11-05</div>
-                        <p className="u-fs-sm u-mb-0">Updated to v2.4.1 to patch security vulnerability.</p>
+                        <div className="u-text-secondary-subtle u-fs-xs u-mb-1">
+                          2023-11-05
+                        </div>
+                        <p className="u-fs-sm u-mb-0">
+                          Updated to v2.4.1 to patch security vulnerability.
+                        </p>
                       </div>
                     </div>
                   </Tabs.Panel>
-                  <Tabs.Panel value="graph">
-                    <div className="u-bg-dark u-rounded u-border u-border-secondary-subtle u-flex u-items-center u-justify-center" style={{ height: '250px' }}>
-                      <span className="u-text-secondary-subtle u-fs-sm u-font-mono">[ Topology Graph Placeholder ]</span>
+                  <Tabs.Panel index={2}>
+                    <div
+                      className="u-bg-dark u-rounded u-border u-border-secondary-subtle u-flex u-items-center u-justify-center"
+                      style={{ height: "250px" }}
+                    >
+                      <span className="u-text-secondary-subtle u-fs-sm u-font-mono">
+                        [ Topology Graph Placeholder ]
+                      </span>
                     </div>
                   </Tabs.Panel>
                 </Tabs.Panels>

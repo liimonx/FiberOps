@@ -12,34 +12,71 @@ import {
   DataTable,
   DataTableColumn,
   Select,
-  Textarea
+  Textarea,
 } from "@shohojdhara/atomix";
 
 const mockIncidents = [
-  { id: "INC-1042", title: "Node Alpha Outage", severity: "Critical", status: "Investigating", technician: "John Doe", time: "10m ago" },
-  { id: "INC-1041", title: "High Attenuation on Splitter 08", severity: "Warning", status: "Assigned", technician: "Jane Smith", time: "2h ago" },
-  { id: "INC-1040", title: "Customer ONT Offline", severity: "Low", status: "Resolved", technician: "Bob Lee", time: "1d ago" },
-  { id: "INC-1039", title: "Fiber Cut Reported", severity: "Critical", status: "In Progress", technician: "Sarah Connor", time: "1d ago" },
+  {
+    id: "INC-1042",
+    title: "Node Alpha Outage",
+    severity: "Critical",
+    status: "Investigating",
+    technician: "John Doe",
+    time: "10m ago",
+  },
+  {
+    id: "INC-1041",
+    title: "High Attenuation on Splitter 08",
+    severity: "Warning",
+    status: "Assigned",
+    technician: "Jane Smith",
+    time: "2h ago",
+  },
+  {
+    id: "INC-1040",
+    title: "Customer ONT Offline",
+    severity: "Low",
+    status: "Resolved",
+    technician: "Bob Lee",
+    time: "1d ago",
+  },
+  {
+    id: "INC-1039",
+    title: "Fiber Cut Reported",
+    severity: "Critical",
+    status: "In Progress",
+    technician: "Sarah Connor",
+    time: "1d ago",
+  },
 ];
 
 export default function IncidentsPage() {
   const [severityFilter, setSeverityFilter] = useState("All");
 
-  const filteredIncidents = severityFilter === "All" 
-    ? mockIncidents 
-    : mockIncidents.filter(inc => inc.severity === severityFilter);
+  const filteredIncidents =
+    severityFilter === "All"
+      ? mockIncidents
+      : mockIncidents.filter((inc) => inc.severity === severityFilter);
 
   const columns: DataTableColumn[] = [
-    { key: "id", title: "Ticket ID", render: (val) => <span className="u-font-mono u-fs-sm">{val}</span> },
-    { key: "title", title: "Issue Description", render: (val) => <span className="u-font-bold">{val}</span> },
+    {
+      key: "id",
+      title: "Ticket ID",
+      render: (val) => <span className="u-font-mono u-fs-sm">{val}</span>,
+    },
+    {
+      key: "title",
+      title: "Issue Description",
+      render: (val) => <span className="u-font-bold">{val}</span>,
+    },
     {
       key: "severity",
       title: "Severity",
       render: (val) => {
-        let variant: "danger" | "warning" | "secondary" = "secondary";
-        if (val === "Critical") variant = "danger";
+        let variant: "error" | "warning" | "secondary" = "secondary";
+        if (val === "Critical") variant = "error";
         if (val === "Warning") variant = "warning";
-        return <Badge variant={variant}>{val}</Badge>;
+        return <Badge variant={variant} label={val} />;
       },
     },
     {
@@ -49,16 +86,20 @@ export default function IncidentsPage() {
         let variant: "success" | "primary" | "warning" = "primary";
         if (val === "Resolved") variant = "success";
         if (val === "Investigating" || val === "In Progress") variant = "warning";
-        return <Badge variant={variant}>{val}</Badge>;
+        return <Badge variant={variant} label={val} />;
       },
     },
     { key: "technician", title: "Technician" },
-    { key: "time", title: "Reported", render: (val) => <span className="u-text-secondary-subtle u-fs-sm">{val}</span> },
+    {
+      key: "time",
+      title: "Reported",
+      render: (val) => <span className="u-text-secondary-subtle u-fs-sm">{val}</span>,
+    },
     {
       key: "actions",
       title: "",
-      render: () => <Button variant="secondary" size="sm" iconName="arrow-right" />
-    }
+      render: () => <Button variant="secondary" size="sm" iconName="arrow-right" />,
+    },
   ];
 
   return (
@@ -70,20 +111,40 @@ export default function IncidentsPage() {
             Track active outages, dispatch technicians, and document resolutions.
           </p>
         </div>
-        <Button variant="error" iconName="warning">Report Incident</Button>
+        <Button variant="error" iconName="Warning">
+          Report Incident
+        </Button>
       </div>
 
-      <Grid className="u-mb-6" gap={6}>
+      <Grid className="u-mb-6">
         <GridCol xs={12} lg={4}>
-          <Card appearance="elevated" glass={true} className="u-h-100 u-flex u-flex-column">
+          <Card
+            appearance="elevated"
+            glass={true}
+            className="u-h-100 u-flex u-flex-column"
+          >
             <h2 className="u-fs-lg u-font-bold u-mb-4">Live Network Map</h2>
-            <div className="u-bg-dark u-rounded u-border u-border-secondary-subtle u-flex-grow-1 u-flex u-items-center u-justify-center u-relative" style={{ minHeight: '300px' }}>
-               <span className="u-text-secondary-subtle u-fs-sm u-font-mono">[ Mapbox GL Canvas ]</span>
-               
-               {/* Mock Map Pinpoint */}
-               <div className="u-absolute u-bg-danger u-rounded-circle u-flex u-items-center u-justify-center" style={{ width: '24px', height: '24px', top: '40%', left: '60%', boxShadow: '0 0 0 4px rgba(220, 53, 69, 0.2)' }}>
-                  <Icon name="warning" size="sm" className="u-text-white" />
-               </div>
+            <div
+              className="u-bg-dark u-rounded u-border u-border-secondary-subtle u-flex-grow-1 u-flex u-items-center u-justify-center u-relative"
+              style={{ minHeight: "300px" }}
+            >
+              <span className="u-text-secondary-subtle u-fs-sm u-font-mono">
+                [ Mapbox GL Canvas ]
+              </span>
+
+              {/* Mock Map Pinpoint */}
+              <div
+                className="u-absolute u-bg-error u-rounded-circle u-flex u-items-center u-justify-center"
+                style={{
+                  width: "24px",
+                  height: "24px",
+                  top: "40%",
+                  left: "60%",
+                  boxShadow: "0 0 0 4px rgba(220, 53, 69, 0.2)",
+                }}
+              >
+                <Icon name="Warning" size="sm" className="u-text-white" />
+              </div>
             </div>
           </Card>
         </GridCol>
@@ -95,7 +156,7 @@ export default function IncidentsPage() {
               <div className="u-w-25">
                 <Select
                   value={severityFilter}
-                  onChange={(val) => setSeverityFilter(val)}
+                  onChange={(val) => setSeverityFilter(String(val))}
                   options={[
                     { label: "All Severities", value: "All" },
                     { label: "Critical", value: "Critical" },
@@ -105,19 +166,17 @@ export default function IncidentsPage() {
                 />
               </div>
             </div>
-            
+
             <div className="u-overflow-x-auto u-mb-6">
-              <DataTable
-                columns={columns}
-                data={filteredIncidents}
-                rowKey="id"
-              />
+              <DataTable columns={columns} data={filteredIncidents} rowKey="id" />
             </div>
 
             <div className="u-border-top u-border-secondary-subtle u-pt-6">
-              <h3 className="u-fs-base u-font-bold u-mb-4">Resolution Notes (Selected Incident)</h3>
+              <h3 className="u-fs-base u-font-bold u-mb-4">
+                Resolution Notes (Selected Incident)
+              </h3>
               <div className="u-mb-4">
-                <Textarea 
+                <Textarea
                   placeholder="Enter detailed resolution steps or current investigation notes..."
                   rows={4}
                   fullWidth

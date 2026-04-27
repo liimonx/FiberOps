@@ -12,7 +12,6 @@ import {
   Icon,
   Grid,
   GridCol,
-  AtomixGlass
 } from "@shohojdhara/atomix";
 
 // Mock Data
@@ -57,7 +56,7 @@ const mockCustomers = [
 
 export default function CustomersPage() {
   const [searchTerm, setSearchTerm] = useState("");
-  
+
   const filteredCustomers = mockCustomers.filter(
     (c) =>
       c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -84,12 +83,12 @@ export default function CustomersPage() {
       key: "signalHealth",
       title: "Signal Health",
       render: (value) => {
-        let variant: "success" | "warning" | "danger" = "success";
+        let variant: "success" | "warning" | "error" = "success";
         if (value < 80) variant = "warning";
-        if (value < 50) variant = "danger";
+        if (value < 50) variant = "error";
         return (
           <div className="u-flex u-items-center u-gap-2">
-            <Badge variant={variant}>{value}%</Badge>
+            <Badge variant={variant} label={`${value}%`} />
           </div>
         );
       },
@@ -98,38 +97,33 @@ export default function CustomersPage() {
       key: "connectionPath",
       title: "Connection Path",
       render: (value) => (
-        <span className="u-fs-sm u-font-mono u-text-secondary-subtle">
-          {value}
-        </span>
+        <span className="u-fs-sm u-font-mono u-text-secondary-subtle">{value}</span>
       ),
     },
     {
       key: "billingStatus",
       title: "Billing",
       render: (value) => {
-        const variant =
-          value === "paid"
-            ? "success"
-            : value === "overdue"
-              ? "danger"
-              : "warning";
-        return <Badge variant={variant}>{value.toUpperCase()}</Badge>;
+        const variant: "success" | "error" | "warning" =
+          value === "paid" ? "success" : value === "overdue" ? "error" : "warning";
+        return <Badge variant={variant} label={value.toUpperCase()} />;
       },
     },
     {
       key: "incidentHistory",
       title: "Incidents",
       render: (value) => (
-        <Badge variant={value > 0 ? "danger" : "secondary"}>
-          {value} {value === 1 ? "Incident" : "Incidents"}
-        </Badge>
+        <Badge
+          variant={value > 0 ? "error" : "secondary"}
+          label={`${value} ${value === 1 ? "Incident" : "Incidents"}`}
+        />
       ),
     },
     {
       key: "actions",
       title: "Actions",
       render: () => (
-        <Button variant="outline-secondary" size="sm" iconName="arrow-right">
+        <Button variant="outline-secondary" size="sm" iconName="ArrowRight">
           View
         </Button>
       ),
@@ -140,20 +134,17 @@ export default function CustomersPage() {
     <Container className="u-py-6 u-w-100">
       <Grid className="u-mb-6">
         <GridCol xs={12}>
-          <Card
-            appearance="elevated"
-            glass={true}
-            className="u-w-100"
-          >
+          <Card appearance="outlined">
             <div className="u-flex u-justify-between u-items-center u-mb-6">
               <div>
                 <h1 className="u-fs-2xl u-font-bold u-mb-2">Customers</h1>
                 <p className="u-text-secondary-subtle u-fs-sm">
-                  Manage customer profiles, check signal health, and track incident history.
+                  Manage customer profiles, check signal health, and track incident
+                  history.
                 </p>
               </div>
               <div className="u-flex u-items-center u-gap-4">
-                <Button variant="primary" iconName="plus">
+                <Button variant="primary" iconName="Plus">
                   Add Customer
                 </Button>
               </div>
@@ -164,17 +155,13 @@ export default function CustomersPage() {
                 placeholder="Search by name or ID..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                icon="magnifying-glass"
+                prefixIcon={<Icon name="MagnifyingGlass" />}
                 fullWidth
               />
             </div>
 
             <div className="u-w-100 u-overflow-x-auto">
-              <DataTable
-                columns={columns}
-                data={filteredCustomers}
-                rowKey="id"
-              />
+              <DataTable columns={columns} data={filteredCustomers} rowKey="id" />
             </div>
           </Card>
         </GridCol>

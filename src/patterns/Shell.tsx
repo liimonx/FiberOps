@@ -2,7 +2,17 @@
 
 import Link from "next/link";
 import styles from "./Shell.module.css";
-import { Badge, Card, Navbar, Nav, NavItem, SideMenu, SideMenuItem, SideMenuList } from "@shohojdhara/atomix";
+import {
+  Badge,
+  Card,
+  Navbar,
+  Nav,
+  NavItem,
+  SideMenu,
+  SideMenuItem,
+  SideMenuList,
+  ColorModeToggle,
+} from "@shohojdhara/atomix";
 
 const nav = [
   { href: "/dashboard", label: "Dashboard" },
@@ -20,6 +30,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
   return (
     <div className={styles.root}>
       <Navbar
+        variant="brand"
         brand={
           <div className={styles.brand}>
             BCN FiberOps <Badge variant="info" label="Mocked" />
@@ -32,6 +43,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
               {item.label}
             </NavItem>
           ))}
+          <ColorModeToggle defaultValue="dark" />
         </Nav>
       </Navbar>
 
@@ -65,4 +77,3 @@ export function Shell({ children }: { children: React.ReactNode }) {
     </div>
   );
 }
-

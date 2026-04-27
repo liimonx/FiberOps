@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import "@shohojdhara/atomix/css";
-import "./globals.css";
+import "./globals.scss";
 import { Shell } from "@/patterns/Shell";
 import { Providers } from "./providers";
 
