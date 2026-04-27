@@ -1,6 +1,7 @@
 // Map styling utilities for Mapbox GL JS
 
 import { MAPBOX_CONFIG } from '../constants';
+import type { LayerSpecification } from 'mapbox-gl';
 
 export interface MapStyleConfig {
   id: string;
@@ -51,7 +52,7 @@ export const CUSTOM_LAYERS = {
         5, 4,   // At zoom 5, radius 4px
         10, 8,  // At zoom 10, radius 8px
         15, 12  // At zoom 15, radius 12px
-      ],
+      ] as any,
       'circle-color': [
         'match',
         ['get', 'status'],
@@ -60,22 +61,22 @@ export const CUSTOM_LAYERS = {
         'warning', '#f59e0b',
         'error', '#ef4444',
         '#6b7280' // Default
-      ],
+      ] as any,
       'circle-stroke-width': [
         'case',
         ['boolean', ['feature-state', 'selected'], false], 3,
         ['boolean', ['feature-state', 'hovered'], false], 2,
         1
-      ],
+      ] as any,
       'circle-stroke-color': [
         'case',
         ['boolean', ['feature-state', 'selected'], false], '#f59e0b',
         ['boolean', ['feature-state', 'hovered'], false], '#3b82f6',
         '#ffffff'
-      ],
+      ] as any,
       'circle-opacity': 0.9
     }
-  },
+  } as LayerSpecification,
 
   // Connection layer configuration
   connections: {
@@ -90,7 +91,7 @@ export const CUSTOM_LAYERS = {
         5, 1,
         10, 2,
         15, 3
-      ],
+      ] as any,
       'line-color': [
         'match',
         ['get', 'status'],
@@ -99,15 +100,15 @@ export const CUSTOM_LAYERS = {
         'warning', '#f59e0b',
         'error', '#ef4444',
         '#6b7280' // Default
-      ],
+      ] as any,
       'line-opacity': 0.8,
       'line-dasharray': [
         'case',
-        ['==', ['get', 'status'], 'inactive'], ['literal', [2, 2]],
-        ['literal', [1, 0]]
-      ]
+        ['==', ['get', 'status'], 'inactive'], [2, 2],
+        [1, 0]
+      ] as any
     }
-  },
+  } as LayerSpecification,
 
   // Outage highlights
   outages: {
@@ -184,6 +185,11 @@ export const clearFeatureState = (
     }, {});
   } else {
     // Clear all feature states for the source
+    // Check if source exists before querying
+    if (!map.getSource(source)) {
+      return;
+    }
+    
     const features = map.querySourceFeatures(source);
     features.forEach(feature => {
       map.setFeatureState({
@@ -196,8 +202,8 @@ export const clearFeatureState = (
 
 // Performance optimization utilities
 export const optimizeMapPerformance = (map: mapboxgl.Map) => {
-  // Reduce maximum tile cache size for better memory management
-  map.setMaxTileCacheSize(50);
+  // Note: Mapbox GL JS doesn't expose setMaxTileCacheSize in public API
+  // Tile cache management is handled internally by Mapbox
   
   // Enable progressive enhancement for raster tiles
   if (map.getStyle().sources?.['raster']) {
@@ -239,18 +245,39 @@ export const createNodeFeature = (node: any): GeoJSON.Feature => ({
   }
 });
 
-export const createConnectionFeature = (connection: any): GeoJSON.Feature => ({
-  type: 'Feature' as const,
-  geometry: {
-    type: 'LineString' as const,
-    coordinates: connection.route || []
-  },
-  properties: {
-    id: connection.id,
-    sourceNodeId: connection.sourceNodeId,
-    targetNodeId: connection.targetNodeId,
-    status: connection.status,
-    bandwidth: connection.bandwidth,
-    utilization: connection.utilization
+export const createConnectionFeature = (connection: any, nodes?: any[]): GeoJSON.Feature => {
+  let coordinates: [number, number][] = [];
+  
+  // If route is provided, use it
+  if (connection.route && connection.route.length > 0) {
+    coordinates = connection.route.map((pos: any) => [pos.lng, pos.lat]);
+  } 
+  // Otherwise, create a straight line between source and target nodes
+  else if (nodes) {
+    const sourceNode = nodes.find((n: any) => n.id === connection.sourceNodeId);
+    const targetNode = nodes.find((n: any) => n.id === connection.targetNodeId);
+    
+    if (sourceNode && targetNode) {
+      coordinates = [
+        [sourceNode.position.lng, sourceNode.position.lat],
+        [targetNode.position.lng, targetNode.position.lat]
+      ];
+    }
   }
-});
+  
+  return {
+    type: 'Feature' as const,
+    geometry: {
+      type: 'LineString' as const,
+      coordinates
+    },
+    properties: {
+      id: connection.id,
+      sourceNodeId: connection.sourceNodeId,
+      targetNodeId: connection.targetNodeId,
+      status: connection.status,
+      bandwidth: connection.bandwidth,
+      utilization: connection.utilization
+    }
+  };
+};

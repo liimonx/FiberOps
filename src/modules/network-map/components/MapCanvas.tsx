@@ -4,9 +4,13 @@ import React, { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { Card } from "@shohojdhara/atomix";
-import { useNetworkMapStore, useViewport } from '../stores/useNetworkMapStore';
+import { useNetworkMapStore, useViewport, useNodes, useConnections } from '../stores/useNetworkMapStore';
 import { MAPBOX_CONFIG } from '../constants';
 import { LoadingState } from './LoadingState';
+import { addCustomLayers, createNodeFeature, createConnectionFeature } from '../utils/mapStyling';
+
+// Module-level variable to store map instance for external access
+let globalMapInstance: mapboxgl.Map | null = null;
 
 interface MapCanvasProps {
   onMapLoad?: (map: mapboxgl.Map) => void;
@@ -20,6 +24,8 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({ onMapLoad, onMapError }) =
   const [mapError, setMapError] = useState<string | null>(null);
   
   const viewport = useViewport();
+  const nodes = useNodes();
+  const connections = useConnections();
   const setViewport = useNetworkMapStore((state) => state.setViewport);
   const setDragging = useNetworkMapStore((state) => state.setDragging);
   const setZooming = useNetworkMapStore((state) => state.setZooming);
@@ -51,9 +57,11 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({ onMapLoad, onMapError }) =
         maxZoom: MAPBOX_CONFIG.MAX_ZOOM,
         attributionControl: false,
         preserveDrawingBuffer: true, // For better performance with overlays
+        maxTileCacheSize: 50, // Optimize tile cache for memory management
       });
 
       mapRef.current = map;
+      globalMapInstance = map; // Store reference for external access
 
       // Map load event
       map.on('load', () => {
@@ -95,6 +103,7 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({ onMapLoad, onMapError }) =
         if (mapRef.current) {
           mapRef.current.remove();
           mapRef.current = null;
+          globalMapInstance = null; // Clear global reference
         }
       };
     } catch (error) {
@@ -133,30 +142,70 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({ onMapLoad, onMapError }) =
 
   // Initialize custom map layers
   const initializeLayers = (map: mapboxgl.Map) => {
-    // Add custom sources and layers for network visualization
-    // This will be expanded in later tasks
-    
-    // Example: Add a custom layer for network nodes
-    // map.addSource('network-nodes', {
-    //   type: 'geojson',
-    //   data: {
-    //     type: 'FeatureCollection',
-    //     features: []
-    //   }
-    // });
-    
-    // map.addLayer({
-    //   id: 'network-nodes-layer',
-    //   type: 'circle',
-    //   source: 'network-nodes',
-    //   paint: {
-    //     'circle-radius': 8,
-    //     'circle-color': '#3b82f6',
-    //     'circle-stroke-width': 2,
-    //     'circle-stroke-color': '#ffffff'
-    //   }
-    // });
+    try {
+      // Add custom GeoJSON sources and Mapbox layers using utility function
+      addCustomLayers(map);
+      
+      console.log('[MapCanvas] Custom layers initialized successfully');
+    } catch (error) {
+      console.error('[MapCanvas] Failed to initialize layers:', error);
+      throw error;
+    }
   };
+
+  // Update map data when store changes
+  useEffect(() => {
+    if (!mapRef.current || !mapRef.current.isStyleLoaded()) return;
+    
+    const map = mapRef.current;
+    
+    try {
+      // Update nodes source
+      const nodeFeatures = nodes.map(createNodeFeature);
+      const nodesGeoJSON: GeoJSON.FeatureCollection = {
+        type: 'FeatureCollection',
+        features: nodeFeatures
+      };
+      
+      const nodesSource = map.getSource('network-nodes') as mapboxgl.GeoJSONSource | undefined;
+      if (nodesSource) {
+        nodesSource.setData(nodesGeoJSON);
+      }
+      
+      // Update connections source (pass nodes for route calculation)
+      const connectionFeatures = connections.map(conn => 
+        createConnectionFeature(conn, nodes)
+      );
+      const connectionsGeoJSON: GeoJSON.FeatureCollection = {
+        type: 'FeatureCollection',
+        features: connectionFeatures
+      };
+      
+      const connectionsSource = map.getSource('network-connections') as mapboxgl.GeoJSONSource | undefined;
+      if (connectionsSource) {
+        connectionsSource.setData(connectionsGeoJSON);
+      }
+      
+      // Update outages source (filter connections with error status)
+      const outageConnections = connections.filter(
+        conn => conn.status === 'error'
+      );
+      const outageFeatures = outageConnections.map(conn => 
+        createConnectionFeature(conn, nodes)
+      );
+      const outagesGeoJSON: GeoJSON.FeatureCollection = {
+        type: 'FeatureCollection',
+        features: outageFeatures
+      };
+      
+      const outagesSource = map.getSource('network-outages') as mapboxgl.GeoJSONSource | undefined;
+      if (outagesSource) {
+        outagesSource.setData(outagesGeoJSON);
+      }
+    } catch (error) {
+      console.error('[MapCanvas] Failed to update map data:', error);
+    }
+  }, [nodes, connections]);
 
   if (mapError) {
     return (
@@ -246,5 +295,5 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({ onMapLoad, onMapError }) =
 
 // Export the map instance for external use
 export const getMapInstance = (): mapboxgl.Map | null => {
-  return mapRef.current;
+  return globalMapInstance;
 };

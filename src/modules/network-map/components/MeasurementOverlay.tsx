@@ -23,7 +23,7 @@ export function MeasurementOverlay({ onClose }: MeasurementOverlayProps) {
   }
 
   return (
-    <div className="measurement-overlay u-absolute u-bottom-4 u-left-1/2 u-transform--translate-x-1/2 u-z-10">
+    <div className="measurement-overlay u-absolute u-bottom-4 u-left-1/2 u-transform--translate-x-1/2">
       <Card appearance="elevated" glass={true} className="u-shadow-xl u-p-4 u-min-w-[300px]">
         <div className="u-flex u-justify-between u-items-center u-mb-3">
           <div className="u-flex u-items-center u-gap-2">
@@ -36,7 +36,7 @@ export function MeasurementOverlay({ onClose }: MeasurementOverlayProps) {
               size="sm"
               onClick={clearMeasurements}
               iconName="Trash"
-              title="Clear all measurements"
+              label="Clear all measurements"
             >
               Clear
             </Button>
@@ -118,7 +118,7 @@ export function TracePathOverlay({ onClose }: { onClose?: () => void }) {
   }
 
   return (
-    <div className="trace-overlay u-absolute u-bottom-4 u-left-1/2 u-transform--translate-x-1/2 u-z-10">
+    <div className="trace-overlay u-absolute u-bottom-4 u-left-1/2 u-transform--translate-x-1/2">
       <Card appearance="elevated" glass={true} className="u-shadow-xl u-p-4 u-min-w-[350px]">
         <div className="u-flex u-justify-between u-items-center u-mb-3">
           <div className="u-flex u-items-center u-gap-2">
@@ -183,7 +183,7 @@ export function HeatmapLegend({ onClose }: { onClose?: () => void }) {
   const gradientStops = Object.entries(heatmapData.gradient || {});
 
   return (
-    <div className="heatmap-legend u-absolute u-bottom-4 u-right-4 u-z-10">
+    <div className="heatmap-legend u-absolute u-bottom-4 u-right-4">
       <Card appearance="elevated" glass={true} className="u-shadow-xl u-p-3">
         <div className="u-flex u-justify-between u-items-center u-mb-2">
           <h4 className="u-font-bold u-fs-sm">Heatmap Legend</h4>

@@ -156,7 +156,7 @@ function NetworkStatusIndicators({
   }[connectionQuality] || 'secondary';
 
   return (
-    <div className="u-absolute u-top-4 u-start-1/2 u-transform--translate-x-1/2 u-z-10 u-flex u-gap-2">
+    <div className="u-absolute u-top-4 u-start-1/2 u-transform--translate-x-1/2 u-flex u-gap-2 u-z-1">
       {/* WebSocket Connection Status */}
       <div className="u-bg-dark u-p-2 u-rounded u-shadow-lg u-flex u-items-center u-gap-2">
         {isConnected ? (
@@ -171,7 +171,7 @@ function NetworkStatusIndicators({
 
       {/* Active Incidents Badge */}
       {activeIncidents > 0 && (
-        <div className="u-bg-danger u-p-2 u-rounded u-shadow-lg u-flex u-items-center u-gap-2">
+        <div className="u-bg-danger u-p-2 u-rounded u-shadow-lg u-flex u-items-center u-gap-2 u-z-">
           <AlertTriangle className="u-w-4 u-h-4 u-text-white" />
           <span className="u-fs-xs u-font-bold u-text-white">
             {activeIncidents} Active Incident{activeIncidents !== 1 ? 's' : ''}
@@ -181,7 +181,7 @@ function NetworkStatusIndicators({
 
       {/* Node Status Summary */}
       {(degradedNodes > 0 || downNodes > 0) && (
-        <div className="u-bg-dark u-p-2 u-rounded u-shadow-lg u-flex u-items-center u-gap-3">
+        <div className="u-bg-dark u-p-2 u-rounded u-shadow-lg u-flex u-items-center u-gap-3 u-z-1">
           {degradedNodes > 0 && (
             <div className="u-flex u-items-center u-gap-1">
               <div className="u-w-2 u-h-2 u-rounded-full u-bg-warning" />

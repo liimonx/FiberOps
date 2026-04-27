@@ -33,19 +33,24 @@ export const MapEventHandler: React.FC<MapEventHandlerProps> = ({
 
     // Handle map click events
     const handleMapClick = (event: mapboxgl.MapMouseEvent) => {
+      // Check if layers exist before querying
+      if (!map.getLayer('network-nodes-layer') || !map.getLayer('network-connections-layer')) {
+        return;
+      }
+
       // Check if any network element was clicked
       const features = map.queryRenderedFeatures(event.point, {
-        layers: ['network-nodes-layer', 'network-connections-layer'] // These layers will be added later
+        layers: ['network-nodes-layer', 'network-connections-layer']
       });
 
       if (features.length > 0) {
         const feature = features[0];
         const elementId = feature.properties?.id;
         
-        if (feature.layer.id === 'network-nodes-layer') {
+        if (feature.layer && feature.layer.id === 'network-nodes-layer') {
           setSelectedElement(elementId);
           onNodeClick?.(elementId, event);
-        } else if (feature.layer.id === 'network-connections-layer') {
+        } else if (feature.layer && feature.layer.id === 'network-connections-layer') {
           onConnectionClick?.(elementId, event);
         }
       } else {
@@ -57,6 +62,11 @@ export const MapEventHandler: React.FC<MapEventHandlerProps> = ({
 
     // Handle mouse move for hover effects
     const handleMouseMove = (event: mapboxgl.MapMouseEvent) => {
+      // Check if layers exist before querying
+      if (!map.getLayer('network-nodes-layer') || !map.getLayer('network-connections-layer')) {
+        return;
+      }
+
       const features = map.queryRenderedFeatures(event.point, {
         layers: ['network-nodes-layer', 'network-connections-layer']
       });
@@ -65,7 +75,7 @@ export const MapEventHandler: React.FC<MapEventHandlerProps> = ({
         const feature = features[0];
         const elementId = feature.properties?.id;
         
-        if (feature.layer.id === 'network-nodes-layer') {
+        if (feature.layer && feature.layer.id === 'network-nodes-layer') {
           setHoveredElement(elementId);
           onNodeHover?.(elementId, event);
         } else {
@@ -240,8 +250,16 @@ export const getFeaturesAtPoint = (point: mapboxgl.Point, layerIds?: string[]) =
   const map = getMapInstance();
   if (!map) return [];
   
+  // Check if layers exist before querying
+  const layersToQuery = layerIds || ['network-nodes-layer', 'network-connections-layer'];
+  const layersExist = layersToQuery.every(layerId => map.getLayer(layerId));
+  
+  if (!layersExist) {
+    return [];
+  }
+  
   return map.queryRenderedFeatures(point, {
-    layers: layerIds || ['network-nodes-layer', 'network-connections-layer']
+    layers: layersToQuery
   });
 };
 
