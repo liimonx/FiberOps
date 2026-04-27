@@ -121,7 +121,8 @@ export function useRealTimeUpdates(options: UseRealTimeUpdatesOptions = {}) {
           unsubscribe();
         };
       } catch (error) {
-        console.error('[RealTime] Failed to initialize WebSocket:', error);
+        const errorMessage = error instanceof Error ? error.message : 'Unknown connection error';
+        console.error('[RealTime] Failed to initialize WebSocket:', errorMessage);
         if (mounted) {
           setWebSocketConnected(false);
           setConnectionQuality('disconnected');

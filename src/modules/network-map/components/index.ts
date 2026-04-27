@@ -91,3 +91,27 @@ export {
   EnhancedConnectionLine,
   AnimatedStatusBadge
 } from './EnhancedNetworkNode';
+
+// Task 10: Error handling and user feedback
+export { 
+  UserFriendlyError,
+  InlineErrorMessage,
+  ErrorToast,
+  RetryWithCountdown
+} from './UserFriendlyError';
+
+export { 
+  OfflineIndicator,
+  OfflineStatusBadge,
+  DataFreshnessIndicator,
+  ConnectionQualityIndicator,
+  offlineQueue
+} from './OfflineIndicator';
+
+export { 
+  LoadingProvider,
+  useLoading,
+  LoadingOverlay,
+  withLoading,
+  useAsyncOperation
+} from './LoadingStateManager';

@@ -46,10 +46,20 @@ export class WebSocketService {
 
       this.isManualClose = false;
 
+      // Set connection timeout
+      const connectionTimeout = setTimeout(() => {
+        if (this.ws?.readyState !== WebSocket.OPEN) {
+          console.error('[WebSocket] Connection timeout');
+          this.ws?.close();
+          reject(new Error('WebSocket connection timed out'));
+        }
+      }, 5000); // 5 second timeout
+
       try {
         this.ws = new WebSocket(this.config.url);
 
         this.ws.onopen = () => {
+          clearTimeout(connectionTimeout);
           console.log('[WebSocket] Connected successfully');
           this.reconnectAttempts = 0;
           this.startHeartbeat();
@@ -67,15 +77,29 @@ export class WebSocketService {
         };
 
         this.ws.onerror = (error) => {
-          console.error('[WebSocket] Error:', error);
-          reject(error);
+          const errorMessage = this.ws?.url 
+            ? `Failed to connect to WebSocket at ${this.ws.url}. Ensure the server is running and accessible.`
+            : 'WebSocket connection failed';
+          console.error('[WebSocket] Connection error:', errorMessage);
+          // Don't reject here - let onclose handle reconnection logic
+          // This prevents unhandled promise rejections for transient errors
         };
 
         this.ws.onclose = (event) => {
-          console.log('[WebSocket] Connection closed:', event.code, event.reason);
+          clearTimeout(connectionTimeout);
+          const closeMessage = event.code === 1006 
+            ? 'Connection failed - server may be unreachable' 
+            : `Connection closed (code: ${event.code})`;
+          
+          if (event.reason) {
+            console.warn(`[WebSocket] ${closeMessage}: ${event.reason}`);
+          } else {
+            console.log(`[WebSocket] ${closeMessage}`);
+          }
+          
           this.stopHeartbeat();
           
-          if (!this.isManualClose) {
+          if (!this.isManualClose && event.code !== 1000) {
             this.attemptReconnect();
           }
         };
