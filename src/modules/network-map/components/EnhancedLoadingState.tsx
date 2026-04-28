@@ -34,19 +34,32 @@ export function EnhancedLoadingState({
       AnimationPerformanceMonitor.startMonitoring();
     }
 
+    let spinnerTween: ReturnType<typeof spin> | null = null;
+    let dotsTween: ReturnType<typeof pulseOpacity> | null = null;
+
     // Animate spinner
     if (spinnerRef.current && showSpinner) {
-      spin(spinnerRef.current, { duration: 1 });
+      spinnerTween = spin(spinnerRef.current, { duration: 1 });
     }
 
     // Animate loading dots
     if (dotsRef.current) {
-      pulseOpacity(dotsRef.current, {
+      dotsTween = pulseOpacity(dotsRef.current, {
         minOpacity: 0.3,
         duration: 1.5,
         repeat: -1
       });
     }
+
+    // Cleanup animations on unmount or when dependencies change
+    return () => {
+      if (spinnerTween) {
+        spinnerTween.kill();
+      }
+      if (dotsTween) {
+        dotsTween.kill();
+      }
+    };
   }, [showSpinner]);
 
   const sizeClasses = {

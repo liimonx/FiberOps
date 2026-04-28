@@ -11,6 +11,7 @@ import { useNetworkMapStore } from '../stores/useNetworkMapStore';
 import { ErrorBoundary } from './ErrorBoundary';
 import { LoadingState } from './LoadingState';
 import { AlertTriangle, Wifi, WifiOff } from 'lucide-react';
+import { NetworkNodeType, NetworkStatus } from '../types';
 
 interface NetworkMapDataProps {
   children: React.ReactNode;
@@ -55,13 +56,62 @@ function NetworkMapDataSync({ children }: NetworkMapDataProps) {
 
   // Sync fetched data with Zustand store
   useEffect(() => {
+    console.log('[NetworkMapDataSync] Nodes query state:', { 
+      hasData: !!nodes.data, 
+      dataLength: nodes.data?.length || 0,
+      isLoading: nodes.isLoading,
+      error: nodes.error 
+    });
+    
     if (nodes.data && nodes.data.length > 0) {
+      console.log('[NetworkMapDataSync] Setting nodes to store:', nodes.data.length, 'nodes');
       setNodes(nodes.data);
     }
   }, [nodes.data, setNodes]);
 
+  // Sync customers as nodes
   useEffect(() => {
+    console.log('[NetworkMapDataSync] Customers query state:', { 
+      hasData: !!customers.data, 
+      dataLength: customers.data?.length || 0,
+      isLoading: customers.isLoading,
+      error: customers.error 
+    });
+    
+    if (customers.data && customers.data.length > 0) {
+      // Transform customers to network nodes and merge with existing nodes
+      const customerNodes = customers.data.map((customer: any) => ({
+        id: customer.id,
+        name: customer.name,
+        type: NetworkNodeType.CUSTOMER,
+        position: customer.location || { lat: 23.8103, lng: 90.4125 },
+        status: customer.status === 'online' ? NetworkStatus.ACTIVE : customer.status === 'offline' ? NetworkStatus.ERROR : NetworkStatus.WARNING,
+        metadata: {
+          kind: 'customer',
+          plan: customer.plan,
+          originalStatus: customer.status
+        }
+      }));
+      
+      console.log('[NetworkMapDataSync] Transforming', customerNodes.length, 'customers to nodes');
+      
+      // Merge asset nodes with customer nodes
+      const allNodes = [...(nodes.data || []), ...customerNodes];
+      console.log('[NetworkMapDataSync] Total nodes after merge:', allNodes.length);
+      setNodes(allNodes);
+    }
+  }, [customers.data, nodes.data, setNodes]);
+
+  useEffect(() => {
+    console.log('[NetworkMapDataSync] Connections query state:', { 
+      hasData: !!connections.data, 
+      dataLength: connections.data?.length || 0,
+      isLoading: connections.isLoading,
+      error: connections.error 
+    });
+    
     if (connections.data && connections.data.length > 0) {
+      console.log('[NetworkMapDataSync] Setting connections to store:', connections.data.length, 'connections');
       setConnections(connections.data);
     }
   }, [connections.data, setConnections]);

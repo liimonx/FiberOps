@@ -125,35 +125,49 @@ export const CUSTOM_LAYERS = {
 
 // Style utility functions
 export const addCustomLayers = (map: mapboxgl.Map) => {
-  // Add custom sources
-  map.addSource('network-nodes', {
-    type: 'geojson',
-    data: {
-      type: 'FeatureCollection',
-      features: []
-    }
-  });
+  // Add custom sources (only if they don't already exist)
+  if (!map.getSource('network-nodes')) {
+    map.addSource('network-nodes', {
+      type: 'geojson',
+      data: {
+        type: 'FeatureCollection',
+        features: []
+      }
+    });
+  }
 
-  map.addSource('network-connections', {
-    type: 'geojson',
-    data: {
-      type: 'FeatureCollection',
-      features: []
-    }
-  });
+  if (!map.getSource('network-connections')) {
+    map.addSource('network-connections', {
+      type: 'geojson',
+      data: {
+        type: 'FeatureCollection',
+        features: []
+      }
+    });
+  }
 
-  map.addSource('network-outages', {
-    type: 'geojson',
-    data: {
-      type: 'FeatureCollection',
-      features: []
-    }
-  });
+  if (!map.getSource('network-outages')) {
+    map.addSource('network-outages', {
+      type: 'geojson',
+      data: {
+        type: 'FeatureCollection',
+        features: []
+      }
+    });
+  }
 
-  // Add custom layers
-  map.addLayer(CUSTOM_LAYERS.connections);
-  map.addLayer(CUSTOM_LAYERS.nodes);
-  map.addLayer(CUSTOM_LAYERS.outages);
+  // Add custom layers (only if they don't already exist)
+  if (!map.getLayer('network-connections-layer')) {
+    map.addLayer(CUSTOM_LAYERS.connections);
+  }
+  
+  if (!map.getLayer('network-nodes-layer')) {
+    map.addLayer(CUSTOM_LAYERS.nodes);
+  }
+  
+  if (!map.getLayer('network-outages-layer')) {
+    map.addLayer(CUSTOM_LAYERS.outages);
+  }
 };
 
 export const updateLayerVisibility = (map: mapboxgl.Map, layerId: string, visible: boolean) => {

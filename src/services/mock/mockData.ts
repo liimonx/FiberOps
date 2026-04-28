@@ -120,37 +120,107 @@ export const mockAssets: Asset[] = [
   },
 ];
 
-// Mock customers
+// Mock customers with locations in Dhaka
 export const mockCustomers: Customer[] = [
+  // Residential customers
   {
     id: "cust-001",
     name: "Rahman Residence",
     plan: "Fiber 100Mbps",
-    status: "online"
+    status: "online",
+    location: { lat: 23.7948, lng: 90.4088 }
   },
   {
     id: "cust-002",
     name: "Karim Tower",
     plan: "Fiber 200Mbps",
-    status: "online"
+    status: "online",
+    location: { lat: 23.7952, lng: 90.4092 }
   },
   {
     id: "cust-003",
     name: "Ahmed Plaza",
     plan: "Fiber 50Mbps",
-    status: "offline"
+    status: "offline",
+    location: { lat: 23.7958, lng: 90.4098 }
   },
+  
+  // Business customers
   {
     id: "cust-004",
     name: "Hossain Enterprise",
     plan: "Fiber 500Mbps",
-    status: "online"
+    status: "online",
+    location: { lat: 23.7932, lng: 90.4075 }
   },
   {
     id: "cust-005",
     name: "Fatema Medical Center",
     plan: "Fiber 1Gbps",
-    status: "unstable"
+    status: "unstable",
+    location: { lat: 23.7940, lng: 90.4082 }
+  },
+  
+  // Additional residential customers
+  {
+    id: "cust-006",
+    name: "Islam Apartment",
+    plan: "Fiber 50Mbps",
+    status: "online",
+    location: { lat: 23.7943, lng: 90.4070 }
+  },
+  {
+    id: "cust-007",
+    name: "Chowdhury Villa",
+    plan: "Fiber 100Mbps",
+    status: "online",
+    location: { lat: 23.7955, lng: 90.4085 }
+  },
+  {
+    id: "cust-008",
+    name: "Begum House",
+    plan: "Fiber 200Mbps",
+    status: "online",
+    location: { lat: 23.7938, lng: 90.4095 }
+  },
+  
+  // Commercial customers
+  {
+    id: "cust-009",
+    name: "Gulshan Tech Park",
+    plan: "Fiber 1Gbps",
+    status: "online",
+    location: { lat: 23.7928, lng: 90.4080 }
+  },
+  {
+    id: "cust-010",
+    name: "Banani Shopping Complex",
+    plan: "Fiber 500Mbps",
+    status: "online",
+    location: { lat: 23.7945, lng: 90.4075 }
+  },
+  {
+    id: "cust-011",
+    name: "Dhaka Cafe & Restaurant",
+    plan: "Fiber 100Mbps",
+    status: "unstable",
+    location: { lat: 23.7950, lng: 90.4078 }
+  },
+  
+  // Educational institutions
+  {
+    id: "cust-012",
+    name: "Gulshan International School",
+    plan: "Fiber 500Mbps",
+    status: "online",
+    location: { lat: 23.7935, lng: 90.4090 }
+  },
+  {
+    id: "cust-013",
+    name: "Banani Library",
+    plan: "Fiber 200Mbps",
+    status: "online",
+    location: { lat: 23.7942, lng: 90.4068 }
   },
 ];
 

@@ -6,14 +6,23 @@ import type {
 import { mockAssets, mockCustomers, mockIncidents } from "./mockData";
 
 export const mockAssetRepository: AssetRepository = {
-  list: async () => ({ items: mockAssets }),
+  list: async () => {
+    console.log('[MockAssetRepository] list() called, returning', mockAssets.length, 'assets');
+    return { items: mockAssets };
+  },
 };
 
 export const mockCustomerRepository: CustomerRepository = {
-  list: async () => ({ items: mockCustomers }),
+  list: async () => {
+    console.log('[MockCustomerRepository] list() called, returning', mockCustomers.length, 'customers');
+    return { items: mockCustomers };
+  },
 };
 
 export const mockIncidentRepository: IncidentRepository = {
-  list: async () => ({ items: mockIncidents }),
+  list: async () => {
+    console.log('[MockIncidentRepository] list() called, returning', mockIncidents.length, 'incidents');
+    return { items: mockIncidents };
+  },
 };
 

@@ -2,6 +2,7 @@
 
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
+import { useMemo } from 'react';
 import { 
   ViewportState, 
   NetworkMapLayer, 
@@ -93,7 +94,7 @@ interface NetworkMapStore {
 }
 
 const initialViewport: ViewportState = {
-  center: { lat: MAPBOX_CONFIG.DEFAULT_CENTER[0], lng: MAPBOX_CONFIG.DEFAULT_CENTER[1] },
+  center: { lat: MAPBOX_CONFIG.DEFAULT_CENTER[1], lng: MAPBOX_CONFIG.DEFAULT_CENTER[0] }, // Mapbox uses [lng, lat] format
   zoom: MAPBOX_CONFIG.DEFAULT_ZOOM,
   bearing: 0,
   pitch: 0
@@ -348,14 +349,19 @@ export const useSearchResults = () => useNetworkMapStore((state) => state.search
 export const useMeasurements = () => useNetworkMapStore((state) => state.measurements);
 export const useTracePath = () => useNetworkMapStore((state) => state.tracePath);
 export const useHeatmapData = () => useNetworkMapStore((state) => state.heatmapData);
-export const useWebSocketStatus = () => ({
-  isConnected: useNetworkMapStore((state) => state.isWebSocketConnected),
-  quality: useNetworkMapStore((state) => state.connectionQuality)
-});
-export const usePerformanceMetrics = () => ({
-  renderTime: useNetworkMapStore((state) => state.renderTime),
-  fps: useNetworkMapStore((state) => state.fps)
-});
+
+// Fixed composite selectors with useMemo to prevent unnecessary re-renders
+export const useWebSocketStatus = () => {
+  const isConnected = useNetworkMapStore((state) => state.isWebSocketConnected);
+  const quality = useNetworkMapStore((state) => state.connectionQuality);
+  return useMemo(() => ({ isConnected, quality }), [isConnected, quality]);
+};
+
+export const usePerformanceMetrics = () => {
+  const renderTime = useNetworkMapStore((state) => state.renderTime);
+  const fps = useNetworkMapStore((state) => state.fps);
+  return useMemo(() => ({ renderTime, fps }), [renderTime, fps]);
+};
 
 // Utility selectors
 export const useVisibleLayers = () => 

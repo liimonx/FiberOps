@@ -28,6 +28,7 @@ export type Customer = {
   name: string;
   plan: string;
   status: CustomerStatus;
+  location?: { lat: number; lng: number };
 };
 
 export type Incident = {

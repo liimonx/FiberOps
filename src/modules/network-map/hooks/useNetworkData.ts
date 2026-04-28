@@ -3,7 +3,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { services } from '@/services/serviceLocator';
 import { Asset, Customer, Incident } from '@/types/domain';
-import { NetworkNode, NetworkConnection, NetworkStatus } from '../types';
+import { NetworkNode, NetworkConnection, NetworkStatus, NetworkNodeType } from '../types';
 
 // Query keys for better organization and cache management
 export const networkQueryKeys = {
@@ -65,6 +65,28 @@ const transformAssetToNode = (asset: Asset): NetworkNode => {
     metadata: {
       kind: asset.kind,
       originalStatus: asset.status
+    }
+  };
+};
+
+// Transform domain customers to network nodes
+const transformCustomerToNode = (customer: Customer): NetworkNode => {
+  const statusMap: Record<string, any> = {
+    online: 'ACTIVE',
+    offline: 'ERROR',
+    unstable: 'WARNING'
+  };
+
+  return {
+    id: customer.id,
+    name: customer.name,
+    type: NetworkNodeType.CUSTOMER,
+    position: customer.location || { lat: 23.8103, lng: 90.4125 }, // Default to Dhaka center if no location
+    status: statusMap[customer.status] || 'ACTIVE',
+    metadata: {
+      kind: 'customer',
+      plan: customer.plan,
+      originalStatus: customer.status
     }
   };
 };

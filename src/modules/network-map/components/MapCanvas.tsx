@@ -8,6 +8,7 @@ import { useNetworkMapStore, useViewport, useNodes, useConnections } from '../st
 import { MAPBOX_CONFIG } from '../constants';
 import { LoadingState } from './LoadingState';
 import { addCustomLayers, createNodeFeature, createConnectionFeature } from '../utils/mapStyling';
+import type { NetworkNode, NetworkConnection } from '../types';
 
 // Module-level variable to store map instance for external access
 let globalMapInstance: mapboxgl.Map | null = null;
@@ -26,6 +27,7 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({ onMapLoad, onMapError }) =
   const viewport = useViewport();
   const nodes = useNodes();
   const connections = useConnections();
+  const layers = useNetworkMapStore((state) => state.layers);
   const setViewport = useNetworkMapStore((state) => state.setViewport);
   const setDragging = useNetworkMapStore((state) => state.setDragging);
   const setZooming = useNetworkMapStore((state) => state.setZooming);
@@ -70,6 +72,10 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({ onMapLoad, onMapError }) =
         
         // Add custom layers and sources here
         initializeLayers(map);
+        
+        // Force data update after layers are initialized
+        console.log('[MapCanvas] Map loaded, triggering data update with', nodes.length, 'nodes and', connections.length, 'connections');
+        updateMapData(map, nodes, connections);
       });
 
       // Map error event
@@ -153,15 +159,13 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({ onMapLoad, onMapError }) =
     }
   };
 
-  // Update map data when store changes
-  useEffect(() => {
-    if (!mapRef.current || !mapRef.current.isStyleLoaded()) return;
-    
-    const map = mapRef.current;
-    
+  // Update map data sources with current nodes and connections
+  const updateMapData = (map: mapboxgl.Map, nodes: NetworkNode[], connections: NetworkConnection[]) => {
     try {
       // Update nodes source
       const nodeFeatures = nodes.map(createNodeFeature);
+      console.log('[MapCanvas] Created', nodeFeatures.length, 'node features');
+      
       const nodesGeoJSON: GeoJSON.FeatureCollection = {
         type: 'FeatureCollection',
         features: nodeFeatures
@@ -169,13 +173,18 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({ onMapLoad, onMapError }) =
       
       const nodesSource = map.getSource('network-nodes') as mapboxgl.GeoJSONSource | undefined;
       if (nodesSource) {
+        console.log('[MapCanvas] Updating network-nodes source with', nodeFeatures.length, 'features');
         nodesSource.setData(nodesGeoJSON);
+      } else {
+        console.warn('[MapCanvas] network-nodes source not found!');
       }
       
       // Update connections source (pass nodes for route calculation)
       const connectionFeatures = connections.map(conn => 
         createConnectionFeature(conn, nodes)
       );
+      console.log('[MapCanvas] Created', connectionFeatures.length, 'connection features');
+      
       const connectionsGeoJSON: GeoJSON.FeatureCollection = {
         type: 'FeatureCollection',
         features: connectionFeatures
@@ -183,7 +192,10 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({ onMapLoad, onMapError }) =
       
       const connectionsSource = map.getSource('network-connections') as mapboxgl.GeoJSONSource | undefined;
       if (connectionsSource) {
+        console.log('[MapCanvas] Updating network-connections source with', connectionFeatures.length, 'features');
         connectionsSource.setData(connectionsGeoJSON);
+      } else {
+        console.warn('[MapCanvas] network-connections source not found!');
       }
       
       // Update outages source (filter connections with error status)
@@ -200,12 +212,56 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({ onMapLoad, onMapError }) =
       
       const outagesSource = map.getSource('network-outages') as mapboxgl.GeoJSONSource | undefined;
       if (outagesSource) {
+        console.log('[MapCanvas] Updating network-outages source with', outageFeatures.length, 'features');
         outagesSource.setData(outagesGeoJSON);
+      } else {
+        console.warn('[MapCanvas] network-outages source not found!');
       }
     } catch (error) {
       console.error('[MapCanvas] Failed to update map data:', error);
     }
+  };
+
+  // Update map data when store changes
+  useEffect(() => {
+    console.log('[MapCanvas] useEffect triggered - nodes:', nodes.length, 'connections:', connections.length);
+    
+    if (!mapRef.current || !mapRef.current.isStyleLoaded()) {
+      console.log('[MapCanvas] Map not ready yet');
+      return;
+    }
+    
+    const map = mapRef.current;
+    updateMapData(map, nodes, connections);
   }, [nodes, connections]);
+
+  // Sync layer visibility from store to Mapbox
+  useEffect(() => {
+    if (!mapRef.current || !mapRef.current.isStyleLoaded()) return;
+    
+    const map = mapRef.current;
+    
+    // Define layer mapping between store layer IDs and Mapbox layer IDs
+    const layerMapping: Record<string, string[]> = {
+      'fiber-routes': ['network-connections-layer'],
+      'nodes-splitters': ['network-nodes-layer'],
+      'outages': ['network-outages-layer'],
+      'customers': ['network-nodes-layer'], // Customers use same layer as nodes
+      'coverage': [] // Coverage not yet implemented
+    };
+    
+    layers.forEach(layer => {
+      const mapboxLayerIds = layerMapping[layer.id];
+      if (mapboxLayerIds) {
+        mapboxLayerIds.forEach(mapboxLayerId => {
+          if (map.getLayer(mapboxLayerId)) {
+            const visibility = layer.visible ? 'visible' : 'none';
+            map.setLayoutProperty(mapboxLayerId, 'visibility', visibility);
+          }
+        });
+      }
+    });
+  }, [layers]);
 
   if (mapError) {
     return (
@@ -256,7 +312,69 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({ onMapLoad, onMapError }) =
         className="map-container"
         data-testid="mapbox-canvas"
         role="application"
-        aria-label="Network Map"
+        aria-label="Network Map. Use arrow keys to pan, plus/minus to zoom, Enter to select nodes."
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (!mapRef.current) return;
+          
+          const map = mapRef.current;
+          const panDistance = 50; // pixels to pan per keypress
+          
+          switch(e.key) {
+            case 'ArrowUp':
+              e.preventDefault();
+              map.panBy([0, -panDistance], { duration: 200 });
+              break;
+            case 'ArrowDown':
+              e.preventDefault();
+              map.panBy([0, panDistance], { duration: 200 });
+              break;
+            case 'ArrowLeft':
+              e.preventDefault();
+              map.panBy([-panDistance, 0], { duration: 200 });
+              break;
+            case 'ArrowRight':
+              e.preventDefault();
+              map.panBy([panDistance, 0], { duration: 200 });
+              break;
+            case '+':
+            case '=':
+              e.preventDefault();
+              map.zoomIn({ duration: 200 });
+              break;
+            case '-':
+            case '_':
+              e.preventDefault();
+              map.zoomOut({ duration: 200 });
+              break;
+            case '0':
+              e.preventDefault();
+              map.setZoom(MAPBOX_CONFIG.DEFAULT_ZOOM, { duration: 300 });
+              map.setCenter(MAPBOX_CONFIG.DEFAULT_CENTER as [number, number], { duration: 300 });
+              break;
+            case 'Enter':
+            case ' ':
+              e.preventDefault();
+              // Trigger selection of center point or nearest node
+              const center = map.getCenter();
+              const features = map.queryRenderedFeatures({
+                filter: ['==', '$type', 'Point']
+              });
+              
+              if (features.length > 0) {
+                const featureId = features[0].properties?.id;
+                if (featureId) {
+                  useNetworkMapStore.getState().setSelectedElement(featureId);
+                  useNetworkMapStore.getState().addToSelectionHistory(featureId);
+                }
+              }
+              break;
+            case 'Escape':
+              e.preventDefault();
+              useNetworkMapStore.getState().setSelectedElement(null);
+              break;
+          }
+        }}
       />
       
       {mapLoading && (
@@ -281,6 +399,11 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({ onMapLoad, onMapError }) =
         
         .map-container :global(.mapboxgl-canvas) {
           outline: none; // Remove focus outline that might conflict with our styling
+        }
+        
+        .map-container:focus {
+          outline: 2px solid var(--color-primary-500);
+          outline-offset: -2px;
         }
         
         @media (max-width: 768px) {

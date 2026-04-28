@@ -23,6 +23,7 @@ interface AdvancedToolbarProps {
 export function AdvancedToolbar({ onToggleFullscreen, isFullscreen }: AdvancedToolbarProps) {
   const { switchTool, activeTool } = useMapTools();
   const activeToolId = useNetworkMapStore((state) => state.interaction.activeTool);
+  const buttonRefs = React.useRef<(HTMLButtonElement | null)[]>([]);
   
   // Get tool-specific data for badges
   const { pointCount } = useMeasurementTool();
@@ -36,11 +37,58 @@ export function AdvancedToolbar({ onToggleFullscreen, isFullscreen }: AdvancedTo
     { id: 'heatmap', icon: Flame, label: 'Heatmap' },
   ];
 
+  // Keyboard navigation handler
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    const focusedIndex = buttonRefs.current.findIndex(btn => btn === document.activeElement);
+    
+    switch (e.key) {
+      case 'ArrowRight':
+      case 'ArrowDown':
+        e.preventDefault();
+        const nextIndex = focusedIndex === -1 ? 0 : (focusedIndex + 1) % tools.length;
+        buttonRefs.current[nextIndex]?.focus();
+        break;
+      
+      case 'ArrowLeft':
+      case 'ArrowUp':
+        e.preventDefault();
+        const prevIndex = focusedIndex === -1 ? tools.length - 1 : (focusedIndex - 1 + tools.length) % tools.length;
+        buttonRefs.current[prevIndex]?.focus();
+        break;
+      
+      case 'Home':
+        e.preventDefault();
+        buttonRefs.current[0]?.focus();
+        break;
+      
+      case 'End':
+        e.preventDefault();
+        buttonRefs.current[tools.length - 1]?.focus();
+        break;
+      
+      case 'Escape':
+        e.preventDefault();
+        (e.currentTarget as HTMLElement).blur();
+        break;
+    }
+  };
+
   return (
-    <Card appearance="elevated" glass={true} className="u-p-2 u-shadow-lg">
-      <div className="u-flex u-gap-2">
+    <Card 
+      appearance="elevated" 
+      glass={true} 
+      className="u-p-2 u-shadow-lg"
+      role="toolbar"
+      aria-label="Advanced map tools"
+    >
+      <div 
+        className="u-flex u-gap-2" 
+        role="group" 
+        aria-label="Tool selection"
+        onKeyDown={handleKeyDown}
+      >
         {/* Tool buttons */}
-        {tools.map(({ id, icon: Icon, label }) => {
+        {tools.map(({ id, icon: Icon, label }, index) => {
           const isActive = activeToolId === id;
           const hasActiveState = 
             (id === 'measure' && pointCount > 0) ||
@@ -53,26 +101,33 @@ export function AdvancedToolbar({ onToggleFullscreen, isFullscreen }: AdvancedTo
               variant={isActive ? 'primary' : 'secondary'}
               size="sm"
               onClick={() => switchTool(id)}
+              aria-label={`${label} tool`}
+              aria-pressed={isActive}
+              ref={(el) => { buttonRefs.current[index] = el as HTMLButtonElement | null; }}
               title={`${label} tool`}
               className="u-relative"
             >
-              <Icon className="u-w-4 u-h-4" />
+              <Icon className="u-w-4 u-h-4" aria-hidden="true" />
               
               {/* Active state indicator */}
               {hasActiveState && (
-                <div className="u-absolute -u-top-1 -u-right-1 u-w-2 u-h-2 u-rounded-full u-bg-success" />
+                <div 
+                  className="u-absolute -u-top-1 -u-right-1 u-w-2 u-h-2 u-rounded-full u-bg-success" 
+                  aria-hidden="true"
+                />
               )}
             </Button>
           );
         })}
 
-        <div className="u-border-start u-border-secondary-subtle u-mx-1" />
+        <div className="u-border-start u-border-secondary-subtle u-mx-1" aria-hidden="true" />
 
         {/* Layer controls button */}
         <Button
           variant="secondary"
           size="sm"
           iconName="Layers"
+          aria-label="Toggle layers panel"
           title="Toggle layers"
         />
 
@@ -82,12 +137,13 @@ export function AdvancedToolbar({ onToggleFullscreen, isFullscreen }: AdvancedTo
             variant="secondary"
             size="sm"
             onClick={onToggleFullscreen}
+            aria-label={isFullscreen ? 'Exit fullscreen mode' : 'Enter fullscreen mode'}
             title={isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}
           >
             {isFullscreen ? (
-              <Minimize2 className="u-w-4 u-h-4" />
+              <Minimize2 className="u-w-4 u-h-4" aria-hidden="true" />
             ) : (
-              <Maximize2 className="u-w-4 u-h-4" />
+              <Maximize2 className="u-w-4 u-h-4" aria-hidden="true" />
             )}
           </Button>
         )}

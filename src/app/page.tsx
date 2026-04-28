@@ -79,7 +79,7 @@ export default function Home() {
       {/* Quick Stats */}
       <Grid className="u-mb-8">
         <GridCol xs={12} sm={6} lg={3}>
-          <Card appearance="elevated" glass={true} className="u-h-100">
+          <Card appearance="ghost" glass={true} className="u-h-100">
             <div className="u-flex u-items-center u-gap-3 u-mb-3">
               <div className="u-bg-primary-subtle u-rounded u-p-2">
                 <Icon name="Users" className="u-text-primary" size="lg" />
@@ -97,7 +97,7 @@ export default function Home() {
         </GridCol>
 
         <GridCol xs={12} sm={6} lg={3}>
-          <Card appearance="elevated" glass={true} className="u-h-100">
+          <Card appearance="ghost" glass={true} className="u-h-100">
             <div className="u-flex u-items-center u-gap-3 u-mb-3">
               <div className="u-bg-error-subtle u-rounded u-p-2">
                 <Icon name="Warning" className="u-text-error" size="lg" />
@@ -115,7 +115,7 @@ export default function Home() {
         </GridCol>
 
         <GridCol xs={12} sm={6} lg={3}>
-          <Card appearance="elevated" glass={true} className="u-h-100">
+          <Card appearance="ghost" glass={true} className="u-h-100">
             <div className="u-flex u-items-center u-gap-3 u-mb-3">
               <div className="u-bg-success-subtle u-rounded u-p-2">
                 <Icon name="Pulse" className="u-text-success" size="lg" />
@@ -130,7 +130,7 @@ export default function Home() {
         </GridCol>
 
         <GridCol xs={12} sm={6} lg={3}>
-          <Card appearance="elevated" glass={true} className="u-h-100">
+          <Card appearance="ghost" glass={true} className="u-h-100">
             <div className="u-flex u-items-center u-gap-3 u-mb-3">
               <div className="u-bg-warning-subtle u-rounded u-p-2">
                 <Icon name="Clipboard" className="u-text-warning" size="lg" />
@@ -153,14 +153,12 @@ export default function Home() {
             <GridCol xs={12} sm={6} lg={3} key={action.href}>
               <Link href={action.href} className="u-text-decoration-none">
                 <Card
-                  appearance="elevated"
+                  appearance="ghost"
                   glass={true}
                   className="u-h-100 u-cursor-pointer u-transition-all u-duration-200 hover:u-scale-105 hover:u-shadow-lg"
                 >
                   <div className="u-flex u-items-start u-gap-3">
-                    <div
-                      className={`u-bg-${action.color}-subtle u-rounded u-p-3`}
-                    >
+                    <div className={`u-bg-${action.color}-subtle u-rounded u-p-3`}>
                       <Icon
                         name={action.icon as any}
                         className={`u-text-${action.color}`}
@@ -185,7 +183,7 @@ export default function Home() {
       {/* Recent Activity */}
       <div>
         <h2 className="u-fs-xl u-font-bold u-mb-4">Recent Activity</h2>
-        <Card appearance="elevated" glass={true}>
+        <Card appearance="ghost" glass={true}>
           <div className="u-flex u-flex-column u-gap-3">
             {recentActivity.map((activity) => (
               <div

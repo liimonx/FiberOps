@@ -2,6 +2,7 @@
 
 import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
+import { classifyError, ErrorLogger } from '../utils/errorHandler';
 
 interface Props {
   children: ReactNode;
@@ -44,6 +45,10 @@ export class ErrorBoundary extends Component<Props, State> {
       errorInfo,
       errorCount: this.state.errorCount + 1,
     });
+
+    // Classify and log the error
+    const appError = classifyError(error);
+    ErrorLogger.log(appError);
 
     // Call optional error handler
     this.props.onError?.(error, errorInfo);
@@ -143,17 +148,19 @@ export class ErrorBoundary extends Component<Props, State> {
           <div className="flex gap-3">
             <button
               onClick={this.handleRetry}
+              aria-label="Try to reload the component"
               className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors"
             >
-              <RefreshCw className="w-4 h-4" />
+              <RefreshCw className="w-4 h-4" aria-hidden="true" />
               Try Again
             </button>
             
             <a
               href="/"
+              aria-label="Navigate to home page"
               className="flex items-center gap-2 px-4 py-2 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 rounded-md transition-colors"
             >
-              <Home className="w-4 h-4" />
+              <Home className="w-4 h-4" aria-hidden="true" />
               Go Home
             </a>
           </div>

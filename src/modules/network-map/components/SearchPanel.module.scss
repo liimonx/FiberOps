@@ -1,0 +1,264 @@
+// SearchPanel Component Styles
+// Following Atomix Design System conventions
+// Using CSS custom properties for theming support
+
+.searchPanel {
+  width: 360px;
+  max-width: 100%;
+  padding: 0;
+  overflow: hidden;
+}
+
+// Header section
+.searchHeader {
+  padding: var(--atomix-spacing-4, 16px);
+  border-bottom: 1px solid var(--atomix-border-color, var(--color-gray-700));
+}
+
+// Search input wrapper
+.searchInputWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.searchIcon {
+  position: absolute;
+  left: var(--atomix-spacing-3, 12px);
+  color: var(--atomix-text-muted, var(--color-gray-500));
+  pointer-events: none;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 10px 36px;
+  background: var(--atomix-bg-input, var(--color-gray-800));
+  border: 1px solid var(--atomix-border-color, var(--color-gray-700));
+  border-radius: var(--atomix-radius-md, 8px);
+  color: var(--atomix-text-primary, var(--color-gray-100));
+  font-size: var(--atomix-font-size-sm, 14px);
+  transition: all var(--atomix-transition-fast, 0.2s) ease;
+
+  &:focus {
+    outline: none;
+    border-color: var(--atomix-primary);
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+  }
+
+  &::placeholder {
+    color: var(--atomix-text-muted, var(--color-gray-500));
+  }
+}
+
+.clearButton {
+  position: absolute;
+  right: var(--atomix-spacing-1, 4px);
+  padding: var(--atomix-spacing-1, 4px);
+  min-width: auto;
+}
+
+// Category filter tabs
+.categoryFilters {
+  display: flex;
+  gap: var(--atomix-spacing-1, 4px);
+  margin-top: var(--atomix-spacing-3, 12px);
+  overflow-x: auto;
+  padding-bottom: var(--atomix-spacing-1, 4px);
+}
+
+.categoryTab {
+  display: flex;
+  align-items: center;
+  gap: var(--atomix-spacing-1, 6px);
+  padding: var(--atomix-spacing-1, 6px) var(--atomix-spacing-3, 12px);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--atomix-radius-sm, 6px);
+  color: var(--atomix-text-muted, var(--color-gray-400));
+  font-size: var(--atomix-font-size-xs, 12px);
+  cursor: pointer;
+  transition: all var(--atomix-transition-fast, 0.2s) ease;
+  white-space: nowrap;
+
+  &:hover {
+    background: var(--atomix-bg-hover, var(--color-gray-800));
+    color: var(--atomix-text-secondary, var(--color-gray-200));
+  }
+
+  &.active {
+    background: var(--atomix-primary);
+    border-color: var(--atomix-primary);
+    color: var(--atomix-text-inverse, white);
+  }
+}
+
+.categoryLabel {
+  text-transform: capitalize;
+}
+
+.categoryCount {
+  padding: 2px var(--atomix-spacing-1, 6px);
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: var(--atomix-radius-full, 10px);
+  font-size: var(--atomix-font-size-xxs, 10px);
+  font-weight: var(--atomix-font-weight-semibold);
+}
+
+// Search results list
+.searchResults {
+  max-height: 300px;
+  overflow-y: auto;
+  padding: var(--atomix-spacing-2, 8px);
+}
+
+.searchResult {
+  display: flex;
+  align-items: center;
+  gap: var(--atomix-spacing-3, 12px);
+  padding: var(--atomix-spacing-2, 10px) var(--atomix-spacing-3, 12px);
+  border-radius: var(--atomix-radius-sm, 6px);
+  cursor: pointer;
+  transition: all var(--atomix-transition-fast, 0.15s) ease;
+
+  &:hover,
+  &.highlighted {
+    background: var(--atomix-bg-hover, var(--color-gray-800));
+  }
+}
+
+// Result item internal elements (using BEM)
+.resultIcon {
+  color: var(--atomix-primary);
+  flex-shrink: 0;
+}
+
+.resultContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.resultName {
+  color: var(--atomix-text-secondary, var(--color-gray-200));
+  font-size: var(--atomix-font-size-sm, 14px);
+  font-weight: var(--atomix-font-weight-medium);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.resultType {
+  color: var(--atomix-text-muted, var(--color-gray-500));
+  font-size: var(--atomix-font-size-xs, 11px);
+  text-transform: capitalize;
+}
+
+.resultArrow {
+  color: var(--atomix-text-muted, var(--color-gray-500));
+  flex-shrink: 0;
+  opacity: 0;
+  transition: opacity var(--atomix-transition-fast, 0.15s) ease;
+
+  .searchResult:hover &,
+  .searchResult.highlighted & {
+    opacity: 1;
+    color: var(--atomix-primary);
+  }
+}
+
+// Empty state
+.searchEmpty {
+  padding: var(--atomix-spacing-8, 32px) var(--atomix-spacing-4, 16px);
+  text-align: center;
+  color: var(--atomix-text-muted, var(--color-gray-400));
+}
+
+.emptyIcon {
+  color: var(--atomix-text-disabled, var(--color-gray-600));
+  margin-bottom: var(--atomix-spacing-3, 12px);
+}
+
+.searchEmpty p {
+  margin: 0 0 var(--atomix-spacing-1, 4px);
+  font-size: var(--atomix-font-size-sm, 14px);
+  color: var(--atomix-text-secondary, var(--color-gray-300));
+}
+
+.emptyHint {
+  font-size: var(--atomix-font-size-xs, 12px);
+  color: var(--atomix-text-muted, var(--color-gray-500));
+}
+
+// Quick actions section
+.quickActions {
+  padding: var(--atomix-spacing-4, 16px);
+  border-top: 1px solid var(--atomix-border-color, var(--color-gray-700));
+}
+
+.quickActionsLabel {
+  display: block;
+  font-size: var(--atomix-font-size-xs, 11px);
+  color: var(--atomix-text-muted, var(--color-gray-500));
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: var(--atomix-spacing-3, 12px);
+}
+
+.quickActionsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--atomix-spacing-2, 8px);
+}
+
+.quickAction {
+  display: flex;
+  align-items: center;
+  gap: var(--atomix-spacing-2, 8px);
+  padding: var(--atomix-spacing-2, 10px) var(--atomix-spacing-3, 12px);
+  background: var(--atomix-bg-subtle, var(--color-gray-800));
+  border: 1px solid var(--atomix-border-color, var(--color-gray-700));
+  border-radius: var(--atomix-radius-sm, 6px);
+  color: var(--atomix-text-secondary, var(--color-gray-300));
+  font-size: var(--atomix-font-size-sm, 13px);
+  cursor: pointer;
+  transition: all var(--atomix-transition-fast, 0.2s) ease;
+
+  &:hover {
+    background: var(--atomix-bg-hover, var(--color-gray-700));
+    border-color: var(--atomix-primary);
+    color: var(--atomix-text-primary, var(--color-gray-100));
+  }
+}
+
+// Mobile optimization
+@media (max-width: 768px) {
+  .searchPanel {
+    width: 100%;
+    max-width: none;
+  }
+
+  .categoryFilters {
+    gap: var(--atomix-spacing-1, 2px);
+  }
+
+  .categoryTab {
+    padding: var(--atomix-spacing-1, 4px) var(--atomix-spacing-2, 8px);
+    font-size: var(--atomix-font-size-xs, 11px);
+  }
+
+  .searchResults {
+    max-height: 200px;
+  }
+}
+
+// Reduced motion support
+@media (prefers-reduced-motion: reduce) {
+  .searchInput,
+  .categoryTab,
+  .searchResult,
+  .resultArrow,
+  .quickAction {
+    transition: none;
+  }
+}

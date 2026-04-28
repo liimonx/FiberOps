@@ -200,9 +200,10 @@ export function useAsyncOperation<T extends (...args: any[]) => Promise<any>>(
     onError?: (error: any) => void;
   } = {}
 ) {
-  const { startLoading, updateProgress, stopLoading } = useLoading();
+  const { startLoading, updateProgress, stopLoading, isLoading: contextIsLoading } = useLoading();
   const [error, setError] = React.useState<any>(null);
   const [result, setResult] = React.useState<any>(null);
+  const [isExecuting, setIsExecuting] = React.useState(false);
 
   const execute = React.useCallback(async (...args: Parameters<T>) => {
     const loadingId = options.loadingId || `async_${Date.now()}`;
@@ -210,6 +211,7 @@ export function useAsyncOperation<T extends (...args: any[]) => Promise<any>>(
 
     try {
       setError(null);
+      setIsExecuting(true);
       startLoading(loadingId, loadingMessage, options.showProgress);
 
       const result = await operation(...args);
@@ -222,16 +224,19 @@ export function useAsyncOperation<T extends (...args: any[]) => Promise<any>>(
       options.onError?.(err);
       throw err;
     } finally {
+      setIsExecuting(false);
       stopLoading(loadingId);
     }
   }, [operation, options, startLoading, stopLoading]);
 
+  // Track loading state properly
+  const loadingId = options.loadingId;
+  const isCurrentlyLoading = loadingId ? contextIsLoading(loadingId) : isExecuting;
+
   return {
     execute,
-    isLoading: !!options.loadingId ? false : false, // Would need tracking
+    isLoading: isCurrentlyLoading,
     error,
     result
   };
 }
-
-import React from 'react';

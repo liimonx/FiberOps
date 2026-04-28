@@ -214,8 +214,18 @@ export const MobileLayout: React.FC<MobileLayoutProps> = ({
                 setSheetHeight(85);
               }
             }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                if (sheetHeight > 70) {
+                  setSheetHeight(50);
+                } else {
+                  setSheetHeight(85);
+                }
+              }
+            }}
             role="button"
-            aria-label="Drag to resize sheet"
+            aria-label="Drag to resize sheet or press Enter to toggle size"
             tabIndex={0}
           >
             <div className="handle-bar" />
@@ -310,10 +320,12 @@ export const MobileLayout: React.FC<MobileLayoutProps> = ({
           flex-direction: column;
           align-items: center;
           gap: 4px;
-          padding: 8px 16px;
+          padding: 12px 16px;
+          min-height: 48px;
+          min-width: 48px;
           background: none;
           border: none;
-          color: var(--color-gray-500);
+          color: var(--color-gray-400);
           font-size: 11px;
           cursor: pointer;
           transition: color 0.2s ease;

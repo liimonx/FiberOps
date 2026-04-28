@@ -5,6 +5,10 @@ export type { Breakpoint } from './useResponsive';
 
 export { useTouchGestures, useMapTouchGestures } from './useTouchGestures';
 
+// Search hook
+export { useAssetSearch } from './useAssetSearch';
+export type { AssetCategory, CategorizedResult } from './useAssetSearch';
+
 // Data fetching hooks
 export {
   useAssets,

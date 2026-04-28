@@ -23,6 +23,10 @@ export { StatusIndicator, StatusBadge, StatusSummary } from './StatusIndicator';
 
 // Task 4: Layout and Navigation
 export { SearchPanel } from './SearchPanel';
+export { SearchInput } from './SearchInput';
+export { CategoryFilterTabs } from './CategoryFilterTabs';
+export { SearchResultsList } from './SearchResultsList';
+export { QuickActions } from './QuickActions';
 
 export { Toolbar, MobileToolbar } from './Toolbar';
 
