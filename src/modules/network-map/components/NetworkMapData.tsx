@@ -265,6 +265,7 @@ function NetworkStatusIndicators({
           display: flex;
           gap: 8px;
           pointer-events: auto;
+          z-index: 10;
         }
 
         .status-badge {
