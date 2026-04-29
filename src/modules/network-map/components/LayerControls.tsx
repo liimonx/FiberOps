@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useEffect } from 'react';
-import { Icon, Card } from "@shohojdhara/atomix";
-import { useNetworkMapStore, useLayers } from '../stores/useNetworkMapStore';
-import { NetworkMapLayer } from '../types';
+import React, { useEffect } from "react";
+import { Icon, Card, Toggle } from "@shohojdhara/atomix";
+import { useNetworkMapStore, useLayers } from "../stores/useNetworkMapStore";
+import { NetworkMapLayer } from "../types";
 
 interface LayerControlsProps {
   className?: string;
@@ -18,111 +18,100 @@ interface LayerConfig extends NetworkMapLayer {
 
 const LAYER_CONFIGS: LayerConfig[] = [
   {
-    id: 'fiber-routes',
-    name: 'Fiber Routes',
+    id: "fiber-routes",
+    name: "Fiber Routes",
     visible: true,
-    type: 'connections',
-    icon: 'GitBranch',
-    description: 'Show fiber optic cable routes',
-    color: '#10b981'
+    type: "connections",
+    icon: "GitBranch",
+    description: "Show fiber optic cable routes",
+    color: "#10b981",
   },
   {
-    id: 'nodes-splitters',
-    name: 'Nodes & Splitters',
+    id: "nodes-splitters",
+    name: "Nodes & Splitters",
     visible: true,
-    type: 'nodes',
-    icon: 'HardDrives',
-    description: 'Display network nodes and splitters',
-    color: '#3b82f6'
+    type: "nodes",
+    icon: "HardDrives",
+    description: "Display network nodes and splitters",
+    color: "#3b82f6",
   },
   {
-    id: 'outages',
-    name: 'Outages',
-    visible: false,
-    type: 'outages',
-    icon: 'WarningCircle',
-    description: 'Highlight current service outages',
-    color: '#ef4444'
+    id: "outages",
+    name: "Outages",
+    visible: true,
+    type: "outages",
+    icon: "WarningCircle",
+    description: "Highlight current service outages",
+    color: "#ef4444",
   },
   {
-    id: 'customers',
-    name: 'Customers',
-    visible: false,
-    type: 'nodes',
-    icon: 'Users',
-    description: 'Show customer connection points',
-    color: '#f59e0b'
+    id: "customers",
+    name: "Customers",
+    visible: true,
+    type: "nodes",
+    icon: "Users",
+    description: "Show customer connection points",
+    color: "#f59e0b",
   },
   {
-    id: 'coverage',
-    name: 'Coverage Area',
-    visible: false,
-    type: 'outages',
-    icon: 'MapTrifold',
-    description: 'Display network coverage zones',
-    color: '#8b5cf6'
-  }
+    id: "coverage",
+    name: "Coverage Area",
+    visible: true,
+    type: "nodes",
+    icon: "MapTrifold",
+    description: "Display network coverage zones",
+    color: "#8b5cf6",
+  },
 ];
 
 export const LayerControls: React.FC<LayerControlsProps> = ({
-  className = '',
-  persistKey = 'network-map-layers'
+  className = "",
+  persistKey = "network-map-layers",
 }) => {
   const layers = useLayers();
   const toggleLayer = useNetworkMapStore((state) => state.toggleLayer);
   const setLayerVisibility = useNetworkMapStore((state) => state.setLayerVisibility);
+  const updateLayers = useNetworkMapStore((state) => state.updateLayers);
 
-  // Load persisted layer states on mount
+  // Sync configured layers with store layers to ensure new layers are added
   useEffect(() => {
-    if (typeof window === 'undefined') return;
-    
-    try {
-      const persisted = localStorage.getItem(persistKey);
-      if (persisted) {
-        const parsed = JSON.parse(persisted);
-        Object.entries(parsed).forEach(([layerId, visible]) => {
-          if (typeof visible === 'boolean') {
-            setLayerVisibility(layerId, visible);
-          }
-        });
-      }
-    } catch (error) {
-      console.warn('Failed to load persisted layer states:', error);
+    const missingLayers = LAYER_CONFIGS.filter(
+      (config) => !layers.some((l) => l.id === config.id)
+    );
+    if (missingLayers.length > 0) {
+      const updatedLayers = [
+        ...layers,
+        ...missingLayers.map((config) => ({
+          id: config.id,
+          name: config.name,
+          visible: config.visible,
+          type: config.type,
+        })),
+      ];
+      updateLayers(updatedLayers);
     }
-  }, [persistKey, setLayerVisibility]);
-
-  // Persist layer states when they change
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-
-    const visibilityState: Record<string, boolean> = {};
-    layers.forEach(layer => {
-      visibilityState[layer.id] = layer.visible;
-    });
-
-    try {
-      localStorage.setItem(persistKey, JSON.stringify(visibilityState));
-    } catch (error) {
-      console.warn('Failed to persist layer states:', error);
-    }
-  }, [layers, persistKey]);
+  }, [layers, updateLayers]);
 
   const handleToggle = (layerId: string) => {
     toggleLayer(layerId);
   };
 
   const getActiveLayerCount = () => {
-    return layers.filter(l => l.visible).length;
+    return layers.filter((l) => l.visible).length;
   };
 
   const handleToggleAll = (visible: boolean) => {
-    layers.forEach(layer => {
+    layers.forEach((layer) => {
       setLayerVisibility(layer.id, visible);
     });
   };
 
   return (
-    <Card appearance="elevated" glass={true} className={`layer-controls ${className}`}>
+    <Card
+      appearance="ghost"
+      glass={{ blurAmount: 4, mode: "shader" }}
+      className={`layer-controls ${className}`}
+    >
       <div className="layer-header">
         <div className="header-title">
           <Icon name="Stack" size={16} className="header-icon" />
@@ -133,19 +122,19 @@ export const LayerControls: React.FC<LayerControlsProps> = ({
 
       <div className="layer-list" role="group" aria-label="Map layers">
         {LAYER_CONFIGS.map((config) => {
-          const layer = layers.find(l => l.id === config.id);
+          const layer = layers.find((l) => l.id === config.id);
           const isVisible = layer?.visible ?? config.visible;
 
           return (
-            <div 
+            <div
               key={config.id}
-              className={`layer-item ${isVisible ? 'layer-item--active' : ''}`}
+              className={`layer-item ${isVisible ? "layer-item--active" : ""}`}
             >
-              <div 
+              <div
                 className="layer-color-indicator"
                 style={{ backgroundColor: config.color }}
               />
-              
+
               <div className="layer-content">
                 <div className="layer-info">
                   <Icon name={config.icon as any} size={16} className="layer-icon" />
@@ -154,18 +143,11 @@ export const LayerControls: React.FC<LayerControlsProps> = ({
                     <span className="layer-description">{config.description}</span>
                   </div>
                 </div>
-                
-                <button
-                  className={`layer-toggle ${isVisible ? 'layer-toggle--active' : ''}`}
-                  onClick={() => handleToggle(config.id)}
-                  aria-label={`Toggle ${config.name} layer`}
-                  aria-pressed={isVisible}
-                  role="switch"
-                >
-                  <span className="toggle-track">
-                    <span className="toggle-thumb" />
-                  </span>
-                </button>
+
+                <Toggle
+                  defaultChecked={isVisible}
+                  onChange={() => handleToggle(config.id)}
+                />
               </div>
             </div>
           );
@@ -173,16 +155,10 @@ export const LayerControls: React.FC<LayerControlsProps> = ({
       </div>
 
       <div className="layer-actions">
-        <button 
-          className="action-button"
-          onClick={() => handleToggleAll(true)}
-        >
+        <button className="action-button" onClick={() => handleToggleAll(true)}>
           Show All
         </button>
-        <button 
-          className="action-button"
-          onClick={() => handleToggleAll(false)}
-        >
+        <button className="action-button" onClick={() => handleToggleAll(false)}>
           Hide All
         </button>
       </div>

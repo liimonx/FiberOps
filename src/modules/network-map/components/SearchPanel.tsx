@@ -1,15 +1,17 @@
 "use client";
 
-import React from 'react';
+import React from "react";
 import { Card, Icon } from "@shohojdhara/atomix";
-import { NetworkNode, NetworkConnection, SearchResult } from '../types';
-import { useAssetSearch, AssetCategory, CategorizedResult } from '../hooks/useAssetSearch';
-import { SearchInput } from './SearchInput';
-import { CategoryFilterTabs } from './CategoryFilterTabs';
-import { SearchResultsList } from './SearchResultsList';
-import { QuickActions } from './QuickActions';
-import styles from './SearchPanel.module.scss';
-
+import { NetworkNode, NetworkConnection, SearchResult } from "../types";
+import {
+  useAssetSearch,
+  AssetCategory,
+  CategorizedResult,
+} from "../hooks/useAssetSearch";
+import { SearchInput } from "./SearchInput";
+import { CategoryFilterTabs } from "./CategoryFilterTabs";
+import { SearchResultsList } from "./SearchResultsList";
+import { QuickActions } from "./QuickActions";
 interface SearchPanelProps {
   nodes: NetworkNode[];
   connections: NetworkConnection[];
@@ -24,8 +26,8 @@ export const SearchPanel: React.FC<SearchPanelProps> = ({
   connections,
   onSelectResult,
   onClose,
-  className = '',
-  isOpen = true
+  className = "",
+  isOpen = true,
 }) => {
   const {
     query,
@@ -35,30 +37,30 @@ export const SearchPanel: React.FC<SearchPanelProps> = ({
     results,
     highlightedIndex,
     setHighlightedIndex,
-    clearSearch
+    clearSearch,
   } = useAssetSearch({ nodes, connections });
 
   // Keyboard navigation
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     switch (e.key) {
-      case 'ArrowDown':
+      case "ArrowDown":
         e.preventDefault();
         setHighlightedIndex(
           highlightedIndex < results.length - 1 ? highlightedIndex + 1 : highlightedIndex
         );
         break;
-      case 'ArrowUp':
+      case "ArrowUp":
         e.preventDefault();
         setHighlightedIndex(highlightedIndex > 0 ? highlightedIndex - 1 : -1);
         break;
-      case 'Enter':
+      case "Enter":
         e.preventDefault();
         if (highlightedIndex >= 0 && results[highlightedIndex]) {
           onSelectResult(results[highlightedIndex]);
           clearSearch();
         }
         break;
-      case 'Escape':
+      case "Escape":
         clearSearch();
         onClose?.();
         break;
@@ -71,54 +73,53 @@ export const SearchPanel: React.FC<SearchPanelProps> = ({
   };
 
   const getCategoryCount = (category: AssetCategory) => {
-    if (category === 'all') return results.length;
-    return results.filter(r => r.category === category).length;
+    if (category === "all") return results.length;
+    return results.filter((r) => r.category === category).length;
   };
 
   const categoryCounts: Record<AssetCategory, number> = {
     all: results.length,
-    nodes: getCategoryCount('nodes'),
-    connections: getCategoryCount('connections'),
-    customers: getCategoryCount('customers')
+    nodes: getCategoryCount("nodes"),
+    connections: getCategoryCount("connections"),
+    customers: getCategoryCount("customers"),
   };
 
   const quickActions = [
     {
-      label: 'Find Nodes',
-      icon: 'HardDrives',
-      onClick: () => setQuery('node')
+      label: "Find Nodes",
+      icon: "HardDrives",
+      onClick: () => setQuery("node"),
     },
     {
-      label: 'Trace Routes',
-      icon: 'GitBranch',
-      onClick: () => setQuery('route')
-    }
+      label: "Trace Routes",
+      icon: "GitBranch",
+      onClick: () => setQuery("route"),
+    },
   ];
 
   if (!isOpen) return null;
 
   return (
-    <Card glass={{elasticity: 10, blurAmount: 3, displacementScale: 100}} className={`${styles.searchPanel} ${className}`}>
-      <div className={styles.searchHeader}>
+    <Card
+      glass={{ elasticity: 10, blurAmount: 3, displacementScale: 100 }}
+      className={`u-w-100 u-p-0 u-overflow-hidden ${className}`}
+    >
+      <div>
         <SearchInput
           value={query}
           onChange={setQuery}
           onKeyDown={handleKeyDown}
           onClear={clearSearch}
           ariaControls="search-results"
-          ariaActiveDescendant={highlightedIndex >= 0 ? `search-result-${highlightedIndex}` : undefined}
-          wrapperClassName={styles.searchInputWrapper}
-          inputClassName={styles.searchInput}
-          iconClassName={styles.searchIcon}
-          buttonClassName={styles.clearButton}
+          ariaActiveDescendant={
+            highlightedIndex >= 0 ? `search-result-${highlightedIndex}` : undefined
+          }
         />
 
         <CategoryFilterTabs
           selectedCategory={selectedCategory}
           onCategoryChange={setSelectedCategory}
           categoryCounts={categoryCounts}
-          containerClassName={styles.categoryFilters}
-          tabClassName={styles.categoryTab}
         />
       </div>
 
@@ -128,29 +129,21 @@ export const SearchPanel: React.FC<SearchPanelProps> = ({
         highlightedIndex={highlightedIndex}
         onSelect={handleSelectResult}
         onHighlight={setHighlightedIndex}
-        containerClassName={styles.searchResults}
-        itemClassName={styles.searchResult}
       />
 
       {/* Empty state */}
       {query && results.length === 0 && (
-        <div className={styles.searchEmpty}>
-          <Icon name="MagnifyingGlass" size={24} className={styles.emptyIcon} />
-          <p>No results found for "{query}"</p>
-          <span className={styles.emptyHint}>Try a different search term</span>
+        <div className="u-py-8 u-px-4 u-text-center u-text-muted">
+          <Icon name="MagnifyingGlass" size={24} className="u-text-disabled u-mb-3" />
+          <p className="u-m-0 u-mb-1 u-fs-sm u-text-secondary">
+            No results found for <strong>{query}</strong>
+          </p>
+          <span className="u-fs-xs u-text-muted">Try a different search term</span>
         </div>
       )}
 
       {/* Quick actions */}
-      {!query && (
-        <QuickActions 
-          actions={quickActions}
-          containerClassName={styles.quickActions}
-          labelClassName={styles.quickActionsLabel}
-          gridClassName={styles.quickActionsGrid}
-          actionClassName={styles.quickAction}
-        />
-      )}
+      {!query && <QuickActions actions={quickActions} />}
     </Card>
   );
 };

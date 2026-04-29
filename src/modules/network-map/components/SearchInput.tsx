@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useRef } from 'react';
+import React, { useRef } from "react";
 import { Icon, Button } from "@shohojdhara/atomix";
+import { Input } from "@shohojdhara/atomix";
 
 interface SearchInputProps {
   value: string;
@@ -28,40 +29,48 @@ export const SearchInput: React.FC<SearchInputProps> = ({
   placeholder = "Search assets, routes, or customers...",
   ariaControls,
   ariaActiveDescendant,
-  wrapperClassName = '',
-  inputClassName = '',
-  iconClassName = '',
-  buttonClassName = ''
+  wrapperClassName = "",
+  inputClassName = "",
+  iconClassName = "",
+  buttonClassName = "",
 }) => {
   const inputRef = useRef<HTMLInputElement>(null);
 
   return (
-    <div className={`search-input-wrapper ${wrapperClassName}`}>
-      <Icon name="MagnifyingGlass" size={16} className={`search-icon ${iconClassName}`} />
-      <input
+    <div
+      className={`u-relative u-flex u-items-center u-w-100 ${wrapperClassName}`}
+      onKeyDown={onKeyDown as any}
+    >
+      <Icon
+        name="MagnifyingGlass"
+        size={16}
+        className={`u-absolute u-ms-3 u-text-muted ${iconClassName}`}
+        style={{ pointerEvents: "none" }}
+      />
+      <Input
         ref={inputRef}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        onKeyDown={onKeyDown}
         placeholder={placeholder}
-        className={`search-input ${inputClassName}`}
+        className={`u-w-100 u-ps-5 u-pe-5 ${inputClassName}`}
         aria-label="Search network assets"
-        aria-autocomplete="list"
         aria-controls={ariaControls}
         aria-activedescendant={ariaActiveDescendant}
       />
       {value && (
-        <Button
-          variant="secondary"
-          size="sm"
-          iconName="X"
-          onClick={() => {
-            onClear();
-            inputRef.current?.focus();
-          }}
-          className={`clear-button ${buttonClassName}`}
-          aria-label="Clear search"
-        />
+        <div className="u-absolute u-end-0 u-me-1 u-flex u-items-center">
+          <Button
+            variant="secondary"
+            size="sm"
+            iconName="X"
+            onClick={() => {
+              onClear();
+              inputRef.current?.focus();
+            }}
+            className={buttonClassName}
+            aria-label="Clear search"
+          />
+        </div>
       )}
     </div>
   );

@@ -1,6 +1,6 @@
 "use client";
 
-import React from 'react';
+import React from "react";
 import { Icon, Button } from "@shohojdhara/atomix";
 
 interface QuickAction {
@@ -19,15 +19,15 @@ interface QuickActionsProps {
 
 const DEFAULT_ACTIONS: QuickAction[] = [
   {
-    label: 'Find Nodes',
-    icon: 'HardDrives',
-    onClick: () => {} // Will be overridden by parent
+    label: "Find Nodes",
+    icon: "HardDrives",
+    onClick: () => {}, // Will be overridden by parent
   },
   {
-    label: 'Trace Routes',
-    icon: 'GitBranch',
-    onClick: () => {} // Will be overridden by parent
-  }
+    label: "Trace Routes",
+    icon: "GitBranch",
+    onClick: () => {}, // Will be overridden by parent
+  },
 ];
 
 /**
@@ -35,23 +35,30 @@ const DEFAULT_ACTIONS: QuickAction[] = [
  */
 export const QuickActions: React.FC<QuickActionsProps> = ({
   actions = DEFAULT_ACTIONS,
-  containerClassName = '',
-  labelClassName = '',
-  gridClassName = '',
-  actionClassName = ''
+  containerClassName = "",
+  labelClassName = "",
+  gridClassName = "",
+  actionClassName = "",
 }) => {
   return (
-    <div className={`quick-actions ${containerClassName}`}>
-      <span className={`quick-actions-label ${labelClassName}`}>Quick Actions</span>
-      <div className={`quick-actions-grid ${gridClassName}`}>
+    <div
+      className={`u-p-4 u-border-t u-border-solid u-border-secondary-subtle ${containerClassName}`}
+    >
+      <span
+        className={`u-block u-fs-xs u-text-muted u-text-uppercase u-mb-3 ${labelClassName}`}
+        style={{ letterSpacing: "0.5px" }}
+      >
+        Quick Actions
+      </span>
+      <div className={`u-flex u-gap-2 ${gridClassName}`}>
         {actions.map((action, index) => (
           <Button
             key={index}
-            variant="secondary"
-            size="md"
-            iconName={action.icon as any}
+            size="sm"
+            variant="light"
+            iconName={action.icon}
             onClick={action.onClick}
-            className={`quick-action ${actionClassName}`}
+            className={` ${actionClassName}`}
           >
             {action.label}
           </Button>

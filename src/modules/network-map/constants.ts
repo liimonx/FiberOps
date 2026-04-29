@@ -35,7 +35,9 @@ export const NODE_TYPE_ICONS = {
 export const DEFAULT_LAYERS: NetworkMapLayer[] = [
   { id: 'fiber-routes', name: 'Fiber Routes', visible: true, type: 'connections' },
   { id: 'nodes-splitters', name: 'Nodes & Splitters', visible: true, type: 'nodes' },
-  { id: 'outages', name: 'Outages', visible: false, type: 'outages' }
+  { id: 'outages', name: 'Outages', visible: true, type: 'outages' },
+  { id: 'customers', name: 'Customers', visible: true, type: 'customers' },
+  { id: 'coverage', name: 'Coverage Area', visible: true, type: 'coverage' }
 ];
 
 // Animation constants

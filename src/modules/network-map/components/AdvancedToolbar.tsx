@@ -1,16 +1,7 @@
 "use client";
 
 import React from 'react';
-import { Button, Card, Badge } from '@shohojdhara/atomix';
-import { 
-  MousePointer, 
-  GitCommit, 
-  Ruler, 
-  Flame,
-  Layers,
-  Maximize2,
-  Minimize2
-} from 'lucide-react';
+import { Button, Card, Icon } from '@shohojdhara/atomix';
 import { useMapTools, useMeasurementTool, useTraceTool, useHeatmapTool } from '../hooks';
 import { ToolType } from '../types';
 import { useNetworkMapStore } from '../stores/useNetworkMapStore';
@@ -20,8 +11,15 @@ interface AdvancedToolbarProps {
   isFullscreen?: boolean;
 }
 
+const TOOL_CONFIG: Array<{ id: ToolType; icon: string; label: string }> = [
+  { id: 'select', icon: 'Cursor', label: 'Select' },
+  { id: 'trace', icon: 'GitBranch', label: 'Trace' },
+  { id: 'measure', icon: 'Ruler', label: 'Measure' },
+  { id: 'heatmap', icon: 'Fire', label: 'Heatmap' },
+];
+
 export function AdvancedToolbar({ onToggleFullscreen, isFullscreen }: AdvancedToolbarProps) {
-  const { switchTool, activeTool } = useMapTools();
+  const { switchTool } = useMapTools();
   const activeToolId = useNetworkMapStore((state) => state.interaction.activeTool);
   const buttonRefs = React.useRef<(HTMLButtonElement | null)[]>([]);
   
@@ -29,13 +27,6 @@ export function AdvancedToolbar({ onToggleFullscreen, isFullscreen }: AdvancedTo
   const { pointCount } = useMeasurementTool();
   const { hasTrace } = useTraceTool() as any;
   const { hasHeatmap } = useHeatmapTool() as any;
-
-  const tools: Array<{ id: ToolType; icon: any; label: string }> = [
-    { id: 'select', icon: MousePointer, label: 'Select' },
-    { id: 'trace', icon: GitCommit, label: 'Trace' },
-    { id: 'measure', icon: Ruler, label: 'Measure' },
-    { id: 'heatmap', icon: Flame, label: 'Heatmap' },
-  ];
 
   // Keyboard navigation handler
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
@@ -45,14 +36,14 @@ export function AdvancedToolbar({ onToggleFullscreen, isFullscreen }: AdvancedTo
       case 'ArrowRight':
       case 'ArrowDown':
         e.preventDefault();
-        const nextIndex = focusedIndex === -1 ? 0 : (focusedIndex + 1) % tools.length;
+        const nextIndex = focusedIndex === -1 ? 0 : (focusedIndex + 1) % TOOL_CONFIG.length;
         buttonRefs.current[nextIndex]?.focus();
         break;
       
       case 'ArrowLeft':
       case 'ArrowUp':
         e.preventDefault();
-        const prevIndex = focusedIndex === -1 ? tools.length - 1 : (focusedIndex - 1 + tools.length) % tools.length;
+        const prevIndex = focusedIndex === -1 ? TOOL_CONFIG.length - 1 : (focusedIndex - 1 + TOOL_CONFIG.length) % TOOL_CONFIG.length;
         buttonRefs.current[prevIndex]?.focus();
         break;
       
@@ -63,7 +54,7 @@ export function AdvancedToolbar({ onToggleFullscreen, isFullscreen }: AdvancedTo
       
       case 'End':
         e.preventDefault();
-        buttonRefs.current[tools.length - 1]?.focus();
+        buttonRefs.current[TOOL_CONFIG.length - 1]?.focus();
         break;
       
       case 'Escape':
@@ -78,17 +69,15 @@ export function AdvancedToolbar({ onToggleFullscreen, isFullscreen }: AdvancedTo
       appearance="elevated" 
       glass={true} 
       className="u-p-2 u-shadow-lg"
-      role="toolbar"
-      aria-label="Advanced map tools"
     >
       <div 
         className="u-flex u-gap-2" 
-        role="group" 
-        aria-label="Tool selection"
+        role="toolbar" 
+        aria-label="Advanced map tools"
         onKeyDown={handleKeyDown}
       >
         {/* Tool buttons */}
-        {tools.map(({ id, icon: Icon, label }, index) => {
+        {TOOL_CONFIG.map(({ id, icon, label }, index) => {
           const isActive = activeToolId === id;
           const hasActiveState = 
             (id === 'measure' && pointCount > 0) ||
@@ -100,23 +89,14 @@ export function AdvancedToolbar({ onToggleFullscreen, isFullscreen }: AdvancedTo
               key={id}
               variant={isActive ? 'primary' : 'secondary'}
               size="sm"
+              iconName={icon as any}
+              iconOnly
               onClick={() => switchTool(id)}
               aria-label={`${label} tool`}
               aria-pressed={isActive}
               ref={(el) => { buttonRefs.current[index] = el as HTMLButtonElement | null; }}
-              title={`${label} tool`}
               className="u-relative"
-            >
-              <Icon className="u-w-4 u-h-4" aria-hidden="true" />
-              
-              {/* Active state indicator */}
-              {hasActiveState && (
-                <div 
-                  className="u-absolute -u-top-1 -u-right-1 u-w-2 u-h-2 u-rounded-full u-bg-success" 
-                  aria-hidden="true"
-                />
-              )}
-            </Button>
+            />
           );
         })}
 
@@ -126,9 +106,9 @@ export function AdvancedToolbar({ onToggleFullscreen, isFullscreen }: AdvancedTo
         <Button
           variant="secondary"
           size="sm"
-          iconName="Layers"
+          iconName="StackSimple"
+          iconOnly
           aria-label="Toggle layers panel"
-          title="Toggle layers"
         />
 
         {/* Fullscreen toggle */}
@@ -136,16 +116,11 @@ export function AdvancedToolbar({ onToggleFullscreen, isFullscreen }: AdvancedTo
           <Button
             variant="secondary"
             size="sm"
+            iconName={isFullscreen ? "ArrowsIn" : "ArrowsOut"}
+            iconOnly
             onClick={onToggleFullscreen}
             aria-label={isFullscreen ? 'Exit fullscreen mode' : 'Enter fullscreen mode'}
-            title={isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}
-          >
-            {isFullscreen ? (
-              <Minimize2 className="u-w-4 u-h-4" aria-hidden="true" />
-            ) : (
-              <Maximize2 className="u-w-4 u-h-4" aria-hidden="true" />
-            )}
-          </Button>
+          />
         )}
       </div>
     </Card>
@@ -225,8 +200,8 @@ export function KeyboardShortcutsHelp() {
       <h4 className="u-font-bold u-fs-sm u-mb-2">Keyboard Shortcuts</h4>
       <div className="u-flex u-flex-column u-gap-1">
         {shortcuts.map(({ key, action }) => (
-          <div key={key} className="u-flex u-justify-between u-items-center u-fs-2xs">
-            <kbd className="u-px-2 u-py-1 u-bg-secondary-subtle u-rounded u-font-mono">
+          <div key={key} className="u-flex u-justify-between u-items-center u-fs-xs">
+            <kbd className="u-px-2 u-py-1 u-bg-secondary-subtle u-rounded">
               {key}
             </kbd>
             <span className="u-text-secondary-subtle">{action}</span>

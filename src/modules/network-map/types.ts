@@ -60,7 +60,7 @@ export interface NetworkMapLayer {
   id: string;
   name: string;
   visible: boolean;
-  type: 'nodes' | 'connections' | 'outages';
+  type: 'nodes' | 'connections' | 'outages' | 'coverage' | 'customers';
 }
 
 export type ToolType = 'select' | 'trace' | 'measure' | 'heatmap';

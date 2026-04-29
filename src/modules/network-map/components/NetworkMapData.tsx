@@ -1,17 +1,17 @@
 "use client";
 
-import { useEffect, useMemo } from 'react';
-import { 
-  useNetworkData, 
+import { useEffect, useMemo } from "react";
+import { Icon, Button } from "@shohojdhara/atomix";
+import {
+  useNetworkData,
   useRealTimeUpdates,
   useActiveIncidents,
-  useNodesByStatus
-} from '../hooks';
-import { useNetworkMapStore } from '../stores/useNetworkMapStore';
-import { ErrorBoundary } from './ErrorBoundary';
-import { LoadingState } from './LoadingState';
-import { AlertTriangle, Wifi, WifiOff } from 'lucide-react';
-import { NetworkNodeType, NetworkStatus } from '../types';
+  useNodesByStatus,
+} from "../hooks";
+import { useNetworkMapStore } from "../stores/useNetworkMapStore";
+import { ErrorBoundary } from "./ErrorBoundary";
+import { LoadingState } from "./LoadingState";
+import { NetworkNodeType, NetworkStatus } from "../types";
 
 interface NetworkMapDataProps {
   children: React.ReactNode;
@@ -35,7 +35,10 @@ function NetworkMapDataSync({ children }: NetworkMapDataProps) {
   const { isConnected, connectionQuality } = useRealTimeUpdates({
     enabled: false, // Disabled until WebSocket server is configured
     onConnectionChange: (connected) => {
-      console.log('[NetworkMap] WebSocket connection:', connected ? 'connected' : 'disconnected');
+      console.log(
+        "[NetworkMap] WebSocket connection:",
+        connected ? "connected" : "disconnected"
+      );
     },
   });
 
@@ -43,41 +46,47 @@ function NetworkMapDataSync({ children }: NetworkMapDataProps) {
   const { data: activeIncidents } = useActiveIncidents();
 
   // Get nodes by status for monitoring
-  const { data: degradedNodes } = useNodesByStatus('degraded');
-  const { data: downNodes } = useNodesByStatus('down');
+  const { data: degradedNodes } = useNodesByStatus("degraded");
+  const { data: downNodes } = useNodesByStatus("down");
 
   // Store actions
   const setNodes = useNetworkMapStore((state) => state.setNodes);
   const setConnections = useNetworkMapStore((state) => state.setConnections);
   const setLoading = useNetworkMapStore((state) => state.setLoading);
   const setError = useNetworkMapStore((state) => state.setError);
-  const setWebSocketConnected = useNetworkMapStore((state) => state.setWebSocketConnected);
+  const setWebSocketConnected = useNetworkMapStore(
+    (state) => state.setWebSocketConnected
+  );
   const setConnectionQuality = useNetworkMapStore((state) => state.setConnectionQuality);
 
   // Sync fetched data with Zustand store
   useEffect(() => {
-    console.log('[NetworkMapDataSync] Nodes query state:', { 
-      hasData: !!nodes.data, 
+    console.log("[NetworkMapDataSync] Nodes query state:", {
+      hasData: !!nodes.data,
       dataLength: nodes.data?.length || 0,
       isLoading: nodes.isLoading,
-      error: nodes.error 
+      error: nodes.error,
     });
-    
+
     if (nodes.data && nodes.data.length > 0) {
-      console.log('[NetworkMapDataSync] Setting nodes to store:', nodes.data.length, 'nodes');
+      console.log(
+        "[NetworkMapDataSync] Setting nodes to store:",
+        nodes.data.length,
+        "nodes"
+      );
       setNodes(nodes.data);
     }
   }, [nodes.data, setNodes]);
 
   // Sync customers as nodes
   useEffect(() => {
-    console.log('[NetworkMapDataSync] Customers query state:', { 
-      hasData: !!customers.data, 
+    console.log("[NetworkMapDataSync] Customers query state:", {
+      hasData: !!customers.data,
       dataLength: customers.data?.length || 0,
       isLoading: customers.isLoading,
-      error: customers.error 
+      error: customers.error,
     });
-    
+
     if (customers.data && customers.data.length > 0) {
       // Transform customers to network nodes and merge with existing nodes
       const customerNodes = customers.data.map((customer: any) => ({
@@ -85,33 +94,46 @@ function NetworkMapDataSync({ children }: NetworkMapDataProps) {
         name: customer.name,
         type: NetworkNodeType.CUSTOMER,
         position: customer.location || { lat: 23.8103, lng: 90.4125 },
-        status: customer.status === 'online' ? NetworkStatus.ACTIVE : customer.status === 'offline' ? NetworkStatus.ERROR : NetworkStatus.WARNING,
+        status:
+          customer.status === "online"
+            ? NetworkStatus.ACTIVE
+            : customer.status === "offline"
+              ? NetworkStatus.ERROR
+              : NetworkStatus.WARNING,
         metadata: {
-          kind: 'customer',
+          kind: "customer",
           plan: customer.plan,
-          originalStatus: customer.status
-        }
+          originalStatus: customer.status,
+        },
       }));
-      
-      console.log('[NetworkMapDataSync] Transforming', customerNodes.length, 'customers to nodes');
-      
+
+      console.log(
+        "[NetworkMapDataSync] Transforming",
+        customerNodes.length,
+        "customers to nodes"
+      );
+
       // Merge asset nodes with customer nodes
       const allNodes = [...(nodes.data || []), ...customerNodes];
-      console.log('[NetworkMapDataSync] Total nodes after merge:', allNodes.length);
+      console.log("[NetworkMapDataSync] Total nodes after merge:", allNodes.length);
       setNodes(allNodes);
     }
   }, [customers.data, nodes.data, setNodes]);
 
   useEffect(() => {
-    console.log('[NetworkMapDataSync] Connections query state:', { 
-      hasData: !!connections.data, 
+    console.log("[NetworkMapDataSync] Connections query state:", {
+      hasData: !!connections.data,
       dataLength: connections.data?.length || 0,
       isLoading: connections.isLoading,
-      error: connections.error 
+      error: connections.error,
     });
-    
+
     if (connections.data && connections.data.length > 0) {
-      console.log('[NetworkMapDataSync] Setting connections to store:', connections.data.length, 'connections');
+      console.log(
+        "[NetworkMapDataSync] Setting connections to store:",
+        connections.data.length,
+        "connections"
+      );
       setConnections(connections.data);
     }
   }, [connections.data, setConnections]);
@@ -124,7 +146,7 @@ function NetworkMapDataSync({ children }: NetworkMapDataProps) {
   // Update error state
   useEffect(() => {
     if (error) {
-      setError(error instanceof Error ? error.message : 'Failed to load network data');
+      setError(error instanceof Error ? error.message : "Failed to load network data");
     } else {
       setError(null);
     }
@@ -140,10 +162,7 @@ function NetworkMapDataSync({ children }: NetworkMapDataProps) {
   if (isLoading && !nodes.data) {
     return (
       <div className="u-w-100 u-h-100 u-flex u-items-center u-justify-center">
-        <LoadingState 
-          message="Loading network map..."
-          showSpinner={true}
-        />
+        <LoadingState message="Loading network map..." showSpinner={true} />
       </div>
     );
   }
@@ -152,16 +171,15 @@ function NetworkMapDataSync({ children }: NetworkMapDataProps) {
   if (error && !nodes.data) {
     return (
       <div className="u-w-100 u-h-100 u-flex u-items-center u-justify-center u-p-8">
-        <div className="u-text-center u-max-w-md">
-          <AlertTriangle className="u-w-16 u-h-16 u-text-warning u-mb-4 u-mx-auto" />
+        <div className="u-text-center">
+          <Icon name="Warning" size={48} className="u-text-warning u-mb-4" />
           <h2 className="u-fs-xl u-font-bold u-mb-2">Failed to Load Network Data</h2>
-          <p className="u-text-secondary-subtle u-mb-4">{error instanceof Error ? error.message : 'An unknown error occurred'}</p>
-          <button 
-            onClick={() => window.location.reload()}
-            className="u-px-4 u-py-2 u-bg-primary u-text-white u-rounded u-cursor-pointer"
-          >
+          <p className="u-text-secondary u-mb-4">
+            {error instanceof Error ? error.message : "An unknown error occurred"}
+          </p>
+          <Button variant="primary" onClick={() => window.location.reload()}>
             Retry
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -171,14 +189,14 @@ function NetworkMapDataSync({ children }: NetworkMapDataProps) {
   return (
     <>
       {/* Network Status Indicators */}
-      <NetworkStatusIndicators 
+      <NetworkStatusIndicators
         isConnected={isConnected}
         connectionQuality={connectionQuality}
         activeIncidents={activeIncidents?.length || 0}
         degradedNodes={degradedNodes?.length || 0}
         downNodes={downNodes?.length || 0}
       />
-      
+
       {children}
     </>
   );
@@ -198,54 +216,127 @@ function NetworkStatusIndicators({
   degradedNodes: number;
   downNodes: number;
 }) {
-  const qualityColor = {
-    good: 'success',
-    fair: 'warning',
-    poor: 'danger',
-    disconnected: 'danger',
-  }[connectionQuality] || 'secondary';
-
   return (
-    <div className="u-absolute u-top-4 u-start-1/2 u-transform--translate-x-1/2 u-flex u-gap-2 u-z-1">
+    <div className="network-status-bar">
       {/* WebSocket Connection Status */}
-      <div className="u-bg-dark u-p-2 u-rounded u-shadow-lg u-flex u-items-center u-gap-2">
-        {isConnected ? (
-          <Wifi className={`u-w-4 u-h-4 u-text-${qualityColor}`} />
-        ) : (
-          <WifiOff className="u-w-4 u-h-4 u-text-danger" />
-        )}
-        <span className="u-fs-xs u-font-medium">
-          {isConnected ? 'Live' : 'Offline'}
-        </span>
+      <div className="status-badge">
+        <Icon
+          name={isConnected ? "WifiHigh" : "WifiSlash"}
+          size={14}
+          className={`status-icon status-icon--${isConnected ? connectionQuality : "disconnected"}`}
+        />
+        <span className="status-label">{isConnected ? "Live" : "Offline"}</span>
       </div>
 
       {/* Active Incidents Badge */}
       {activeIncidents > 0 && (
-        <div className="u-bg-danger u-p-2 u-rounded u-shadow-lg u-flex u-items-center u-gap-2 u-z-">
-          <AlertTriangle className="u-w-4 u-h-4 u-text-white" />
-          <span className="u-fs-xs u-font-bold u-text-white">
-            {activeIncidents} Active Incident{activeIncidents !== 1 ? 's' : ''}
+        <div className="status-badge status-badge--danger">
+          <Icon name="Warning" size={14} />
+          <span className="status-label">
+            {activeIncidents} Incident{activeIncidents !== 1 ? "s" : ""}
           </span>
         </div>
       )}
 
       {/* Node Status Summary */}
       {(degradedNodes > 0 || downNodes > 0) && (
-        <div className="u-bg-dark u-p-2 u-rounded u-shadow-lg u-flex u-items-center u-gap-3 u-z-1">
+        <div className="status-badge">
           {degradedNodes > 0 && (
-            <div className="u-flex u-items-center u-gap-1">
-              <div className="u-w-2 u-h-2 u-rounded-full u-bg-warning" />
-              <span className="u-fs-xs">{degradedNodes} Degraded</span>
-            </div>
+            <span className="status-count status-count--warning">
+              <span className="status-dot status-dot--warning" />
+              {degradedNodes} Degraded
+            </span>
           )}
           {downNodes > 0 && (
-            <div className="u-flex u-items-center u-gap-1">
-              <div className="u-w-2 u-h-2 u-rounded-full u-bg-danger" />
-              <span className="u-fs-xs">{downNodes} Down</span>
-            </div>
+            <span className="status-count status-count--error">
+              <span className="status-dot status-dot--error" />
+              {downNodes} Down
+            </span>
           )}
         </div>
       )}
+
+      <style jsx>{`
+        .network-status-bar {
+          position: absolute;
+          top: 12px;
+          left: 50%;
+          transform: translateX(-50%);
+          display: flex;
+          gap: 8px;
+          pointer-events: auto;
+        }
+
+        .status-badge {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          padding: 6px 12px;
+          background: rgba(17, 24, 39, 0.85);
+          backdrop-filter: blur(8px);
+          border-radius: 20px;
+          border: 1px solid var(--color-gray-700);
+          font-size: 12px;
+          color: var(--color-gray-200);
+        }
+
+        .status-badge--danger {
+          background: rgba(239, 68, 68, 0.2);
+          border-color: rgba(239, 68, 68, 0.5);
+          color: #fca5a5;
+        }
+
+        .status-icon--good {
+          color: #10b981;
+        }
+        .status-icon--fair {
+          color: #f59e0b;
+        }
+        .status-icon--poor {
+          color: #ef4444;
+        }
+        .status-icon--disconnected {
+          color: #ef4444;
+        }
+
+        .status-label {
+          font-weight: 500;
+          white-space: nowrap;
+        }
+
+        .status-count {
+          display: flex;
+          align-items: center;
+          gap: 4px;
+          font-size: 11px;
+        }
+
+        .status-dot {
+          width: 6px;
+          height: 6px;
+          border-radius: 50%;
+          flex-shrink: 0;
+        }
+
+        .status-dot--warning {
+          background: #f59e0b;
+        }
+        .status-dot--error {
+          background: #ef4444;
+        }
+
+        @media (max-width: 768px) {
+          .network-status-bar {
+            top: 8px;
+            gap: 4px;
+          }
+
+          .status-badge {
+            padding: 4px 8px;
+            font-size: 11px;
+          }
+        }
+      `}</style>
     </div>
   );
 }
@@ -257,17 +348,14 @@ export function NetworkMapDataProvider({ children }: NetworkMapDataProps) {
       fallback={
         <div className="u-w-100 u-h-100 u-flex u-items-center u-justify-center u-p-8">
           <div className="u-text-center">
-            <AlertTriangle className="u-w-16 u-h-16 u-text-danger u-mb-4 u-mx-auto" />
+            <Icon name="Warning" size={48} className="u-text-danger u-mb-4" />
             <h2 className="u-fs-xl u-font-bold u-mb-2">Map Component Error</h2>
-            <p className="u-text-secondary-subtle u-mb-4">
+            <p className="u-text-secondary u-mb-4">
               The network map encountered an error. Please try refreshing.
             </p>
-            <button 
-              onClick={() => window.location.reload()}
-              className="u-px-4 u-py-2 u-bg-primary u-text-white u-rounded u-cursor-pointer"
-            >
+            <Button variant="primary" onClick={() => window.location.reload()}>
               Refresh Page
-            </button>
+            </Button>
           </div>
         </div>
       }
@@ -285,12 +373,15 @@ export function useLoadedNetworkData() {
   const error = useNetworkMapStore((state) => state.error);
   const lastUpdated = useNetworkMapStore((state) => state.lastUpdated);
 
-  return useMemo(() => ({
-    nodes,
-    connections,
-    isLoading,
-    error,
-    lastUpdated,
-    hasData: nodes.length > 0 && connections.length > 0,
-  }), [nodes, connections, isLoading, error, lastUpdated]);
+  return useMemo(
+    () => ({
+      nodes,
+      connections,
+      isLoading,
+      error,
+      lastUpdated,
+      hasData: nodes.length > 0 && connections.length > 0,
+    }),
+    [nodes, connections, isLoading, error, lastUpdated]
+  );
 }

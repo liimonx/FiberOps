@@ -1,14 +1,14 @@
 "use client";
 
-import React, { useRef, useCallback } from 'react';
+import React, { useRef, useCallback } from "react";
 import { Button, Card, Tooltip } from "@shohojdhara/atomix";
-import { useNetworkMapStore } from '../stores/useNetworkMapStore';
-import { useAccessibilityAnnounce } from './AccessibilityAnnouncer';
-import { ToolType } from '../types';
+import { useNetworkMapStore } from "../stores/useNetworkMapStore";
+import { useAccessibilityAnnounce } from "./AccessibilityAnnouncer";
+import { ToolType } from "../types";
 
 interface ToolbarProps {
   className?: string;
-  position?: 'top-right' | 'bottom-right' | 'top-left' | 'bottom-left';
+  position?: "top-right" | "bottom-right" | "top-left" | "bottom-left";
 }
 
 interface ToolConfig {
@@ -21,48 +21,51 @@ interface ToolConfig {
 
 const TOOLS: ToolConfig[] = [
   {
-    id: 'select',
-    icon: 'CursorClick',
-    label: 'Select',
-    description: 'Select and inspect network elements',
-    shortcut: 'V'
+    id: "select",
+    icon: "CursorClick",
+    label: "Select",
+    description: "Select and inspect network elements",
+    shortcut: "V",
   },
   {
-    id: 'trace',
-    icon: 'GitCommit',
-    label: 'Trace Path',
-    description: 'Trace connection paths between nodes',
-    shortcut: 'T'
+    id: "trace",
+    icon: "GitCommit",
+    label: "Trace Path",
+    description: "Trace connection paths between nodes",
+    shortcut: "T",
   },
   {
-    id: 'measure',
-    icon: 'Ruler',
-    label: 'Measure',
-    description: 'Measure distances on the map',
-    shortcut: 'M'
+    id: "measure",
+    icon: "Ruler",
+    label: "Measure",
+    description: "Measure distances on the map",
+    shortcut: "M",
   },
   {
-    id: 'heatmap',
-    icon: 'Fire',
-    label: 'Heatmap',
-    description: 'Show network density heatmap',
-    shortcut: 'H'
-  }
+    id: "heatmap",
+    icon: "Fire",
+    label: "Heatmap",
+    description: "Show network density heatmap",
+    shortcut: "H",
+  },
 ];
 
 export const Toolbar: React.FC<ToolbarProps> = ({
-  className = '',
-  position = 'top-right'
+  className = "",
+  position = "top-right",
 }) => {
   const activeTool = useNetworkMapStore((state) => state.interaction.activeTool);
   const setActiveTool = useNetworkMapStore((state) => state.setActiveTool);
   const { announce } = useAccessibilityAnnounce();
   const buttonRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
-  const handleToolClick = useCallback((toolId: ToolType, index: number) => {
-    setActiveTool(toolId);
-    announce(`${TOOLS[index].label} tool activated`, 'polite');
-  }, [setActiveTool, announce]);
+  const handleToolClick = useCallback(
+    (toolId: ToolType, index: number) => {
+      setActiveTool(toolId);
+      announce(`${TOOLS[index].label} tool activated`, "polite");
+    },
+    [setActiveTool, announce]
+  );
 
   const handleToolbarKeyDown = useCallback((e: React.KeyboardEvent<HTMLDivElement>) => {
     const currentIndex = buttonRefs.current.findIndex(
@@ -73,23 +76,23 @@ export const Toolbar: React.FC<ToolbarProps> = ({
     let nextIndex = currentIndex;
 
     switch (e.key) {
-      case 'ArrowDown':
-      case 'ArrowRight':
+      case "ArrowDown":
+      case "ArrowRight":
         e.preventDefault();
         nextIndex = (currentIndex + 1) % TOOLS.length;
         buttonRefs.current[nextIndex]?.focus();
         break;
-      case 'ArrowUp':
-      case 'ArrowLeft':
+      case "ArrowUp":
+      case "ArrowLeft":
         e.preventDefault();
         nextIndex = currentIndex === 0 ? TOOLS.length - 1 : currentIndex - 1;
         buttonRefs.current[nextIndex]?.focus();
         break;
-      case 'Home':
+      case "Home":
         e.preventDefault();
         buttonRefs.current[0]?.focus();
         break;
-      case 'End':
+      case "End":
         e.preventDefault();
         buttonRefs.current[TOOLS.length - 1]?.focus();
         break;
@@ -97,16 +100,25 @@ export const Toolbar: React.FC<ToolbarProps> = ({
   }, []);
 
   const positionClasses = {
-    'top-right': 'u-absolute u-top-4 u-end-4',
-    'bottom-right': 'u-absolute u-bottom-4 u-end-4',
-    'top-left': 'u-absolute u-top-4 u-start-4',
-    'bottom-left': 'u-absolute u-bottom-4 u-start-4'
+    "top-right": "u-absolute u-top-4 u-end-4",
+    "bottom-right": "u-absolute u-bottom-4 u-end-4",
+    "top-left": "u-absolute u-top-4 u-start-4",
+    "bottom-left": "u-absolute u-bottom-4 u-start-4",
   };
 
   return (
-    <div className={`toolbar ${positionClasses[position]} ${className}`} role="toolbar" aria-label="Map tools">
+    <div
+      className={`toolbar ${positionClasses[position]} ${className}`}
+      role="toolbar"
+      aria-label="Map tools"
+    >
       <Card appearance="elevated" glass={true} className="toolbar-card">
-        <div className="tools-grid" role="group" aria-label="Tool selection" onKeyDown={handleToolbarKeyDown}>
+        <div
+          className="tools-grid"
+          role="group"
+          aria-label="Tool selection"
+          onKeyDown={handleToolbarKeyDown}
+        >
           {TOOLS.map((tool, index) => (
             <Tooltip
               key={tool.id}
@@ -114,23 +126,23 @@ export const Toolbar: React.FC<ToolbarProps> = ({
                 <div className="tooltip-content">
                   <strong>{tool.label}</strong>
                   <span className="tooltip-description">{tool.description}</span>
-                  {tool.shortcut && (
-                    <kbd className="shortcut">{tool.shortcut}</kbd>
-                  )}
+                  {tool.shortcut && <kbd className="shortcut">{tool.shortcut}</kbd>}
                 </div>
               }
               position="left"
             >
               <Button
-                ref={(el: HTMLButtonElement | HTMLAnchorElement | null) => { buttonRefs.current[index] = el as HTMLButtonElement | null; }}
-                variant={activeTool === tool.id ? 'primary' : 'secondary'}
+                ref={(el: HTMLButtonElement | HTMLAnchorElement | null) => {
+                  buttonRefs.current[index] = el as HTMLButtonElement | null;
+                }}
+                variant={activeTool === tool.id ? "primary" : "outline-primary"}
                 size="sm"
-                iconName={tool.icon as any}
+                iconName={tool.icon}
                 onClick={() => handleToolClick(tool.id, index)}
-                aria-label={`${tool.label}${tool.shortcut ? `, shortcut ${tool.shortcut}` : ''}`}
+                aria-label={`${tool.label}${tool.shortcut ? `, shortcut ${tool.shortcut}` : ""}`}
                 aria-pressed={activeTool === tool.id}
                 aria-keyshortcuts={tool.shortcut}
-                className={`tool-button ${activeTool === tool.id ? 'tool-button--active' : ''}`}
+                className={`tool-button ${activeTool === tool.id ? "tool-button--active" : ""}`}
               />
             </Tooltip>
           ))}
@@ -234,26 +246,26 @@ export const Toolbar: React.FC<ToolbarProps> = ({
 // Compact toolbar for mobile
 export const MobileToolbar: React.FC<{
   className?: string;
-}> = ({ className = '' }) => {
+}> = ({ className = "" }) => {
   const activeTool = useNetworkMapStore((state) => state.interaction.activeTool);
   const setActiveTool = useNetworkMapStore((state) => state.setActiveTool);
   const [isExpanded, setIsExpanded] = React.useState(false);
 
   return (
     <div className={`mobile-toolbar ${className}`}>
-      <Card appearance="elevated" glass={true} className="mobile-toolbar-card">
+      <Card appearance="ghost" glass={true} className="mobile-toolbar-card">
         {!isExpanded ? (
           <div className="mobile-toolbar-collapsed">
             <Button
               variant="primary"
               size="md"
-              iconName={TOOLS.find(t => t.id === activeTool)?.icon as any}
+              iconName={TOOLS.find((t) => t.id === activeTool)?.icon}
               onClick={() => setIsExpanded(true)}
               aria-label="Open tools menu"
               className="active-tool-button"
             />
             <span className="active-tool-label">
-              {TOOLS.find(t => t.id === activeTool)?.label}
+              {TOOLS.find((t) => t.id === activeTool)?.label}
             </span>
           </div>
         ) : (
@@ -262,7 +274,7 @@ export const MobileToolbar: React.FC<{
               {TOOLS.map((tool) => (
                 <button
                   key={tool.id}
-                  className={`mobile-tool-item ${activeTool === tool.id ? 'active' : ''}`}
+                  className={`mobile-tool-item ${activeTool === tool.id ? "active" : ""}`}
                   onClick={() => {
                     setActiveTool(tool.id);
                     setIsExpanded(false);
@@ -270,9 +282,7 @@ export const MobileToolbar: React.FC<{
                 >
                   <span className="tool-icon">{tool.icon}</span>
                   <span className="tool-label">{tool.label}</span>
-                  {activeTool === tool.id && (
-                    <span className="active-indicator" />
-                  )}
+                  {activeTool === tool.id && <span className="active-indicator" />}
                 </button>
               ))}
             </div>

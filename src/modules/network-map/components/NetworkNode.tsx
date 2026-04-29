@@ -1,9 +1,9 @@
 "use client";
 
-import React from 'react';
+import React from "react";
 import { Icon } from "@shohojdhara/atomix";
-import { NetworkNode as NetworkNodeType, NetworkStatus } from '../types';
-import { NODE_TYPE_ICONS, NETWORK_STATUS_COLORS } from '../constants';
+import { NetworkNode as NetworkNodeType, NetworkStatus } from "../types";
+import { NODE_TYPE_ICONS, NETWORK_STATUS_COLORS } from "../constants";
 
 interface NetworkNodeProps {
   node: NetworkNodeType;
@@ -22,18 +22,20 @@ export const NetworkNode: React.FC<NetworkNodeProps> = ({
   onClick,
   onMouseEnter,
   onMouseLeave,
-  className = ''
+  className = "",
 }) => {
   const statusColor = NETWORK_STATUS_COLORS[node.status];
   const iconName = NODE_TYPE_ICONS[node.type];
-  
+
   const nodeClasses = [
-    'network-node',
+    "network-node",
     `network-node--${node.status}`,
-    selected && 'network-node--selected',
-    hovered && 'network-node--hover',
-    className
-  ].filter(Boolean).join(' ');
+    selected && "network-node--selected",
+    hovered && "network-node--hover",
+    className,
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   const handleClick = (e: React.MouseEvent | React.KeyboardEvent) => {
     e.stopPropagation();
@@ -41,7 +43,7 @@ export const NetworkNode: React.FC<NetworkNodeProps> = ({
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' || e.key === ' ') {
+    if (e.key === "Enter" || e.key === " ") {
       e.preventDefault();
       handleClick(e);
     }
@@ -66,28 +68,30 @@ export const NetworkNode: React.FC<NetworkNodeProps> = ({
       data-node-status={node.status}
     >
       <div className="node-visual">
-        <div 
+        <div
           className="node-indicator"
           style={{
             backgroundColor: statusColor,
-            borderColor: selected ? '#f59e0b' : hovered ? '#3b82f6' : '#ffffff'
+            borderColor: selected ? "#f59e0b" : hovered ? "#3b82f6" : "#ffffff",
           }}
         >
-          <Icon 
-            name={iconName as any} 
-            size="16" 
+          <Icon
+            name={iconName as any}
+            size={16}
             className="node-icon"
             aria-hidden="true"
           />
         </div>
-        
+
         {node.utilization !== undefined && (
-          <div 
+          <div
             className="utilization-ring"
-            style={{
-              '--utilization': `${node.utilization}%`,
-              '--ring-color': statusColor
-            } as React.CSSProperties}
+            style={
+              {
+                "--utilization": `${node.utilization}%`,
+                "--ring-color": statusColor,
+              } as React.CSSProperties
+            }
           />
         )}
       </div>
@@ -97,16 +101,12 @@ export const NetworkNode: React.FC<NetworkNodeProps> = ({
         <div className="node-tooltip">
           <div className="tooltip-header">
             <strong>{node.name}</strong>
-            <span className={`status-badge status-${node.status}`}>
-              {node.status}
-            </span>
+            <span className={`status-badge status-${node.status}`}>{node.status}</span>
           </div>
-          
+
           <div className="tooltip-details">
             <span>Type: {node.type}</span>
-            {node.capacity && (
-              <span>Capacity: {node.capacity} ports</span>
-            )}
+            {node.capacity && <span>Capacity: {node.capacity} ports</span>}
             {node.utilization !== undefined && (
               <span>Utilization: {node.utilization}%</span>
             )}
@@ -174,7 +174,6 @@ export const NetworkNode: React.FC<NetworkNodeProps> = ({
           font-size: 12px;
           min-width: 160px;
           box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-          z-index: 100;
           pointer-events: none;
         }
 
@@ -200,10 +199,22 @@ export const NetworkNode: React.FC<NetworkNodeProps> = ({
           text-transform: uppercase;
         }
 
-        .status-active { background: var(--color-status-active); color: white; }
-        .status-inactive { background: var(--color-status-inactive); color: white; }
-        .status-warning { background: var(--color-status-warning); color: black; }
-        .status-error { background: var(--color-status-error); color: white; }
+        .status-active {
+          background: var(--color-status-active);
+          color: white;
+        }
+        .status-inactive {
+          background: var(--color-status-inactive);
+          color: white;
+        }
+        .status-warning {
+          background: var(--color-status-warning);
+          color: black;
+        }
+        .status-error {
+          background: var(--color-status-error);
+          color: white;
+        }
 
         /* Interaction states */
         .network-node:hover .node-indicator {
@@ -229,8 +240,12 @@ export const NetworkNode: React.FC<NetworkNodeProps> = ({
 
         /* Animation for utilization ring */
         @keyframes rotate-ring {
-          0% { transform: rotate(-45deg); }
-          100% { transform: rotate(315deg); }
+          0% {
+            transform: rotate(-45deg);
+          }
+          100% {
+            transform: rotate(315deg);
+          }
         }
 
         /* Mobile optimization */
@@ -258,7 +273,7 @@ export const NetworkNode: React.FC<NetworkNodeProps> = ({
           .network-node {
             transition: none;
           }
-          
+
           .utilization-ring {
             animation: none;
             opacity: 0.7;

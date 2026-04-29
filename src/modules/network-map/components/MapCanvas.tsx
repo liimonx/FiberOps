@@ -8,6 +8,7 @@ import { useNetworkMapStore, useViewport, useNodes, useConnections } from '../st
 import { MAPBOX_CONFIG } from '../constants';
 import { LoadingState } from './LoadingState';
 import { addCustomLayers, createNodeFeature, createConnectionFeature } from '../utils/mapStyling';
+import { NetworkNodeType, NetworkStatus } from '../types';
 import type { NetworkNode, NetworkConnection } from '../types';
 
 // Module-level variable to store map instance for external access
@@ -21,8 +22,13 @@ interface MapCanvasProps {
 export const MapCanvas: React.FC<MapCanvasProps> = ({ onMapLoad, onMapError }) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
-  const [mapLoading, setMapLoading] = useState(true);
-  const [mapError, setMapError] = useState<string | null>(null);
+  // Check for Mapbox access token at render time to avoid cascading renders in useEffect
+  const tokenError = !MAPBOX_CONFIG.ACCESS_TOKEN 
+    ? 'Mapbox access token not configured. Please set NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN environment variable.' 
+    : null;
+
+  const [mapLoading, setMapLoading] = useState(!tokenError);
+  const [mapError, setMapError] = useState<string | null>(tokenError);
   
   const viewport = useViewport();
   const nodes = useNodes();
@@ -32,20 +38,138 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({ onMapLoad, onMapError }) =
   const setDragging = useNetworkMapStore((state) => state.setDragging);
   const setZooming = useNetworkMapStore((state) => state.setZooming);
 
+  // Report configuration errors to parent
+  useEffect(() => {
+    if (tokenError) {
+      onMapError?.(new Error(tokenError));
+    }
+  }, [tokenError, onMapError]);
+
+  // Helper to create circle coordinates for coverage polygons
+  const createCircleCoordinates = (lng: number, lat: number, radius: number, points = 32) => {
+    const coords = [];
+    for (let i = 0; i < points; i++) {
+      const angle = (i / points) * Math.PI * 2;
+      coords.push([
+        lng + radius * Math.cos(angle),
+        lat + radius * Math.sin(angle)
+      ]);
+    }
+    coords.push(coords[0]); // Close the polygon
+    return coords;
+  };
+
+  // Initialize custom map layers
+  const initializeLayers = (map: mapboxgl.Map) => {
+    try {
+      // Add custom GeoJSON sources and Mapbox layers using utility function
+      addCustomLayers(map);
+      
+      console.log('[MapCanvas] Custom layers initialized successfully');
+    } catch (error) {
+      console.error('[MapCanvas] Failed to initialize layers:', error);
+      throw error;
+    }
+  };
+
+  // Update map data sources with current nodes and connections
+  const updateMapData = (map: mapboxgl.Map, nodes: NetworkNode[], connections: NetworkConnection[]) => {
+    try {
+      // Update nodes source
+      const nodeFeatures = nodes.map(createNodeFeature);
+      console.log('[MapCanvas] Created', nodeFeatures.length, 'node features');
+      
+      const nodesGeoJSON: GeoJSON.FeatureCollection = {
+        type: 'FeatureCollection',
+        features: nodeFeatures
+      };
+      
+      const nodesSource = map.getSource('network-nodes') as mapboxgl.GeoJSONSource | undefined;
+      if (nodesSource) {
+        console.log('[MapCanvas] Updating network-nodes source with', nodeFeatures.length, 'features');
+        nodesSource.setData(nodesGeoJSON);
+      } else {
+        console.warn('[MapCanvas] network-nodes source not found!');
+      }
+      
+      // Update connections source (pass nodes for route calculation)
+      const connectionFeatures = connections.map(conn => 
+        createConnectionFeature(conn, nodes)
+      );
+      console.log('[MapCanvas] Created', connectionFeatures.length, 'connection features');
+      
+      const connectionsGeoJSON: GeoJSON.FeatureCollection = {
+        type: 'FeatureCollection',
+        features: connectionFeatures
+      };
+      
+      const connectionsSource = map.getSource('network-connections') as mapboxgl.GeoJSONSource | undefined;
+      if (connectionsSource) {
+        console.log('[MapCanvas] Updating network-connections source with', connectionFeatures.length, 'features');
+        connectionsSource.setData(connectionsGeoJSON);
+      } else {
+        console.warn('[MapCanvas] network-connections source not found!');
+      }
+      
+      // Update outages source (filter connections with error status)
+      const outageConnections = connections.filter(
+        conn => conn.status === NetworkStatus.ERROR
+      );
+      const outageFeatures = outageConnections.map(conn => 
+        createConnectionFeature(conn, nodes)
+      );
+      const outagesGeoJSON: GeoJSON.FeatureCollection = {
+        type: 'FeatureCollection',
+        features: outageFeatures
+      };
+      
+      const outagesSource = map.getSource('network-outages') as mapboxgl.GeoJSONSource | undefined;
+      if (outagesSource) {
+        console.log('[MapCanvas] Updating network-outages source with', outageFeatures.length, 'features');
+        outagesSource.setData(outagesGeoJSON);
+      } else {
+        console.warn('[MapCanvas] network-outages source not found!');
+      }
+
+      // Update coverage source (mock polygons around core and distribution nodes)
+      const coverageNodes = nodes.filter(
+        node => node.type === NetworkNodeType.CORE_NODE || node.type === NetworkNodeType.DISTRIBUTION_NODE
+      );
+      
+      const coverageFeatures = coverageNodes.map(node => ({
+        type: 'Feature' as const,
+        geometry: {
+          type: 'Polygon' as const,
+          coordinates: [createCircleCoordinates(node.position.lng, node.position.lat, 0.015)] // approx 1.5km radius
+        },
+        properties: {
+          id: `coverage-${node.id}`,
+          nodeId: node.id,
+          name: `${node.name} Coverage`
+        }
+      }));
+
+      const coverageGeoJSON: GeoJSON.FeatureCollection = {
+        type: 'FeatureCollection',
+        features: coverageFeatures
+      };
+
+      const coverageSource = map.getSource('network-coverage') as mapboxgl.GeoJSONSource | undefined;
+      if (coverageSource) {
+        console.log('[MapCanvas] Updating network-coverage source with', coverageFeatures.length, 'features');
+        coverageSource.setData(coverageGeoJSON);
+      }
+    } catch (error) {
+      console.error('[MapCanvas] Failed to update map data:', error);
+    }
+  };
+
   // Initialize Mapbox map
   useEffect(() => {
-    if (!mapContainer.current) return;
-    if (mapRef.current) return; // Already initialized
+    // Skip initialization if container missing, map already exists, or there is a config error
+    if (!mapContainer.current || mapRef.current || tokenError) return;
 
-    // Check for Mapbox access token
-    if (!MAPBOX_CONFIG.ACCESS_TOKEN) {
-      const error = new Error('Mapbox access token not configured. Please set NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN environment variable.');
-      setMapError(error.message);
-      onMapError?.(error);
-      return;
-    }
-
-    mapboxgl.accessToken = MAPBOX_CONFIG.ACCESS_TOKEN;
+    mapboxgl.accessToken = MAPBOX_CONFIG.ACCESS_TOKEN as string;
 
     try {
       const map = new mapboxgl.Map({
@@ -114,8 +238,12 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({ onMapLoad, onMapError }) =
       };
     } catch (error) {
       const mapError = error instanceof Error ? error : new Error('Failed to initialize map');
-      setMapError(mapError.message);
-      onMapError?.(mapError);
+      // Defer state update to avoid cascading renders warning
+      setTimeout(() => {
+        setMapError(mapError.message);
+        onMapError?.(mapError);
+        setMapLoading(false);
+      }, 0);
     }
   }, []);
 
@@ -146,81 +274,6 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({ onMapLoad, onMapError }) =
     }
   }, [viewport]);
 
-  // Initialize custom map layers
-  const initializeLayers = (map: mapboxgl.Map) => {
-    try {
-      // Add custom GeoJSON sources and Mapbox layers using utility function
-      addCustomLayers(map);
-      
-      console.log('[MapCanvas] Custom layers initialized successfully');
-    } catch (error) {
-      console.error('[MapCanvas] Failed to initialize layers:', error);
-      throw error;
-    }
-  };
-
-  // Update map data sources with current nodes and connections
-  const updateMapData = (map: mapboxgl.Map, nodes: NetworkNode[], connections: NetworkConnection[]) => {
-    try {
-      // Update nodes source
-      const nodeFeatures = nodes.map(createNodeFeature);
-      console.log('[MapCanvas] Created', nodeFeatures.length, 'node features');
-      
-      const nodesGeoJSON: GeoJSON.FeatureCollection = {
-        type: 'FeatureCollection',
-        features: nodeFeatures
-      };
-      
-      const nodesSource = map.getSource('network-nodes') as mapboxgl.GeoJSONSource | undefined;
-      if (nodesSource) {
-        console.log('[MapCanvas] Updating network-nodes source with', nodeFeatures.length, 'features');
-        nodesSource.setData(nodesGeoJSON);
-      } else {
-        console.warn('[MapCanvas] network-nodes source not found!');
-      }
-      
-      // Update connections source (pass nodes for route calculation)
-      const connectionFeatures = connections.map(conn => 
-        createConnectionFeature(conn, nodes)
-      );
-      console.log('[MapCanvas] Created', connectionFeatures.length, 'connection features');
-      
-      const connectionsGeoJSON: GeoJSON.FeatureCollection = {
-        type: 'FeatureCollection',
-        features: connectionFeatures
-      };
-      
-      const connectionsSource = map.getSource('network-connections') as mapboxgl.GeoJSONSource | undefined;
-      if (connectionsSource) {
-        console.log('[MapCanvas] Updating network-connections source with', connectionFeatures.length, 'features');
-        connectionsSource.setData(connectionsGeoJSON);
-      } else {
-        console.warn('[MapCanvas] network-connections source not found!');
-      }
-      
-      // Update outages source (filter connections with error status)
-      const outageConnections = connections.filter(
-        conn => conn.status === 'error'
-      );
-      const outageFeatures = outageConnections.map(conn => 
-        createConnectionFeature(conn, nodes)
-      );
-      const outagesGeoJSON: GeoJSON.FeatureCollection = {
-        type: 'FeatureCollection',
-        features: outageFeatures
-      };
-      
-      const outagesSource = map.getSource('network-outages') as mapboxgl.GeoJSONSource | undefined;
-      if (outagesSource) {
-        console.log('[MapCanvas] Updating network-outages source with', outageFeatures.length, 'features');
-        outagesSource.setData(outagesGeoJSON);
-      } else {
-        console.warn('[MapCanvas] network-outages source not found!');
-      }
-    } catch (error) {
-      console.error('[MapCanvas] Failed to update map data:', error);
-    }
-  };
 
   // Update map data when store changes
   useEffect(() => {
@@ -244,15 +297,14 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({ onMapLoad, onMapError }) =
     // Define layer mapping between store layer IDs and Mapbox layer IDs
     const layerMapping: Record<string, string[]> = {
       'fiber-routes': ['network-connections-layer'],
-      'nodes-splitters': ['network-nodes-layer'],
       'outages': ['network-outages-layer'],
-      'customers': ['network-nodes-layer'], // Customers use same layer as nodes
-      'coverage': [] // Coverage not yet implemented
+      'coverage': ['network-coverage-layer']
     };
     
-    layers.forEach(layer => {
-      const mapboxLayerIds = layerMapping[layer.id];
-      if (mapboxLayerIds) {
+    // Handle standard layer mappings
+    Object.entries(layerMapping).forEach(([storeLayerId, mapboxLayerIds]) => {
+      const layer = layers.find(l => l.id === storeLayerId);
+      if (layer) {
         mapboxLayerIds.forEach(mapboxLayerId => {
           if (map.getLayer(mapboxLayerId)) {
             const visibility = layer.visible ? 'visible' : 'none';
@@ -261,6 +313,29 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({ onMapLoad, onMapError }) =
         });
       }
     });
+
+    // Special logic for network-nodes-layer (split between nodes-splitters and customers)
+    const nodesLayer = layers.find(l => l.id === 'nodes-splitters');
+    const customersLayer = layers.find(l => l.id === 'customers');
+    const nodesVisible = nodesLayer?.visible ?? true;
+    const customersVisible = customersLayer?.visible ?? false;
+
+    if (map.getLayer('network-nodes-layer')) {
+      // Show layer if either nodes or customers are visible
+      map.setLayoutProperty('network-nodes-layer', 'visibility', (nodesVisible || customersVisible) ? 'visible' : 'none');
+      
+      // Apply filter based on which one is visible
+      if (nodesVisible && customersVisible) {
+        map.setFilter('network-nodes-layer', null); // Show all
+      } else if (nodesVisible) {
+        map.setFilter('network-nodes-layer', ['!=', ['get', 'type'], 'customer']);
+      } else if (customersVisible) {
+        map.setFilter('network-nodes-layer', ['==', ['get', 'type'], 'customer']);
+      } else {
+        // Both off
+        map.setFilter('network-nodes-layer', ['==', ['get', 'type'], 'NONE']);
+      }
+    }
   }, [layers]);
 
   if (mapError) {

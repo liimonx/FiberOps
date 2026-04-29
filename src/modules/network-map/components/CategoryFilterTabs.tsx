@@ -1,8 +1,8 @@
 "use client";
 
-import React from 'react';
-import { Icon, Button } from "@shohojdhara/atomix";
-import { AssetCategory } from '../hooks/useAssetSearch';
+import React from "react";
+import { Icon, Button, Badge } from "@shohojdhara/atomix";
+import { AssetCategory } from "../hooks/useAssetSearch";
 
 interface CategoryFilterTabsProps {
   selectedCategory: AssetCategory;
@@ -13,10 +13,10 @@ interface CategoryFilterTabsProps {
 }
 
 const CATEGORY_CONFIG: Record<AssetCategory, { label: string; icon: string }> = {
-  all: { label: 'All', icon: 'SquaresFour' },
-  nodes: { label: 'Nodes', icon: 'HardDrives' },
-  connections: { label: 'Connections', icon: 'GitBranch' },
-  customers: { label: 'Customers', icon: 'Users' }
+  all: { label: "All", icon: "SquaresFour" },
+  nodes: { label: "Nodes", icon: "HardDrives" },
+  connections: { label: "Connections", icon: "GitBranch" },
+  customers: { label: "Customers", icon: "Users" },
 };
 
 /**
@@ -26,18 +26,18 @@ export const CategoryFilterTabs: React.FC<CategoryFilterTabsProps> = ({
   selectedCategory,
   onCategoryChange,
   categoryCounts,
-  containerClassName = '',
-  tabClassName = ''
+  containerClassName = "",
+  tabClassName = "",
 }) => {
-  const categories: AssetCategory[] = ['all', 'nodes', 'connections', 'customers'];
+  const categories: AssetCategory[] = ["all", "nodes", "connections", "customers"];
 
   return (
-    <div 
-      className={`category-filters ${containerClassName}`} 
-      role="tablist" 
+    <div
+      className={`u-flex u-gap-1 u-mt-3 u-overflow-x-auto u-pb-1 ${containerClassName}`}
+      role="tablist"
       aria-label="Search categories"
     >
-      {categories.map(category => {
+      {categories.map((category) => {
         const config = CATEGORY_CONFIG[category];
         const isActive = selectedCategory === category;
         const count = categoryCounts[category];
@@ -45,17 +45,16 @@ export const CategoryFilterTabs: React.FC<CategoryFilterTabsProps> = ({
         return (
           <Button
             key={category}
-            role="tab"
             aria-selected={isActive}
             aria-controls="search-results"
             variant={isActive ? "primary" : "secondary"}
             size="sm"
-            iconName={config.icon as any}
+            iconName={config.icon}
             onClick={() => onCategoryChange(category)}
-            className={`category-tab ${isActive ? 'active' : ''} ${tabClassName}`}
+            className={tabClassName}
           >
-            <span className="category-label">{config.label}</span>
-            <span className="category-count">{count}</span>
+            <span className="u-text-capitalize">{config.label}</span>
+            <Badge label={`${count}`} variant="error" size="sm" />
           </Button>
         );
       })}

@@ -141,22 +141,37 @@ export const useNetworkMapStore = create<NetworkMapStore>()(
 
         // Layer actions
         toggleLayer: (layerId) =>
-          set((state) => ({
-            layers: state.layers.map(layer =>
-              layer.id === layerId 
-                ? { ...layer, visible: !layer.visible }
-                : layer
-            )
-          }), false, 'toggleLayer'),
+          set((state) => {
+            const layerExists = state.layers.some(l => l.id === layerId);
+            if (layerExists) {
+              return {
+                layers: state.layers.map(layer =>
+                  layer.id === layerId 
+                    ? { ...layer, visible: !layer.visible }
+                    : layer
+                )
+              };
+            }
+            // If layer doesn't exist (e.g. newly added to config), we can't easily toggle it without its metadata
+            // But we can assume it should be visible if it was missing and we are trying to toggle it
+            // Actually, it's better to just ensure all layers are synced.
+            return state;
+          }, false, 'toggleLayer'),
 
         setLayerVisibility: (layerId, visible) =>
-          set((state) => ({
-            layers: state.layers.map(layer =>
-              layer.id === layerId 
-                ? { ...layer, visible }
-                : layer
-            )
-          }), false, 'setLayerVisibility'),
+          set((state) => {
+            const layerExists = state.layers.some(l => l.id === layerId);
+            if (layerExists) {
+              return {
+                layers: state.layers.map(layer =>
+                  layer.id === layerId 
+                    ? { ...layer, visible }
+                    : layer
+                )
+              };
+            }
+            return state;
+          }, false, 'setLayerVisibility'),
 
         updateLayers: (layers) =>
           set({ layers }, false, 'updateLayers'),

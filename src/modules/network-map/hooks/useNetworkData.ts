@@ -40,28 +40,28 @@ export const networkQueryKeys = {
 
 // Transform domain assets to network nodes
 const transformAssetToNode = (asset: Asset): NetworkNode => {
-  const nodeTypeMap: Record<string, any> = {
-    pop: 'CORE_NODE',
-    junction_box: 'DISTRIBUTION_NODE',
-    splitter: 'SPLITTER',
-    onu: 'CUSTOMER',
-    pole: 'ACCESS_NODE',
-    fiber_route: 'ACCESS_NODE'
+  const nodeTypeMap: Record<string, NetworkNodeType> = {
+    pop: NetworkNodeType.CORE_NODE,
+    junction_box: NetworkNodeType.DISTRIBUTION_NODE,
+    splitter: NetworkNodeType.SPLITTER,
+    onu: NetworkNodeType.CUSTOMER,
+    pole: NetworkNodeType.ACCESS_NODE,
+    fiber_route: NetworkNodeType.ACCESS_NODE
   };
 
-  const statusMap: Record<string, any> = {
-    active: 'ACTIVE',
-    degraded: 'WARNING',
-    down: 'ERROR',
-    maintenance: 'INACTIVE'
+  const statusMap: Record<string, NetworkStatus> = {
+    active: NetworkStatus.ACTIVE,
+    degraded: NetworkStatus.WARNING,
+    down: NetworkStatus.ERROR,
+    maintenance: NetworkStatus.INACTIVE
   };
 
   return {
     id: asset.id,
     name: asset.name,
-    type: nodeTypeMap[asset.kind] || 'ACCESS_NODE',
+    type: nodeTypeMap[asset.kind] || NetworkNodeType.ACCESS_NODE,
     position: asset.location,
-    status: statusMap[asset.status] || 'ACTIVE',
+    status: statusMap[asset.status] || NetworkStatus.ACTIVE,
     metadata: {
       kind: asset.kind,
       originalStatus: asset.status
@@ -71,10 +71,10 @@ const transformAssetToNode = (asset: Asset): NetworkNode => {
 
 // Transform domain customers to network nodes
 const transformCustomerToNode = (customer: Customer): NetworkNode => {
-  const statusMap: Record<string, any> = {
-    online: 'ACTIVE',
-    offline: 'ERROR',
-    unstable: 'WARNING'
+  const statusMap: Record<string, NetworkStatus> = {
+    online: NetworkStatus.ACTIVE,
+    offline: NetworkStatus.ERROR,
+    unstable: NetworkStatus.WARNING
   };
 
   return {
@@ -82,7 +82,7 @@ const transformCustomerToNode = (customer: Customer): NetworkNode => {
     name: customer.name,
     type: NetworkNodeType.CUSTOMER,
     position: customer.location || { lat: 23.8103, lng: 90.4125 }, // Default to Dhaka center if no location
-    status: statusMap[customer.status] || 'ACTIVE',
+    status: statusMap[customer.status] || NetworkStatus.ACTIVE,
     metadata: {
       kind: 'customer',
       plan: customer.plan,
@@ -193,24 +193,93 @@ export function useNetworkConnections() {
     queryKey: networkQueryKeys.connections.list(),
     queryFn: async () => {
       // In production, this would fetch from a real endpoint
-      // For now, we'll generate mock connections based on assets
+      // For now, we'll generate mock connections based on assets and hierarchy
       const result = await services.assets.list();
       const assets = result.items;
       
-      // Create simple chain connections for demo purposes
       const connections: NetworkConnection[] = [];
-      for (let i = 0; i < assets.length - 1; i++) {
-        connections.push({
-          id: `conn_${assets[i].id}_${assets[i + 1].id}`,
-          sourceNodeId: assets[i].id,
-          targetNodeId: assets[i + 1].id,
-          status: assets[i].status === 'active' && assets[i + 1].status === 'active' 
-            ? NetworkStatus.ACTIVE 
-            : NetworkStatus.WARNING,
-          bandwidth: 1000, // 1 Gbps
-          utilization: Math.random() * 80 // Random utilization 0-80%
-        });
+      
+      // Categorize assets for hierarchical connection generation
+      const pops = assets.filter(a => a.kind === 'pop');
+      const junctionBoxes = assets.filter(a => a.kind === 'junction_box');
+      const splitters = assets.filter(a => a.kind === 'splitter');
+      const poles = assets.filter(a => a.kind === 'pole');
+      
+      // 1. Connect PoPs to each other (Core Ring)
+      for (let i = 0; i < pops.length; i++) {
+        const source = pops[i];
+        const target = pops[(i + 1) % pops.length];
+        if (source.id !== target.id) {
+          connections.push({
+            id: `conn_${source.id}_${target.id}`,
+            sourceNodeId: source.id,
+            targetNodeId: target.id,
+            status: NetworkStatus.ACTIVE,
+            bandwidth: 10000, // 10 Gbps core
+            utilization: 20 + Math.random() * 30
+          });
+        }
       }
+      
+      // 2. Connect each Junction Box to the nearest PoP
+      junctionBoxes.forEach(jb => {
+        const nearestPop = pops.reduce((prev, curr) => {
+          const distPrev = Math.sqrt(Math.pow(jb.location.lat - prev.location.lat, 2) + Math.pow(jb.location.lng - prev.location.lng, 2));
+          const distCurr = Math.sqrt(Math.pow(jb.location.lat - curr.location.lat, 2) + Math.pow(jb.location.lng - curr.location.lng, 2));
+          return distCurr < distPrev ? curr : prev;
+        }, pops[0]);
+        
+        if (nearestPop) {
+          connections.push({
+            id: `conn_${nearestPop.id}_${jb.id}`,
+            sourceNodeId: nearestPop.id,
+            targetNodeId: jb.id,
+            status: jb.status === 'degraded' ? NetworkStatus.WARNING : NetworkStatus.ACTIVE,
+            bandwidth: 2000,
+            utilization: 30 + Math.random() * 40
+          });
+        }
+      });
+      
+      // 3. Connect each Splitter to the nearest Junction Box
+      splitters.forEach(split => {
+        const nearestJB = junctionBoxes.reduce((prev, curr) => {
+          const distPrev = Math.sqrt(Math.pow(split.location.lat - prev.location.lat, 2) + Math.pow(split.location.lng - prev.location.lng, 2));
+          const distCurr = Math.sqrt(Math.pow(split.location.lat - curr.location.lat, 2) + Math.pow(split.location.lng - curr.location.lng, 2));
+          return distCurr < distPrev ? curr : prev;
+        }, junctionBoxes[0]);
+        
+        if (nearestJB) {
+          connections.push({
+            id: `conn_${nearestJB.id}_${split.id}`,
+            sourceNodeId: nearestJB.id,
+            targetNodeId: split.id,
+            status: NetworkStatus.ACTIVE,
+            bandwidth: 1000,
+            utilization: 10 + Math.random() * 60
+          });
+        }
+      });
+      
+      // 4. Connect each Pole to the nearest Splitter
+      poles.forEach(pole => {
+        const nearestSplit = splitters.reduce((prev, curr) => {
+          const distPrev = Math.sqrt(Math.pow(pole.location.lat - prev.location.lat, 2) + Math.pow(pole.location.lng - prev.location.lng, 2));
+          const distCurr = Math.sqrt(Math.pow(pole.location.lat - curr.location.lat, 2) + Math.pow(pole.location.lng - curr.location.lng, 2));
+          return distCurr < distPrev ? curr : prev;
+        }, splitters[0]);
+        
+        if (nearestSplit) {
+          connections.push({
+            id: `conn_${nearestSplit.id}_${pole.id}`,
+            sourceNodeId: nearestSplit.id,
+            targetNodeId: pole.id,
+            status: pole.status === 'down' ? NetworkStatus.ERROR : NetworkStatus.ACTIVE,
+            bandwidth: 1000,
+            utilization: Math.random() * 90
+          });
+        }
+      });
       
       return connections;
     },

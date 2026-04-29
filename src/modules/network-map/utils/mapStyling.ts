@@ -2,6 +2,7 @@
 
 import { MAPBOX_CONFIG } from '../constants';
 import type { LayerSpecification } from 'mapbox-gl';
+import type { NetworkNode, NetworkConnection } from '../types';
 
 export interface MapStyleConfig {
   id: string;
@@ -52,7 +53,7 @@ export const CUSTOM_LAYERS = {
         5, 4,   // At zoom 5, radius 4px
         10, 8,  // At zoom 10, radius 8px
         15, 12  // At zoom 15, radius 12px
-      ] as any,
+      ],
       'circle-color': [
         'match',
         ['get', 'status'],
@@ -61,19 +62,19 @@ export const CUSTOM_LAYERS = {
         'warning', '#f59e0b',
         'error', '#ef4444',
         '#6b7280' // Default
-      ] as any,
+      ],
       'circle-stroke-width': [
         'case',
         ['boolean', ['feature-state', 'selected'], false], 3,
         ['boolean', ['feature-state', 'hovered'], false], 2,
         1
-      ] as any,
+      ],
       'circle-stroke-color': [
         'case',
         ['boolean', ['feature-state', 'selected'], false], '#f59e0b',
         ['boolean', ['feature-state', 'hovered'], false], '#3b82f6',
         '#ffffff'
-      ] as any,
+      ],
       'circle-opacity': 0.9
     }
   } as LayerSpecification,
@@ -91,7 +92,7 @@ export const CUSTOM_LAYERS = {
         5, 1,
         10, 2,
         15, 3
-      ] as any,
+      ],
       'line-color': [
         'match',
         ['get', 'status'],
@@ -100,13 +101,13 @@ export const CUSTOM_LAYERS = {
         'warning', '#f59e0b',
         'error', '#ef4444',
         '#6b7280' // Default
-      ] as any,
+      ],
       'line-opacity': 0.8,
       'line-dasharray': [
         'case',
         ['==', ['get', 'status'], 'inactive'], [2, 2],
         [1, 0]
-      ] as any
+      ]
     }
   } as LayerSpecification,
 
@@ -119,6 +120,18 @@ export const CUSTOM_LAYERS = {
       'fill-color': '#ef4444',
       'fill-opacity': 0.3,
       'fill-outline-color': '#ef4444'
+    }
+  },
+  
+  // Coverage area visualization
+  coverage: {
+    id: 'network-coverage-layer',
+    type: 'fill' as const,
+    source: 'network-coverage',
+    paint: {
+      'fill-color': '#8b5cf6',
+      'fill-opacity': 0.2,
+      'fill-outline-color': '#8b5cf6'
     }
   }
 };
@@ -156,6 +169,16 @@ export const addCustomLayers = (map: mapboxgl.Map) => {
     });
   }
 
+  if (!map.getSource('network-coverage')) {
+    map.addSource('network-coverage', {
+      type: 'geojson',
+      data: {
+        type: 'FeatureCollection',
+        features: []
+      }
+    });
+  }
+
   // Add custom layers (only if they don't already exist)
   if (!map.getLayer('network-connections-layer')) {
     map.addLayer(CUSTOM_LAYERS.connections);
@@ -167,6 +190,10 @@ export const addCustomLayers = (map: mapboxgl.Map) => {
   
   if (!map.getLayer('network-outages-layer')) {
     map.addLayer(CUSTOM_LAYERS.outages);
+  }
+
+  if (!map.getLayer('network-coverage-layer')) {
+    map.addLayer(CUSTOM_LAYERS.coverage as any);
   }
 };
 
@@ -243,7 +270,7 @@ export const applyTheme = (map: mapboxgl.Map, theme: 'light' | 'dark') => {
 };
 
 // Export utility for creating GeoJSON features
-export const createNodeFeature = (node: any): GeoJSON.Feature => ({
+export const createNodeFeature = (node: NetworkNode): GeoJSON.Feature => ({
   type: 'Feature' as const,
   geometry: {
     type: 'Point' as const,
@@ -259,17 +286,17 @@ export const createNodeFeature = (node: any): GeoJSON.Feature => ({
   }
 });
 
-export const createConnectionFeature = (connection: any, nodes?: any[]): GeoJSON.Feature => {
+export const createConnectionFeature = (connection: NetworkConnection, nodes?: NetworkNode[]): GeoJSON.Feature => {
   let coordinates: [number, number][] = [];
   
   // If route is provided, use it
   if (connection.route && connection.route.length > 0) {
-    coordinates = connection.route.map((pos: any) => [pos.lng, pos.lat]);
+    coordinates = connection.route.map((pos) => [pos.lng, pos.lat]);
   } 
   // Otherwise, create a straight line between source and target nodes
   else if (nodes) {
-    const sourceNode = nodes.find((n: any) => n.id === connection.sourceNodeId);
-    const targetNode = nodes.find((n: any) => n.id === connection.targetNodeId);
+    const sourceNode = nodes.find((n) => n.id === connection.sourceNodeId);
+    const targetNode = nodes.find((n) => n.id === connection.targetNodeId);
     
     if (sourceNode && targetNode) {
       coordinates = [

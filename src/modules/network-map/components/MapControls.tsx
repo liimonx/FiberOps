@@ -47,7 +47,7 @@ export const MapControls: React.FC<MapControlsProps> = ({
   const handleResetPitch = useCallback(() => {
     const map = getMapInstance();
     if (map) {
-      map.resetPitch();
+      map.setPitch(0);
       announce('Map pitch reset', 'polite');
     }
   }, [announce]);
@@ -62,15 +62,15 @@ export const MapControls: React.FC<MapControlsProps> = ({
   return (
     <div className={`map-controls ${positionClasses[position]} ${className}`}>
       <Card appearance="elevated" glass={true} className="controls-card">
-        <div className="controls-grid" role="toolbar" aria-label="地图控制">
+        <div className="controls-grid" role="toolbar" aria-label="Map controls">
           {/* Zoom controls */}
-          <div className="zoom-controls" role="group" aria-label="缩放控制">
+          <div className="zoom-controls" role="group" aria-label="Zoom controls">
             <Button
               variant="secondary"
               size={isMobile ? 'sm' : 'md'}
               iconName="Plus"
               onClick={handleZoomIn}
-              aria-label="放大"
+              aria-label="Zoom in"
               className="zoom-in"
             />
             <Button
@@ -78,20 +78,20 @@ export const MapControls: React.FC<MapControlsProps> = ({
               size={isMobile ? 'sm' : 'md'}
               iconName="Minus"
               onClick={handleZoomOut}
-              aria-label="缩小"
+              aria-label="Zoom out"
               className="zoom-out"
             />
           </div>
 
           {/* Compass controls */}
           {showCompass && (
-            <div className="compass-controls" role="group" aria-label="方向控制">
+            <div className="compass-controls" role="group" aria-label="Orientation controls">
               <Button
                 variant="secondary"
                 size={isMobile ? 'sm' : 'md'}
                 iconName="Compass"
                 onClick={handleResetBearing}
-                aria-label="重置北向"
+                aria-label="Reset north"
                 className="compass-reset"
               />
               <Button
@@ -99,7 +99,7 @@ export const MapControls: React.FC<MapControlsProps> = ({
                 size={isMobile ? 'sm' : 'md'}
                 iconName="Navigation"
                 onClick={handleResetPitch}
-                aria-label="重置俯仰角"
+                aria-label="Reset pitch"
                 className="pitch-reset"
               />
             </div>
@@ -192,7 +192,7 @@ export const CompassControl: React.FC = () => {
       variant="secondary"
       size="sm"
       onClick={handleResetBearing}
-      aria-label={`重置地图方向，当前角度: ${Math.round(bearing)}度`}
+      aria-label={`Reset map orientation, current bearing: ${Math.round(bearing)} degrees`}
       className="compass-button"
     >
       <div className="compass-indicator">

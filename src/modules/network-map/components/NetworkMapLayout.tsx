@@ -34,7 +34,7 @@ export const NetworkMapLayout: React.FC<NetworkMapLayoutProps> = ({
       </main>
 
       {/* Desktop layout */}
-      <div className="desktop-controls hidden md:block" role="presentation">
+      <div className="desktop-controls" role="presentation">
         {/* Top left - Search panel */}
         <nav className="search-panel" aria-label="Search">
           <Card appearance="elevated" glass={true} className="search-card">
@@ -61,7 +61,7 @@ export const NetworkMapLayout: React.FC<NetworkMapLayoutProps> = ({
       </div>
 
       {/* Mobile layout */}
-      <div className="mobile-controls md:hidden" role="presentation">
+      <div className="mobile-controls" role="presentation">
         {mobileControls}
       </div>
 
@@ -135,13 +135,14 @@ export const NetworkMapLayout: React.FC<NetworkMapLayoutProps> = ({
 
         .inspector-panel {
           position: absolute;
-          top: 16px;
+          top: 80px;
           right: 16px;
           width: 320px;
           pointer-events: auto;
         }
 
         .mobile-controls {
+          display: none;
           position: absolute;
           bottom: 0;
           left: 0;
@@ -169,6 +170,14 @@ export const NetworkMapLayout: React.FC<NetworkMapLayoutProps> = ({
         }
 
         @media (max-width: ${RESPONSIVE_BREAKPOINTS.MOBILE}px) {
+          .desktop-controls {
+            display: none;
+          }
+
+          .mobile-controls {
+            display: block;
+          }
+
           .search-panel,
           .inspector-panel {
             width: calc(100% - 32px);

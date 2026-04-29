@@ -17,6 +17,13 @@ export const mockAssets: Asset[] = [
     status: "active",
     location: { lat: 23.7925, lng: 90.4078 }
   },
+  {
+    id: "pop-banani-01",
+    kind: "pop",
+    name: "Banani Core Hub",
+    status: "active",
+    location: { lat: 23.7940, lng: 90.4030 }
+  },
 
   // Junction boxes - Distribution nodes
   {
@@ -40,6 +47,13 @@ export const mockAssets: Asset[] = [
     status: "active",
     location: { lat: 23.7644, lng: 90.3928 }
   },
+  {
+    id: "jb-gulshan-02",
+    kind: "junction_box",
+    name: "Gulshan Circle 2 Hub",
+    status: "active",
+    location: { lat: 23.7910, lng: 90.4150 }
+  },
 
   // Splitters
   {
@@ -55,6 +69,13 @@ export const mockAssets: Asset[] = [
     name: "Banani Splitter 1:16",
     status: "active",
     location: { lat: 23.7945, lng: 90.4072 }
+  },
+  {
+    id: "split-uttara-01",
+    kind: "splitter",
+    name: "Uttara Sec 4 Splitter",
+    status: "active",
+    location: { lat: 23.8710, lng: 90.3950 }
   },
 
   // Poles - Access nodes
@@ -79,6 +100,20 @@ export const mockAssets: Asset[] = [
     status: "down",
     location: { lat: 23.7960, lng: 90.4100 }
   },
+  {
+    id: "pole-circle-2-01",
+    kind: "pole",
+    name: "Circle 2 Pole #4",
+    status: "active",
+    location: { lat: 23.7915, lng: 90.4155 }
+  },
+  {
+    id: "pole-circle-2-02",
+    kind: "pole",
+    name: "Circle 2 Pole #5",
+    status: "active",
+    location: { lat: 23.7920, lng: 90.4160 }
+  },
 
   // Fiber routes
   {
@@ -95,29 +130,13 @@ export const mockAssets: Asset[] = [
     status: "maintenance",
     location: { lat: 23.7800, lng: 90.3950 }
   },
-
-  // ONUs - Customer premises equipment
   {
-    id: "onu-cust-001",
-    kind: "onu",
-    name: "Customer ONU - Rahman Residence",
+    id: "fiber-route-003",
+    kind: "fiber_route",
+    name: "Tejgaon Main Link",
     status: "active",
-    location: { lat: 23.7965, lng: 90.4105 }
-  },
-  {
-    id: "onu-cust-002",
-    kind: "onu",
-    name: "Customer ONU - Karim Tower",
-    status: "active",
-    location: { lat: 23.7970, lng: 90.4110 }
-  },
-  {
-    id: "onu-cust-003",
-    kind: "onu",
-    name: "Customer ONU - Ahmed Plaza",
-    status: "down",
-    location: { lat: 23.7975, lng: 90.4115 }
-  },
+    location: { lat: 23.7650, lng: 90.3930 }
+  }
 ];
 
 // Mock customers with locations in Dhaka
@@ -144,6 +163,20 @@ export const mockCustomers: Customer[] = [
     status: "offline",
     location: { lat: 23.7958, lng: 90.4098 }
   },
+  {
+    id: "cust-014",
+    name: "Siddique Heights",
+    plan: "Fiber 100Mbps",
+    status: "online",
+    location: { lat: 23.7920, lng: 90.4170 }
+  },
+  {
+    id: "cust-015",
+    name: "Manir Mansion",
+    plan: "Fiber 50Mbps",
+    status: "online",
+    location: { lat: 23.7925, lng: 90.4175 }
+  },
   
   // Business customers
   {
@@ -159,6 +192,13 @@ export const mockCustomers: Customer[] = [
     plan: "Fiber 1Gbps",
     status: "unstable",
     location: { lat: 23.7940, lng: 90.4082 }
+  },
+  {
+    id: "cust-016",
+    name: "Green Bank Ltd",
+    plan: "Fiber 2Gbps",
+    status: "online",
+    location: { lat: 23.7918, lng: 90.4145 }
   },
   
   // Additional residential customers

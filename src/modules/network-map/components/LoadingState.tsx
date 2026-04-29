@@ -25,9 +25,9 @@ export const LoadingState: React.FC<LoadingStateProps> = ({
   };
 
   const spinnerSizes = {
-    sm: '16px',
-    md: '24px',
-    lg: '32px'
+    sm: 16,
+    md: 24,
+    lg: 32
   };
 
   return (

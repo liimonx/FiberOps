@@ -1,8 +1,10 @@
 "use client";
 
 import { useEffect, useRef, useCallback } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { useNetworkMapStore } from '../stores/useNetworkMapStore';
 import { getWebSocketService, WebSocketMessage, WebSocketService } from '../services/websocketService';
+import { NetworkStatus } from '../types';
 
 interface UseRealTimeUpdatesOptions {
   enabled?: boolean;
@@ -51,7 +53,7 @@ export function useRealTimeUpdates(options: UseRealTimeUpdatesOptions = {}) {
         case 'status_broadcast':
           if (message.data.nodeId !== 'system') {
             updateNode(message.data.nodeId, { 
-              status: message.data.status as any 
+              status: message.data.status as NetworkStatus
             });
           }
           break;
@@ -161,7 +163,7 @@ export function useRealTimeUpdates(options: UseRealTimeUpdatesOptions = {}) {
   }, []);
 
   return {
-    isConnected: isConnectedRef.current,
+    isConnected: useNetworkMapStore((state) => state.isWebSocketConnected),
     sendMessage,
     connectionQuality: useNetworkMapStore((state) => state.connectionQuality),
   };
@@ -196,4 +198,3 @@ export function useOptimisticUpdate<T extends { id: string }>(
   }, [queryClient, updateMutation]);
 }
 
-import { useQueryClient } from '@tanstack/react-query';
