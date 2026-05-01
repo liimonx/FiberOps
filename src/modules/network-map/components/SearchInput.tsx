@@ -2,7 +2,6 @@
 
 import React, { useRef } from "react";
 import { Icon, Button } from "@shohojdhara/atomix";
-import { Input } from "@shohojdhara/atomix";
 
 interface SearchInputProps {
   value: string;
@@ -39,7 +38,6 @@ export const SearchInput: React.FC<SearchInputProps> = ({
   return (
     <div
       className={`u-relative u-flex u-items-center u-w-100 ${wrapperClassName}`}
-      onKeyDown={onKeyDown as any}
     >
       <Icon
         name="MagnifyingGlass"
@@ -47,10 +45,12 @@ export const SearchInput: React.FC<SearchInputProps> = ({
         className={`u-absolute u-ms-3 u-text-muted ${iconClassName}`}
         style={{ pointerEvents: "none" }}
       />
-      <Input
+      <input
         ref={inputRef}
+        type="text"
         value={value}
         onChange={(e) => onChange(e.target.value)}
+        onKeyDown={onKeyDown}
         placeholder={placeholder}
         className={`u-w-100 u-ps-5 u-pe-5 ${inputClassName}`}
         aria-label="Search network assets"

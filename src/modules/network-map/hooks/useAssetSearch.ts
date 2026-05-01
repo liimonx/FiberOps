@@ -5,6 +5,10 @@ import { NetworkNode, NetworkConnection, SearchResult, NetworkNodeType } from '.
 
 export type AssetCategory = 'all' | 'nodes' | 'connections' | 'customers';
 
+/**
+ * Extended search result with category information for filtering
+ * Inherits all properties from SearchResult plus category field
+ */
 export interface CategorizedResult extends SearchResult {
   category: AssetCategory;
 }

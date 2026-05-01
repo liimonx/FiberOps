@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Card, Icon } from "@shohojdhara/atomix";
-import { NetworkNode, NetworkConnection, SearchResult } from "../types";
+import { NetworkNode, NetworkConnection } from "../types";
 import {
   useAssetSearch,
   AssetCategory,
@@ -15,8 +15,7 @@ import { QuickActions } from "./QuickActions";
 interface SearchPanelProps {
   nodes: NetworkNode[];
   connections: NetworkConnection[];
-  onSelectResult: (result: SearchResult) => void;
-  onClose?: () => void;
+  onSelectResult: (result: CategorizedResult) => void;
   className?: string;
   isOpen?: boolean;
 }
@@ -25,7 +24,6 @@ export const SearchPanel: React.FC<SearchPanelProps> = ({
   nodes,
   connections,
   onSelectResult,
-  onClose,
   className = "",
   isOpen = true,
 }) => {
@@ -62,7 +60,6 @@ export const SearchPanel: React.FC<SearchPanelProps> = ({
         break;
       case "Escape":
         clearSearch();
-        onClose?.();
         break;
     }
   };

@@ -71,7 +71,7 @@ export default function Home() {
       {/* Hero Section */}
       <div className="u-mb-8">
         <h1 className="u-fs-3xl u-font-bold u-mb-2">Welcome to FiberOps</h1>
-        <p className="u-text-secondary-subtle u-fs-lg">
+        <p className="u-text-secondary-emphasis u-fs-lg">
           Monitor, manage, and optimize your fiber network operations in real-time.
         </p>
       </div>
@@ -85,7 +85,7 @@ export default function Home() {
                 <Icon name="Users" className="u-text-primary" size="lg" />
               </div>
               <div>
-                <div className="u-fs-xs u-text-secondary-subtle">Total Customers</div>
+                <div className="u-fs-xs u-text-secondary-emphasis">Total Customers</div>
                 <div className="u-fs-xl u-font-bold">12,492</div>
               </div>
             </div>
@@ -97,13 +97,13 @@ export default function Home() {
         </GridCol>
 
         <GridCol xs={12} sm={6} lg={3}>
-          <Card appearance="ghost" glass={true} className="u-h-100">
+          <Card appearance="ghost" glass className="u-h-100">
             <div className="u-flex u-items-center u-gap-3 u-mb-3">
               <div className="u-bg-error-subtle u-rounded u-p-2">
                 <Icon name="Warning" className="u-text-error" size="lg" />
               </div>
               <div>
-                <div className="u-fs-xs u-text-secondary-subtle">Active Incidents</div>
+                <div className="u-fs-xs u-text-secondary-emphasis">s</div>
                 <div className="u-fs-xl u-font-bold">3</div>
               </div>
             </div>
@@ -121,11 +121,11 @@ export default function Home() {
                 <Icon name="Pulse" className="u-text-success" size="lg" />
               </div>
               <div>
-                <div className="u-fs-xs u-text-secondary-subtle">Signal Health</div>
+                <div className="u-fs-xs u-text-secondary-emphasis">Signal Health</div>
                 <div className="u-fs-xl u-font-bold">94%</div>
               </div>
             </div>
-            <div className="u-fs-xs u-text-secondary-subtle">Stable across all nodes</div>
+            <div className="u-fs-xs u-text-secondary-emphasis">Stable across all nodes</div>
           </Card>
         </GridCol>
 
@@ -136,7 +136,7 @@ export default function Home() {
                 <Icon name="Clipboard" className="u-text-warning" size="lg" />
               </div>
               <div>
-                <div className="u-fs-xs u-text-secondary-subtle">Open Work Orders</div>
+                <div className="u-fs-xs u-text-secondary-emphasis">Open Work Orders</div>
                 <div className="u-fs-xl u-font-bold">28</div>
               </div>
             </div>
@@ -167,11 +167,11 @@ export default function Home() {
                     </div>
                     <div className="u-flex-grow-1">
                       <h3 className="u-fs-base u-font-bold u-mb-1">{action.title}</h3>
-                      <p className="u-fs-sm u-text-secondary-subtle u-mb-0">
+                      <p className="u-fs-sm u-text-secondary-emphasis u-mb-0">
                         {action.description}
                       </p>
                     </div>
-                    <Icon name="ArrowRight" className="u-text-secondary-subtle" />
+                    <Icon name="ArrowRight" className="u-text-secondary-emphasis" />
                   </div>
                 </Card>
               </Link>
@@ -209,7 +209,7 @@ export default function Home() {
                 </div>
                 <div className="u-flex-grow-1">
                   <div className="u-fs-sm u-font-bold">{activity.message}</div>
-                  <div className="u-fs-xs u-text-secondary-subtle">{activity.time}</div>
+                  <div className="u-fs-xs u-text-secondary-emphasis">{activity.time}</div>
                 </div>
               </div>
             ))}

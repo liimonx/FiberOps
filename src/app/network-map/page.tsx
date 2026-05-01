@@ -28,6 +28,7 @@ import {
   NetworkNode,
   NetworkConnection,
 } from "@/modules/network-map/types";
+import { CategorizedResult } from "@/modules/network-map/hooks/useAssetSearch";
 import { flyToLocation } from "@/modules/network-map/components/MapEventHandler";
 import { getMapInstance } from "@/modules/network-map/components/MapCanvas";
 
@@ -59,7 +60,7 @@ function NetworkMapContent() {
 
   // Handle search result selection — fly to actual node coordinates
   const handleSelectResult = useCallback(
-    (result: SearchResult) => {
+    (result: CategorizedResult) => {
       setSelectedElement(result.id);
       addToSelectionHistory(result.id);
 

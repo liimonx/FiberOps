@@ -97,7 +97,7 @@ export const MapControls: React.FC<MapControlsProps> = ({
               <Button
                 variant="secondary"
                 size={isMobile ? 'sm' : 'md'}
-                iconName="Navigation"
+                iconName="SlidersVertical"
                 onClick={handleResetPitch}
                 aria-label="Reset pitch"
                 className="pitch-reset"

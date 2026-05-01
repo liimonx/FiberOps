@@ -65,6 +65,10 @@ export interface NetworkMapLayer {
 
 export type ToolType = 'select' | 'trace' | 'measure' | 'heatmap';
 
+/**
+ * Base search result interface
+ * Extended by CategorizedResult to include category field for filtering
+ */
 export interface SearchResult {
   id: string;
   name: string;

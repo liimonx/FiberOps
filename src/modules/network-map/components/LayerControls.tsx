@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useEffect } from "react";
-import { Icon, Card, Toggle } from "@shohojdhara/atomix";
+import React, { useEffect, useState } from "react";
+import { Icon, Card, Toggle, Button } from "@shohojdhara/atomix";
 import { useNetworkMapStore, useLayers } from "../stores/useNetworkMapStore";
 import { NetworkMapLayer } from "../types";
 
@@ -66,12 +66,12 @@ const LAYER_CONFIGS: LayerConfig[] = [
 
 export const LayerControls: React.FC<LayerControlsProps> = ({
   className = "",
-  persistKey = "network-map-layers",
 }) => {
   const layers = useLayers();
   const toggleLayer = useNetworkMapStore((state) => state.toggleLayer);
   const setLayerVisibility = useNetworkMapStore((state) => state.setLayerVisibility);
   const updateLayers = useNetworkMapStore((state) => state.updateLayers);
+  const [hoveredLayer, setHoveredLayer] = useState<string | null>(null);
 
   // Sync configured layers with store layers to ensure new layers are added
   useEffect(() => {
@@ -106,271 +106,243 @@ export const LayerControls: React.FC<LayerControlsProps> = ({
     });
   };
 
+  const totalLayers = LAYER_CONFIGS.length;
+  const activeCount = getActiveLayerCount();
+  const progressPercentage = (activeCount / totalLayers) * 100;
+
   return (
     <Card
-      appearance="ghost"
-      glass={{ blurAmount: 4, mode: "shader" }}
-      className={`layer-controls ${className}`}
+      glass={{blurAmount: 10}}
+      className={`u-w-100 u-p-0 u-overflow-hidden ${className}`}
+      style={{ 
+        // maxWidth: "320px",
+        boxShadow: "0 8px 32px rgba(0, 0, 0, 0.12)",
+        border: "1px solid rgba(255, 255, 255, 0.1)"
+      }}
     >
-      <div className="layer-header">
-        <div className="header-title">
-          <Icon name="Stack" size={16} className="header-icon" />
-          <span className="header-text">Map Layers</span>
+      {/* Header with Progress Indicator */}
+      <div className="u-flex u-items-center u-justify-between u-p-4 u-border">
+        <div className="u-flex u-items-center u-gap-3">
+          <div 
+            className="u-rounded u-flex u-items-center u-justify-center"
+            style={{
+              width: "32px",
+              height: "32px",
+              background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+              boxShadow: "0 2px 8px rgba(102, 126, 234, 0.3)"
+            }}
+          >
+            <Icon name="Stack" size={18} className="u-text-white" />
+          </div>
+          <div className="u-flex u-flex-column u-gap-1">
+            <span className="u-text-sm u-font-bold u-text-gray-100">Map Layers</span>
+            <span className="u-fs-xs u-text-gray-500">
+              {activeCount} of {totalLayers} active
+            </span>
+          </div>
         </div>
-        <span className="layer-count">{getActiveLayerCount()} active</span>
+        
+        {/* Progress Bar */}
+        <div 
+          className="u-rounded"
+          style={{
+            width: "40px",
+            height: "40px",
+            position: "relative",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center"
+          }}
+        >
+          <svg width="40" height="40" viewBox="0 0 40 40">
+            <circle
+              cx="20"
+              cy="20"
+              r="16"
+              fill="none"
+              stroke="rgba(255, 255, 255, 0.1)"
+              strokeWidth="3"
+            />
+            <circle
+              cx="20"
+              cy="20"
+              r="16"
+              fill="none"
+              stroke="url(#gradient)"
+              strokeWidth="3"
+              strokeLinecap="round"
+              strokeDasharray={`${progressPercentage} 100`}
+              transform="rotate(-90 20 20)"
+              style={{
+                transition: "stroke-dasharray 0.3s ease"
+              }}
+            />
+            <defs>
+              <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#667eea" />
+                <stop offset="100%" stopColor="#764ba2" />
+              </linearGradient>
+            </defs>
+          </svg>
+          <span 
+            className="u-fs-xs u-font-bold"
+            style={{
+              position: "absolute",
+              color: activeCount > 0 ? "#667eea" : "rgba(255, 255, 255, 0.3)"
+            }}
+          >
+            {activeCount}
+          </span>
+        </div>
       </div>
 
-      <div className="layer-list" role="group" aria-label="Map layers">
-        {LAYER_CONFIGS.map((config) => {
+      {/* Layer List */}
+      <div
+        className="u-p-2 u-overflow-y-auto"
+        style={{ maxHeight: "360px" }}
+        role="group"
+        aria-label="Map layers"
+      >
+        {LAYER_CONFIGS.map((config, index) => {
           const layer = layers.find((l) => l.id === config.id);
           const isVisible = layer?.visible ?? config.visible;
+          const isHovered = hoveredLayer === config.id;
 
           return (
             <div
               key={config.id}
-              className={`layer-item ${isVisible ? "layer-item--active" : ""}`}
+              className="u-mb-2 u-rounded u-transition-all u-duration-200"
+              onMouseEnter={() => setHoveredLayer(config.id)}
+              onMouseLeave={() => setHoveredLayer(null)}
+              style={{
+                backgroundColor: isVisible 
+                  ? isHovered 
+                    ? "rgba(255, 255, 255, 0.08)" 
+                    : "rgba(255, 255, 255, 0.04)"
+                  : "transparent",
+                transform: isVisible && isHovered ? "translateX(4px)" : "translateX(0)",
+                opacity: isVisible ? 1 : 0.5,
+                transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)"
+              }}
             >
-              <div
-                className="layer-color-indicator"
-                style={{ backgroundColor: config.color }}
-              />
+              <div className="u-flex u-items-center u-gap-3 u-p-3">
+                {/* Color Indicator with Glow Effect */}
+                <div
+                  className="u-rounded u-flex-shrink-0"
+                  style={{
+                    width: "8px",
+                    height: "32px",
+                    backgroundColor: config.color,
+                    opacity: isVisible ? 1 : 0.3,
+                    boxShadow: isVisible ? `0 0 12px ${config.color}40` : "none",
+                    transition: "all 0.2s ease",
+                    transform: isVisible ? "scaleY(1)" : "scaleY(0.7)"
+                  }}
+                />
 
-              <div className="layer-content">
-                <div className="layer-info">
-                  <Icon name={config.icon as any} size={16} className="layer-icon" />
-                  <div className="layer-text">
-                    <span className="layer-name">{config.name}</span>
-                    <span className="layer-description">{config.description}</span>
+                {/* Icon and Text */}
+                <div className="u-flex u-flex-1 u-items-center u-gap-3 u-min-w-0">
+                  <div 
+                    className="u-rounded u-flex u-items-center u-justify-center u-flex-shrink-0"
+                    style={{
+                      width: "32px",
+                      height: "32px",
+                      backgroundColor: `${config.color}15`,
+                      border: `1px solid ${config.color}30`,
+                      opacity: isVisible ? 1 : 0.5
+                    }}
+                  >
+                    <Icon 
+                      name={config.icon as any} 
+                      size={16} 
+                      style={{ color: config.color }}
+                    />
+                  </div>
+                  
+                  <div className="u-flex u-flex-column u-min-w-0 u-flex-1">
+                    <span
+                      className="u-text-sm u-font-semibold u-text-gray-100 u-transition-colors u-duration-200"
+                      style={{
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        display: "block",
+                        color: isVisible ? "rgba(255, 255, 255, 0.95)" : "rgba(255, 255, 255, 0.5)"
+                      }}
+                    >
+                      {config.name}
+                    </span>
+                    <span
+                      className="u-text-xs u-text-gray-500 u-mt-1"
+                      style={{
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        display: "block",
+                        opacity: isVisible ? 0.7 : 0.4
+                      }}
+                    >
+                      {config.description}
+                    </span>
                   </div>
                 </div>
 
-                <Toggle
-                  defaultChecked={isVisible}
-                  onChange={() => handleToggle(config.id)}
-                />
+                {/* Toggle Switch */}
+                <div className="u-flex-shrink-0">
+                  <Toggle
+                    checked={isVisible}
+                    onChange={() => handleToggle(config.id)}
+                    aria-label={`Toggle ${config.name} layer`}
+                    style={{
+                      transform: "scale(0.9)",
+                      transition: "transform 0.2s ease"
+                    }}
+                  />
+                </div>
               </div>
             </div>
           );
         })}
       </div>
 
-      <div className="layer-actions">
-        <button className="action-button" onClick={() => handleToggleAll(true)}>
+      {/* Actions */}
+      <div 
+        className="u-flex u-gap-2 u-p-4 u-border-top u-border-solid u-border-secondary-subtle"
+        style={{
+          background: "linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.1))"
+        }}
+      >
+        <Button
+          variant="secondary"
+          fullWidth
+          size="sm"
+          onClick={() => handleToggleAll(true)}
+          disabled={activeCount === totalLayers}
+          style={{
+            opacity: activeCount === totalLayers ? 0.5 : 1,
+            cursor: activeCount === totalLayers ? "not-allowed" : "pointer",
+            transition: "all 0.2s ease"
+          }}
+        >
+          <Icon name="Eye" size={14} style={{ marginRight: "6px" }} />
           Show All
-        </button>
-        <button className="action-button" onClick={() => handleToggleAll(false)}>
+        </Button>
+        <Button
+          variant="secondary"
+          fullWidth
+          size="sm"
+          onClick={() => handleToggleAll(false)}
+          disabled={activeCount === 0}
+          style={{
+            opacity: activeCount === 0 ? 0.5 : 1,
+            cursor: activeCount === 0 ? "not-allowed" : "pointer",
+            transition: "all 0.2s ease"
+          }}
+        >
+          <Icon name="EyeSlash" size={14} style={{ marginRight: "6px" }} />
           Hide All
-        </button>
+        </Button>
       </div>
-
-      <style jsx>{`
-        .layer-controls {
-          width: 280px;
-          max-width: 100%;
-          padding: 0;
-          overflow: hidden;
-        }
-
-        .layer-header {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          padding: 16px;
-          border-bottom: 1px solid var(--color-gray-700);
-        }
-
-        .header-title {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-        }
-
-        .header-icon {
-          color: var(--color-primary-500);
-        }
-
-        .header-text {
-          font-size: 14px;
-          font-weight: var(--font-weight-semibold);
-          color: var(--color-gray-100);
-        }
-
-        .layer-count {
-          font-size: 12px;
-          color: var(--color-gray-500);
-          padding: 2px 8px;
-          background: var(--color-gray-800);
-          border-radius: 12px;
-        }
-
-        .layer-list {
-          max-height: 300px;
-          overflow-y: auto;
-          padding: 8px;
-        }
-
-        .layer-item {
-          display: flex;
-          align-items: stretch;
-          border-radius: 8px;
-          overflow: hidden;
-          transition: background 0.15s ease;
-        }
-
-        .layer-item:hover {
-          background: var(--color-gray-800);
-        }
-
-        .layer-item--active .layer-color-indicator {
-          opacity: 1;
-        }
-
-        .layer-color-indicator {
-          width: 4px;
-          opacity: 0.3;
-          transition: opacity 0.15s ease;
-        }
-
-        .layer-content {
-          flex: 1;
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          gap: 12px;
-          padding: 10px 12px;
-        }
-
-        .layer-info {
-          display: flex;
-          align-items: center;
-          gap: 10px;
-          flex: 1;
-          min-width: 0;
-        }
-
-        .layer-icon {
-          color: var(--color-gray-500);
-          flex-shrink: 0;
-        }
-
-        .layer-text {
-          display: flex;
-          flex-direction: column;
-          min-width: 0;
-        }
-
-        .layer-name {
-          font-size: 13px;
-          color: var(--color-gray-200);
-          font-weight: var(--font-weight-medium);
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-        }
-
-        .layer-description {
-          font-size: 11px;
-          color: var(--color-gray-500);
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-        }
-
-        .layer-actions {
-          display: flex;
-          gap: 8px;
-          padding: 12px 16px;
-          border-top: 1px solid var(--color-gray-700);
-        }
-
-        .action-button {
-          flex: 1;
-          padding: 8px 12px;
-          background: var(--color-gray-800);
-          border: 1px solid var(--color-gray-700);
-          border-radius: 6px;
-          color: var(--color-gray-300);
-          font-size: 12px;
-          cursor: pointer;
-          transition: all 0.2s ease;
-        }
-
-        .action-button:hover {
-          background: var(--color-gray-700);
-          border-color: var(--color-primary-500);
-          color: var(--color-gray-100);
-        }
-
-        .layer-toggle {
-          background: none;
-          border: none;
-          padding: 4px;
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-        }
-
-        .toggle-track {
-          width: 40px;
-          height: 20px;
-          background: var(--color-gray-600);
-          border-radius: 10px;
-          position: relative;
-          transition: background 0.2s ease;
-        }
-
-        .layer-toggle--active .toggle-track {
-          background: var(--color-primary-500);
-        }
-
-        .toggle-thumb {
-          width: 16px;
-          height: 16px;
-          background: white;
-          border-radius: 50%;
-          position: absolute;
-          top: 2px;
-          left: 2px;
-          transition: transform 0.2s ease;
-          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-        }
-
-        .layer-toggle--active .toggle-thumb {
-          transform: translateX(20px);
-        }
-
-        .layer-toggle:hover .toggle-track {
-          background: var(--color-gray-500);
-        }
-
-        .layer-toggle--active:hover .toggle-track {
-          background: var(--color-primary-600);
-        }
-
-        /* Mobile optimization */
-        @media (max-width: 768px) {
-          .layer-controls {
-            width: 100%;
-          }
-
-          .layer-list {
-            max-height: 200px;
-          }
-
-          .layer-content {
-            padding: 8px;
-          }
-        }
-
-        /* Reduced motion support */
-        @media (prefers-reduced-motion: reduce) {
-          .layer-item,
-          .layer-color-indicator,
-          .action-button {
-            transition: none;
-          }
-        }
-      `}</style>
     </Card>
   );
 };

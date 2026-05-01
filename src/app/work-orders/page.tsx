@@ -105,7 +105,7 @@ export default function WorkOrdersPage() {
         draggable
         onDragStart={() => handleDragStart(task, Object.keys(kanbanData).find((col) => kanbanData[col].some((t) => t.id === task.id)) || "")}
         onDragEnd={handleDragEnd}
-        role="listitem"
+        role="article"
         aria-grabbed={draggedTask?.task.id === task.id}
         tabIndex={0}
       >

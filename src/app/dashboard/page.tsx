@@ -86,7 +86,7 @@ export default function DashboardPage() {
 
       <Grid className="u-mb-6">
         <GridCol xs={12} sm={6} lg={3}>
-          <Card className="u-h-100" variant="primary">
+          <Card className="u-h-100" appearance="ghost" glass>
             <div className="u-flex u-justify-between u-items-center u-mb-4">
               <span className="u-text-secondary-subtle u-fs-sm u-font-bold">
                 Total Customers
@@ -99,7 +99,7 @@ export default function DashboardPage() {
         </GridCol>
 
         <GridCol xs={12} sm={6} lg={3}>
-          <Card className="u-h-100" variant="error">
+          <Card className="u-h-100" appearance="ghost" glass>
             <div className="u-flex u-justify-between u-items-center u-mb-4">
               <span className="u-text-secondary-subtle u-fs-sm u-font-bold">
                 Active Incidents
@@ -112,7 +112,7 @@ export default function DashboardPage() {
         </GridCol>
 
         <GridCol xs={12} sm={6} lg={3}>
-          <Card className="u-h-100" variant="success">
+          <Card className="u-h-100" appearance="ghost" glass>
             <div className="u-flex u-justify-between u-items-center u-mb-4">
               <span className="u-text-secondary-subtle u-fs-sm u-font-bold">
                 Avg. Signal Health
@@ -127,7 +127,7 @@ export default function DashboardPage() {
         </GridCol>
 
         <GridCol xs={12} sm={6} lg={3}>
-          <Card className="u-h-100" variant="warning">
+          <Card className="u-h-100" glass appearance="ghost">
             <div className="u-flex u-justify-between u-items-center u-mb-4">
               <span className="u-text-secondary-subtle u-fs-sm u-font-bold">
                 Open Work Orders
@@ -142,7 +142,7 @@ export default function DashboardPage() {
 
       <Grid className="u-mb-6">
         <GridCol xs={12} lg={8}>
-          <Card className="u-h-100" title="Network Usage Trends">
+          <Card className="u-h-100" title="Network Usage Trends" glass>
             <div className="u-w-100" style={{ height: "300px" }}>
               <AreaChart
                 data={networkTrends}
@@ -170,7 +170,7 @@ export default function DashboardPage() {
           </Card>
         </GridCol>
         <GridCol xs={12} lg={4}>
-          <Card className="u-h-100" title="Active Outages">
+          <Card className="u-h-100" title="Active Outages" glass appearance="ghost">
             <div className="u-flex u-flex-column u-gap-4">
               <Callout
                 variant="error"
@@ -204,14 +204,14 @@ export default function DashboardPage() {
 
       <Grid className="u-mb-6">
         <GridCol xs={12} lg={4}>
-          <Card title="Customer Segments" className="u-h-100">
+          <Card title="Customer Segments" className="u-h-100" glass>
             <div style={{ height: "250px" }} className="u-w-100">
               <DonutChart data={customerSegments} interactive={true} showLegend={true} />
             </div>
           </Card>
         </GridCol>
         <GridCol xs={12} lg={8}>
-          <Card title="Recent Work Orders" className="u-overflow-x-auto">
+          <Card title="Recent Work Orders" className="u-overflow-x-auto u-h-100" glass>
             <DataTable columns={workOrderColumns} data={recentWorkOrders} rowKey="id" />
           </Card>
         </GridCol>
