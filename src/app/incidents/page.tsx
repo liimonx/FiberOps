@@ -62,7 +62,7 @@ export default function IncidentsPage() {
     {
       key: "id",
       title: "Ticket ID",
-      render: (val) => <span className="u-font-mono u-fs-sm">{val}</span>,
+      render: (val) => <span className="u-font-mono u-text-sm">{val}</span>,
     },
     {
       key: "title",
@@ -93,7 +93,7 @@ export default function IncidentsPage() {
     {
       key: "time",
       title: "Reported",
-      render: (val) => <span className="u-text-secondary-subtle u-fs-sm">{val}</span>,
+      render: (val) => <span className="u-text-secondary-subtle u-text-sm">{val}</span>,
     },
     {
       key: "actions",
@@ -106,8 +106,8 @@ export default function IncidentsPage() {
     <Container className="u-py-6 u-w-100">
       <div className="u-flex u-justify-between u-items-center u-mb-6">
         <div>
-          <h1 className="u-fs-2xl u-font-bold u-mb-2">Incident Management</h1>
-          <p className="u-text-secondary-subtle u-fs-sm">
+          <h1 className="u-text-2xl u-font-bold u-mb-2">Incident Management</h1>
+          <p className="u-text-secondary-subtle u-text-sm">
             Track active outages, dispatch technicians, and document resolutions.
           </p>
         </div>
@@ -123,12 +123,12 @@ export default function IncidentsPage() {
             glass={true}
             className="u-h-100 u-flex u-flex-column"
           >
-            <h2 className="u-fs-lg u-font-bold u-mb-4">Live Network Map</h2>
+            <h2 className="u-text-lg u-font-bold u-mb-4">Live Network Map</h2>
             <div
               className="u-bg-dark u-rounded u-border u-border-secondary-subtle u-flex-grow-1 u-flex u-items-center u-justify-center u-relative"
               style={{ minHeight: "300px" }}
             >
-              <span className="u-text-secondary-subtle u-fs-sm u-font-mono">
+              <span className="u-text-secondary-subtle u-text-sm u-font-mono">
                 [ Mapbox GL Canvas ]
               </span>
 
@@ -152,7 +152,7 @@ export default function IncidentsPage() {
         <GridCol xs={12} lg={8}>
           <Card appearance="elevated" glass={true} className="u-h-100">
             <div className="u-flex u-justify-between u-items-center u-mb-4">
-              <h2 className="u-fs-lg u-font-bold">Incident Log</h2>
+              <h2 className="u-text-lg u-font-bold">Incident Log</h2>
               <div className="u-w-25">
                 <Select
                   value={severityFilter}
@@ -172,7 +172,7 @@ export default function IncidentsPage() {
             </div>
 
             <div className="u-border-top u-border-secondary-subtle u-pt-6">
-              <h3 className="u-fs-base u-font-bold u-mb-4">
+              <h3 className="u-text-base u-font-bold u-mb-4">
                 Resolution Notes (Selected Incident)
               </h3>
               <div className="u-mb-4">

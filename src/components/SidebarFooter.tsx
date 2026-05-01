@@ -18,7 +18,7 @@ export function SidebarFooter() {
           aria-label="Toggle keyboard shortcuts"
         >
           <Icon name="Keyboard" size="sm" className="u-text-secondary-subtle" />
-          <span className="u-fs-sm u-font-medium u-text-secondary">Shortcuts</span>
+          <span className="u-text-sm u-font-medium u-text-secondary">Shortcuts</span>
           <Icon
             name={`Caret${showShortcuts ? "Up" : "Down"}`}
             size="xs"
@@ -28,20 +28,20 @@ export function SidebarFooter() {
 
         {showShortcuts && (
           <div className="u-flex u-flex-column u-gap-1 u-px-3 u-py-2 u-bg-secondary-subtle u-rounded u-animate-slide-down">
-            <div className="u-flex u-justify-between u-items-center u-fs-xs u-text-secondary-subtle">
-              <kbd className="u-px-2 u-py-0.5 u-bg-surface u-border u-rounded-sm u-font-mono u-fs-xs">
+            <div className="u-flex u-justify-between u-items-center u-text-xs u-text-secondary-subtle">
+              <kbd className="u-px-2 u-py-0.5 u-bg-surface u-border u-rounded-sm u-font-mono u-text-xs">
                 ⌘K
               </kbd>
               <span>Quick search</span>
             </div>
-            <div className="u-flex u-justify-between u-items-center u-fs-xs u-text-secondary-subtle">
-              <kbd className="u-px-2 u-py-0.5 u-bg-surface u-border u-rounded-sm u-font-mono u-fs-xs">
+            <div className="u-flex u-justify-between u-items-center u-text-xs u-text-secondary-subtle">
+              <kbd className="u-px-2 u-py-0.5 u-bg-surface u-border u-rounded-sm u-font-mono u-text-xs">
                 ?
               </kbd>
               <span>Show shortcuts</span>
             </div>
-            <div className="u-flex u-justify-between u-items-center u-fs-xs u-text-secondary-subtle">
-              <kbd className="u-px-2 u-py-0.5 u-bg-surface u-border u-rounded-sm u-font-mono u-fs-xs">
+            <div className="u-flex u-justify-between u-items-center u-text-xs u-text-secondary-subtle">
+              <kbd className="u-px-2 u-py-0.5 u-bg-surface u-border u-rounded-sm u-font-mono u-text-xs">
                 Esc
               </kbd>
               <span>Close panel</span>
@@ -54,7 +54,7 @@ export function SidebarFooter() {
       <div className="u-flex u-items-center u-justify-between u-px-3 u-py-2 u-bg-secondary-subtle u-rounded">
         <div className="u-flex u-items-center u-gap-2">
           <Icon name="Moon" size="sm" className="u-text-secondary-subtle" />
-          <span className="u-fs-sm u-font-medium u-text-secondary">Theme</span>
+          <span className="u-text-sm u-font-medium u-text-secondary">Theme</span>
         </div>
         <div className="u-scale-75">
           <ColorModeToggle defaultValue="dark" />
@@ -65,14 +65,14 @@ export function SidebarFooter() {
       <div className="u-flex u-flex-column u-gap-0.5">
         <Link
           href="/help"
-          className="u-flex u-items-center u-gap-2 u-px-3 u-py-1.5 u-rounded u-text-secondary u-fs-xs u-no-underline hover:u-bg-secondary-subtle hover:u-text-primary transition-all"
+          className="u-flex u-items-center u-gap-2 u-px-3 u-py-1.5 u-rounded u-text-secondary u-text-xs u-no-underline hover:u-bg-secondary-subtle hover:u-text-primary transition-all"
         >
           <Icon name="Question" size="sm" className="u-text-secondary-subtle" />
           <span>Help Center</span>
         </Link>
         <Link
           href="/feedback"
-          className="u-flex u-items-center u-gap-2 u-px-3 u-py-1.5 u-rounded u-text-secondary u-fs-xs u-no-underline hover:u-bg-secondary-subtle hover:u-text-primary transition-all"
+          className="u-flex u-items-center u-gap-2 u-px-3 u-py-1.5 u-rounded u-text-secondary u-text-xs u-no-underline hover:u-bg-secondary-subtle hover:u-text-primary transition-all"
         >
           <Icon name="ChatCircleText" size="sm" className="u-text-secondary-subtle" />
           <span>Feedback</span>
@@ -81,7 +81,7 @@ export function SidebarFooter() {
           href="https://github.com/shohojdhara/atomix"
           target="_blank"
           rel="noopener noreferrer"
-          className="u-flex u-items-center u-gap-2 u-px-3 u-py-1.5 u-rounded u-text-secondary u-fs-xs u-no-underline hover:u-bg-secondary-subtle hover:u-text-primary transition-all"
+          className="u-flex u-items-center u-gap-2 u-px-3 u-py-1.5 u-rounded u-text-secondary u-text-xs u-no-underline hover:u-bg-secondary-subtle hover:u-text-primary transition-all"
         >
           <Icon name="GithubLogo" size="sm" className="u-text-secondary-subtle" />
           <span>GitHub</span>
@@ -89,7 +89,7 @@ export function SidebarFooter() {
       </div>
 
       {/* Version Info - Single line */}
-      <div className="u-flex u-items-center u-justify-center u-gap-1 u-py-1 u-fs-xs u-text-secondary-subtle">
+      <div className="u-flex u-items-center u-justify-center u-gap-1 u-py-1 u-text-xs u-text-secondary-subtle">
         <span>FiberOps v1.0.0</span>
         <span className="u-opacity-50">•</span>
         <span className="u-opacity-80">Build 2026.04.28</span>

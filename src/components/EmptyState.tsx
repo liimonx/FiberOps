@@ -24,7 +24,7 @@ export function EmptyState({
           <Icon name={icon as any} size="xl" className="u-text-secondary-subtle" />
         </div>
         <div>
-          <h3 className="u-fs-lg u-font-bold u-mb-2">{title}</h3>
+          <h3 className="u-text-lg u-font-bold u-mb-2">{title}</h3>
           <p className="u-text-secondary-subtle u-mb-4">{description}</p>
         </div>
         {actionLabel && onAction && (

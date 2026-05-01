@@ -75,7 +75,7 @@ export default function CustomersPage() {
       render: (value, row) => (
         <div className="u-flex u-flex-column">
           <span className="u-font-bold">{value}</span>
-          <span className="u-fs-sm u-text-secondary-subtle">{row.type}</span>
+          <span className="u-text-sm u-text-secondary-subtle">{row.type}</span>
         </div>
       ),
     },
@@ -97,7 +97,7 @@ export default function CustomersPage() {
       key: "connectionPath",
       title: "Connection Path",
       render: (value) => (
-        <span className="u-fs-sm u-font-mono u-text-secondary-subtle">{value}</span>
+        <span className="u-text-sm u-font-mono u-text-secondary-subtle">{value}</span>
       ),
     },
     {
@@ -137,8 +137,8 @@ export default function CustomersPage() {
           <Card appearance="outlined">
             <div className="u-flex u-justify-between u-items-center u-mb-6">
               <div>
-                <h1 className="u-fs-2xl u-font-bold u-mb-2">Customers</h1>
-                <p className="u-text-secondary-subtle u-fs-sm">
+                <h1 className="u-text-2xl u-font-bold u-mb-2">Customers</h1>
+                <p className="u-text-secondary-subtle u-text-sm">
                   Manage customer profiles, check signal health, and track incident
                   history.
                 </p>

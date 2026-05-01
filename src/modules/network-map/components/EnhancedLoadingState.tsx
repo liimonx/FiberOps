@@ -1,14 +1,19 @@
 "use client";
 
-import React, { useEffect, useRef } from 'react';
-import { Icon } from '@shohojdhara/atomix';
-import { spin, pulseOpacity, staggerFadeIn, AnimationPerformanceMonitor } from '../utils/animations';
+import React, { useEffect, useRef } from "react";
+import { Icon } from "@shohojdhara/atomix";
+import {
+  spin,
+  pulseOpacity,
+  staggerFadeIn,
+  AnimationPerformanceMonitor,
+} from "../utils/animations";
 
 interface EnhancedLoadingStateProps {
   message?: string;
   subMessage?: string;
-  variant?: 'inline' | 'overlay' | 'fullscreen' | 'minimal';
-  size?: 'sm' | 'md' | 'lg';
+  variant?: "inline" | "overlay" | "fullscreen" | "minimal";
+  size?: "sm" | "md" | "lg";
   showSpinner?: boolean;
   showProgress?: boolean;
   progress?: number;
@@ -16,21 +21,21 @@ interface EnhancedLoadingStateProps {
 }
 
 export function EnhancedLoadingState({
-  message = 'Loading...',
+  message = "Loading...",
   subMessage,
-  variant = 'inline',
-  size = 'md',
+  variant = "inline",
+  size = "md",
   showSpinner = true,
   showProgress = false,
   progress,
-  className = ''
+  className = "",
 }: EnhancedLoadingStateProps) {
   const spinnerRef = useRef<HTMLDivElement>(null);
   const dotsRef = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
     // Start FPS monitoring in development
-    if (process.env.NODE_ENV === 'development') {
+    if (process.env.NODE_ENV === "development") {
       AnimationPerformanceMonitor.startMonitoring();
     }
 
@@ -47,7 +52,7 @@ export function EnhancedLoadingState({
       dotsTween = pulseOpacity(dotsRef.current, {
         minOpacity: 0.3,
         duration: 1.5,
-        repeat: -1
+        repeat: -1,
       });
     }
 
@@ -63,66 +68,60 @@ export function EnhancedLoadingState({
   }, [showSpinner]);
 
   const sizeClasses = {
-    sm: 'u-fs-sm',
-    md: 'u-fs-base',
-    lg: 'u-fs-lg'
+    sm: "u-text-sm",
+    md: "u-text-base",
+    lg: "u-text-lg",
   };
 
   const spinnerSizes = {
-    sm: '24px',
-    md: '32px',
-    lg: '48px'
+    sm: "24px",
+    md: "32px",
+    lg: "48px",
   };
 
   const variantClasses = {
-    inline: 'u-p-4',
-    overlay: 'u-absolute u-inset-0 u-bg-dark/80 u-backdrop-blur-sm',
-    fullscreen: 'u-fixed u-inset-0 u-z-50 u-bg-dark/90 u-backdrop-blur-md',
-    minimal: 'u-p-2'
+    inline: "u-p-4",
+    overlay: "u-absolute u-inset-0 u-bg-dark/80 u-backdrop-blur-sm",
+    fullscreen: "u-fixed u-inset-0 u-z-50 u-bg-dark/90 u-backdrop-blur-md",
+    minimal: "u-p-2",
   };
 
   return (
-    <div 
+    <div
       className={`loading-state loading-state--${variant} ${variantClasses[variant]} ${className}`}
       role="status"
       aria-live="polite"
     >
       <div className="u-flex u-flex-column u-items-center u-gap-3">
         {showSpinner && (
-          <div 
-            ref={spinnerRef}
-            className="loading-spinner" 
-            aria-hidden="true"
-          >
-            <Icon 
-              name="SpinnerGap" 
-              size={spinnerSizes[size] as any} 
-              className="u-text-primary" 
+          <div ref={spinnerRef} className="loading-spinner" aria-hidden="true">
+            <Icon
+              name="SpinnerGap"
+              size={spinnerSizes[size] as any}
+              className="u-text-primary"
             />
           </div>
         )}
-        
+
         <div className="u-text-center">
           <span className={`loading-message ${sizeClasses[size]} u-font-medium`}>
             {message}
             <span ref={dotsRef}>...</span>
           </span>
-          
+
           {subMessage && (
-            <p className="u-fs-xs u-text-secondary-subtle u-mt-1">
-              {subMessage}
-            </p>
+            <p className="u-text-xs u-text-secondary-subtle u-mt-1">{subMessage}</p>
           )}
         </div>
 
         {showProgress && progress !== undefined && (
           <div className="u-w-100 u-max-w-[300px] u-mt-2">
-            <div className="u-flex u-justify-between u-fs-2xs u-text-secondary-subtle u-mb-1">
+            <div className="u-flex u-justify-between u-text-2xs u-text-secondary-subtle u-mb-1">
               <span>Loading progress</span>
               <span>{Math.round(progress)}%</span>
             </div>
             <div className="u-w-100 u-h-2 u-bg-secondary-subtle u-rounded-full u-overflow-hidden">
-              <div 
+              <div
                 className="u-h-100 u-bg-primary u-rounded-full u-transition-all u-duration-300"
                 style={{ width: `${progress}%` }}
               />
@@ -136,7 +135,7 @@ export function EnhancedLoadingState({
 
 // Skeleton loader with animation
 interface SkeletonLoaderProps {
-  variant?: 'text' | 'circle' | 'rectangle' | 'card';
+  variant?: "text" | "circle" | "rectangle" | "card";
   width?: string | number;
   height?: string | number;
   count?: number;
@@ -144,11 +143,11 @@ interface SkeletonLoaderProps {
 }
 
 export function AnimatedSkeletonLoader({
-  variant = 'text',
+  variant = "text",
   width,
   height,
   count = 1,
-  className = ''
+  className = "",
 }: SkeletonLoaderProps) {
   const itemsRef = useRef<HTMLDivElement[]>([]);
 
@@ -157,18 +156,18 @@ export function AnimatedSkeletonLoader({
     if (itemsRef.current.length > 0) {
       staggerFadeIn(itemsRef.current, {
         stagger: 0.1,
-        duration: 0.8
+        duration: 0.8,
       });
     }
   }, [count]);
 
-  const baseClasses = 'u-bg-secondary-subtle u-relative u-overflow-hidden';
-  
+  const baseClasses = "u-bg-secondary-subtle u-relative u-overflow-hidden";
+
   const variantClasses = {
-    text: 'u-rounded u-mb-2',
-    circle: 'u-rounded-full',
-    rectangle: 'u-rounded',
-    card: 'u-rounded u-p-4 u-shadow-sm'
+    text: "u-rounded u-mb-2",
+    circle: "u-rounded-full",
+    rectangle: "u-rounded",
+    card: "u-rounded u-p-4 u-shadow-sm",
   };
 
   const shimmerEffect = `
@@ -206,11 +205,13 @@ export function AnimatedSkeletonLoader({
             }}
             className={`${baseClasses} ${variantClasses[variant]} skeleton-shimmer`}
             style={{
-              width: width || (variant === 'text' ? '100%' : undefined),
-              height: height || (variant === 'text' ? '16px' : variant === 'circle' ? '40px' : '100px'),
+              width: width || (variant === "text" ? "100%" : undefined),
+              height:
+                height ||
+                (variant === "text" ? "16px" : variant === "circle" ? "40px" : "100px"),
             }}
           >
-            {variant === 'card' && (
+            {variant === "card" && (
               <div className="u-flex u-flex-column u-gap-2">
                 <div className="u-w-60% u-h-4 u-bg-dark/20 u-rounded" />
                 <div className="u-w-100% u-h-3 u-bg-dark/20 u-rounded" />
@@ -238,16 +239,18 @@ export function ProgressRing({
   progress,
   size = 60,
   strokeWidth = 4,
-  color = 'var(--color-primary)',
+  color = "var(--color-primary)",
   showLabel = true,
-  className = ''
+  className = "",
 }: ProgressRingProps) {
   const radius = (size - strokeWidth) / 2;
   const circumference = radius * 2 * Math.PI;
   const offset = circumference - (progress / 100) * circumference;
 
   return (
-    <div className={`u-relative u-inline-flex u-items-center u-justify-center ${className}`}>
+    <div
+      className={`u-relative u-inline-flex u-items-center u-justify-center ${className}`}
+    >
       <svg width={size} height={size} className="u-transform--rotate-90">
         {/* Background circle */}
         <circle
@@ -258,7 +261,7 @@ export function ProgressRing({
           stroke="var(--color-secondary-subtle)"
           strokeWidth={strokeWidth}
         />
-        
+
         {/* Progress circle */}
         <circle
           cx={size / 2}
@@ -273,10 +276,10 @@ export function ProgressRing({
           className="u-transition-all u-duration-500"
         />
       </svg>
-      
+
       {showLabel && (
         <div className="u-absolute u-text-center">
-          <span className="u-fs-sm u-font-bold">{Math.round(progress)}%</span>
+          <span className="u-text-sm u-font-bold">{Math.round(progress)}%</span>
         </div>
       )}
     </div>
@@ -284,11 +287,11 @@ export function ProgressRing({
 }
 
 // Loading dots animation
-export function LoadingDots({ 
-  count = 3, 
-  size = 8, 
+export function LoadingDots({
+  count = 3,
+  size = 8,
   spacing = 4,
-  color = 'var(--color-primary)' 
+  color = "var(--color-primary)",
 }: {
   count?: number;
   size?: number;
@@ -303,7 +306,7 @@ export function LoadingDots({
         pulseOpacity(dot, {
           minOpacity: 0.3,
           duration: 1.5,
-          repeat: -1
+          repeat: -1,
         });
       }
     });
@@ -322,7 +325,7 @@ export function LoadingDots({
             width: `${size}px`,
             height: `${size}px`,
             backgroundColor: color,
-            animationDelay: `${index * 0.2}s`
+            animationDelay: `${index * 0.2}s`,
           }}
         />
       ))}
@@ -331,9 +334,9 @@ export function LoadingDots({
 }
 
 // Pulse indicator for live status
-export function LivePulseIndicator({ 
+export function LivePulseIndicator({
   size = 12,
-  color = 'var(--color-success)' 
+  color = "var(--color-success)",
 }: {
   size?: number;
   color?: string;
@@ -345,7 +348,7 @@ export function LivePulseIndicator({
       pulseOpacity(pulseRef.current, {
         minOpacity: 0.4,
         duration: 2,
-        repeat: -1
+        repeat: -1,
       });
     }
   }, []);
@@ -359,10 +362,10 @@ export function LivePulseIndicator({
           width: `${size * 1.5}px`,
           height: `${size * 1.5}px`,
           border: `2px solid ${color}`,
-          opacity: 0.5
+          opacity: 0.5,
         }}
       />
-      
+
       {/* Inner pulse dot */}
       <div
         ref={pulseRef}
@@ -370,7 +373,7 @@ export function LivePulseIndicator({
         style={{
           width: `${size}px`,
           height: `${size}px`,
-          backgroundColor: color
+          backgroundColor: color,
         }}
       />
     </div>

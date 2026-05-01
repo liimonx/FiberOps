@@ -70,8 +70,8 @@ export default function Home() {
     <div className="u-py-6 u-w-100">
       {/* Hero Section */}
       <div className="u-mb-8">
-        <h1 className="u-fs-3xl u-font-bold u-mb-2">Welcome to FiberOps</h1>
-        <p className="u-text-secondary-emphasis u-fs-lg">
+        <h1 className="u-text-3xl u-font-bold u-mb-2">Welcome to FiberOps</h1>
+        <p className="u-text-secondary-emphasis u-text-lg">
           Monitor, manage, and optimize your fiber network operations in real-time.
         </p>
       </div>
@@ -85,11 +85,11 @@ export default function Home() {
                 <Icon name="Users" className="u-text-primary" size="lg" />
               </div>
               <div>
-                <div className="u-fs-xs u-text-secondary-emphasis">Total Customers</div>
-                <div className="u-fs-xl u-font-bold">12,492</div>
+                <div className="u-text-xs u-text-secondary-emphasis">Total Customers</div>
+                <div className="u-text-xl u-font-bold">12,492</div>
               </div>
             </div>
-            <div className="u-fs-xs u-text-success u-flex u-items-center u-gap-1">
+            <div className="u-text-xs u-text-success u-flex u-items-center u-gap-1">
               <Icon name="TrendUp" size="sm" />
               <span>+124 this month</span>
             </div>
@@ -103,11 +103,11 @@ export default function Home() {
                 <Icon name="Warning" className="u-text-error" size="lg" />
               </div>
               <div>
-                <div className="u-fs-xs u-text-secondary-emphasis">s</div>
-                <div className="u-fs-xl u-font-bold">3</div>
+                <div className="u-text-xs u-text-secondary-emphasis">s</div>
+                <div className="u-text-xl u-font-bold">3</div>
               </div>
             </div>
-            <div className="u-fs-xs u-text-danger u-flex u-items-center u-gap-1">
+            <div className="u-text-xs u-text-danger u-flex u-items-center u-gap-1">
               <Icon name="TrendDown" size="sm" />
               <span>-1 since yesterday</span>
             </div>
@@ -121,11 +121,13 @@ export default function Home() {
                 <Icon name="Pulse" className="u-text-success" size="lg" />
               </div>
               <div>
-                <div className="u-fs-xs u-text-secondary-emphasis">Signal Health</div>
-                <div className="u-fs-xl u-font-bold">94%</div>
+                <div className="u-text-xs u-text-secondary-emphasis">Signal Health</div>
+                <div className="u-text-xl u-font-bold">94%</div>
               </div>
             </div>
-            <div className="u-fs-xs u-text-secondary-emphasis">Stable across all nodes</div>
+            <div className="u-text-xs u-text-secondary-emphasis">
+              Stable across all nodes
+            </div>
           </Card>
         </GridCol>
 
@@ -136,18 +138,20 @@ export default function Home() {
                 <Icon name="Clipboard" className="u-text-warning" size="lg" />
               </div>
               <div>
-                <div className="u-fs-xs u-text-secondary-emphasis">Open Work Orders</div>
-                <div className="u-fs-xl u-font-bold">28</div>
+                <div className="u-text-xs u-text-secondary-emphasis">
+                  Open Work Orders
+                </div>
+                <div className="u-text-xl u-font-bold">28</div>
               </div>
             </div>
-            <div className="u-fs-xs u-text-warning">5 high priority</div>
+            <div className="u-text-xs u-text-warning">5 high priority</div>
           </Card>
         </GridCol>
       </Grid>
 
       {/* Quick Actions */}
       <div className="u-mb-8">
-        <h2 className="u-fs-xl u-font-bold u-mb-4">Quick Actions</h2>
+        <h2 className="u-text-xl u-font-bold u-mb-4">Quick Actions</h2>
         <Grid>
           {quickActions.map((action) => (
             <GridCol xs={12} sm={6} lg={3} key={action.href}>
@@ -166,8 +170,8 @@ export default function Home() {
                       />
                     </div>
                     <div className="u-flex-grow-1">
-                      <h3 className="u-fs-base u-font-bold u-mb-1">{action.title}</h3>
-                      <p className="u-fs-sm u-text-secondary-emphasis u-mb-0">
+                      <h3 className="u-text-base u-font-bold u-mb-1">{action.title}</h3>
+                      <p className="u-text-sm u-text-secondary-emphasis u-mb-0">
                         {action.description}
                       </p>
                     </div>
@@ -182,7 +186,7 @@ export default function Home() {
 
       {/* Recent Activity */}
       <div>
-        <h2 className="u-fs-xl u-font-bold u-mb-4">Recent Activity</h2>
+        <h2 className="u-text-xl u-font-bold u-mb-4">Recent Activity</h2>
         <Card appearance="ghost" glass={true}>
           <div className="u-flex u-flex-column u-gap-3">
             {recentActivity.map((activity) => (
@@ -208,8 +212,10 @@ export default function Home() {
                   />
                 </div>
                 <div className="u-flex-grow-1">
-                  <div className="u-fs-sm u-font-bold">{activity.message}</div>
-                  <div className="u-fs-xs u-text-secondary-emphasis">{activity.time}</div>
+                  <div className="u-text-sm u-font-bold">{activity.message}</div>
+                  <div className="u-text-xs u-text-secondary-emphasis">
+                    {activity.time}
+                  </div>
                 </div>
               </div>
             ))}

@@ -40,7 +40,10 @@ const initialKanbanData: KanbanData = {
 
 export default function WorkOrdersPage() {
   const [kanbanData, setKanbanData] = useState<KanbanData>(initialKanbanData);
-  const [draggedTask, setDraggedTask] = useState<{ task: Task; sourceColumn: string } | null>(null);
+  const [draggedTask, setDraggedTask] = useState<{
+    task: Task;
+    sourceColumn: string;
+  } | null>(null);
   const [dragOverColumn, setDragOverColumn] = useState<string | null>(null);
 
   const handleDragStart = (task: Task, sourceColumn: string) => {
@@ -58,7 +61,7 @@ export default function WorkOrdersPage() {
 
   const handleDrop = (e: React.DragEvent, targetColumn: string) => {
     e.preventDefault();
-    
+
     if (!draggedTask) return;
 
     const { task, sourceColumn } = draggedTask;
@@ -87,7 +90,9 @@ export default function WorkOrdersPage() {
     setDragOverColumn(null);
   };
 
-  const getPriorityBadgeVariant = (priority: string): "error" | "warning" | "success" | "secondary" => {
+  const getPriorityBadgeVariant = (
+    priority: string
+  ): "error" | "warning" | "success" | "secondary" => {
     if (priority === "Critical") return "error";
     if (priority === "High") return "warning";
     if (priority === "Medium") return "success";
@@ -103,7 +108,14 @@ export default function WorkOrdersPage() {
         appearance="elevated"
         className="u-mb-3 u-cursor-pointer u-border u-border-secondary-subtle u-transition-all u-duration-200"
         draggable
-        onDragStart={() => handleDragStart(task, Object.keys(kanbanData).find((col) => kanbanData[col].some((t) => t.id === task.id)) || "")}
+        onDragStart={() =>
+          handleDragStart(
+            task,
+            Object.keys(kanbanData).find((col) =>
+              kanbanData[col].some((t) => t.id === task.id)
+            ) || ""
+          )
+        }
         onDragEnd={handleDragEnd}
         role="article"
         aria-grabbed={draggedTask?.task.id === task.id}
@@ -113,9 +125,9 @@ export default function WorkOrdersPage() {
           <Badge variant={badgeVariant} label={task.priority} />
           <Icon name="DotsThree" className="u-text-secondary-subtle" />
         </div>
-        <h4 className="u-fs-base u-font-bold u-mb-1">{task.title}</h4>
+        <h4 className="u-text-base u-font-bold u-mb-1">{task.title}</h4>
         <div className="u-flex u-justify-between u-items-center u-mt-4">
-          <span className="u-font-mono u-fs-xs u-text-secondary-subtle">{task.id}</span>
+          <span className="u-font-mono u-text-xs u-text-secondary-subtle">{task.id}</span>
           <Avatar initials={task.type} size="sm" />
         </div>
       </Card>
@@ -126,8 +138,8 @@ export default function WorkOrdersPage() {
     <Container className="u-py-4 u-w-100" type="fluid">
       <div className="u-flex u-justify-between u-items-center u-mb-6">
         <div>
-          <h1 className="u-fs-2xl u-font-bold u-mb-2">Work Orders</h1>
-          <p className="u-text-secondary-subtle u-fs-sm">
+          <h1 className="u-text-2xl u-font-bold u-mb-2">Work Orders</h1>
+          <p className="u-text-secondary-subtle u-text-sm">
             Drag-and-drop Kanban board for managing field operations.
           </p>
         </div>
@@ -146,7 +158,9 @@ export default function WorkOrdersPage() {
           <GridCol xs={12} sm={6} lg={2} key={column} className="u-flex-grow-1">
             <div
               className={`u-bg-dark u-p-3 u-rounded u-h-100 u-border u-transition-all u-duration-200 ${
-                dragOverColumn === column ? "u-border-primary u-bg-primary-subtle" : "u-border-secondary-subtle"
+                dragOverColumn === column
+                  ? "u-border-primary u-bg-primary-subtle"
+                  : "u-border-secondary-subtle"
               }`}
               onDragOver={(e) => handleDragOver(e, column)}
               onDragLeave={handleDragLeave}
@@ -155,13 +169,16 @@ export default function WorkOrdersPage() {
               aria-label={`${column} work orders`}
             >
               <div className="u-flex u-justify-between u-items-center u-mb-4">
-                <h3 className="u-font-bold u-fs-base">{column}</h3>
+                <h3 className="u-font-bold u-text-base">{column}</h3>
                 <Badge variant="secondary" label={String(tasks.length)} />
               </div>
 
-              <div className="u-flex u-flex-column u-h-100" style={{ minHeight: "400px" }}>
+              <div
+                className="u-flex u-flex-column u-h-100"
+                style={{ minHeight: "400px" }}
+              >
                 {tasks.length === 0 ? (
-                  <div className="u-text-center u-py-8 u-text-secondary-subtle u-fs-sm">
+                  <div className="u-text-center u-py-8 u-text-secondary-subtle u-text-sm">
                     Drop tasks here
                   </div>
                 ) : (

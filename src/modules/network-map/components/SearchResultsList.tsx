@@ -57,10 +57,12 @@ export const SearchResultsList: React.FC<SearchResultsListProps> = ({
             />
           </div>
           <div className="u-flex-1 u-flex u-flex-column u-min-w-0">
-            <span className="u-text-secondary u-fs-sm u-font-medium u-white-space-nowrap u-overflow-hidden u-text-ellipsis">
+            <span className="u-text-secondary u-text-sm u-font-medium u-white-space-nowrap u-overflow-hidden u-text-ellipsis">
               {result.name}
             </span>
-            <span className="u-text-muted u-fs-xs u-text-capitalize">{result.type}</span>
+            <span className="u-text-muted u-text-xs u-text-capitalize">
+              {result.type}
+            </span>
           </div>
           <Icon
             name="ArrowRight"

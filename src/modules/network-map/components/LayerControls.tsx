@@ -64,9 +64,7 @@ const LAYER_CONFIGS: LayerConfig[] = [
   },
 ];
 
-export const LayerControls: React.FC<LayerControlsProps> = ({
-  className = "",
-}) => {
+export const LayerControls: React.FC<LayerControlsProps> = ({ className = "" }) => {
   const layers = useLayers();
   const toggleLayer = useNetworkMapStore((state) => state.toggleLayer);
   const setLayerVisibility = useNetworkMapStore((state) => state.setLayerVisibility);
@@ -112,38 +110,38 @@ export const LayerControls: React.FC<LayerControlsProps> = ({
 
   return (
     <Card
-      glass={{blurAmount: 10}}
+      glass={{ blurAmount: 10 }}
       className={`u-w-100 u-p-0 u-overflow-hidden ${className}`}
-      style={{ 
+      style={{
         // maxWidth: "320px",
         boxShadow: "0 8px 32px rgba(0, 0, 0, 0.12)",
-        border: "1px solid rgba(255, 255, 255, 0.1)"
+        border: "1px solid rgba(255, 255, 255, 0.1)",
       }}
     >
       {/* Header with Progress Indicator */}
       <div className="u-flex u-items-center u-justify-between u-p-4 u-border">
         <div className="u-flex u-items-center u-gap-3">
-          <div 
+          <div
             className="u-rounded u-flex u-items-center u-justify-center"
             style={{
               width: "32px",
               height: "32px",
               background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-              boxShadow: "0 2px 8px rgba(102, 126, 234, 0.3)"
+              boxShadow: "0 2px 8px rgba(102, 126, 234, 0.3)",
             }}
           >
             <Icon name="Stack" size={18} className="u-text-white" />
           </div>
           <div className="u-flex u-flex-column u-gap-1">
             <span className="u-text-sm u-font-bold u-text-gray-100">Map Layers</span>
-            <span className="u-fs-xs u-text-gray-500">
+            <span className="u-text-xs u-text-gray-500">
               {activeCount} of {totalLayers} active
             </span>
           </div>
         </div>
-        
+
         {/* Progress Bar */}
-        <div 
+        <div
           className="u-rounded"
           style={{
             width: "40px",
@@ -151,7 +149,7 @@ export const LayerControls: React.FC<LayerControlsProps> = ({
             position: "relative",
             display: "flex",
             alignItems: "center",
-            justifyContent: "center"
+            justifyContent: "center",
           }}
         >
           <svg width="40" height="40" viewBox="0 0 40 40">
@@ -174,7 +172,7 @@ export const LayerControls: React.FC<LayerControlsProps> = ({
               strokeDasharray={`${progressPercentage} 100`}
               transform="rotate(-90 20 20)"
               style={{
-                transition: "stroke-dasharray 0.3s ease"
+                transition: "stroke-dasharray 0.3s ease",
               }}
             />
             <defs>
@@ -184,11 +182,11 @@ export const LayerControls: React.FC<LayerControlsProps> = ({
               </linearGradient>
             </defs>
           </svg>
-          <span 
-            className="u-fs-xs u-font-bold"
+          <span
+            className="u-text-xs u-font-bold"
             style={{
               position: "absolute",
-              color: activeCount > 0 ? "#667eea" : "rgba(255, 255, 255, 0.3)"
+              color: activeCount > 0 ? "#667eea" : "rgba(255, 255, 255, 0.3)",
             }}
           >
             {activeCount}
@@ -215,14 +213,14 @@ export const LayerControls: React.FC<LayerControlsProps> = ({
               onMouseEnter={() => setHoveredLayer(config.id)}
               onMouseLeave={() => setHoveredLayer(null)}
               style={{
-                backgroundColor: isVisible 
-                  ? isHovered 
-                    ? "rgba(255, 255, 255, 0.08)" 
+                backgroundColor: isVisible
+                  ? isHovered
+                    ? "rgba(255, 255, 255, 0.08)"
                     : "rgba(255, 255, 255, 0.04)"
                   : "transparent",
                 transform: isVisible && isHovered ? "translateX(4px)" : "translateX(0)",
                 opacity: isVisible ? 1 : 0.5,
-                transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)"
+                transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
               }}
             >
               <div className="u-flex u-items-center u-gap-3 u-p-3">
@@ -236,29 +234,29 @@ export const LayerControls: React.FC<LayerControlsProps> = ({
                     opacity: isVisible ? 1 : 0.3,
                     boxShadow: isVisible ? `0 0 12px ${config.color}40` : "none",
                     transition: "all 0.2s ease",
-                    transform: isVisible ? "scaleY(1)" : "scaleY(0.7)"
+                    transform: isVisible ? "scaleY(1)" : "scaleY(0.7)",
                   }}
                 />
 
                 {/* Icon and Text */}
                 <div className="u-flex u-flex-1 u-items-center u-gap-3 u-min-w-0">
-                  <div 
+                  <div
                     className="u-rounded u-flex u-items-center u-justify-center u-flex-shrink-0"
                     style={{
                       width: "32px",
                       height: "32px",
                       backgroundColor: `${config.color}15`,
                       border: `1px solid ${config.color}30`,
-                      opacity: isVisible ? 1 : 0.5
+                      opacity: isVisible ? 1 : 0.5,
                     }}
                   >
-                    <Icon 
-                      name={config.icon as any} 
-                      size={16} 
+                    <Icon
+                      name={config.icon as any}
+                      size={16}
                       style={{ color: config.color }}
                     />
                   </div>
-                  
+
                   <div className="u-flex u-flex-column u-min-w-0 u-flex-1">
                     <span
                       className="u-text-sm u-font-semibold u-text-gray-100 u-transition-colors u-duration-200"
@@ -267,7 +265,9 @@ export const LayerControls: React.FC<LayerControlsProps> = ({
                         overflow: "hidden",
                         textOverflow: "ellipsis",
                         display: "block",
-                        color: isVisible ? "rgba(255, 255, 255, 0.95)" : "rgba(255, 255, 255, 0.5)"
+                        color: isVisible
+                          ? "rgba(255, 255, 255, 0.95)"
+                          : "rgba(255, 255, 255, 0.5)",
                       }}
                     >
                       {config.name}
@@ -279,7 +279,7 @@ export const LayerControls: React.FC<LayerControlsProps> = ({
                         overflow: "hidden",
                         textOverflow: "ellipsis",
                         display: "block",
-                        opacity: isVisible ? 0.7 : 0.4
+                        opacity: isVisible ? 0.7 : 0.4,
                       }}
                     >
                       {config.description}
@@ -295,7 +295,7 @@ export const LayerControls: React.FC<LayerControlsProps> = ({
                     aria-label={`Toggle ${config.name} layer`}
                     style={{
                       transform: "scale(0.9)",
-                      transition: "transform 0.2s ease"
+                      transition: "transform 0.2s ease",
                     }}
                   />
                 </div>
@@ -306,10 +306,10 @@ export const LayerControls: React.FC<LayerControlsProps> = ({
       </div>
 
       {/* Actions */}
-      <div 
+      <div
         className="u-flex u-gap-2 u-p-4 u-border-top u-border-solid u-border-secondary-subtle"
         style={{
-          background: "linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.1))"
+          background: "linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.1))",
         }}
       >
         <Button
@@ -321,7 +321,7 @@ export const LayerControls: React.FC<LayerControlsProps> = ({
           style={{
             opacity: activeCount === totalLayers ? 0.5 : 1,
             cursor: activeCount === totalLayers ? "not-allowed" : "pointer",
-            transition: "all 0.2s ease"
+            transition: "all 0.2s ease",
           }}
         >
           <Icon name="Eye" size={14} style={{ marginRight: "6px" }} />
@@ -336,7 +336,7 @@ export const LayerControls: React.FC<LayerControlsProps> = ({
           style={{
             opacity: activeCount === 0 ? 0.5 : 1,
             cursor: activeCount === 0 ? "not-allowed" : "pointer",
-            transition: "all 0.2s ease"
+            transition: "all 0.2s ease",
           }}
         >
           <Icon name="EyeSlash" size={14} style={{ marginRight: "6px" }} />

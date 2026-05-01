@@ -45,7 +45,7 @@ export const QuickActions: React.FC<QuickActionsProps> = ({
       className={`u-p-4 u-border-t u-border-solid u-border-secondary-subtle ${containerClassName}`}
     >
       <span
-        className={`u-block u-fs-xs u-text-muted u-text-uppercase u-mb-3 ${labelClassName}`}
+        className={`u-block u-text-xs u-text-muted u-text-uppercase u-mb-3 ${labelClassName}`}
         style={{ letterSpacing: "0.5px" }}
       >
         Quick Actions

@@ -74,8 +74,8 @@ export default function DashboardPage() {
     <Container className="u-py-6 u-w-100">
       <div className="u-flex u-justify-between u-items-center u-mb-6">
         <div>
-          <h1 className="u-fs-2xl u-font-bold u-mb-2">Network Dashboard</h1>
-          <p className="u-text-secondary-subtle u-fs-sm">
+          <h1 className="u-text-2xl u-font-bold u-mb-2">Network Dashboard</h1>
+          <p className="u-text-secondary-subtle u-text-sm">
             Overview of network health, active incidents, and operational metrics.
           </p>
         </div>
@@ -88,39 +88,39 @@ export default function DashboardPage() {
         <GridCol xs={12} sm={6} lg={3}>
           <Card className="u-h-100" appearance="ghost" glass>
             <div className="u-flex u-justify-between u-items-center u-mb-4">
-              <span className="u-text-secondary-subtle u-fs-sm u-font-bold">
+              <span className="u-text-secondary-subtle u-text-sm u-font-bold">
                 Total Customers
               </span>
               <Icon name="Users" className="u-text-primary-emphasis" />
             </div>
-            <div className="u-fs-2xl u-font-bold">12,492</div>
-            <div className="u-fs-xs u-text-success u-mt-2">+124 this month</div>
+            <div className="u-text-2xl u-font-bold">12,492</div>
+            <div className="u-text-xs u-text-success u-mt-2">+124 this month</div>
           </Card>
         </GridCol>
 
         <GridCol xs={12} sm={6} lg={3}>
           <Card className="u-h-100" appearance="ghost" glass>
             <div className="u-flex u-justify-between u-items-center u-mb-4">
-              <span className="u-text-secondary-subtle u-fs-sm u-font-bold">
+              <span className="u-text-secondary-subtle u-text-sm u-font-bold">
                 Active Incidents
               </span>
               <Icon name="Warning" className="u-text-error" />
             </div>
-            <div className="u-fs-2xl u-font-bold">3</div>
-            <div className="u-fs-xs u-text-danger u-mt-2">-1 since yesterday</div>
+            <div className="u-text-2xl u-font-bold">3</div>
+            <div className="u-text-xs u-text-danger u-mt-2">-1 since yesterday</div>
           </Card>
         </GridCol>
 
         <GridCol xs={12} sm={6} lg={3}>
           <Card className="u-h-100" appearance="ghost" glass>
             <div className="u-flex u-justify-between u-items-center u-mb-4">
-              <span className="u-text-secondary-subtle u-fs-sm u-font-bold">
+              <span className="u-text-secondary-subtle u-text-sm u-font-bold">
                 Avg. Signal Health
               </span>
               <Icon name="Pulse" className="u-text-success" />
             </div>
-            <div className="u-fs-2xl u-font-bold">94%</div>
-            <div className="u-fs-xs u-text-secondary-subtle u-mt-2">
+            <div className="u-text-2xl u-font-bold">94%</div>
+            <div className="u-text-xs u-text-secondary-subtle u-mt-2">
               Stable across all nodes
             </div>
           </Card>
@@ -129,13 +129,13 @@ export default function DashboardPage() {
         <GridCol xs={12} sm={6} lg={3}>
           <Card className="u-h-100" glass appearance="ghost">
             <div className="u-flex u-justify-between u-items-center u-mb-4">
-              <span className="u-text-secondary-subtle u-fs-sm u-font-bold">
+              <span className="u-text-secondary-subtle u-text-sm u-font-bold">
                 Open Work Orders
               </span>
               <Icon name="Clipboard" className="u-text-warning-emphasis" />
             </div>
-            <div className="u-fs-2xl u-font-bold">28</div>
-            <div className="u-fs-xs u-text-warning u-mt-2">5 high priority</div>
+            <div className="u-text-2xl u-font-bold">28</div>
+            <div className="u-text-xs u-text-warning u-mt-2">5 high priority</div>
           </Card>
         </GridCol>
       </Grid>
@@ -178,9 +178,9 @@ export default function DashboardPage() {
                 icon={<Icon name="Warning" />}
               >
                 <div className="u-flex u-justify-between u-items-center u-mb-1">
-                  <span className="u-fs-xs u-text-secondary-subtle">10m ago</span>
+                  <span className="u-text-xs u-text-secondary-subtle">10m ago</span>
                 </div>
-                <p className="u-fs-sm u-mb-0">
+                <p className="u-text-sm u-mb-0">
                   Loss of signal reported on splitters 01-08 affecting 64 customers.
                 </p>
               </Callout>
@@ -191,9 +191,9 @@ export default function DashboardPage() {
                 icon={<Icon name="CellSignalHigh" />}
               >
                 <div className="u-flex u-justify-between u-items-center u-mb-1">
-                  <span className="u-fs-xs u-text-secondary-subtle">2h ago</span>
+                  <span className="u-text-xs u-text-secondary-subtle">2h ago</span>
                 </div>
-                <p className="u-fs-sm u-mb-0">
+                <p className="u-text-sm u-mb-0">
                   Node Gamma showing abnormal signal drop on downstream.
                 </p>
               </Callout>

@@ -38,7 +38,7 @@ export class ErrorBoundary extends Component<Props, State> {
           <div className="u-flex u-flex-column u-items-center u-gap-4">
             <Icon name="WarningCircle" size="xl" className="u-text-error" />
             <div>
-              <h2 className="u-fs-lg u-font-bold u-mb-2">Something went wrong</h2>
+              <h2 className="u-text-lg u-font-bold u-mb-2">Something went wrong</h2>
               <p className="u-text-secondary-subtle u-mb-4">
                 {this.state.error?.message || "An unexpected error occurred"}
               </p>

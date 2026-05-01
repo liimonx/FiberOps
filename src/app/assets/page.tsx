@@ -97,8 +97,8 @@ export default function AssetsPage() {
     <Container className="u-py-6 u-w-100">
       <div className="u-flex u-justify-between u-items-center u-mb-6">
         <div>
-          <h1 className="u-fs-2xl u-font-bold u-mb-2">Assets Inventory</h1>
-          <p className="u-text-secondary-subtle u-fs-sm">
+          <h1 className="u-text-2xl u-font-bold u-mb-2">Assets Inventory</h1>
+          <p className="u-text-secondary-subtle u-text-sm">
             Manage infrastructure assets, connection graphs, and maintenance logs.
           </p>
         </div>
@@ -130,8 +130,8 @@ export default function AssetsPage() {
             <Card appearance="elevated" glass={true} className="u-h-100">
               <div className="u-flex u-justify-between u-items-start u-mb-6">
                 <div>
-                  <h2 className="u-fs-lg u-font-bold u-mb-1">{selectedAsset.id}</h2>
-                  <p className="u-text-secondary-subtle u-fs-sm u-mb-0">
+                  <h2 className="u-text-lg u-font-bold u-mb-1">{selectedAsset.id}</h2>
+                  <p className="u-text-secondary-subtle u-text-sm u-mb-0">
                     {selectedAsset.type} • {selectedAsset.location}
                   </p>
                 </div>
@@ -154,7 +154,9 @@ export default function AssetsPage() {
                     <div className="u-flex u-flex-column u-gap-4">
                       <div className="u-p-4 u-bg-dark u-rounded u-border u-border-secondary-subtle">
                         <div className="u-flex u-justify-between u-mb-2">
-                          <span className="u-text-secondary-subtle u-fs-sm">Status</span>
+                          <span className="u-text-secondary-subtle u-text-sm">
+                            Status
+                          </span>
                           <Badge
                             variant={
                               selectedAsset.status === "Active"
@@ -167,24 +169,24 @@ export default function AssetsPage() {
                           />
                         </div>
                         <div className="u-flex u-justify-between u-mb-2">
-                          <span className="u-text-secondary-subtle u-fs-sm">
+                          <span className="u-text-secondary-subtle u-text-sm">
                             Last Maintenance
                           </span>
-                          <span className="u-font-mono u-fs-sm">
+                          <span className="u-font-mono u-text-sm">
                             {selectedAsset.lastMaintenance}
                           </span>
                         </div>
                         <div className="u-flex u-justify-between">
-                          <span className="u-text-secondary-subtle u-fs-sm">
+                          <span className="u-text-secondary-subtle u-text-sm">
                             Coordinates
                           </span>
-                          <span className="u-font-mono u-fs-sm">
+                          <span className="u-font-mono u-text-sm">
                             40.7128° N, 74.0060° W
                           </span>
                         </div>
                       </div>
 
-                      <h3 className="u-fs-base u-font-bold u-mt-2 u-mb-2">Photos</h3>
+                      <h3 className="u-text-base u-font-bold u-mt-2 u-mb-2">Photos</h3>
                       <div
                         className="u-grid u-gap-2"
                         style={{ gridTemplateColumns: "1fr 1fr" }}
@@ -215,20 +217,20 @@ export default function AssetsPage() {
                   <Tabs.Panel index={1}>
                     <div className="u-flex u-flex-column u-gap-4">
                       <div className="u-border-start u-border-primary u-ps-4 u-py-2">
-                        <div className="u-font-bold u-fs-sm">Routine Inspection</div>
-                        <div className="u-text-secondary-subtle u-fs-xs u-mb-1">
+                        <div className="u-font-bold u-text-sm">Routine Inspection</div>
+                        <div className="u-text-secondary-subtle u-text-xs u-mb-1">
                           {selectedAsset.lastMaintenance}
                         </div>
-                        <p className="u-fs-sm u-mb-0">
+                        <p className="u-text-sm u-mb-0">
                           Checked signal attenuation. Cleaned optical connectors.
                         </p>
                       </div>
                       <div className="u-border-start u-border-secondary-subtle u-ps-4 u-py-2">
-                        <div className="u-font-bold u-fs-sm">Firmware Update</div>
-                        <div className="u-text-secondary-subtle u-fs-xs u-mb-1">
+                        <div className="u-font-bold u-text-sm">Firmware Update</div>
+                        <div className="u-text-secondary-subtle u-text-xs u-mb-1">
                           2023-11-05
                         </div>
-                        <p className="u-fs-sm u-mb-0">
+                        <p className="u-text-sm u-mb-0">
                           Updated to v2.4.1 to patch security vulnerability.
                         </p>
                       </div>
@@ -239,7 +241,7 @@ export default function AssetsPage() {
                       className="u-bg-dark u-rounded u-border u-border-secondary-subtle u-flex u-items-center u-justify-center"
                       style={{ height: "250px" }}
                     >
-                      <span className="u-text-secondary-subtle u-fs-sm u-font-mono">
+                      <span className="u-text-secondary-subtle u-text-sm u-font-mono">
                         [ Topology Graph Placeholder ]
                       </span>
                     </div>

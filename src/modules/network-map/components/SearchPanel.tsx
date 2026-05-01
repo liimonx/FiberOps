@@ -132,10 +132,10 @@ export const SearchPanel: React.FC<SearchPanelProps> = ({
       {query && results.length === 0 && (
         <div className="u-py-8 u-px-4 u-text-center u-text-muted">
           <Icon name="MagnifyingGlass" size={24} className="u-text-disabled u-mb-3" />
-          <p className="u-m-0 u-mb-1 u-fs-sm u-text-secondary">
+          <p className="u-m-0 u-mb-1 u-text-sm u-text-secondary">
             No results found for <strong>{query}</strong>
           </p>
-          <span className="u-fs-xs u-text-muted">Try a different search term</span>
+          <span className="u-text-xs u-text-muted">Try a different search term</span>
         </div>
       )}
 

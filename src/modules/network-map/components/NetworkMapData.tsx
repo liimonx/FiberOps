@@ -173,7 +173,7 @@ function NetworkMapDataSync({ children }: NetworkMapDataProps) {
       <div className="u-w-100 u-h-100 u-flex u-items-center u-justify-center u-p-8">
         <div className="u-text-center">
           <Icon name="Warning" size={48} className="u-text-warning u-mb-4" />
-          <h2 className="u-fs-xl u-font-bold u-mb-2">Failed to Load Network Data</h2>
+          <h2 className="u-text-xl u-font-bold u-mb-2">Failed to Load Network Data</h2>
           <p className="u-text-secondary u-mb-4">
             {error instanceof Error ? error.message : "An unknown error occurred"}
           </p>
@@ -350,7 +350,7 @@ export function NetworkMapDataProvider({ children }: NetworkMapDataProps) {
         <div className="u-w-100 u-h-100 u-flex u-items-center u-justify-center u-p-8">
           <div className="u-text-center">
             <Icon name="Warning" size={48} className="u-text-danger u-mb-4" />
-            <h2 className="u-fs-xl u-font-bold u-mb-2">Map Component Error</h2>
+            <h2 className="u-text-xl u-font-bold u-mb-2">Map Component Error</h2>
             <p className="u-text-secondary u-mb-4">
               The network map encountered an error. Please try refreshing.
             </p>
