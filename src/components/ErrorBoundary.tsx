@@ -34,7 +34,7 @@ export class ErrorBoundary extends Component<Props, State> {
       }
 
       return (
-        <Card appearance="elevated" className="u-p-6 u-text-center">
+        <Card className="u-p-6 u-text-center">
           <div className="u-flex u-flex-column u-items-center u-gap-4">
             <Icon name="WarningCircle" size="xl" className="u-text-error" />
             <div>

@@ -1,9 +1,13 @@
 "use client";
 
-import React, { useMemo } from 'react';
-import { Icon } from "@shohojdhara/atomix";
-import { NetworkConnection as NetworkConnectionType, NetworkStatus, LatLng } from '../types';
-import { NETWORK_STATUS_COLORS } from '../constants';
+import React, { useMemo } from "react";
+import { Icon, Card } from "@shohojdhara/atomix";
+import {
+  NetworkConnection as NetworkConnectionType,
+  NetworkStatus,
+  LatLng,
+} from "../types";
+import { NETWORK_STATUS_COLORS } from "../constants";
 
 interface NetworkConnectionProps {
   connection: NetworkConnectionType;
@@ -30,65 +34,51 @@ export const NetworkConnection: React.FC<NetworkConnectionProps> = ({
   onClick,
   onMouseEnter,
   onMouseLeave,
-  className = ''
+  className = "",
 }) => {
   const statusColor = NETWORK_STATUS_COLORS[connection.status];
-  
+
   const pathData = useMemo(() => {
     if (connection.route && connection.route.length > 0) {
-      return connection.route.map((point, index) => 
-        `${index === 0 ? 'M' : 'L'} ${point.lng} ${point.lat}`
-      ).join(' ');
+      return connection.route
+        .map((point, index) => `${index === 0 ? "M" : "L"} ${point.lng} ${point.lat}`)
+        .join(" ");
     }
     return `M ${sourcePosition.lng} ${sourcePosition.lat} L ${targetPosition.lng} ${targetPosition.lat}`;
   }, [connection.route, sourcePosition, targetPosition]);
 
-  const connectionClasses = [
-    'network-connection',
-    `network-connection--${connection.status}`,
-    selected && 'network-connection--selected',
-    hovered && 'network-connection--hover',
-    animated && 'network-connection--animated',
-    className
-  ].filter(Boolean).join(' ');
-
-  const handleClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    onClick?.(connection);
-  };
-
-  const handleMouseEnter = () => {
-    onMouseEnter?.(connection);
-  };
-
   const getStatusIcon = () => {
     switch (connection.status) {
       case NetworkStatus.ACTIVE:
-        return 'Activity';
+        return "Activity";
       case NetworkStatus.WARNING:
-        return 'Warning';
+        return "Warning";
       case NetworkStatus.ERROR:
-        return 'WarningCircle';
+        return "WarningCircle";
       case NetworkStatus.INACTIVE:
-        return 'Power';
+        return "Power";
       default:
-        return 'Activity';
+        return "Activity";
     }
   };
 
   return (
     <div
-      className={connectionClasses}
-      onClick={handleClick}
-      onMouseEnter={handleMouseEnter}
+      className={`u-absolute u-cursor-pointer u-transition-all u-z-5 ${className}`}
+      onClick={(e) => {
+        e.stopPropagation();
+        onClick?.(connection);
+      }}
+      onMouseEnter={() => onMouseEnter?.(connection)}
       onMouseLeave={onMouseLeave}
       role="button"
       aria-label={`Connection ${connection.id} - ${connection.status}`}
       tabIndex={0}
-      data-connection-id={connection.id}
-      data-connection-status={connection.status}
     >
-      <svg className="connection-svg" preserveAspectRatio="none">
+      <svg
+        className="u-absolute u-inset-0 u-w-100 u-h-100 u-overflow-visible"
+        preserveAspectRatio="none"
+      >
         <defs>
           <marker
             id={`arrowhead-${connection.id}`}
@@ -104,32 +94,36 @@ export const NetworkConnection: React.FC<NetworkConnectionProps> = ({
               opacity={connection.status === NetworkStatus.ACTIVE ? 1 : 0.5}
             />
           </marker>
-          
-          <linearGradient id={`gradient-${connection.id}`} x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor={statusColor} stopOpacity={0.8} />
-            <stop offset="50%" stopColor={statusColor} stopOpacity={1} />
-            <stop offset="100%" stopColor={statusColor} stopOpacity={0.8} />
-          </linearGradient>
         </defs>
-        
+
         <path
           d={pathData}
-          className="connection-path"
+          className="u-transition-all"
           style={{
-            stroke: `url(#gradient-${connection.id})`,
+            stroke: statusColor,
             strokeWidth: selected ? 4 : hovered ? 3 : 2,
-            strokeDasharray: connection.status === NetworkStatus.INACTIVE ? '5,5' : 'none',
+            strokeDasharray:
+              connection.status === NetworkStatus.INACTIVE ? "5,5" : "none",
+            fill: "none",
+            filter: selected || hovered ? `drop-shadow(0 0 4px ${statusColor})` : "none",
           }}
-          markerEnd={connection.status === NetworkStatus.ACTIVE ? `url(#arrowhead-${connection.id})` : undefined}
+          markerEnd={
+            connection.status === NetworkStatus.ACTIVE
+              ? `url(#arrowhead-${connection.id})`
+              : undefined
+          }
         />
-        
+
         {animated && connection.status === NetworkStatus.ACTIVE && (
           <path
             d={pathData}
-            className="connection-flow"
+            className="u-animate-pulse"
             style={{
               stroke: statusColor,
               strokeWidth: 2,
+              fill: "none",
+              strokeDasharray: "10, 20",
+              opacity: 0.6,
             }}
           />
         )}
@@ -137,171 +131,39 @@ export const NetworkConnection: React.FC<NetworkConnectionProps> = ({
 
       {/* Metrics overlay */}
       {showMetrics && (
-        <div className="connection-metrics">
-          <div className="metrics-content">
-            <Icon name={getStatusIcon() as any} size={12} className="status-icon" />
-            {connection.bandwidth && (
-              <span className="bandwidth">{connection.bandwidth} Mbps</span>
-            )}
-            {connection.utilization !== undefined && (
-              <span className="utilization">{connection.utilization}% used</span>
-            )}
-          </div>
+        <div className="u-absolute u-top-50 u-start-50 u-transform-center u-pointer-events-none u-z-10">
+          <Card glass={true} className="u-px-3 u-py-2 u-shadow-lg">
+            <div className="u-flex u-items-center u-gap-2">
+              <Icon
+                name={getStatusIcon() as any}
+                size={14}
+                style={{ color: statusColor }}
+              />
+              {connection.bandwidth && (
+                <span className="u-text-xs u-font-bold u-text-primary">
+                  {connection.bandwidth} Mbps
+                </span>
+              )}
+              {connection.utilization !== undefined && (
+                <span className="u-text-xs u-text-secondary-subtle u-opacity-70">
+                  {connection.utilization}%
+                </span>
+              )}
+            </div>
+          </Card>
         </div>
       )}
 
       <style jsx>{`
-        .network-connection {
-          position: absolute;
-          cursor: pointer;
-          transition: all var(--duration-normal) ease;
-          z-index: 5;
-        }
-
-        .connection-svg {
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          overflow: visible;
-        }
-
-        .connection-path {
-          fill: none;
-          transition: all var(--duration-normal) ease;
-        }
-
-        .connection-flow {
-          fill: none;
-          stroke-dasharray: 10, 20;
-          stroke-dashoffset: 0;
-          animation: flow 1s linear infinite;
-          opacity: 0.6;
-        }
-
-        @keyframes flow {
-          0% {
-            stroke-dashoffset: 0;
-          }
-          100% {
-            stroke-dashoffset: -30;
-          }
-        }
-
-        .connection-metrics {
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          background: rgba(0, 0, 0, 0.8);
-          border: 1px solid ${statusColor};
-          border-radius: 6px;
-          padding: 6px 10px;
-          font-size: 11px;
-          color: white;
-          pointer-events: none;
-          z-index: 10;
-          white-space: nowrap;
-        }
-
-        .metrics-content {
-          display: flex;
-          align-items: center;
-          gap: 6px;
-        }
-
-        .status-icon {
-          color: ${statusColor};
-        }
-
-        .bandwidth,
-        .utilization {
-          font-weight: var(--font-weight-medium);
-        }
-
-        /* Status-specific styles */
-        .network-connection--active .connection-path {
-          filter: drop-shadow(0 0 2px ${statusColor});
-        }
-
-        .network-connection--warning .connection-path {
-          filter: drop-shadow(0 0 2px ${statusColor});
-          animation: pulse 2s ease-in-out infinite;
-        }
-
-        .network-connection--error .connection-path {
-          filter: drop-shadow(0 0 4px ${statusColor});
-          animation: pulse 1s ease-in-out infinite;
-        }
-
-        .network-connection--inactive .connection-path {
-          opacity: 0.4;
-        }
-
-        /* Interaction states */
-        .network-connection--selected .connection-path {
-          filter: drop-shadow(0 0 6px rgba(245, 158, 11, 0.5));
-        }
-
-        .network-connection--hover .connection-path {
-          filter: drop-shadow(0 0 4px rgba(59, 130, 246, 0.5));
-          stroke-width: 3 !important;
-        }
-
-        /* Focus states for accessibility */
-        .network-connection:focus {
-          outline: none;
-        }
-
-        .network-connection:focus .connection-path {
-          filter: drop-shadow(0 0 6px var(--color-primary-500));
-          stroke-width: 4;
-        }
-
-        @keyframes pulse {
-          0%, 100% {
-            opacity: 1;
-          }
-          50% {
-            opacity: 0.5;
-          }
-        }
-
-        /* Reduced motion support */
-        @media (prefers-reduced-motion: reduce) {
-          .connection-flow {
-            animation: none;
-            opacity: 0.3;
-          }
-
-          .network-connection--warning .connection-path,
-          .network-connection--error .connection-path {
-            animation: none;
-            opacity: 0.7;
-          }
-
-          .network-connection {
-            transition: none;
-          }
-
-          .connection-path {
-            transition: none;
-          }
-        }
-
-        /* High contrast mode */
-        @media (prefers-contrast: high) {
-          .connection-path {
-            stroke-width: 3 !important;
-          }
+        div:focus {
+          outline: 2px solid var(--color-primary);
+          outline-offset: 4px;
         }
       `}</style>
     </div>
   );
 };
 
-// Collection component for rendering multiple connections
 export const NetworkConnections: React.FC<{
   connections: NetworkConnectionType[];
   nodePositions: Map<string, LatLng>;
@@ -309,22 +171,21 @@ export const NetworkConnections: React.FC<{
   hoveredConnectionId?: string;
   onConnectionClick?: (connection: NetworkConnectionType) => void;
   onConnectionHover?: (connection: NetworkConnectionType | null) => void;
-}> = ({ 
-  connections, 
-  nodePositions, 
-  selectedConnectionId, 
+}> = ({
+  connections,
+  nodePositions,
+  selectedConnectionId,
   hoveredConnectionId,
   onConnectionClick,
-  onConnectionHover 
+  onConnectionHover,
 }) => {
   return (
     <>
       {connections.map((connection) => {
         const sourcePosition = nodePositions.get(connection.sourceNodeId);
         const targetPosition = nodePositions.get(connection.targetNodeId);
-        
         if (!sourcePosition || !targetPosition) return null;
-        
+
         return (
           <NetworkConnection
             key={connection.id}

@@ -16,7 +16,7 @@ export default function SettingsPage() {
         </div>
       </div>
 
-      <Card appearance="elevated" glass={true} className="u-w-100">
+      <Card glass={true} className="u-w-100">
         <Tabs activeIndex={activeTab} onTabChange={setActiveTab}>
           <Tabs.List className="u-mb-6">
             <Tabs.Trigger index={0}>General</Tabs.Trigger>

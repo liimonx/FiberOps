@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback, createContext, useContext } from 'react';
+import React, { useState, useCallback, createContext, useContext, useEffect } from 'react';
 
 interface Announcement {
   id: string;
@@ -38,18 +38,8 @@ export const AccessibilityProvider: React.FC<{ children: React.ReactNode }> = ({
       <div
         aria-live="polite"
         aria-atomic="true"
-        className="sr-only"
-        style={{
-          position: 'absolute',
-          width: '1px',
-          height: '1px',
-          padding: '0',
-          margin: '-1px',
-          overflow: 'hidden',
-          clip: 'rect(0, 0, 0, 0)',
-          whiteSpace: 'nowrap',
-          border: '0',
-        }}
+        className="u-absolute u-w-0 u-h-0 u-p-0 u-m-n1 u-overflow-hidden u-pointer-events-none"
+        style={{ clip: 'rect(0, 0, 0, 0)', whiteSpace: 'nowrap', border: '0' }}
       >
         {announcements
           .filter(a => a.priority === 'polite')
@@ -60,18 +50,8 @@ export const AccessibilityProvider: React.FC<{ children: React.ReactNode }> = ({
       <div
         aria-live="assertive"
         aria-atomic="true"
-        className="sr-only"
-        style={{
-          position: 'absolute',
-          width: '1px',
-          height: '1px',
-          padding: '0',
-          margin: '-1px',
-          overflow: 'hidden',
-          clip: 'rect(0, 0, 0, 0)',
-          whiteSpace: 'nowrap',
-          border: '0',
-        }}
+        className="u-absolute u-w-0 u-h-0 u-p-0 u-m-n1 u-overflow-hidden u-pointer-events-none"
+        style={{ clip: 'rect(0, 0, 0, 0)', whiteSpace: 'nowrap', border: '0' }}
       >
         {announcements
           .filter(a => a.priority === 'assertive')

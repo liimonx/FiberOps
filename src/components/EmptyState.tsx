@@ -18,7 +18,7 @@ export function EmptyState({
   onAction,
 }: EmptyStateProps) {
   return (
-    <Card appearance="elevated" className="u-p-8 u-text-center">
+    <Card className="u-p-8 u-text-center">
       <div className="u-flex u-flex-column u-items-center u-gap-4">
         <div className="u-bg-secondary-subtle u-rounded-circle u-p-4">
           <Icon name={icon as any} size="xl" className="u-text-secondary-subtle" />

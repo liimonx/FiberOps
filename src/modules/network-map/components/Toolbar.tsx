@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useRef, useCallback } from "react";
-import { Button, Card, Tooltip } from "@shohojdhara/atomix";
+import { Button, Card, Tooltip, Icon } from "@shohojdhara/atomix";
 import { useNetworkMapStore } from "../stores/useNetworkMapStore";
 import { useAccessibilityAnnounce } from "./AccessibilityAnnouncer";
 import { ToolType } from "../types";
@@ -108,13 +108,13 @@ export const Toolbar: React.FC<ToolbarProps> = ({
 
   return (
     <div
-      className={`toolbar ${positionClasses[position]} ${className}`}
+      className={`u-z-modal u-flex u-flex-column u-gap-2 ${positionClasses[position]} ${className}`}
       role="toolbar"
       aria-label="Map tools"
     >
-      <Card appearance="elevated" glass={true} className="toolbar-card">
+      <Card glass={true} className="u-p-1 u-bg-white-opacity-5">
         <div
-          className="tools-grid"
+          className="u-flex u-flex-column u-flex-md-row u-gap-1"
           role="group"
           aria-label="Tool selection"
           onKeyDown={handleToolbarKeyDown}
@@ -123,122 +123,41 @@ export const Toolbar: React.FC<ToolbarProps> = ({
             <Tooltip
               key={tool.id}
               content={
-                <div className="tooltip-content">
-                  <strong>{tool.label}</strong>
-                  <span className="tooltip-description">{tool.description}</span>
-                  {tool.shortcut && <kbd className="shortcut">{tool.shortcut}</kbd>}
+                <div className="u-flex u-flex-column u-gap-1 u-p-1">
+                  <strong className="u-text-sm u-text-primary">{tool.label}</strong>
+                  <span className="u-text-xs u-text-secondary-subtle">
+                    {tool.description}
+                  </span>
+                  {tool.shortcut && (
+                    <kbd className="u-mt-1 u-self-start u-px-2 u-py-0 u-bg-white-opacity-10 u-rounded-sm u-text-xs u-font-mono">
+                      {tool.shortcut}
+                    </kbd>
+                  )}
                 </div>
               }
               position="left"
             >
               <Button
-                ref={(el: HTMLButtonElement | HTMLAnchorElement | null) => {
-                  buttonRefs.current[index] = el as HTMLButtonElement | null;
+                ref={(el: any) => {
+                  buttonRefs.current[index] = el;
                 }}
-                variant={activeTool === tool.id ? "primary" : "outline-primary"}
-                size="sm"
+                variant={activeTool === tool.id ? "primary" : "secondary"}
+                size="md"
                 iconName={tool.icon}
+                iconOnly
                 onClick={() => handleToolClick(tool.id, index)}
                 aria-label={`${tool.label}${tool.shortcut ? `, shortcut ${tool.shortcut}` : ""}`}
                 aria-pressed={activeTool === tool.id}
                 aria-keyshortcuts={tool.shortcut}
-                className={`tool-button ${activeTool === tool.id ? "tool-button--active" : ""}`}
+                className={`u-transition-all ${activeTool === tool.id ? "u-shadow-lg" : ""}`}
+                style={{
+                  transform: activeTool === tool.id ? "scale(1.1)" : "scale(1)",
+                }}
               />
             </Tooltip>
           ))}
         </div>
       </Card>
-
-      <style jsx>{`
-        .toolbar {
-          pointer-events: auto;
-          z-index: var(--z-index-toolbar);
-        }
-
-        .toolbar-card {
-          padding: 8px;
-          background: rgba(31, 41, 55, 0.9);
-          backdrop-filter: blur(8px);
-        }
-
-        .tools-grid {
-          display: flex;
-          flex-direction: column;
-          gap: 4px;
-        }
-
-        .tooltip-content {
-          display: flex;
-          flex-direction: column;
-          gap: 4px;
-          font-size: 12px;
-        }
-
-        .tooltip-content strong {
-          color: var(--color-gray-100);
-        }
-
-        .tooltip-description {
-          color: var(--color-gray-400);
-          font-size: 11px;
-        }
-
-        .shortcut {
-          display: inline-block;
-          padding: 2px 6px;
-          background: var(--color-gray-700);
-          border: 1px solid var(--color-gray-600);
-          border-radius: 4px;
-          font-size: 10px;
-          font-family: monospace;
-          color: var(--color-gray-300);
-          margin-top: 4px;
-          align-self: flex-start;
-        }
-
-        .tool-button {
-          min-width: 36px;
-          min-height: 36px;
-          padding: 0;
-          transition: all 0.2s ease;
-        }
-
-        .tool-button:hover {
-          transform: scale(1.05);
-        }
-
-        .tool-button--active {
-          box-shadow: 0 0 0 2px var(--color-primary-500);
-        }
-
-        /* Mobile optimization */
-        @media (max-width: 768px) {
-          .toolbar-card {
-            padding: 6px;
-          }
-
-          .tools-grid {
-            flex-direction: row;
-            gap: 6px;
-          }
-
-          .tool-button {
-            min-width: 40px;
-            min-height: 40px;
-          }
-        }
-
-        /* Reduced motion support */
-        @media (prefers-reduced-motion: reduce) {
-          .tool-button {
-            transition: none;
-          }
-
-          .tool-button:hover {
-            transform: none;
-          }
-        }
-      `}</style>
     </div>
   );
 };
@@ -251,38 +170,52 @@ export const MobileToolbar: React.FC<{
   const setActiveTool = useNetworkMapStore((state) => state.setActiveTool);
   const [isExpanded, setIsExpanded] = React.useState(false);
 
+  const activeToolConfig = TOOLS.find((t) => t.id === activeTool) || TOOLS[0];
+
   return (
-    <div className={`mobile-toolbar ${className}`}>
-      <Card appearance="ghost" glass={true} className="mobile-toolbar-card">
+    <div className={`u-z-modal ${className}`}>
+      <Card glass={true} className="u-p-2 u-bg-white-opacity-10">
         {!isExpanded ? (
-          <div className="mobile-toolbar-collapsed">
+          <div className="u-flex u-items-center u-gap-3">
             <Button
               variant="primary"
-              size="md"
-              iconName={TOOLS.find((t) => t.id === activeTool)?.icon}
+              size="lg"
+              iconName={activeToolConfig.icon}
+              iconOnly
               onClick={() => setIsExpanded(true)}
               aria-label="Open tools menu"
-              className="active-tool-button"
+              className="u-shadow-lg"
             />
-            <span className="active-tool-label">
-              {TOOLS.find((t) => t.id === activeTool)?.label}
+            <span className="u-text-sm u-font-bold u-text-primary">
+              {activeToolConfig.label}
             </span>
+            <Icon
+              name="CaretDown"
+              size={12}
+              className="u-text-secondary-subtle u-opacity-50"
+            />
           </div>
         ) : (
-          <div className="mobile-toolbar-expanded">
-            <div className="mobile-tools-list">
+          <div className="u-flex u-flex-column u-gap-3">
+            <div className="u-flex u-flex-column u-gap-1">
               {TOOLS.map((tool) => (
                 <button
                   key={tool.id}
-                  className={`mobile-tool-item ${activeTool === tool.id ? "active" : ""}`}
+                  className={`u-flex u-items-center u-gap-3 u-p-3 u-rounded u-transition-all u-border-0 u-w-100 u-text-start ${
+                    activeTool === tool.id
+                      ? "u-bg-primary u-text-white u-shadow-md"
+                      : "u-bg-transparent u-text-secondary-subtle"
+                  }`}
                   onClick={() => {
                     setActiveTool(tool.id);
                     setIsExpanded(false);
                   }}
                 >
-                  <span className="tool-icon">{tool.icon}</span>
-                  <span className="tool-label">{tool.label}</span>
-                  {activeTool === tool.id && <span className="active-indicator" />}
+                  <Icon name={tool.icon} size={20} />
+                  <span className="u-flex-1 u-text-sm u-font-medium">{tool.label}</span>
+                  {activeTool === tool.id && (
+                    <div className="u-w-2 u-h-2 u-rounded-circle u-bg-white" />
+                  )}
                 </button>
               ))}
             </div>
@@ -290,98 +223,14 @@ export const MobileToolbar: React.FC<{
               variant="secondary"
               size="sm"
               iconName="X"
+              fullWidth
               onClick={() => setIsExpanded(false)}
-              className="close-button"
             >
               Close
             </Button>
           </div>
         )}
       </Card>
-
-      <style jsx>{`
-        .mobile-toolbar {
-          pointer-events: auto;
-        }
-
-        .mobile-toolbar-card {
-          padding: 12px;
-        }
-
-        .mobile-toolbar-collapsed {
-          display: flex;
-          align-items: center;
-          gap: 12px;
-        }
-
-        .active-tool-button {
-          min-width: 44px;
-          min-height: 44px;
-        }
-
-        .active-tool-label {
-          font-size: 14px;
-          color: var(--color-gray-200);
-          font-weight: var(--font-weight-medium);
-        }
-
-        .mobile-toolbar-expanded {
-          display: flex;
-          flex-direction: column;
-          gap: 12px;
-        }
-
-        .mobile-tools-list {
-          display: flex;
-          flex-direction: column;
-          gap: 4px;
-        }
-
-        .mobile-tool-item {
-          display: flex;
-          align-items: center;
-          gap: 12px;
-          padding: 12px;
-          background: transparent;
-          border: none;
-          border-radius: 8px;
-          color: var(--color-gray-300);
-          font-size: 14px;
-          cursor: pointer;
-          transition: all 0.2s ease;
-          position: relative;
-        }
-
-        .mobile-tool-item:hover {
-          background: var(--color-gray-800);
-        }
-
-        .mobile-tool-item.active {
-          background: var(--color-primary-500);
-          color: white;
-        }
-
-        .tool-icon {
-          width: 20px;
-          height: 20px;
-        }
-
-        .tool-label {
-          flex: 1;
-          text-align: left;
-        }
-
-        .active-indicator {
-          width: 8px;
-          height: 8px;
-          background: currentColor;
-          border-radius: 50%;
-        }
-
-        .close-button {
-          align-self: stretch;
-        }
-      `}</style>
     </div>
   );
 };

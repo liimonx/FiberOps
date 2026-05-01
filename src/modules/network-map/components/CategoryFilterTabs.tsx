@@ -8,8 +8,7 @@ interface CategoryFilterTabsProps {
   selectedCategory: AssetCategory;
   onCategoryChange: (category: AssetCategory) => void;
   categoryCounts: Record<AssetCategory, number>;
-  containerClassName?: string;
-  tabClassName?: string;
+  className?: string;
 }
 
 const CATEGORY_CONFIG: Record<AssetCategory, { label: string; icon: string }> = {
@@ -26,14 +25,13 @@ export const CategoryFilterTabs: React.FC<CategoryFilterTabsProps> = ({
   selectedCategory,
   onCategoryChange,
   categoryCounts,
-  containerClassName = "",
-  tabClassName = "",
+  className = "",
 }) => {
   const categories: AssetCategory[] = ["all", "nodes", "connections", "customers"];
 
   return (
     <div
-      className={`u-flex u-gap-1 u-mt-3 u-overflow-x-auto u-pb-1 ${containerClassName}`}
+      className={`u-flex u-gap-2 u-px-4 u-py-3 u-overflow-x-auto u-no-scrollbar ${className}`}
       role="tablist"
       aria-label="Search categories"
     >
@@ -51,10 +49,13 @@ export const CategoryFilterTabs: React.FC<CategoryFilterTabsProps> = ({
             size="sm"
             iconName={config.icon}
             onClick={() => onCategoryChange(category)}
-            className={tabClassName}
+            className="u-flex-shrink-0 u-transition-all"
+            style={{
+              transform: isActive ? "translateY(-2px)" : "none",
+            }}
           >
             <span className="u-text-capitalize">{config.label}</span>
-            <Badge label={`${count}`} variant="error" size="sm" />
+            <Badge label={`${count}`} variant={isActive ? "primary" : "secondary"} size="sm" className="u-ms-2" />
           </Button>
         );
       })}

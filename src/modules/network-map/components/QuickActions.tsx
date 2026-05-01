@@ -11,10 +11,7 @@ interface QuickAction {
 
 interface QuickActionsProps {
   actions?: QuickAction[];
-  containerClassName?: string;
-  labelClassName?: string;
-  gridClassName?: string;
-  actionClassName?: string;
+  className?: string;
 }
 
 const DEFAULT_ACTIONS: QuickAction[] = [
@@ -35,30 +32,28 @@ const DEFAULT_ACTIONS: QuickAction[] = [
  */
 export const QuickActions: React.FC<QuickActionsProps> = ({
   actions = DEFAULT_ACTIONS,
-  containerClassName = "",
-  labelClassName = "",
-  gridClassName = "",
-  actionClassName = "",
+  className = "",
 }) => {
   return (
     <div
-      className={`u-p-4 u-border-t u-border-solid u-border-secondary-subtle ${containerClassName}`}
+      className={`u-p-4 u-bg-white-opacity-5 u-border-top u-border-secondary-subtle ${className}`}
     >
       <span
-        className={`u-block u-text-xs u-text-muted u-text-uppercase u-mb-3 ${labelClassName}`}
-        style={{ letterSpacing: "0.5px" }}
+        className="u-block u-text-xs u-text-secondary-subtle u-font-bold u-text-uppercase u-mb-3 u-leading-none"
+        style={{ letterSpacing: "1px" }}
       >
         Quick Actions
       </span>
-      <div className={`u-flex u-gap-2 ${gridClassName}`}>
+      <div className="u-flex u-gap-2">
         {actions.map((action, index) => (
           <Button
             key={index}
             size="sm"
-            variant="light"
+            variant="secondary"
             iconName={action.icon}
             onClick={action.onClick}
-            className={` ${actionClassName}`}
+            fullWidth
+            className="u-transition-all hover:u-shadow-sm"
           >
             {action.label}
           </Button>

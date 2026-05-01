@@ -12,13 +12,9 @@ export function PageStub({
   return (
     <Container className="u-py-6">
       <Card
-        appearance="elevated"
         title={title}
-        text={
-          description ?? "This module is scaffolded and ready for implementation."
-        }
+        text={description ?? "This module is scaffolded and ready for implementation."}
       />
     </Container>
   );
 }
-

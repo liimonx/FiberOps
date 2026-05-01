@@ -219,14 +219,9 @@ function NetworkMapContent() {
             left: tooltip.x + 12,
             top: tooltip.y - 12,
             pointerEvents: "none",
-            zIndex: 1000,
           }}
         >
-          <Card
-            appearance="elevated"
-            glass={{ blurAmount: 6, mode: "shader" }}
-            className="tooltip-card"
-          >
+          <Card glass={{ blurAmount: 6, mode: "shader" }} className="tooltip-card">
             <div className="tooltip-body">
               <strong className="tooltip-title">{tooltip.content.title}</strong>
               {tooltip.content.subtitle && (

@@ -1,7 +1,7 @@
 "use client";
 
 import React from 'react';
-import { useResponsive, useResponsiveValue, Breakpoint } from '../hooks/useResponsive';
+import { useResponsive, Breakpoint } from '../hooks/useResponsive';
 
 interface ResponsiveContainerProps {
   children: React.ReactNode;
@@ -27,204 +27,132 @@ export const ResponsiveContainer: React.FC<ResponsiveContainerProps> = ({
   };
 
   return (
-    <div className={`responsive-container ${className} ${breakpointClasses[breakpoint]}`}>
+    <div className={`u-transition-all ${className} ${breakpointClasses[breakpoint]}`}>
       {children}
     </div>
   );
 };
 
 // Component that conditionally renders based on breakpoint
-interface ResponsiveShowProps {
-  children: React.ReactNode;
-  at: Breakpoint | Breakpoint[];
-}
-
-export const ResponsiveShow: React.FC<ResponsiveShowProps> = ({ children, at }) => {
+export const ResponsiveShow: React.FC<{ children: React.ReactNode; at: Breakpoint | Breakpoint[] }> = ({ children, at }) => {
   const { breakpoint } = useResponsive();
   const breakpoints = Array.isArray(at) ? at : [at];
-
-  if (!breakpoints.includes(breakpoint)) {
-    return null;
-  }
-
+  if (!breakpoints.includes(breakpoint)) return null;
   return <>{children}</>;
 };
 
 // Component that hides at specific breakpoints
-interface ResponsiveHideProps {
-  children: React.ReactNode;
-  at: Breakpoint | Breakpoint[];
-}
-
-export const ResponsiveHide: React.FC<ResponsiveHideProps> = ({ children, at }) => {
+export const ResponsiveHide: React.FC<{ children: React.ReactNode; at: Breakpoint | Breakpoint[] }> = ({ children, at }) => {
   const { breakpoint } = useResponsive();
   const breakpoints = Array.isArray(at) ? at : [at];
-
-  if (breakpoints.includes(breakpoint)) {
-    return null;
-  }
-
+  if (breakpoints.includes(breakpoint)) return null;
   return <>{children}</>;
 };
 
 // Component for responsive grid layouts
-interface ResponsiveGridProps {
+export const ResponsiveGrid: React.FC<{
   children: React.ReactNode;
   className?: string;
   mobileColumns?: number;
   tabletColumns?: number;
   desktopColumns?: number;
-  gap?: string;
-}
-
-export const ResponsiveGrid: React.FC<ResponsiveGridProps> = ({
+  gap?: number;
+}> = ({
   children,
   className = '',
   mobileColumns = 1,
   tabletColumns = 2,
   desktopColumns = 3,
-  gap = '16px'
+  gap = 4
 }) => {
-  const columnCount = useResponsiveValue(mobileColumns, tabletColumns, desktopColumns);
-
   return (
     <div 
-      className={`responsive-grid ${className}`}
+      className={`u-grid u-gap-${gap} ${className}`}
       style={{
-        display: 'grid',
-        gridTemplateColumns: `repeat(${columnCount}, 1fr)`,
-        gap
+        gridTemplateColumns: `repeat(${mobileColumns}, 1fr)`,
       }}
     >
+      <style jsx>{`
+        @media (min-width: 768px) {
+          div { grid-template-columns: repeat(${tabletColumns}, 1fr) !important; }
+        }
+        @media (min-width: 1024px) {
+          div { grid-template-columns: repeat(${desktopColumns}, 1fr) !important; }
+        }
+      `}</style>
       {children}
     </div>
   );
 };
 
 // Component for responsive stack layouts
-interface ResponsiveStackProps {
+export const ResponsiveStack: React.FC<{
   children: React.ReactNode;
   className?: string;
   mobileDirection?: 'vertical' | 'horizontal';
   tabletDirection?: 'vertical' | 'horizontal';
   desktopDirection?: 'vertical' | 'horizontal';
-  gap?: string;
+  gap?: number;
   align?: 'start' | 'center' | 'end' | 'stretch';
   justify?: 'start' | 'center' | 'end' | 'between' | 'around';
-}
-
-export const ResponsiveStack: React.FC<ResponsiveStackProps> = ({
+}> = ({
   children,
   className = '',
   mobileDirection = 'vertical',
   tabletDirection = 'horizontal',
   desktopDirection = 'horizontal',
-  gap = '16px',
+  gap = 4,
   align = 'stretch',
   justify = 'start'
 }) => {
-  const direction = useResponsiveValue(mobileDirection, tabletDirection, desktopDirection);
-
-  const flexDirection = direction === 'vertical' ? 'column' : 'row';
-  const alignItems = {
-    start: 'flex-start',
-    center: 'center',
-    end: 'flex-end',
-    stretch: 'stretch'
-  }[align];
-
-  const justifyContent = {
-    start: 'flex-start',
-    center: 'center',
-    end: 'flex-end',
-    between: 'space-between',
-    around: 'space-around'
-  }[justify];
+  const getAlignClass = (val: string) => `u-items-${val === 'stretch' ? 'stretch' : val}`;
+  const getJustifyClass = (val: string) => `u-justify-${val}`;
 
   return (
-    <div 
-      className={`responsive-stack ${className}`}
-      style={{
-        display: 'flex',
-        flexDirection,
-        gap,
-        alignItems,
-        justifyContent
-      }}
-    >
+    <div className={`u-flex u-gap-${gap} ${getAlignClass(align)} ${getJustifyClass(justify)} ${className}`}>
+      <style jsx>{`
+        div { flex-direction: ${mobileDirection === 'vertical' ? 'column' : 'row'}; }
+        @media (min-width: 768px) {
+          div { flex-direction: ${tabletDirection === 'vertical' ? 'column' : 'row'}; }
+        }
+        @media (min-width: 1024px) {
+          div { flex-direction: ${desktopDirection === 'vertical' ? 'column' : 'row'}; }
+        }
+      `}</style>
       {children}
     </div>
   );
 };
 
 // Touch-optimized wrapper
-interface TouchFriendlyProps {
+export const TouchFriendly: React.FC<{
   children: React.ReactNode;
   className?: string;
   minTouchSize?: number;
-  enableTouchFeedback?: boolean;
-}
-
-export const TouchFriendly: React.FC<TouchFriendlyProps> = ({
+}> = ({
   children,
   className = '',
   minTouchSize = 44,
-  enableTouchFeedback = true
 }) => {
   return (
     <div 
-      className={`touch-friendly ${enableTouchFeedback ? 'touch-feedback' : ''} ${className}`}
+      className={`u-flex u-items-center u-justify-center u-cursor-pointer u-transition-all active:u-opacity-80 active:u-transform-scale-95 ${className}`}
       style={{
-        minHeight: minTouchSize,
-        minWidth: minTouchSize
+        minHeight: `${minTouchSize}px`,
+        minWidth: `${minTouchSize}px`
       }}
     >
       {children}
-      <style jsx>{`
-        .touch-friendly {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-
-        .touch-feedback {
-          transition: transform 0.1s ease, opacity 0.1s ease;
-        }
-
-        .touch-feedback:active {
-          transform: scale(0.95);
-          opacity: 0.8;
-        }
-
-        @media (hover: hover) {
-          .touch-feedback:active {
-            transform: none;
-            opacity: 1;
-          }
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-          .touch-feedback {
-            transition: none;
-          }
-
-          .touch-feedback:active {
-            transform: none;
-          }
-        }
-      `}</style>
     </div>
   );
 };
 
 // Safe area inset wrapper for notched devices
-interface SafeAreaWrapperProps {
+export const SafeAreaWrapper: React.FC<{
   children: React.ReactNode;
   className?: string;
   edges?: Array<'top' | 'bottom' | 'left' | 'right'>;
-}
-
-export const SafeAreaWrapper: React.FC<SafeAreaWrapperProps> = ({
+}> = ({
   children,
   className = '',
   edges = ['top', 'bottom', 'left', 'right']
@@ -237,7 +165,7 @@ export const SafeAreaWrapper: React.FC<SafeAreaWrapperProps> = ({
   };
 
   return (
-    <div className={`safe-area-wrapper ${className}`} style={paddingStyles}>
+    <div className={`u-w-100 ${className}`} style={paddingStyles}>
       {children}
     </div>
   );

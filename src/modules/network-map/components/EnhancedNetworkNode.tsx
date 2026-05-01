@@ -1,17 +1,14 @@
 "use client";
 
-import React, { useEffect, useRef } from 'react';
-import { Icon } from '@shohojdhara/atomix';
-import { NetworkNode, NetworkStatus } from '../types';
-import { 
-  getStatusColor, 
-  statusIcons, 
+import React, { useEffect, useRef } from "react";
+import { Icon, Card } from "@shohojdhara/atomix";
+import { NetworkNode, NetworkStatus } from "../types";
+import {
+  getStatusColor,
   statusLabels,
   nodeTypeIcons,
   getNodeMarkerStyle,
-  hoverEffects
-} from '../utils/statusColors';
-import { scalePulse, transitionClasses } from '../utils/animations';
+} from "../utils/statusColors";
 
 interface EnhancedNetworkNodeProps {
   node: NetworkNode;
@@ -32,103 +29,72 @@ export function EnhancedNetworkNode({
   onHover,
   size = 12,
   showLabel = true,
-  className = ''
+  className = "",
 }: EnhancedNetworkNodeProps) {
   const nodeRef = useRef<HTMLDivElement>(null);
   const colors = getStatusColor(node.status);
-  const icon = nodeTypeIcons[node.type] || 'Circle';
-
-  useEffect(() => {
-    // Animate on selection
-    if (isSelected && nodeRef.current) {
-      scalePulse(nodeRef.current, {
-        scale: 1.3,
-        duration: 0.4,
-        repeat: 1
-      });
-    }
-  }, [isSelected]);
-
-  const handleClick = () => {
-    onClick?.(node);
-  };
-
-  const handleMouseEnter = () => {
-    onHover?.(node);
-  };
-
-  const handleMouseLeave = () => {
-    onHover?.(null);
-  };
+  const icon = nodeTypeIcons[node.type] || "Circle";
 
   const markerStyle = getNodeMarkerStyle(node.status, size);
 
   return (
     <div
       ref={nodeRef}
-      className={`network-node ${transitionClasses.interactive} ${className}`}
+      className={`u-relative u-cursor-pointer u-transition-all ${className}`}
       style={{
-        position: 'relative',
-        cursor: 'pointer',
-        zIndex: isSelected ? 1000 : isHovered ? 100 : 1
+        zIndex: isSelected ? 1000 : isHovered ? 100 : 1,
       }}
-      onClick={handleClick}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
+      onClick={() => onClick?.(node)}
+      onMouseEnter={() => onHover?.(node)}
+      onMouseLeave={() => onHover?.(null)}
       role="button"
       tabIndex={0}
       aria-label={`${node.name} - ${statusLabels[node.status]}`}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          handleClick();
-        }
-      }}
     >
-      {/* Glow effect for selected/hovered */}
+      {/* Glow effect */}
       {(isSelected || isHovered) && (
         <div
-          className="absolute inset-0 rounded-full"
+          className="u-absolute u-rounded-circle u-backdrop-blur-sm"
           style={{
             width: `${size * 2}px`,
             height: `${size * 2}px`,
-            left: `${-size / 2}px`,
-            top: `${-size / 2}px`,
-            backgroundColor: colors.glow || 'transparent',
+            left: "50%",
+            top: "50%",
+            transform: "translate(-50%, -50%)",
+            backgroundColor: colors.glow || "transparent",
             opacity: isSelected ? 0.3 : 0.2,
-            filter: 'blur(8px)',
-            transition: 'all 0.2s ease-out'
+            filter: "blur(8px)",
           }}
         />
       )}
 
       {/* Main node marker */}
       <div
-        className="relative flex items-center justify-center"
+        className="u-relative u-flex u-items-center u-justify-center u-rounded-circle u-transition-all u-shadow-md"
         style={{
           ...markerStyle,
-          borderRadius: '50%',
-          transition: 'all 0.2s ease-out',
-          transform: isHovered ? `scale(${hoverEffects.node.scale})` : 'scale(1)'
+          width: `${size}px`,
+          height: `${size}px`,
+          transform: isHovered ? "scale(1.2)" : "scale(1)",
         }}
       >
         {/* Status indicator ring */}
         {node.status !== NetworkStatus.ACTIVE && (
           <div
-            className="absolute inset-0 rounded-full"
+            className="u-absolute u-inset-0 u-rounded-circle u-border u-border-solid u-animate-pulse"
             style={{
-              border: `2px solid ${colors.primary}`,
-              animation: node.status === NetworkStatus.ERROR ? 'pulse-error 2s infinite' : undefined
+              borderColor: colors.primary,
+              borderWidth: "2px",
             }}
           />
         )}
 
-        {/* Icon inside node */}
+        {/* Icon */}
         {size >= 16 && (
           <Icon
             name={icon as any}
-            size={Math.max(size * 0.5, 8)}
-            color="white"
-            weight="bold"
+            size={Math.max(size * 0.5, 10)}
+            className="u-text-white"
           />
         )}
       </div>
@@ -136,26 +102,15 @@ export function EnhancedNetworkNode({
       {/* Label */}
       {showLabel && (isHovered || isSelected) && (
         <div
-          className="absolute left-1/2 transform -translate-x-1/2 mt-2 px-2 py-1 rounded bg-dark text-white text-xs whitespace-nowrap shadow-lg"
+          className="u-absolute u-start-50 u-transform-center-x u-mt-2 u-px-3 u-py-1 u-rounded u-bg-dark u-text-white u-text-2xs u-font-bold u-text-uppercase u-shadow-xl u-z-modal"
           style={{
-            top: `${size + 4}px`,
-            zIndex: 1001,
-            animation: 'fadeIn 0.2s ease-out'
+            top: `${size}px`,
+            letterSpacing: "1px",
+            whiteSpace: "nowrap",
           }}
         >
-          <div className="font-medium">{node.name}</div>
-          <div className="text-2xs opacity-75">{statusLabels[node.status]}</div>
+          {node.name}
         </div>
-      )}
-
-      {/* Selection indicator */}
-      {isSelected && (
-        <div
-          className="absolute -inset-2 rounded-full border-2 border-primary"
-          style={{
-            animation: 'pulse-active 2s infinite'
-          }}
-        />
       )}
     </div>
   );
@@ -183,48 +138,26 @@ export function EnhancedConnectionLine({
   isHovered = false,
   onClick,
   onHover,
-  animated = true
+  animated = true,
 }: EnhancedConnectionLineProps) {
   const lineRef = useRef<SVGLineElement>(null);
   const colors = getStatusColor(status);
-  
-  // Calculate line properties
-  const dx = target.x - source.x;
-  const dy = target.y - source.y;
-  const length = Math.sqrt(dx * dx + dy * dy);
-  const angle = Math.atan2(dy, dx) * 180 / Math.PI;
 
-  const lineWidth = isHovered || isSelected ? 4 : utilization ? 2 + (utilization / 100) * 2 : 2;
-  const opacity = isHovered || isSelected ? 1 : status === NetworkStatus.INACTIVE ? 0.4 : 0.8;
-
-  useEffect(() => {
-    if (animated && lineRef.current && status === NetworkStatus.ACTIVE) {
-      // Animate dash offset for flow effect
-      const line = lineRef.current;
-      let offset = 0;
-      
-      const animate = () => {
-        offset -= 1;
-        line.style.strokeDashoffset = offset.toString();
-        requestAnimationFrame(animate);
-      };
-      
-      const id = requestAnimationFrame(animate);
-      return () => cancelAnimationFrame(id);
-    }
-  }, [animated, status]);
+  const lineWidth =
+    isHovered || isSelected ? 4 : utilization ? 2 + (utilization / 100) * 2 : 2;
+  const opacity =
+    isHovered || isSelected ? 1 : status === NetworkStatus.INACTIVE ? 0.4 : 0.8;
 
   return (
     <g
       onClick={onClick}
       onMouseEnter={() => onHover?.(true)}
       onMouseLeave={() => onHover?.(false)}
-      style={{ cursor: 'pointer' }}
+      className="u-cursor-pointer"
       role="button"
       tabIndex={0}
       aria-label={`Connection - ${status}`}
     >
-      {/* Background line for easier clicking */}
       <line
         x1={source.x}
         y1={source.y}
@@ -235,7 +168,6 @@ export function EnhancedConnectionLine({
         fill="none"
       />
 
-      {/* Main connection line */}
       <line
         ref={lineRef}
         x1={source.x}
@@ -246,10 +178,17 @@ export function EnhancedConnectionLine({
         strokeWidth={lineWidth}
         opacity={opacity}
         strokeLinecap="round"
-        strokeDasharray={status === NetworkStatus.INACTIVE ? '5,5' : animated ? '10,5' : 'none'}
-        className="transition-all duration-200"
+        strokeDasharray={
+          status === NetworkStatus.INACTIVE
+            ? "5,5"
+            : animated && status === NetworkStatus.ACTIVE
+              ? "10,5"
+              : "none"
+        }
+        className="u-transition-all"
         style={{
-          filter: isHovered || isSelected ? `drop-shadow(0 0 4px ${colors.glow})` : 'none'
+          filter:
+            isHovered || isSelected ? `drop-shadow(0 0 4px ${colors.glow})` : "none",
         }}
       />
 
@@ -259,82 +198,71 @@ export function EnhancedConnectionLine({
           cx={(source.x + target.x) / 2}
           cy={(source.y + target.y) / 2}
           r={4}
-          fill={utilization > 90 ? '#EF4444' : '#F59E0B'}
-          className="animate-pulse"
+          fill={utilization > 90 ? "var(--color-error)" : "var(--color-warning)"}
+          className="u-animate-pulse"
         />
-      )}
-
-      {/* Hover tooltip */}
-      {isHovered && (
-        <foreignObject
-          x={(source.x + target.x) / 2 - 50}
-          y={(source.y + target.y) / 2 - 30}
-          width={100}
-          height={40}
-        >
-          <div className="bg-dark text-white text-xs px-2 py-1 rounded shadow-lg text-center">
-            <div className="font-medium">Connection</div>
-            {utilization && <div className="text-2xs">{utilization}% utilized</div>}
-          </div>
-        </foreignObject>
       )}
     </g>
   );
 }
 
 // Status badge component
-interface AnimatedStatusBadgeProps {
+export function AnimatedStatusBadge({
+  status,
+  size = "md",
+  showLabel = true,
+  animated = true,
+  className = "",
+}: {
   status: NetworkStatus;
-  size?: 'sm' | 'md' | 'lg';
+  size?: "sm" | "md" | "lg";
   showLabel?: boolean;
   animated?: boolean;
   className?: string;
-}
-
-export function AnimatedStatusBadge({
-  status,
-  size = 'md',
-  showLabel = true,
-  animated = true,
-  className = ''
-}: AnimatedStatusBadgeProps) {
+}) {
   const colors = getStatusColor(status);
-  const icon = statusIcons[status];
 
-  const sizeConfig = {
-    sm: { icon: 12, text: 'text-2xs', padding: 'px-2 py-0.5' },
-    md: { icon: 16, text: 'text-xs', padding: 'px-2.5 py-1' },
-    lg: { icon: 20, text: 'text-sm', padding: 'px-3 py-1.5' }
+  const sizeMap = {
+    sm: { icon: 12, font: "u-text-2xs", p: "u-px-2 u-py-0.5" },
+    md: { icon: 16, font: "u-text-xs", p: "u-px-3 u-py-1" },
+    lg: { icon: 20, font: "u-text-sm", p: "u-px-4 u-py-1.5" },
   };
 
-  const config = sizeConfig[size];
+  const config = sizeMap[size];
 
   return (
     <div
-      className={`inline-flex items-center gap-1.5 rounded-full ${config.padding} ${className}`}
+      className={`u-inline-flex u-items-center u-gap-2 u-rounded-pill u-border u-border-solid ${config.p} ${className}`}
       style={{
         backgroundColor: colors.background,
-        border: `1px solid ${colors.border}`,
-        color: colors.primary
+        borderColor: colors.border,
+        color: colors.primary,
       }}
     >
-      <div className="relative">
-        <Icon name={icon as any} size={config.icon as any} />
-        
-        {/* Animated pulse dot */}
+      <div className="u-relative u-flex u-items-center u-justify-center">
+        <Icon
+          name={
+            (status === "active"
+              ? "CheckCircle"
+              : status === "error"
+                ? "XCircle"
+                : "Warning") as any
+          }
+          size={config.icon}
+        />
         {animated && status !== NetworkStatus.INACTIVE && (
           <div
-            className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full"
-            style={{
-              backgroundColor: colors.primary,
-              animation: `pulse-${status === NetworkStatus.ERROR ? 'error' : status === NetworkStatus.WARNING ? 'warning' : 'active'} 2s infinite`
-            }}
+            className="u-absolute u-top-n1 u-end-n1 u-w-2 u-h-2 u-rounded-circle u-animate-pulse"
+            style={{ backgroundColor: colors.primary }}
           />
         )}
       </div>
-      
+
       {showLabel && (
-        <span className={`font-medium ${config.text}`}>
+        <span
+          className={`${config.font} u-font-bold u-text-uppercase`}
+          style={{ letterSpacing: "0.5px" }}
+        >
           {statusLabels[status]}
         </span>
       )}

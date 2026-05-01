@@ -1,38 +1,33 @@
 "use client";
 
 import React from "react";
-import { Ruler, X, Trash2 } from "lucide-react";
 import { useMeasurementTool } from "../hooks/useMapTools";
-import { Button, Card } from "@shohojdhara/atomix";
+import { Button, Card, Icon } from "@shohojdhara/atomix";
 
 interface MeasurementOverlayProps {
   onClose?: () => void;
 }
 
 export function MeasurementOverlay({ onClose }: MeasurementOverlayProps) {
-  const {
-    measurements,
-    totalDistance,
-    formattedDistance,
-    clearMeasurements,
-    pointCount,
-  } = useMeasurementTool();
+  const { measurements, formattedDistance, clearMeasurements } = useMeasurementTool();
 
   if (measurements.length === 0) {
     return null;
   }
 
   return (
-    <div className="measurement-overlay u-absolute u-bottom-4 u-left-1/2 u-transform--translate-x-1/2">
+    <div className="u-absolute u-bottom-4 u-start-50 u-translate-middle-x u-z-modal">
       <Card
-        appearance="elevated"
         glass={true}
-        className="u-shadow-xl u-p-4 u-min-w-[300px]"
+        className="u-shadow-lg u-p-4 u-bg-white-opacity-5"
+        style={{ minWidth: "320px" }}
       >
-        <div className="u-flex u-justify-between u-items-center u-mb-3">
-          <div className="u-flex u-items-center u-gap-2">
-            <Ruler className="u-w-5 u-h-5 u-text-primary" />
-            <h3 className="u-font-bold u-text-base">Measurement Tool</h3>
+        <div className="u-flex u-justify-between u-items-center u-mb-4">
+          <div className="u-flex u-items-center u-gap-3">
+            <div className="u-w-8 u-h-8 u-rounded u-bg-primary-subtle u-flex u-items-center u-justify-center">
+              <Icon name="Ruler" size={18} className="u-text-primary" />
+            </div>
+            <h3 className="u-font-bold u-text-sm u-text-primary">Measurement Tool</h3>
           </div>
           <div className="u-flex u-gap-2">
             <Button
@@ -40,48 +35,59 @@ export function MeasurementOverlay({ onClose }: MeasurementOverlayProps) {
               size="sm"
               onClick={clearMeasurements}
               iconName="Trash"
-              label="Clear all measurements"
-            >
-              Clear
-            </Button>
+              iconOnly
+              aria-label="Clear all measurements"
+            />
             {onClose && (
-              <Button variant="secondary" size="sm" onClick={onClose} iconName="X" />
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={onClose}
+                iconName="X"
+                iconOnly
+              />
             )}
           </div>
         </div>
 
-        <div className="u-bg-primary-subtle u-rounded u-p-3 u-mb-3">
+        <div className="u-bg-primary-subtle u-rounded u-p-3 u-mb-4 u-border u-border-solid u-border-primary-subtle">
           <div className="u-flex u-justify-between u-items-center">
-            <span className="u-text-secondary-subtle u-text-sm">Total Distance</span>
+            <span className="u-text-secondary-subtle u-text-xs u-font-bold u-text-uppercase">
+              Total Distance
+            </span>
             <span className="u-font-bold u-text-lg u-text-primary">
               {formattedDistance}
             </span>
           </div>
         </div>
 
-        <div className="u-max-h-[200px] u-overflow-y-auto">
+        <div className="u-overflow-y-auto u-mb-4" style={{ maxHeight: "180px" }}>
           <table className="u-w-100 u-text-xs">
             <thead className="u-border-bottom u-border-secondary-subtle">
               <tr>
-                <th className="u-text-left u-py-2 u-text-secondary-subtle">#</th>
-                <th className="u-text-left u-py-2 u-text-secondary-subtle">
+                <th className="u-text-start u-py-2 u-text-secondary-subtle u-font-bold">
+                  #
+                </th>
+                <th className="u-text-start u-py-2 u-text-secondary-subtle u-font-bold">
                   Coordinates
                 </th>
-                <th className="u-text-right u-py-2 u-text-secondary-subtle">Segment</th>
+                <th className="u-text-end u-py-2 u-text-secondary-subtle u-font-bold">
+                  Segment
+                </th>
               </tr>
             </thead>
             <tbody>
               {measurements.map((point, index) => (
                 <tr
                   key={point.id}
-                  className="u-border-bottom u-border-secondary-subtle/30"
+                  className="u-border-bottom u-border-secondary-subtle u-opacity-80"
                 >
-                  <td className="u-py-2 u-font-medium">{index + 1}</td>
-                  <td className="u-py-2 u-font-mono u-text-2xs">
-                    {point.position.lat.toFixed(6)}, {point.position.lng.toFixed(6)}
+                  <td className="u-py-2 u-font-bold u-text-primary">{index + 1}</td>
+                  <td className="u-py-2 u-font-mono u-opacity-70">
+                    {point.position.lat.toFixed(5)}, {point.position.lng.toFixed(5)}
                   </td>
-                  <td className="u-py-2 u-text-right">
-                    {point.distance ? `${Math.round(point.distance)} m` : "-"}
+                  <td className="u-py-2 u-text-end u-font-medium">
+                    {point.distance ? `${Math.round(point.distance)}m` : "-"}
                   </td>
                 </tr>
               ))}
@@ -89,9 +95,11 @@ export function MeasurementOverlay({ onClose }: MeasurementOverlayProps) {
           </table>
         </div>
 
-        <div className="u-mt-3 u-pt-3 u-border-top u-border-secondary-subtle u-text-xs u-text-secondary-subtle">
-          <p>
-            Click on the map to add measurement points. Press Escape to remove last point.
+        <div className="u-p-3 u-rounded u-bg-white-opacity-5 u-border u-border-solid u-border-secondary-subtle">
+          <p className="u-m-0 u-text-xs u-text-secondary-subtle u-leading-normal">
+            Click on map to add points. Press{" "}
+            <kbd className="u-bg-white-opacity-10 u-px-1 u-rounded-sm">Esc</kbd> to remove
+            last point.
           </p>
         </div>
       </Card>
@@ -101,6 +109,7 @@ export function MeasurementOverlay({ onClose }: MeasurementOverlayProps) {
 
 // Trace path overlay component
 export function TracePathOverlay({ onClose }: { onClose?: () => void }) {
+  const traceData = require("../hooks/useMapTools").useTraceTool();
   const {
     tracePath,
     hasTrace,
@@ -108,82 +117,83 @@ export function TracePathOverlay({ onClose }: { onClose?: () => void }) {
     nodeCount,
     connectionCount,
     clearTrace,
-  } = useMeasurementTool() as any; // Using wrong hook, need to use useTraceTool
-
-  // Import the correct hook
-  const traceData = require("../hooks/useMapTools").useTraceTool();
-  const {
-    tracePath: actualTracePath,
-    hasTrace: actualHasTrace,
-    formattedDistance: traceFormattedDistance,
-    nodeCount: actualNodeCount,
-    connectionCount: actualConnectionCount,
-    clearTrace: actualClearTrace,
   } = traceData;
 
-  if (!actualHasTrace || !actualTracePath) {
+  if (!hasTrace || !tracePath) {
     return null;
   }
 
   return (
-    <div className="trace-overlay u-absolute u-bottom-4 u-left-1/2 u-transform--translate-x-1/2">
+    <div className="u-absolute u-bottom-4 u-start-50 u-translate-middle-x u-z-modal">
       <Card
-        appearance="elevated"
         glass={true}
-        className="u-shadow-xl u-p-4 u-min-w-[350px]"
+        className="u-shadow-lg u-p-4 u-bg-white-opacity-5"
+        style={{ minWidth: "350px" }}
       >
-        <div className="u-flex u-justify-between u-items-center u-mb-3">
-          <div className="u-flex u-items-center u-gap-2">
-            <Ruler className="u-w-5 u-h-5 u-text-success" />
-            <h3 className="u-font-bold u-text-base">Connection Trace</h3>
+        <div className="u-flex u-justify-between u-items-center u-mb-4">
+          <div className="u-flex u-items-center u-gap-3">
+            <div className="u-w-8 u-h-8 u-rounded u-bg-success-subtle u-flex u-items-center u-justify-center">
+              <Icon name="GitBranch" size={18} className="u-text-success" />
+            </div>
+            <h3 className="u-font-bold u-text-sm u-text-success">Connection Trace</h3>
           </div>
-          <div className="u-flex u-gap-2">
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={actualClearTrace}
-              iconName="X"
-            />
-          </div>
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={clearTrace}
+            iconName="X"
+            iconOnly
+          />
         </div>
 
-        <div className="u-grid u-grid-cols-3 u-gap-3 u-mb-3">
-          <div className="u-bg-success-subtle u-rounded u-p-2 u-text-center">
-            <div className="u-text-2xs u-text-secondary-subtle">Distance</div>
-            <div className="u-font-bold u-text-base u-text-success">
-              {traceFormattedDistance}
+        <div className="u-flex u-gap-2 u-mb-4">
+          {[
+            { label: "Distance", value: formattedDistance, color: "success" },
+            { label: "Nodes", value: nodeCount, color: "primary" },
+            { label: "Links", value: connectionCount, color: "warning" },
+          ].map((stat) => (
+            <div
+              key={stat.label}
+              className={`u-flex-1 u-p-2 u-rounded u-bg-${stat.color}-subtle u-text-center u-border u-border-solid u-border-${stat.color}-subtle`}
+            >
+              <div
+                className="u-text-xs u-text-secondary-subtle u-font-bold u-text-uppercase u-mb-1"
+                style={{ fontSize: "10px" }}
+              >
+                {stat.label}
+              </div>
+              <div className={`u-font-bold u-text-base u-text-${stat.color}`}>
+                {stat.value}
+              </div>
             </div>
-          </div>
-          <div className="u-bg-primary-subtle u-rounded u-p-2 u-text-center">
-            <div className="u-text-2xs u-text-secondary-subtle">Nodes</div>
-            <div className="u-font-bold u-text-base u-text-primary">
-              {actualNodeCount}
-            </div>
-          </div>
-          <div className="u-bg-warning-subtle u-rounded u-p-2 u-text-center">
-            <div className="u-text-2xs u-text-secondary-subtle">Connections</div>
-            <div className="u-font-bold u-text-base u-text-warning">
-              {actualConnectionCount}
-            </div>
-          </div>
+          ))}
         </div>
 
-        <div className="u-max-h-[150px] u-overflow-y-auto">
-          <div className="u-text-xs u-text-secondary-subtle u-mb-2">Path:</div>
-          <div className="u-flex u-flex-column u-gap-1">
-            {actualTracePath.path.map((node: any, index: number) => (
-              <div key={node.id} className="u-flex u-items-center u-gap-2 u-text-xs">
+        <div className="u-overflow-y-auto" style={{ maxHeight: "150px" }}>
+          <div className="u-text-xs u-font-bold u-text-secondary-subtle u-text-uppercase u-mb-2 u-ms-1">
+            Route Path
+          </div>
+          <div className="u-flex u-flex-column u-gap-2">
+            {tracePath.path.map((node: any, index: number) => (
+              <div
+                key={node.id}
+                className="u-flex u-items-center u-gap-3 u-p-2 u-rounded u-bg-white-opacity-5"
+              >
                 <div
-                  className={`u-w-2 u-h-2 u-rounded-full ${
+                  className={`u-w-2 u-h-2 u-rounded-circle u-flex-shrink-0 ${
                     index === 0
                       ? "u-bg-success"
-                      : index === actualTracePath.path.length - 1
-                        ? "u-bg-danger"
+                      : index === tracePath.path.length - 1
+                        ? "u-bg-error"
                         : "u-bg-primary"
                   }`}
                 />
-                <span className="u-font-medium">{node.name}</span>
-                <span className="u-text-secondary-subtle u-text-2xs">({node.type})</span>
+                <span className="u-text-xs u-font-medium u-text-primary u-text-truncate">
+                  {node.name}
+                </span>
+                <span className="u-text-xs u-text-secondary-subtle u-opacity-60">
+                  ({node.type})
+                </span>
               </div>
             ))}
           </div>
@@ -195,7 +205,7 @@ export function TracePathOverlay({ onClose }: { onClose?: () => void }) {
 
 // Heatmap legend component
 export function HeatmapLegend({ onClose }: { onClose?: () => void }) {
-  const { heatmapData, hasHeatmap, setHeatmapType, clearHeatmap } =
+  const { heatmapData, hasHeatmap, setHeatmapType, clearHeatmap, activeHeatmapType } =
     require("../hooks/useMapTools").useHeatmapTool();
 
   if (!hasHeatmap || !heatmapData) {
@@ -205,49 +215,64 @@ export function HeatmapLegend({ onClose }: { onClose?: () => void }) {
   const gradientStops = Object.entries(heatmapData.gradient || {});
 
   return (
-    <div className="heatmap-legend u-absolute u-bottom-4 u-right-4">
-      <Card appearance="elevated" glass={true} className="u-shadow-xl u-p-3">
-        <div className="u-flex u-justify-between u-items-center u-mb-2">
-          <h4 className="u-font-bold u-text-sm">Heatmap Legend</h4>
-          <Button variant="secondary" size="sm" onClick={clearHeatmap} iconName="X" />
+    <div className="u-absolute u-bottom-4 u-end-4 u-z-modal">
+      <Card
+        glass={true}
+        className="u-shadow-lg u-p-4 u-bg-white-opacity-5"
+        style={{ width: "260px" }}
+      >
+        <div className="u-flex u-justify-between u-items-center u-mb-4">
+          <div className="u-flex u-items-center u-gap-2">
+            <Icon name="Fire" size={18} className="u-text-error" />
+            <h4 className="u-font-bold u-text-sm u-text-primary">Heatmap Analysis</h4>
+          </div>
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={clearHeatmap}
+            iconName="X"
+            iconOnly
+          />
         </div>
 
-        <div className="u-flex u-flex-column u-gap-2">
-          {/* Gradient bar */}
-          <div
-            className="u-h-4 u-rounded u-mb-2"
-            style={{
-              background: `linear-gradient(to right, ${gradientStops
-                .map(([stop, color]) => `${color} ${parseFloat(stop) * 100}%`)
-                .join(", ")})`,
-            }}
-          />
-
-          <div className="u-flex u-justify-between u-text-2xs u-text-secondary-subtle">
-            <span>Low</span>
-            <span>High</span>
+        <div className="u-flex u-flex-column u-gap-3">
+          <div className="u-flex u-flex-column u-gap-1">
+            <div
+              className="u-h-3 u-rounded-sm u-w-100 u-border u-border-solid u-border-secondary-subtle"
+              style={{
+                background: `linear-gradient(to right, ${gradientStops
+                  .map(([stop, color]) => `${color} ${parseFloat(stop) * 100}%`)
+                  .join(", ")})`,
+              }}
+            />
+            <div className="u-flex u-justify-between u-text-xs u-text-secondary-subtle u-font-medium">
+              <span>Low Density</span>
+              <span>High</span>
+            </div>
           </div>
 
-          {/* Heatmap type selector */}
-          <div className="u-flex u-gap-1 u-mt-2">
-            <button
-              onClick={() => setHeatmapType("density")}
-              className="u-px-2 u-py-1 u-text-2xs u-rounded u-bg-primary u-text-white"
-            >
-              Density
-            </button>
-            <button
-              onClick={() => setHeatmapType("utilization")}
-              className="u-px-2 u-py-1 u-text-2xs u-rounded u-bg-secondary-subtle"
-            >
-              Utilization
-            </button>
-            <button
-              onClick={() => setHeatmapType("incidents")}
-              className="u-px-2 u-py-1 u-text-2xs u-rounded u-bg-secondary-subtle"
-            >
-              Incidents
-            </button>
+          <div className="u-flex u-flex-column u-gap-1 u-mt-2">
+            <span className="u-text-xs u-font-bold u-text-secondary-subtle u-text-uppercase u-mb-1">
+              Analyze By
+            </span>
+            <div className="u-flex u-gap-1">
+              {[
+                { id: "density", label: "Density" },
+                { id: "utilization", label: "Load" },
+                { id: "incidents", label: "Alerts" },
+              ].map((type) => (
+                <Button
+                  key={type.id}
+                  size="sm"
+                  variant={activeHeatmapType === type.id ? "primary" : "secondary"}
+                  onClick={() => setHeatmapType(type.id)}
+                  fullWidth
+                  className="u-p-1 u-text-xs"
+                >
+                  {type.label}
+                </Button>
+              ))}
+            </div>
           </div>
         </div>
       </Card>

@@ -105,7 +105,6 @@ export default function WorkOrdersPage() {
     return (
       <Card
         key={task.id}
-        appearance="elevated"
         className="u-mb-3 u-cursor-pointer u-border u-border-secondary-subtle u-transition-all u-duration-200"
         draggable
         onDragStart={() =>

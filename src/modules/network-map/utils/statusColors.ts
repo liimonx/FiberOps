@@ -129,7 +129,6 @@ export const hoverEffects = {
   node: {
     scale: 1.2,
     duration: 0.2,
-    zIndex: 1000
   },
   connection: {
     lineWidthMultiplier: 1.5,

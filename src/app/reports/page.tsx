@@ -16,7 +16,7 @@ export default function ReportsPage() {
 
       <Grid>
         <GridCol xs={12} sm={6} lg={4}>
-          <Card appearance="elevated" glass={true} className="u-cursor-pointer u-h-100">
+          <Card glass={true} className="u-cursor-pointer u-h-100">
             <Icon name="FilePdf" size="xl" className="u-text-danger u-mb-4" />
             <h3 className="u-font-bold u-text-lg u-mb-2">Uptime Summary</h3>
             <p className="u-text-secondary-subtle u-text-sm">
@@ -28,7 +28,7 @@ export default function ReportsPage() {
           </Card>
         </GridCol>
         <GridCol xs={12} sm={6} lg={4}>
-          <Card appearance="elevated" glass={true} className="u-cursor-pointer u-h-100">
+          <Card glass={true} className="u-cursor-pointer u-h-100">
             <Icon name="FileCsv" size="xl" className="u-text-success u-mb-4" />
             <h3 className="u-font-bold u-text-lg u-mb-2">Asset Inventory</h3>
             <p className="u-text-secondary-subtle u-text-sm">
@@ -40,7 +40,7 @@ export default function ReportsPage() {
           </Card>
         </GridCol>
         <GridCol xs={12} sm={6} lg={4}>
-          <Card appearance="elevated" glass={true} className="u-cursor-pointer u-h-100">
+          <Card glass={true} className="u-cursor-pointer u-h-100">
             <Icon name="ChartBar" size="xl" className="u-text-primary u-mb-4" />
             <h3 className="u-font-bold u-text-lg u-mb-2">Incident Analytics</h3>
             <p className="u-text-secondary-subtle u-text-sm">

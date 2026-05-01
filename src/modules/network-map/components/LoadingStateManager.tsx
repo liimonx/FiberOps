@@ -128,13 +128,10 @@ interface LoadingOverlayProps {
   className?: string;
 }
 
-export function LoadingOverlay({ loadingId, fallbackMessage = 'Loading...', className = '' }: LoadingOverlayProps) {
+export function LoadingOverlay({ loadingId, fallbackMessage = 'Processing...', className = '' }: LoadingOverlayProps) {
   const { hasAnyLoading, getLoadingState } = useLoading();
 
-  // If specific ID provided, check that one
   const state = loadingId ? getLoadingState(loadingId) : null;
-  
-  // Show if specific ID is loading or any loading when no ID specified
   const shouldShow = loadingId ? !!state : hasAnyLoading;
   
   if (!shouldShow) return null;
@@ -147,7 +144,7 @@ export function LoadingOverlay({ loadingId, fallbackMessage = 'Loading...', clas
   };
 
   return (
-    <div className={`absolute inset-0 z-50 flex items-center justify-center bg-dark/80 backdrop-blur-sm ${className}`}>
+    <div className={`u-absolute u-inset-0 u-z-modal u-flex u-items-center u-justify-center u-bg-black-opacity-50 u-backdrop-blur-sm ${className}`}>
       <EnhancedLoadingState
         message={displayState.message}
         showProgress={displayState.showProgress}
@@ -174,14 +171,14 @@ export function withLoading<P extends object>(
     const shouldShow = options.loadingId ? !!state : hasAnyLoading;
 
     return (
-      <div className="relative">
+      <div className="u-relative">
         <Component {...props} />
         
         {shouldShow && (
           <LoadingOverlay
             loadingId={options.loadingId}
             fallbackMessage={options.fallbackMessage}
-            className={options.fullScreen ? 'fixed inset-0' : ''}
+            className={options.fullScreen ? 'u-fixed u-inset-0' : ''}
           />
         )}
       </div>
@@ -200,7 +197,7 @@ export function useAsyncOperation<T extends (...args: any[]) => Promise<any>>(
     onError?: (error: any) => void;
   } = {}
 ) {
-  const { startLoading, updateProgress, stopLoading, isLoading: contextIsLoading } = useLoading();
+  const { startLoading, stopLoading, isLoading: contextIsLoading } = useLoading();
   const [error, setError] = React.useState<any>(null);
   const [result, setResult] = React.useState<any>(null);
   const [isExecuting, setIsExecuting] = React.useState(false);
@@ -229,7 +226,6 @@ export function useAsyncOperation<T extends (...args: any[]) => Promise<any>>(
     }
   }, [operation, options, startLoading, stopLoading]);
 
-  // Track loading state properly
   const loadingId = options.loadingId;
   const isCurrentlyLoading = loadingId ? contextIsLoading(loadingId) : isExecuting;
 

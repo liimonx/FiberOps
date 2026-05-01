@@ -1,21 +1,21 @@
 "use client";
 
-import React, { useCallback } from 'react';
-import { Button, Card } from "@shohojdhara/atomix";
-import { getMapInstance } from './MapCanvas';
-import { useResponsive } from '../hooks/useResponsive';
-import { useAccessibilityAnnounce } from './AccessibilityAnnouncer';
+import React, { useCallback, useState, useEffect } from "react";
+import { Button, Card, Icon } from "@shohojdhara/atomix";
+import { getMapInstance } from "./MapCanvas";
+import { useResponsive } from "../hooks/useResponsive";
+import { useAccessibilityAnnounce } from "./AccessibilityAnnouncer";
 
 interface MapControlsProps {
   className?: string;
-  position?: 'top-right' | 'bottom-right' | 'top-left' | 'bottom-left';
+  position?: "top-right" | "bottom-right" | "top-left" | "bottom-left";
   showCompass?: boolean;
 }
 
 export const MapControls: React.FC<MapControlsProps> = ({
-  className = '',
-  position = 'top-right',
-  showCompass = true
+  className = "",
+  position = "top-right",
+  showCompass = true,
 }) => {
   const { isMobile } = useResponsive();
   const { announce } = useAccessibilityAnnounce();
@@ -24,7 +24,7 @@ export const MapControls: React.FC<MapControlsProps> = ({
     const map = getMapInstance();
     if (map) {
       map.zoomIn();
-      announce('Map zoomed in', 'polite');
+      announce("Map zoomed in", "polite");
     }
   }, [announce]);
 
@@ -32,7 +32,7 @@ export const MapControls: React.FC<MapControlsProps> = ({
     const map = getMapInstance();
     if (map) {
       map.zoomOut();
-      announce('Map zoomed out', 'polite');
+      announce("Map zoomed out", "polite");
     }
   }, [announce]);
 
@@ -40,7 +40,7 @@ export const MapControls: React.FC<MapControlsProps> = ({
     const map = getMapInstance();
     if (map) {
       map.resetNorth();
-      announce('Map orientation reset to north', 'polite');
+      announce("Map orientation reset to north", "polite");
     }
   }, [announce]);
 
@@ -48,191 +48,117 @@ export const MapControls: React.FC<MapControlsProps> = ({
     const map = getMapInstance();
     if (map) {
       map.setPitch(0);
-      announce('Map pitch reset', 'polite');
+      announce("Map pitch reset", "polite");
     }
   }, [announce]);
 
   const positionClasses = {
-    'top-right': 'u-absolute u-top-4 u-end-4',
-    'bottom-right': 'u-absolute u-bottom-4 u-end-4',
-    'top-left': 'u-absolute u-top-4 u-start-4',
-    'bottom-left': 'u-absolute u-bottom-4 u-start-4'
+    "top-right": "u-absolute u-top-4 u-end-4",
+    "bottom-right": "u-absolute u-bottom-4 u-end-4",
+    "top-left": "u-absolute u-top-4 u-start-4",
+    "bottom-left": "u-absolute u-bottom-4 u-start-4",
   };
 
   return (
-    <div className={`map-controls ${positionClasses[position]} ${className}`}>
-      <Card appearance="elevated" glass={true} className="controls-card">
-        <div className="controls-grid" role="toolbar" aria-label="Map controls">
+    <div className={` ${positionClasses[position]} ${className}`}>
+      <Card glass={true}>
+        <div
+          className="u-flex u-flex-column u-gap-1"
+          role="toolbar"
+          aria-label="Map controls"
+        >
           {/* Zoom controls */}
-          <div className="zoom-controls" role="group" aria-label="Zoom controls">
+          <div
+            className="u-flex u-flex-column u-gap-1"
+            role="group"
+            aria-label="Zoom controls"
+          >
             <Button
               variant="secondary"
-              size={isMobile ? 'sm' : 'md'}
+              size={isMobile ? "sm" : "md"}
               iconName="Plus"
+              iconOnly
               onClick={handleZoomIn}
               aria-label="Zoom in"
-              className="zoom-in"
             />
             <Button
               variant="secondary"
-              size={isMobile ? 'sm' : 'md'}
+              size={isMobile ? "sm" : "md"}
               iconName="Minus"
+              iconOnly
               onClick={handleZoomOut}
               aria-label="Zoom out"
-              className="zoom-out"
             />
           </div>
 
+          <div className="u-border-top u-border-secondary-subtle u-opacity-20 u-my-1" />
+
           {/* Compass controls */}
           {showCompass && (
-            <div className="compass-controls" role="group" aria-label="Orientation controls">
+            <div
+              className="u-flex u-flex-column u-gap-1"
+              role="group"
+              aria-label="Orientation controls"
+            >
+              <CompassControl size={isMobile ? "sm" : "md"} />
               <Button
                 variant="secondary"
-                size={isMobile ? 'sm' : 'md'}
-                iconName="Compass"
-                onClick={handleResetBearing}
-                aria-label="Reset north"
-                className="compass-reset"
-              />
-              <Button
-                variant="secondary"
-                size={isMobile ? 'sm' : 'md'}
+                size={isMobile ? "sm" : "md"}
                 iconName="SlidersVertical"
+                iconOnly
                 onClick={handleResetPitch}
                 aria-label="Reset pitch"
-                className="pitch-reset"
               />
             </div>
           )}
         </div>
       </Card>
-
-      <style jsx>{`
-        .map-controls {
-          pointer-events: auto;
-          z-index: var(--z-index-controls);
-        }
-
-        .controls-card {
-          padding: var(--spacing-sm);
-          background: rgba(31, 41, 55, 0.9);
-          backdrop-filter: blur(8px);
-        }
-
-        .controls-grid {
-          display: flex;
-          flex-direction: column;
-          gap: var(--spacing-xs);
-        }
-
-        .zoom-controls,
-        .compass-controls {
-          display: flex;
-          flex-direction: column;
-          gap: var(--spacing-xs);
-        }
-
-        /* Mobile optimization */
-        @media (max-width: 768px) {
-          .map-controls {
-            // Adjust spacing for mobile
-          }
-          
-          .controls-card {
-            padding: var(--spacing-xs);
-          }
-          
-          .controls-grid {
-            gap: var(--spacing-xs);
-          }
-        }
-
-        /* Focus and hover states for better accessibility */
-        :global(.zoom-in:focus),
-        :global(.zoom-out:focus),
-        :global(.compass-reset:focus),
-        :global(.pitch-reset:focus) {
-          outline: 2px solid var(--color-primary-500);
-          outline-offset: 2px;
-        }
-      `}</style>
     </div>
   );
 };
 
 // Enhanced controls component with bearing indicator
-export const CompassControl: React.FC = () => {
-  const [bearing, setBearing] = React.useState(0);
+export const CompassControl: React.FC<{ size?: "sm" | "md" }> = ({ size = "md" }) => {
+  const [bearing, setBearing] = useState(0);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const map = getMapInstance();
     if (!map) return;
 
-    const updateBearing = () => {
-      setBearing(map.getBearing());
-    };
-
-    map.on('rotate', updateBearing);
-    updateBearing(); // Initial value
+    const updateBearing = () => setBearing(map.getBearing());
+    map.on("rotate", updateBearing);
+    updateBearing();
 
     return () => {
-      map.off('rotate', updateBearing);
+      map.off("rotate", updateBearing);
     };
   }, []);
 
   const handleResetBearing = () => {
     const map = getMapInstance();
-    if (map) {
-      map.resetNorth();
-    }
+    if (map) map.resetNorth();
   };
 
   return (
     <Button
       variant="secondary"
-      size="sm"
+      size={size}
+      iconOnly
       onClick={handleResetBearing}
       aria-label={`Reset map orientation, current bearing: ${Math.round(bearing)} degrees`}
-      className="compass-button"
+      className="u-relative"
     >
-      <div className="compass-indicator">
-        <span 
-          className="compass-arrow"
-          style={{ transform: `rotate(${-bearing}deg)` }}
+      <div className="u-flex u-items-center u-justify-center u-w-5 u-h-5">
+        <div
+          className="u-flex u-items-center u-justify-center u-transition-all"
+          style={{
+            transform: `rotate(${-bearing}deg)`,
+          }}
           aria-hidden="true"
         >
-          ↑
-        </span>
+          <Icon name="NavigationArrow" size={16} className="u-text-primary" />
+        </div>
       </div>
-      
-      <style jsx>{`
-        .compass-indicator {
-          position: relative;
-          width: 20px;
-          height: 20px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-
-        .compass-arrow {
-          font-size: 14px;
-          font-weight: bold;
-          transition: transform 0.3s ease;
-          color: currentColor;
-        }
-
-        .compass-button:hover .compass-arrow {
-          color: var(--color-primary-500);
-        }
-
-        /* Reduced motion support */
-        @media (prefers-reduced-motion: reduce) {
-          .compass-arrow {
-            transition: none;
-          }
-        }
-      `}</style>
     </Button>
   );
 };

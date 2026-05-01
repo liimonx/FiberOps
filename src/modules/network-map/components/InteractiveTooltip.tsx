@@ -1,18 +1,22 @@
 "use client";
 
-import React, { useState, useCallback, useRef, useEffect } from 'react';
-import { Icon } from "@shohojdhara/atomix";
-import { Card, Button } from "@shohojdhara/atomix";
-import { NetworkNode, NetworkConnection, NetworkStatus, NetworkNodeType } from '../types';
-import { StatusIndicator, StatusBadge } from './StatusIndicator';
-import { NETWORK_STATUS_COLORS, NODE_TYPE_ICONS } from '../constants';
+import React, { useState, useCallback, useRef, useEffect } from "react";
+import { Icon, Card, Button } from "@shohojdhara/atomix";
+import { NetworkNode, NetworkConnection, NetworkStatus } from "../types";
+import { StatusIndicator } from "./StatusIndicator";
+import { NETWORK_STATUS_COLORS, NODE_TYPE_ICONS } from "../constants";
 
 export interface TooltipContent {
   title: string;
   subtitle?: string;
   status: NetworkStatus;
   details: Array<{ label: string; value: string | number; icon?: string }>;
-  actions?: Array<{ label: string; icon: string; onClick: () => void; variant?: 'primary' | 'secondary' }>;
+  actions?: Array<{
+    label: string;
+    icon: string;
+    onClick: () => void;
+    variant?: "primary" | "secondary";
+  }>;
   metadata?: Record<string, any>;
 }
 
@@ -24,7 +28,7 @@ interface InteractiveTooltipProps {
   visible: boolean;
   onClose?: () => void;
   onActionClick?: (actionId: string) => void;
-  anchor?: 'top' | 'bottom' | 'left' | 'right';
+  anchor?: "top" | "bottom" | "left" | "right";
   offset?: number;
   className?: string;
   maxWidth?: number;
@@ -39,11 +43,11 @@ export const InteractiveTooltip: React.FC<InteractiveTooltipProps> = ({
   visible,
   onClose,
   onActionClick,
-  anchor = 'top',
+  anchor = "top",
   offset = 12,
-  className = '',
-  maxWidth = 280,
-  interactive = true
+  className = "",
+  maxWidth = 300,
+  interactive = true,
 }) => {
   const tooltipRef = useRef<HTMLDivElement>(null);
   const [adjustedPosition, setAdjustedPosition] = useState(position);
@@ -57,19 +61,17 @@ export const InteractiveTooltip: React.FC<InteractiveTooltipProps> = ({
     const rect = tooltip.getBoundingClientRect();
     const viewport = {
       width: window.innerWidth,
-      height: window.innerHeight
+      height: window.innerHeight,
     };
 
     let adjusted = { ...position };
 
-    // Horizontal adjustment
     if (rect.right > viewport.width) {
       adjusted.x = position.x - rect.width - offset;
     } else if (rect.left < 0) {
       adjusted.x = offset;
     }
 
-    // Vertical adjustment
     if (rect.bottom > viewport.height) {
       adjusted.y = position.y - rect.height - offset;
     } else if (rect.top < 0) {
@@ -80,39 +82,33 @@ export const InteractiveTooltip: React.FC<InteractiveTooltipProps> = ({
   }, [position, visible, offset]);
 
   const getAnchorStyles = useCallback(() => {
-    const base = {
-      position: 'absolute' as const,
-      zIndex: 1000,
-      maxWidth: `${maxWidth}px`
+    const base: React.CSSProperties = {
+      position: "absolute",
+      maxWidth: `${maxWidth}px`,
+      pointerEvents: interactive ? "auto" : "none",
     };
 
     switch (anchor) {
-      case 'top':
+      case "top":
         return {
           ...base,
           left: adjustedPosition.x,
-          bottom: `calc(100vh - ${adjustedPosition.y - offset}px)`
+          bottom: `calc(100vh - ${adjustedPosition.y - offset}px)`,
         };
-      case 'bottom':
-        return {
-          ...base,
-          left: adjustedPosition.x,
-          top: adjustedPosition.y + offset
-        };
-      case 'left':
+      case "bottom":
+        return { ...base, left: adjustedPosition.x, top: adjustedPosition.y + offset };
+      case "left":
         return {
           ...base,
           right: `calc(100vw - ${adjustedPosition.x - offset}px)`,
-          top: adjustedPosition.y
+          top: adjustedPosition.y,
         };
-      case 'right':
-        return {
-          ...base,
-          left: adjustedPosition.x + offset,
-          top: adjustedPosition.y
-        };
+      case "right":
+        return { ...base, left: adjustedPosition.x + offset, top: adjustedPosition.y };
+      default:
+        return base;
     }
-  }, [adjustedPosition, anchor, offset, maxWidth]);
+  }, [adjustedPosition, anchor, offset, maxWidth, interactive]);
 
   const handleActionClick = (actionIndex: number) => {
     const action = content.actions?.[actionIndex];
@@ -123,15 +119,16 @@ export const InteractiveTooltip: React.FC<InteractiveTooltipProps> = ({
   };
 
   const getNodeIcon = () => {
-    if (!node) return 'Circle';
-    return NODE_TYPE_ICONS[node.type] || 'Circle';
+    if (!node) return "Circle";
+    return NODE_TYPE_ICONS[node.type] || "Circle";
   };
 
   const getNodeTypeLabel = () => {
-    if (!node) return '';
-    return node.type.split('_').map(word => 
-      word.charAt(0).toUpperCase() + word.slice(1)
-    ).join(' ');
+    if (!node) return "";
+    return node.type
+      .split("_")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
   };
 
   if (!visible) return null;
@@ -139,50 +136,45 @@ export const InteractiveTooltip: React.FC<InteractiveTooltipProps> = ({
   return (
     <div
       ref={tooltipRef}
-      className={`interactive-tooltip ${className}`}
+      className={`u-transition-all ${className}`}
       style={getAnchorStyles()}
       role="dialog"
       aria-label={`${content.title} details`}
-      aria-modal={interactive}
     >
-      <Card appearance="elevated" glass={true} className="tooltip-card">
+      <Card glass={true} className="u-p-0 u-overflow-hidden u-bg-white-opacity-5">
         {/* Header */}
-        <div className="tooltip-header">
-          <div className="header-icon">
-            {node && (
-              <div 
-                className="node-icon-wrapper"
-                style={{ backgroundColor: NETWORK_STATUS_COLORS[node.status] }}
-              >
-                <Icon name={getNodeIcon() as any} size={20} />
-              </div>
-            )}
-            {connection && (
-              <div 
-                className="connection-icon-wrapper"
-                style={{ backgroundColor: NETWORK_STATUS_COLORS[connection.status] }}
-              >
-                <Icon name={"Activity" as any} size={20} />
-              </div>
-            )}
+        <div className="u-flex u-items-start u-gap-3 u-p-4 u-border-bottom u-border-secondary-subtle">
+          <div className="u-flex-shrink-0">
+            <div
+              className="u-w-10 u-h-10 u-rounded-circle u-flex u-items-center u-justify-center u-text-white u-shadow-sm"
+              style={{ backgroundColor: NETWORK_STATUS_COLORS[content.status] }}
+            >
+              <Icon name={(node ? getNodeIcon() : "GitBranch") as any} size={20} />
+            </div>
           </div>
-          
-          <div className="header-content">
-            <h4 className="tooltip-title">{content.title}</h4>
+
+          <div className="u-flex-1 u-min-w-0">
+            <h4 className="u-m-0 u-text-sm u-font-bold u-text-primary u-text-truncate">
+              {content.title}
+            </h4>
             {content.subtitle && (
-              <span className="tooltip-subtitle">{content.subtitle}</span>
+              <span className="u-block u-text-xs u-text-secondary-subtle u-mt-1">
+                {content.subtitle}
+              </span>
             )}
             {node && (
-              <span className="node-type-label">{getNodeTypeLabel()}</span>
+              <span className="u-block u-text-xs u-text-secondary-subtle u-opacity-70 u-text-capitalize">
+                {getNodeTypeLabel()}
+              </span>
             )}
           </div>
-          
-          <div className="header-status">
-            <StatusIndicator 
-              status={content.status} 
-              size="sm" 
+
+          <div className="u-flex u-items-center u-gap-2">
+            <StatusIndicator
+              status={content.status}
+              size="sm"
               showLabel={false}
-              pulse={content.status === NetworkStatus.ERROR || content.status === NetworkStatus.WARNING}
+              pulse={content.status === "error"}
             />
             {onClose && (
               <Button
@@ -190,49 +182,52 @@ export const InteractiveTooltip: React.FC<InteractiveTooltipProps> = ({
                 size="sm"
                 iconName="X"
                 onClick={onClose}
-                aria-label="Close tooltip"
-                className="close-button"
+                iconOnly
               />
             )}
           </div>
         </div>
 
         {/* Details Section */}
-        <div className="tooltip-details">
+        <div className="u-p-4 u-flex u-flex-column u-gap-2">
           {content.details.map((detail, index) => (
-            <div key={index} className="detail-row">
+            <div key={index} className="u-flex u-items-center u-gap-2 u-text-xs">
               {detail.icon && (
-                <Icon name={detail.icon as any} size={14} className="detail-icon" />
+                <Icon
+                  name={detail.icon as any}
+                  size={14}
+                  className="u-text-secondary-subtle u-opacity-50"
+                />
               )}
-              <span className="detail-label">{detail.label}:</span>
-              <span className="detail-value">{detail.value}</span>
+              <span
+                className="u-text-secondary-subtle u-font-bold u-text-uppercase"
+                style={{ fontSize: "10px" }}
+              >
+                {detail.label}:
+              </span>
+              <span className="u-ms-auto u-font-bold u-text-primary">{detail.value}</span>
             </div>
           ))}
         </div>
 
-        {/* Expandable Metadata Section */}
+        {/* Expandable Metadata */}
         {content.metadata && Object.keys(content.metadata).length > 0 && (
-          <div className={`metadata-section ${isExpanded ? 'expanded' : ''}`}>
+          <div className="u-border-top u-border-secondary-subtle">
             <button
-              className="expand-toggle"
+              className="u-w-100 u-flex u-items-center u-justify-between u-px-4 u-py-2 u-bg-transparent u-border-0 u-text-secondary-subtle u-text-xs u-font-bold u-text-uppercase u-cursor-pointer hover:u-text-primary u-transition-all"
               onClick={() => setIsExpanded(!isExpanded)}
-              aria-expanded={isExpanded}
             >
-              <span>Additional Information</span>
-              <Icon 
-                name={isExpanded ? "CaretUp" : "CaretDown"} 
-                size={14} 
-                className="toggle-icon"
-              />
+              <span>More Info</span>
+              <Icon name={isExpanded ? "CaretUp" : "CaretDown"} size={14} />
             </button>
-            
+
             {isExpanded && (
-              <div className="metadata-content">
+              <div className="u-px-4 u-pb-3 u-flex u-flex-column u-gap-1">
                 {Object.entries(content.metadata).map(([key, value]) => (
-                  <div key={key} className="metadata-item">
-                    <span className="metadata-key">{key}:</span>
-                    <span className="metadata-value">
-                      {typeof value === 'object' ? JSON.stringify(value) : String(value)}
+                  <div key={key} className="u-flex u-justify-between u-gap-2 u-text-xs">
+                    <span className="u-text-secondary-subtle u-opacity-60">{key}:</span>
+                    <span className="u-font-mono u-text-primary u-opacity-80 u-text-truncate u-max-w-60">
+                      {typeof value === "object" ? JSON.stringify(value) : String(value)}
                     </span>
                   </div>
                 ))}
@@ -241,284 +236,24 @@ export const InteractiveTooltip: React.FC<InteractiveTooltipProps> = ({
           </div>
         )}
 
-        {/* Action Buttons */}
+        {/* Actions */}
         {content.actions && content.actions.length > 0 && (
-          <div className="tooltip-actions" role="group" aria-label="Available actions">
+          <div className="u-flex u-gap-2 u-p-3 u-border-top u-border-secondary-subtle u-bg-white-opacity-5">
             {content.actions.map((action, index) => (
               <Button
                 key={index}
-                variant={action.variant || 'secondary'}
+                variant={action.variant || "secondary"}
                 size="sm"
                 iconName={action.icon as any}
-                onClick={() => handleActionClick(index)}
-                className={`action-button action-button--${action.variant || 'secondary'}`}
+                onClick={action.onClick}
+                fullWidth
               >
                 {action.label}
               </Button>
             ))}
           </div>
         )}
-
-        {/* Arrow indicator */}
-        <div className={`tooltip-arrow tooltip-arrow--${anchor}`} />
       </Card>
-
-      <style jsx>{`
-        .interactive-tooltip {
-          pointer-events: auto;
-          animation: tooltip-in 0.2s ease-out;
-        }
-
-        @keyframes tooltip-in {
-          from {
-            opacity: 0;
-            transform: translateY(-8px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
-        .tooltip-card {
-          padding: 0;
-          overflow: hidden;
-        }
-
-        .tooltip-header {
-          display: flex;
-          align-items: flex-start;
-          gap: 12px;
-          padding: 16px;
-          border-bottom: 1px solid var(--color-gray-700);
-        }
-
-        .header-icon {
-          flex-shrink: 0;
-        }
-
-        .node-icon-wrapper,
-        .connection-icon-wrapper {
-          width: 40px;
-          height: 40px;
-          border-radius: 50%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          color: white;
-        }
-
-        .header-content {
-          flex: 1;
-          min-width: 0;
-        }
-
-        .tooltip-title {
-          margin: 0;
-          font-size: 14px;
-          font-weight: var(--font-weight-semibold);
-          color: var(--color-gray-100);
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-        }
-
-        .tooltip-subtitle {
-          display: block;
-          font-size: 12px;
-          color: var(--color-gray-400);
-          margin-top: 2px;
-        }
-
-        .node-type-label {
-          display: block;
-          font-size: 11px;
-          color: var(--color-gray-500);
-          margin-top: 2px;
-          text-transform: capitalize;
-        }
-
-        .header-status {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-        }
-
-        .close-button {
-          padding: 4px;
-          min-width: auto;
-        }
-
-        .tooltip-details {
-          padding: 12px 16px;
-          display: flex;
-          flex-direction: column;
-          gap: 8px;
-        }
-
-        .detail-row {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          font-size: 12px;
-        }
-
-        .detail-icon {
-          color: var(--color-gray-500);
-          flex-shrink: 0;
-        }
-
-        .detail-label {
-          color: var(--color-gray-400);
-          white-space: nowrap;
-        }
-
-        .detail-value {
-          color: var(--color-gray-200);
-          font-weight: var(--font-weight-medium);
-          margin-left: auto;
-        }
-
-        .metadata-section {
-          border-top: 1px solid var(--color-gray-700);
-        }
-
-        .expand-toggle {
-          width: 100%;
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          padding: 10px 16px;
-          background: none;
-          border: none;
-          color: var(--color-gray-400);
-          font-size: 12px;
-          cursor: pointer;
-          transition: color var(--duration-normal) ease;
-        }
-
-        .expand-toggle:hover {
-          color: var(--color-gray-200);
-        }
-
-        .toggle-icon {
-          transition: transform var(--duration-normal) ease;
-        }
-
-        .metadata-content {
-          padding: 0 16px 12px;
-          display: flex;
-          flex-direction: column;
-          gap: 6px;
-        }
-
-        .metadata-item {
-          display: flex;
-          justify-content: space-between;
-          font-size: 11px;
-        }
-
-        .metadata-key {
-          color: var(--color-gray-500);
-        }
-
-        .metadata-value {
-          color: var(--color-gray-300);
-          font-family: monospace;
-          max-width: 60%;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          white-space: nowrap;
-        }
-
-        .tooltip-actions {
-          display: flex;
-          gap: 8px;
-          padding: 12px 16px;
-          border-top: 1px solid var(--color-gray-700);
-          flex-wrap: wrap;
-        }
-
-        .action-button {
-          flex: 1;
-          min-width: 80px;
-        }
-
-        .tooltip-arrow {
-          position: absolute;
-          width: 12px;
-          height: 12px;
-          background: var(--color-gray-800);
-          border: 1px solid var(--color-gray-700);
-        }
-
-        .tooltip-arrow--top {
-          bottom: -6px;
-          left: 50%;
-          transform: translateX(-50%) rotate(45deg);
-          border-top: none;
-          border-left: none;
-        }
-
-        .tooltip-arrow--bottom {
-          top: -6px;
-          left: 50%;
-          transform: translateX(-50%) rotate(45deg);
-          border-bottom: none;
-          border-right: none;
-        }
-
-        .tooltip-arrow--left {
-          right: -6px;
-          top: 50%;
-          transform: translateY(-50%) rotate(45deg);
-          border-bottom: none;
-          border-left: none;
-        }
-
-        .tooltip-arrow--right {
-          left: -6px;
-          top: 50%;
-          transform: translateY(-50%) rotate(45deg);
-          border-top: none;
-          border-right: none;
-        }
-
-        /* Reduced motion support */
-        @media (prefers-reduced-motion: reduce) {
-          .interactive-tooltip {
-            animation: none;
-          }
-
-          .toggle-icon {
-            transition: none;
-          }
-
-          .expand-toggle {
-            transition: none;
-          }
-        }
-
-        /* High contrast mode */
-        @media (prefers-contrast: high) {
-          .tooltip-card {
-            border: 2px solid white;
-          }
-
-          .tooltip-header {
-            border-bottom-width: 2px;
-          }
-
-          .detail-label {
-            color: white;
-          }
-
-          .detail-value {
-            color: white;
-            font-weight: bold;
-          }
-        }
-      `}</style>
     </div>
   );
 };
@@ -530,68 +265,36 @@ export const SimpleTooltip: React.FC<{
   visible: boolean;
   position: { x: number; y: number };
   className?: string;
-}> = ({ title, content, visible, position, className = '' }) => {
+}> = ({ title, content, visible, position, className = "" }) => {
   if (!visible) return null;
 
   return (
     <div
-      className={`simple-tooltip ${className}`}
+      className={`u-fixed u-z-tooltip u-pointer-events-none u-transition-all ${className}`}
       style={{
-        position: 'absolute',
         left: position.x,
         top: position.y - 12,
-        transform: 'translate(-50%, -100%)',
-        zIndex: 1000
+        transform: "translate(-50%, -100%)",
       }}
       role="tooltip"
     >
-      <Card appearance="elevated" glass={true} className="simple-tooltip-card">
-        <div className="simple-tooltip-content">
-          <strong className="simple-tooltip-title">{title}</strong>
-          <div className="simple-tooltip-body">{content}</div>
+      <Card
+        glass={true}
+        className="u-p-3 u-bg-white-opacity-10 u-shadow-lg"
+        style={{ maxWidth: "240px" }}
+      >
+        <div className="u-flex u-flex-column u-gap-1">
+          <strong
+            className="u-text-xs u-font-bold u-text-primary u-text-uppercase"
+            style={{ letterSpacing: "0.5px" }}
+          >
+            {title}
+          </strong>
+          <div className="u-text-xs u-text-secondary-subtle u-leading-normal">
+            {content}
+          </div>
         </div>
       </Card>
-
-      <style jsx>{`
-        .simple-tooltip {
-          pointer-events: none;
-          animation: simple-tooltip-in 0.15s ease-out;
-        }
-
-        @keyframes simple-tooltip-in {
-          from {
-            opacity: 0;
-            transform: translate(-50%, calc(-100% + 4px));
-          }
-          to {
-            opacity: 1;
-            transform: translate(-50%, -100%);
-          }
-        }
-
-        .simple-tooltip-card {
-          padding: 12px 16px;
-          max-width: 240px;
-        }
-
-        .simple-tooltip-title {
-          display: block;
-          font-size: 13px;
-          color: var(--color-gray-100);
-          margin-bottom: 4px;
-        }
-
-        .simple-tooltip-body {
-          font-size: 12px;
-          color: var(--color-gray-400);
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-          .simple-tooltip {
-            animation: none;
-          }
-        }
-      `}</style>
     </div>
   );
 };
@@ -601,31 +304,45 @@ export const createNodeTooltipContent = (node: NetworkNode): TooltipContent => (
   title: node.name,
   status: node.status,
   details: [
-    { label: 'Type', value: node.type, icon: 'Tag' },
-    { label: 'ID', value: node.id, icon: 'Fingerprint' },
-    ...(node.capacity ? [{ label: 'Capacity', value: `${node.capacity} ports`, icon: 'HardDrives' }] : []),
-    ...(node.utilization !== undefined ? [{ label: 'Utilization', value: `${node.utilization}%`, icon: 'Gauge' }] : []),
-    { label: 'Location', value: `${node.position.lat.toFixed(4)}, ${node.position.lng.toFixed(4)}`, icon: 'MapPin' }
+    { label: "Type", value: node.type, icon: "Tag" },
+    { label: "ID", value: node.id, icon: "Fingerprint" },
+    ...(node.capacity
+      ? [{ label: "Capacity", value: `${node.capacity} ports`, icon: "HardDrives" }]
+      : []),
+    ...(node.utilization !== undefined
+      ? [{ label: "Utilization", value: `${node.utilization}%`, icon: "Gauge" }]
+      : []),
+    {
+      label: "Location",
+      value: `${node.position.lat.toFixed(4)}, ${node.position.lng.toFixed(4)}`,
+      icon: "MapPin",
+    },
   ],
   actions: [
-    { label: 'View Details', icon: 'Eye', onClick: () => {}, variant: 'primary' },
-    { label: 'Trace Path', icon: 'GitBranch', onClick: () => {}, variant: 'secondary' }
+    { label: "View Details", icon: "Eye", onClick: () => {}, variant: "primary" },
+    { label: "Trace Path", icon: "GitBranch", onClick: () => {}, variant: "secondary" },
   ],
-  metadata: node.metadata
+  metadata: node.metadata,
 });
 
 // Utility to create tooltip content from connection
-export const createConnectionTooltipContent = (connection: NetworkConnection): TooltipContent => ({
+export const createConnectionTooltipContent = (
+  connection: NetworkConnection
+): TooltipContent => ({
   title: `Connection ${connection.id}`,
   status: connection.status,
   details: [
-    { label: 'From', value: connection.sourceNodeId, icon: 'ArrowRight' },
-    { label: 'To', value: connection.targetNodeId, icon: 'ArrowLeft' },
-    ...(connection.bandwidth ? [{ label: 'Bandwidth', value: `${connection.bandwidth} Mbps`, icon: 'Speed' }] : []),
-    ...(connection.utilization !== undefined ? [{ label: 'Utilization', value: `${connection.utilization}%`, icon: 'Gauge' }] : [])
+    { label: "From", value: connection.sourceNodeId, icon: "ArrowRight" },
+    { label: "To", value: connection.targetNodeId, icon: "ArrowLeft" },
+    ...(connection.bandwidth
+      ? [{ label: "Bandwidth", value: `${connection.bandwidth} Mbps`, icon: "Speed" }]
+      : []),
+    ...(connection.utilization !== undefined
+      ? [{ label: "Utilization", value: `${connection.utilization}%`, icon: "Gauge" }]
+      : []),
   ],
   actions: [
-    { label: 'View Route', icon: 'MapTrifold', onClick: () => {}, variant: 'primary' },
-    { label: 'Check Health', icon: 'Heartbeat', onClick: () => {}, variant: 'secondary' }
-  ]
+    { label: "View Route", icon: "MapTrifold", onClick: () => {}, variant: "primary" },
+    { label: "Check Health", icon: "Heartbeat", onClick: () => {}, variant: "secondary" },
+  ],
 });

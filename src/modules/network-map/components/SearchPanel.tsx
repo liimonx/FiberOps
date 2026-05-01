@@ -98,27 +98,25 @@ export const SearchPanel: React.FC<SearchPanelProps> = ({
 
   return (
     <Card
-      glass={{ elasticity: 10, blurAmount: 3, displacementScale: 100 }}
-      className={`u-w-100 u-p-0 u-overflow-hidden ${className}`}
+      glass={true}
+      className={`u-w-100 u-p-0 u-overflow-hidden u-flex u-flex-column ${className}`}
     >
-      <div>
-        <SearchInput
-          value={query}
-          onChange={setQuery}
-          onKeyDown={handleKeyDown}
-          onClear={clearSearch}
-          ariaControls="search-results"
-          ariaActiveDescendant={
-            highlightedIndex >= 0 ? `search-result-${highlightedIndex}` : undefined
-          }
-        />
+      <SearchInput
+        value={query}
+        onChange={setQuery}
+        onKeyDown={handleKeyDown}
+        onClear={clearSearch}
+        ariaControls="search-results"
+        ariaActiveDescendant={
+          highlightedIndex >= 0 ? `search-result-${highlightedIndex}` : undefined
+        }
+      />
 
-        <CategoryFilterTabs
-          selectedCategory={selectedCategory}
-          onCategoryChange={setSelectedCategory}
-          categoryCounts={categoryCounts}
-        />
-      </div>
+      <CategoryFilterTabs
+        selectedCategory={selectedCategory}
+        onCategoryChange={setSelectedCategory}
+        categoryCounts={categoryCounts}
+      />
 
       {/* Search results */}
       <SearchResultsList
@@ -130,12 +128,18 @@ export const SearchPanel: React.FC<SearchPanelProps> = ({
 
       {/* Empty state */}
       {query && results.length === 0 && (
-        <div className="u-py-8 u-px-4 u-text-center u-text-muted">
-          <Icon name="MagnifyingGlass" size={24} className="u-text-disabled u-mb-3" />
-          <p className="u-m-0 u-mb-1 u-text-sm u-text-secondary">
-            No results found for <strong>{query}</strong>
+        <div className="u-py-10 u-px-4 u-text-center">
+          <Icon
+            name="MagnifyingGlass"
+            size={32}
+            className="u-text-secondary-subtle u-opacity-30 u-mb-4"
+          />
+          <p className="u-m-0 u-mb-2 u-text-sm u-font-bold u-text-primary">
+            No results found for "{query}"
           </p>
-          <span className="u-text-xs u-text-muted">Try a different search term</span>
+          <span className="u-text-xs u-text-secondary-subtle">
+            Try adjusting your keywords or categories
+          </span>
         </div>
       )}
 

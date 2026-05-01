@@ -11,13 +11,13 @@
   --color-primary-700: #1d4ed8;
   --color-primary-800: #1e40af;
   --color-primary-900: #1e3a8a;
-  
+
   --color-status-active: #10b981;
   --color-status-inactive: #6b7280;
   --color-status-warning: #f59e0b;
   --color-status-error: #ef4444;
   --color-status-info: #3b82f6;
-  
+
   --color-gray-50: #f9fafb;
   --color-gray-100: #f3f4f6;
   --color-gray-200: #e5e7eb;
@@ -28,7 +28,7 @@
   --color-gray-700: #374151;
   --color-gray-800: #1f2937;
   --color-gray-900: #111827;
-  
+
   --color-map-background: #1f2937;
   --color-map-canvas: #111827;
   --color-map-grid: #374151;
@@ -50,7 +50,7 @@
   --font-size-lg: 18px;
   --font-size-xl: 20px;
   --font-size-xxl: 24px;
-  
+
   --font-weight-normal: 400;
   --font-weight-medium: 500;
   --font-weight-semibold: 600;
@@ -79,7 +79,7 @@
   width: 100%;
   height: 100vh;
   background-color: var(--color-map-background);
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: "Inter", system-ui, sans-serif;
 }
 
 /* Node styling */
@@ -158,7 +158,6 @@
   color: white;
   font-size: var(--font-size-sm);
   max-width: 300px;
-  z-index: 1000;
   pointer-events: none;
   box-shadow: var(--shadow-lg);
 }
@@ -187,8 +186,12 @@
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 /* Accessibility */
@@ -215,7 +218,7 @@
   .network-map-container {
     height: 100dvh; /* Use dynamic viewport height for mobile */
   }
-  
+
   .network-node {
     min-width: 12px;
     min-height: 12px;
@@ -234,7 +237,7 @@
     background: white;
     color: black;
   }
-  
+
   .network-node {
     fill: black !important;
     stroke: black !important;
@@ -247,7 +250,7 @@
     fill: #000000;
     stroke: #000000;
   }
-  
+
   .network-connection--active {
     stroke: #000000;
     stroke-width: 2px;
@@ -260,7 +263,7 @@
   .network-connection {
     transition: none;
   }
-  
+
   .network-loading--spinner {
     animation: none;
     border-top-color: transparent;

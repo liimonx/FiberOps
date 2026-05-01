@@ -1,19 +1,7 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { Icon, Button, Card } from "@shohojdhara/atomix";
-import {
-  AlertTriangle,
-  WifiOff,
-  Clock,
-  Lock,
-  Ban,
-  FileX,
-  ServerCrash,
-  RefreshCw,
-  Home,
-  Bug,
-} from "lucide-react";
 import {
   ErrorType,
   AppError,
@@ -21,7 +9,6 @@ import {
   errorMessages,
   OfflineDetector,
 } from "../utils/errorHandler";
-import { fadeIn, shake } from "../utils/animations";
 
 interface UserFriendlyErrorProps {
   error?: any;
@@ -48,20 +35,11 @@ export function UserFriendlyError({
 }: UserFriendlyErrorProps) {
   const [appError, setAppError] = useState<AppError | null>(null);
   const [isOffline, setIsOffline] = useState(!OfflineDetector.isCurrentlyOnline());
-  const cardRef = React.useRef<HTMLDivElement>(null);
 
-  // Classify the error
   useEffect(() => {
     if (error) {
-      const classified = classifyError(error);
-      setAppError(classified);
-
-      // Animate error appearance
-      if (cardRef.current) {
-        shake(cardRef.current, { distance: 5, duration: 0.4 });
-      }
+      setAppError(classifyError(error));
     } else if (title && message) {
-      // Create custom error from props
       setAppError({
         type: ErrorType.UNKNOWN,
         message: title,
@@ -72,176 +50,144 @@ export function UserFriendlyError({
     }
   }, [error, title, message, onRetry]);
 
-  // Listen for online/offline status
   useEffect(() => {
     const unsubscribe = OfflineDetector.onStatusChange(setIsOffline);
     return unsubscribe;
   }, []);
 
-  // Get error configuration
   const errorConfig = appError
     ? errorMessages[appError.type]
     : errorMessages[ErrorType.UNKNOWN];
 
-  // Determine icon based on error type
   const getIcon = () => {
-    if (isOffline) return WifiOff;
-
+    if (isOffline) return "WifiSlash";
     switch (appError?.type) {
       case ErrorType.NETWORK:
-        return WifiOff;
+        return "WifiSlash";
       case ErrorType.TIMEOUT:
-        return Clock;
+        return "Clock";
       case ErrorType.AUTHENTICATION:
-        return Lock;
+        return "Lock";
       case ErrorType.AUTHORIZATION:
-        return Ban;
+        return "Prohibit";
       case ErrorType.NOT_FOUND:
-        return FileX;
+        return "FileX";
       case ErrorType.SERVER:
-        return ServerCrash;
+        return "HardDrives";
       default:
-        return AlertTriangle;
+        return "Warning";
     }
   };
 
-  const IconComponent = getIcon();
+  const content = (
+    <Card
+      glass={true}
+      className={`u-text-center ${variant === "inline" ? "u-p-6" : variant === "overlay" ? "u-p-8 u-max-w-md" : "u-p-12 u-max-w-lg"} u-bg-white-opacity-5`}
+    >
+      <div className="u-mb-6">
+        <div
+          className="u-inline-flex u-items-center u-justify-center u-w-20 u-h-20 u-rounded-circle u-bg-white-opacity-5 u-border u-border-solid u-shadow-lg"
+          style={{
+            borderColor: isOffline ? "var(--atomix-error)" : "var(--atomix-warning)",
+          }}
+        >
+          <Icon
+            name={getIcon() as any}
+            size={40}
+            className={isOffline ? "u-text-error" : "u-text-warning"}
+          />
+        </div>
+      </div>
 
-  // Variant styles
-  const variantClasses = {
-    inline: "u-p-6 u-max-w-full",
-    overlay: "u-p-8 u-shadow-2xl u-max-w-md",
-    fullscreen: "u-p-12 u-min-h-screen u-flex u-items-center u-justify-center",
-  };
+      <h2
+        className="u-m-0 u-text-xl u-font-bold u-text-primary u-text-uppercase u-mb-2"
+        style={{ letterSpacing: "1px" }}
+      >
+        {title || errorConfig.title}
+      </h2>
+
+      <p className="u-text-sm u-text-secondary-subtle u-mb-8 u-leading-normal">
+        {message || appError?.userMessage || errorConfig.description}
+      </p>
+
+      {isOffline && (
+        <div className="u-mb-8 u-p-3 u-bg-error-subtle u-border u-border-solid u-border-error u-rounded u-animate-pulse">
+          <div className="u-flex u-items-center u-justify-center u-gap-2 u-text-xs u-font-bold u-text-error u-text-uppercase">
+            <Icon name="WifiSlash" size={16} />
+            <span>Connection Offline</span>
+          </div>
+        </div>
+      )}
+
+      <div className="u-flex u-gap-3 u-justify-center u-flex-wrap">
+        {showRetry && onRetry && (
+          <Button
+            variant="primary"
+            onClick={onRetry}
+            iconName="ArrowsCounterClockwise"
+            disabled={isOffline}
+          >
+            {errorConfig.action}
+          </Button>
+        )}
+
+        {showHome && onGoHome && (
+          <Button variant="secondary" onClick={onGoHome} iconName="House">
+            Go Home
+          </Button>
+        )}
+
+        {!onRetry && !onGoHome && (
+          <Button
+            variant="primary"
+            onClick={() => window.location.reload()}
+            iconName="ArrowsCounterClockwise"
+          >
+            Reload Page
+          </Button>
+        )}
+      </div>
+
+      {process.env.NODE_ENV === "development" && appError && (
+        <details className="u-mt-8 u-text-start u-opacity-60">
+          <summary className="u-text-xs u-font-bold u-text-secondary-subtle u-cursor-pointer">
+            Diagnostic Info
+          </summary>
+          <div className="u-mt-2 u-p-4 u-bg-black-opacity-20 u-rounded u-text-2xs u-font-mono u-text-error u-overflow-auto u-max-h-48">
+            <pre className="u-m-0">{JSON.stringify(appError, null, 2)}</pre>
+          </div>
+        </details>
+      )}
+    </Card>
+  );
+
+  if (variant === "fullscreen") {
+    return (
+      <div
+        className="u-fixed u-inset-0 u-flex u-items-center u-justify-center u-bg-dark u-z-modal u-p-6"
+        role="alert"
+      >
+        {content}
+      </div>
+    );
+  }
+
+  if (variant === "overlay") {
+    return (
+      <div
+        className="u-absolute u-inset-0 u-flex u-items-center u-justify-center u-z-modal u-bg-black-opacity-50 u-backdrop-blur-sm u-p-6"
+        role="alert"
+      >
+        {content}
+      </div>
+    );
+  }
 
   return (
-    <div
-      ref={cardRef}
-      className={`error-container ${variant === "fullscreen" ? "u-fixed u-inset-0 u-z-50 u-bg-dark/95 u-backdrop-blur-sm" : ""} ${className}`}
-      role="alert"
-      aria-live="assertive"
-    >
-      <Card
-        appearance="elevated"
-        glass={true}
-        className={`${variantClasses[variant]} u-text-center`}
-      >
-        {/* Icon */}
-        <div className="u-mb-4">
-          <div
-            className="u-inline-flex u-items-center u-justify-center u-rounded-full"
-            style={{
-              width: "80px",
-              height: "80px",
-              backgroundColor: isOffline
-                ? "rgba(239, 68, 68, 0.1)"
-                : "rgba(245, 158, 11, 0.1)",
-              border: `2px solid ${isOffline ? "#EF4444" : "#F59E0B"}`,
-            }}
-          >
-            <IconComponent size={40} color={isOffline ? "#EF4444" : "#F59E0B"} />
-          </div>
-        </div>
-
-        {/* Title */}
-        <h2 className="u-text-xl u-font-bold u-mb-2 u-text-white">
-          {title || errorConfig.title}
-        </h2>
-
-        {/* Message */}
-        <p className="u-text-sm u-text-secondary-subtle u-mb-6 u-leading-relaxed">
-          {message || appError?.userMessage || errorConfig.description}
-        </p>
-
-        {/* Offline indicator */}
-        {isOffline && (
-          <div
-            className="u-mb-6 u-p-3 u-rounded u-bg-danger-subtle u-border u-border-danger"
-            style={{ animation: "pulse-active 2s infinite" }}
-          >
-            <div className="u-flex u-items-center u-justify-center u-gap-2 u-text-xs u-text-danger">
-              <WifiOff size={16} />
-              <span>You are currently offline</span>
-            </div>
-          </div>
-        )}
-
-        {/* Action buttons */}
-        <div className="u-flex u-gap-3 u-justify-center u-flex-wrap">
-          {showRetry && onRetry && (
-            <Button
-              variant="primary"
-              onClick={() => {
-                onRetry();
-                if (cardRef.current) {
-                  fadeIn(cardRef.current, { duration: 0.3 });
-                }
-              }}
-              iconName="RefreshCw"
-              disabled={isOffline}
-            >
-              {errorConfig.action}
-            </Button>
-          )}
-
-          {showHome && onGoHome && (
-            <Button variant="secondary" onClick={onGoHome} iconName="Home">
-              Go Home
-            </Button>
-          )}
-
-          {!onRetry && !onGoHome && (
-            <Button
-              variant="primary"
-              onClick={() => window.location.reload()}
-              iconName="RefreshCw"
-            >
-              Reload Page
-            </Button>
-          )}
-        </div>
-
-        {/* Technical details (development only) */}
-        {process.env.NODE_ENV === "development" && appError && (
-          <details className="u-mt-6 u-text-left">
-            <summary className="u-cursor-pointer u-text-xs u-text-secondary-subtle u-mb-2">
-              Technical Details (Development)
-            </summary>
-            <div className="u-bg-dark u-p-3 u-rounded u-text-2xs u-font-mono u-text-danger u-overflow-auto u-max-h-48">
-              <div>
-                <strong>Type:</strong> {appError.type}
-              </div>
-              <div>
-                <strong>Message:</strong> {appError.message}
-              </div>
-              {appError.code && (
-                <div>
-                  <strong>Code:</strong> {appError.code}
-                </div>
-              )}
-              <div>
-                <strong>Time:</strong> {appError.timestamp.toLocaleTimeString()}
-              </div>
-              {appError.details && (
-                <pre className="u-mt-2 u-whitespace-pre-wrap">
-                  {JSON.stringify(appError.details, null, 2)}
-                </pre>
-              )}
-            </div>
-          </details>
-        )}
-      </Card>
+    <div className={`u-w-100 ${className}`} role="alert">
+      {content}
     </div>
   );
-}
-
-// Inline error message component
-interface InlineErrorMessageProps {
-  error?: any;
-  message?: string;
-  onRetry?: () => void;
-  compact?: boolean;
-  className?: string;
 }
 
 export function InlineErrorMessage({
@@ -250,150 +196,160 @@ export function InlineErrorMessage({
   onRetry,
   compact = false,
   className = "",
-}: InlineErrorMessageProps) {
+}: {
+  error?: any;
+  message?: string;
+  onRetry?: () => void;
+  compact?: boolean;
+  className?: string;
+}) {
   const appError = error ? classifyError(error) : null;
 
   return (
     <div
-      className={`u-flex u-items-start u-gap-3 u-p-3 u-rounded u-bg-danger-subtle u-border u-border-danger ${className}`}
+      className={`u-flex u-items-center u-gap-3 u-p-3 u-rounded u-bg-error-subtle u-border u-border-solid u-border-error ${className}`}
       role="alert"
     >
-      <AlertTriangle
-        className="u-text-danger u-flex-shrink-0 u-mt-0.5"
-        size={compact ? 16 : 20}
-      />
-
-      <div className="u-flex-grow">
-        <p className={`u-text-danger ${compact ? "u-text-2xs" : "u-text-xs"}`}>
+      <Icon name="Warning" size={compact ? 16 : 20} className="u-text-error" />
+      <div className="u-flex-1">
+        <p
+          className={`u-m-0 u-text-error u-font-bold ${compact ? "u-text-2xs" : "u-text-xs"}`}
+        >
           {message || appError?.userMessage || "An error occurred"}
         </p>
-
-        {onRetry && !compact && (
-          <button
-            onClick={onRetry}
-            className="u-mt-1 u-text-2xs u-text-primary u-hover:underline u-flex u-items-center u-gap-1"
-          >
-            <RefreshCw size={12} />
-            Try again
-          </button>
-        )}
       </div>
+      {onRetry && !compact && (
+        <Button
+          variant="secondary"
+          size="sm"
+          onClick={onRetry}
+          iconName="ArrowsCounterClockwise"
+          className="u-bg-transparent u-border-0 u-text-primary u-p-0 hover:u-bg-transparent"
+        >
+          Retry
+        </Button>
+      )}
     </div>
   );
-}
-
-// Toast notification for errors
-interface ErrorToastProps {
-  error?: any;
-  message?: string;
-  onClose?: () => void;
-  autoClose?: boolean;
-  autoCloseDelay?: number;
 }
 
 export function ErrorToast({
   error,
-  message,
   onClose,
-  autoClose = true,
-  autoCloseDelay = 5000,
-}: ErrorToastProps) {
-  const appError = error ? classifyError(error) : null;
-  const toastRef = React.useRef<HTMLDivElement>(null);
+  duration = 5000,
+}: {
+  error: any;
+  onClose: () => void;
+  duration?: number;
+}) {
+  const appError = classifyError(error);
 
   useEffect(() => {
-    // Animate in
-    if (toastRef.current) {
-      fadeIn(toastRef.current, { duration: 0.3 });
-    }
-
-    // Auto-close
-    if (autoClose && onClose) {
-      const timer = setTimeout(onClose, autoCloseDelay);
-      return () => clearTimeout(timer);
-    }
-  }, [autoClose, autoCloseDelay, onClose]);
+    const timer = setTimeout(onClose, duration);
+    return () => clearTimeout(timer);
+  }, [onClose, duration]);
 
   return (
-    <div
-      ref={toastRef}
-      className="u-fixed u-top-4 u-right-4 u-z-50 u-max-w-sm"
-      role="alert"
-      aria-live="assertive"
-    >
-      <Card appearance="elevated" className="u-shadow-2xl u-p-4 u-bg-danger u-text-white">
+    <div className="u-fixed u-bottom-6 u-end-6 u-z-tooltip u-animate-slide-in-right">
+      <Card glass={true} className="u-p-4 u-min-w-xs u-border-error u-bg-error-subtle">
         <div className="u-flex u-items-start u-gap-3">
-          <AlertTriangle className="u-flex-shrink-0 u-mt-0.5" size={20} />
-
-          <div className="u-flex-grow">
-            <h4 className="u-font-bold u-text-sm u-mb-1">Error</h4>
-            <p className="u-text-xs u-opacity-90">
-              {message || appError?.userMessage || "An unexpected error occurred"}
+          <div className="u-flex-shrink-0 u-mt-1">
+            <Icon name="WarningCircle" size={20} className="u-text-error" />
+          </div>
+          <div className="u-flex-1">
+            <h4 className="u-m-0 u-text-sm u-font-bold u-text-primary u-mb-1">
+              Error Detected
+            </h4>
+            <p className="u-m-0 u-text-xs u-text-secondary-subtle">
+              {appError.userMessage}
             </p>
           </div>
-
-          {onClose && (
-            <button
-              onClick={onClose}
-              className="u-flex-shrink-0 u-opacity-75 u-hover:opacity-100 u-transition-opacity"
-              aria-label="Close notification"
-            >
-              ×
-            </button>
-          )}
+          <Button
+            variant="secondary"
+            size="sm"
+            iconName="X"
+            iconOnly
+            onClick={onClose}
+            className="u-opacity-50 hover:u-opacity-100"
+          />
         </div>
+        <div
+          className="u-absolute u-bottom-0 u-start-0 u-h-1 u-bg-error"
+          style={{
+            width: "100%",
+            animation: `shrinkWidth ${duration}ms linear forwards`,
+          }}
+        />
       </Card>
+      <style jsx>{`
+        @keyframes shrinkWidth {
+          from {
+            width: 100%;
+          }
+          to {
+            width: 0%;
+          }
+        }
+      `}</style>
     </div>
   );
 }
 
-// Retry button with countdown
-interface RetryWithCountdownProps {
-  onRetry: () => void;
-  initialDelay?: number;
-  label?: string;
-  className?: string;
-}
-
 export function RetryWithCountdown({
   onRetry,
-  initialDelay = 5,
-  label = "Retrying in",
-  className = "",
-}: RetryWithCountdownProps) {
-  const [countdown, setCountdown] = useState(initialDelay);
+  countdownSeconds = 10,
+}: {
+  onRetry: () => void;
+  countdownSeconds?: number;
+}) {
+  const [secondsLeft, setSecondsLeft] = useState(countdownSeconds);
 
   useEffect(() => {
-    if (countdown <= 0) {
+    if (secondsLeft <= 0) {
       onRetry();
-      setCountdown(initialDelay);
       return;
     }
-
-    const timer = setInterval(() => {
-      setCountdown((prev) => prev - 1);
-    }, 1000);
-
+    const timer = setInterval(() => setSecondsLeft((s) => s - 1), 1000);
     return () => clearInterval(timer);
-  }, [countdown, initialDelay, onRetry]);
+  }, [secondsLeft, onRetry]);
 
   return (
-    <div
-      className={`u-flex u-items-center u-gap-2 u-text-xs u-text-secondary-subtle ${className}`}
-    >
-      <RefreshCw size={14} className="animate-spin" />
-      <span>
-        {label} {countdown}s...
-      </span>
-      <button
-        onClick={() => {
-          setCountdown(0);
-          onRetry();
-        }}
-        className="u-text-primary u-hover:underline"
-      >
-        Retry now
-      </button>
+    <div className="u-flex u-flex-column u-items-center u-gap-4">
+      <div className="u-relative u-w-16 u-h-16 u-flex u-items-center u-justify-center">
+        <svg className="u-absolute u-inset-0 u-w-100 u-h-100" viewBox="0 0 36 36">
+          <circle
+            className="u-text-secondary-subtle u-opacity-10"
+            stroke="currentColor"
+            strokeWidth="3"
+            fill="transparent"
+            r="16"
+            cx="18"
+            cy="18"
+          />
+          <circle
+            className="u-text-primary u-transition-all"
+            stroke="currentColor"
+            strokeWidth="3"
+            strokeDasharray="100"
+            strokeDashoffset={100 - (secondsLeft / countdownSeconds) * 100}
+            strokeLinecap="round"
+            fill="transparent"
+            r="16"
+            cx="18"
+            cy="18"
+            style={{ transition: "stroke-dashoffset 1s linear" }}
+          />
+        </svg>
+        <span className="u-text-lg u-font-bold u-text-primary">{secondsLeft}</span>
+      </div>
+      <div className="u-text-center">
+        <p className="u-m-0 u-text-sm u-text-secondary-subtle u-mb-4">
+          Retrying connection in {secondsLeft} seconds...
+        </p>
+        <Button variant="secondary" onClick={onRetry} iconName="ArrowsCounterClockwise">
+          Retry Now
+        </Button>
+      </div>
     </div>
   );
 }

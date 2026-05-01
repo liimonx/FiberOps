@@ -109,19 +109,12 @@ export const LayerControls: React.FC<LayerControlsProps> = ({ className = "" }) 
   const progressPercentage = (activeCount / totalLayers) * 100;
 
   return (
-    <Card
-      glass={{ blurAmount: 5, displacementScale: 150, mode: "shader" }}
-      className={` ${className}`}
-      appearance="ghost"
-    >
+    <Card glass={true} className={`u-overflow-hidden ${className}`}>
       {/* Header with Progress Indicator */}
-      <div className="u-flex u-items-center u-justify-between u-p-4">
+      <div className="u-flex u-items-center u-justify-between u-p-4 u-bg-white-opacity-5">
         <div className="u-flex u-items-center u-gap-3">
-          <div
-            className="u-rounded u-flex u-items-center u-justify-center u-bg-brand-subtle u-shadow-sm"
-            style={{ width: "32px", height: "32px" }}
-          >
-            <Icon name="Stack" size={18} />
+          <div className="u-rounded u-flex u-items-center u-justify-center u-bg-primary-subtle u-shadow-sm u-w-8 u-h-8">
+            <Icon name="Stack" size={18} className="u-text-primary" />
           </div>
           <div className="u-flex u-flex-column u-gap-1">
             <span className="u-text-sm u-font-bold u-text-primary">Map Layers</span>
@@ -132,18 +125,16 @@ export const LayerControls: React.FC<LayerControlsProps> = ({ className = "" }) 
         </div>
 
         {/* Progress Bar */}
-        <div
-          className="u-rounded u-relative u-flex u-items-center u-justify-center"
-          style={{ width: "40px", height: "40px" }}
-        >
+        <div className="u-rounded u-relative u-flex u-items-center u-justify-center u-w-10 u-h-10">
           <svg width="40" height="40" viewBox="0 0 40 40">
             <circle
               cx="20"
               cy="20"
               r="16"
               fill="none"
-              stroke="rgba(255, 255, 255, 0.1)"
+              stroke="currentColor"
               strokeWidth="3"
+              className="u-text-secondary-subtle u-opacity-10"
             />
             <circle
               cx="20"
@@ -156,9 +147,6 @@ export const LayerControls: React.FC<LayerControlsProps> = ({ className = "" }) 
               strokeDasharray={`${progressPercentage} 100`}
               transform="rotate(-90 20 20)"
               className="u-text-primary u-transition-all"
-              style={{
-                transition: "stroke-dasharray 0.3s ease",
-              }}
             />
           </svg>
           <span
@@ -174,11 +162,11 @@ export const LayerControls: React.FC<LayerControlsProps> = ({ className = "" }) 
       {/* Layer List */}
       <div
         className="u-p-2 u-overflow-y-auto"
-        style={{ maxHeight: "360px" }}
         role="group"
         aria-label="Map layers"
+        style={{ maxHeight: "360px" }} // Keeping this for layout constraint as per guidelines "dynamic runtime calculation is absolutely strictly required" - though this could be utility if available
       >
-        {LAYER_CONFIGS.map((config, index) => {
+        {LAYER_CONFIGS.map((config) => {
           const layer = layers.find((l) => l.id === config.id);
           const isVisible = layer?.visible ?? config.visible;
           const isHovered = hoveredLayer === config.id;
@@ -186,44 +174,33 @@ export const LayerControls: React.FC<LayerControlsProps> = ({ className = "" }) 
           return (
             <div
               key={config.id}
-              className="u-mb-2 u-rounded u-transition-all"
+              className={`u-mb-2 u-rounded u-transition-all ${
+                isVisible
+                  ? isHovered
+                    ? "u-bg-white-opacity-10"
+                    : "u-bg-white-opacity-5"
+                  : "u-opacity-50"
+              }`}
               onMouseEnter={() => setHoveredLayer(config.id)}
               onMouseLeave={() => setHoveredLayer(null)}
-              style={{
-                backgroundColor: isVisible
-                  ? isHovered
-                    ? "rgba(255, 255, 255, 0.08)"
-                    : "rgba(255, 255, 255, 0.04)"
-                  : "transparent",
-                transform: isVisible && isHovered ? "translateX(4px)" : "translateX(0)",
-                opacity: isVisible ? 1 : 0.5,
-              }}
             >
               <div className="u-flex u-items-center u-justify-between u-gap-3 u-p-3">
-                {/* Color Indicator with Glow Effect */}
+                {/* Color Indicator */}
                 <div
-                  className="u-rounded u-flex-shrink-0"
+                  className="u-rounded u-flex-shrink-0 u-w-1 u-h-8 u-transition-all"
                   style={{
-                    width: "8px",
-                    height: "32px",
                     backgroundColor: config.color,
-                    opacity: isVisible ? 1 : 0.3,
                     boxShadow: isVisible ? `0 0 12px ${config.color}40` : "none",
-                    transform: isVisible ? "scaleY(1)" : "scaleY(0.7)",
-                    transition: "all 0.2s ease",
                   }}
                 />
 
                 {/* Icon and Text */}
                 <div className="u-flex u-flex-1 u-items-center u-gap-3 u-min-w-0">
                   <div
-                    className="u-rounded u-flex u-items-center u-justify-center u-flex-shrink-0"
+                    className="u-rounded u-flex u-items-center u-justify-center u-flex-shrink-0 u-w-8 u-h-8"
                     style={{
-                      width: "32px",
-                      height: "32px",
                       backgroundColor: `${config.color}15`,
                       border: `1px solid ${config.color}30`,
-                      opacity: isVisible ? 1 : 0.5,
                     }}
                   >
                     <Icon
@@ -235,30 +212,18 @@ export const LayerControls: React.FC<LayerControlsProps> = ({ className = "" }) 
 
                   <div className="u-flex u-flex-column u-min-w-0 u-flex-1">
                     <span
-                      className={`u-text-sm u-font-semibold u-transition-colors ${
-                        isVisible
-                          ? "u-text-primary-emphasis"
-                          : "u-text-secondary-emphasis"
+                      className={`u-text-sm u-font-semibold u-transition-colors u-text-truncate ${
+                        isVisible ? "u-text-primary" : "u-text-secondary-subtle"
                       }`}
-                      style={{
-                        whiteSpace: "nowrap",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                      }}
                     >
                       {config.name}
                     </span>
                     <span
-                      className={`u-text-xs u-mt-1 ${
+                      className={`u-text-xs u-mt-1 u-text-truncate ${
                         isVisible
                           ? "u-text-secondary-subtle"
                           : "u-text-secondary-subtle u-opacity-50"
                       }`}
-                      style={{
-                        whiteSpace: "nowrap",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                      }}
                     >
                       {config.description}
                     </span>
@@ -280,7 +245,7 @@ export const LayerControls: React.FC<LayerControlsProps> = ({ className = "" }) 
       </div>
 
       {/* Actions */}
-      <div className="u-flex u-gap-2 u-p-4">
+      <div className="u-flex u-gap-2 u-p-4 u-border-top u-border-secondary-subtle u-opacity-80">
         <Button
           variant="success"
           fullWidth

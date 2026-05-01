@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Icon } from "@shohojdhara/atomix";
+import { Icon, Card } from "@shohojdhara/atomix";
 
 interface LoadingStateProps {
   message?: string;
@@ -18,112 +18,54 @@ export const LoadingState: React.FC<LoadingStateProps> = ({
   showSpinner = true,
   className = "",
 }) => {
-  const sizeClasses = {
-    sm: "u-text-sm",
-    md: "u-text-base",
-    lg: "u-text-lg",
+  const sizeMap = {
+    sm: { icon: 16, text: "u-text-xs" },
+    md: { icon: 24, text: "u-text-sm" },
+    lg: { icon: 32, text: "u-text-base" },
   };
 
-  const spinnerSizes = {
-    sm: 16,
-    md: 24,
-    lg: 32,
-  };
+  const currentSize = sizeMap[size];
 
-  return (
-    <div
-      className={`loading-state loading-state--${variant} ${className}`}
-      role="status"
-      aria-live="polite"
-    >
+  const content = (
+    <div className={`u-flex u-items-center u-justify-center u-gap-3 ${className}`}>
       {showSpinner && (
-        <div className="loading-spinner" aria-hidden="true">
-          <Icon name="SpinnerGap" size={spinnerSizes[size]} className="spinning" />
-        </div>
+        <Icon
+          name="SpinnerGap"
+          size={currentSize.icon}
+          className="u-text-primary u-animate-spin"
+        />
       )}
-
-      <span className={`loading-message ${sizeClasses[size]}`}>{message}</span>
-
-      <style jsx>{`
-        .loading-state {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: var(--spacing-md);
-          color: var(--color-gray-400);
-        }
-
-        .loading-state--inline {
-          padding: var(--spacing-md);
-        }
-
-        .loading-state--overlay {
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          background: rgba(0, 0, 0, 0.8);
-          border-radius: var(--border-radius-md);
-          padding: var(--spacing-xl);
-          z-index: var(--z-index-modal);
-        }
-
-        .loading-state--fullscreen {
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100vw;
-          height: 100vh;
-          background: var(--color-map-background);
-          z-index: var(--z-index-modal);
-          flex-direction: column;
-        }
-
-        .loading-spinner {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-
-        .spinning {
-          animation: spin 1s linear infinite;
-        }
-
-        .loading-message {
-          font-weight: var(--font-weight-medium);
-        }
-
-        @keyframes spin {
-          0% {
-            transform: rotate(0deg);
-          }
-          100% {
-            transform: rotate(360deg);
-          }
-        }
-
-        /* Reduced motion support */
-        @media (prefers-reduced-motion: reduce) {
-          .spinning {
-            animation: none;
-          }
-
-          .loading-spinner :global(svg) {
-            opacity: 0.7;
-          }
-        }
-
-        /* High contrast mode */
-        @media (prefers-contrast: high) {
-          .loading-state {
-            color: #000000;
-            background: #ffffff;
-            border: 2px solid #000000;
-          }
-        }
-      `}</style>
+      <span className={`${currentSize.text} u-font-bold u-text-primary`}>{message}</span>
     </div>
   );
+
+  if (variant === "overlay") {
+    return (
+      <div className="u-absolute u-inset-0 u-flex u-items-center u-justify-center u-z-modal">
+        <Card glass={true} className="u-p-6 u-shadow-lg">
+          {content}
+        </Card>
+      </div>
+    );
+  }
+
+  if (variant === "fullscreen") {
+    return (
+      <div className="u-fixed u-inset-0 u-flex u-items-center u-justify-center u-bg-dark u-z-modal">
+        <div className="u-flex u-flex-column u-items-center u-gap-4">
+          <Icon name="SpinnerGap" size={48} className="u-text-primary u-animate-spin" />
+          <span
+            className="u-text-lg u-font-bold u-text-primary u-text-uppercase"
+            style={{ letterSpacing: "2px" }}
+          >
+            {message}
+          </span>
+        </div>
+      </div>
+    );
+  }
+
+  return content;
 };
 
 export const SkeletonLoader: React.FC<{
@@ -132,55 +74,17 @@ export const SkeletonLoader: React.FC<{
   variant?: "text" | "rect" | "circle";
   className?: string;
 }> = ({ width = "100%", height = "1rem", variant = "rect", className = "" }) => {
+  const variantClasses = {
+    text: "u-rounded-sm",
+    rect: "u-rounded",
+    circle: "u-rounded-circle",
+  };
+
   return (
     <div
-      className={`skeleton skeleton--${variant} ${className}`}
+      className={`u-bg-white-opacity-5 u-animate-pulse ${variantClasses[variant]} ${className}`}
       style={{ width, height }}
       aria-hidden="true"
-    >
-      <style jsx>{`
-        .skeleton {
-          background: linear-gradient(
-            90deg,
-            var(--color-gray-600) 0%,
-            var(--color-gray-500) 50%,
-            var(--color-gray-600) 100%
-          );
-          background-size: 200% 100%;
-          animation: shimmer 2s infinite;
-          border-radius: var(--border-radius-sm);
-        }
-
-        .skeleton--text {
-          height: 1rem;
-          border-radius: 4px;
-        }
-
-        .skeleton--rect {
-          border-radius: var(--border-radius-md);
-        }
-
-        .skeleton--circle {
-          border-radius: 50%;
-        }
-
-        @keyframes shimmer {
-          0% {
-            background-position: -200% 0;
-          }
-          100% {
-            background-position: 200% 0;
-          }
-        }
-
-        /* Reduced motion support */
-        @media (prefers-reduced-motion: reduce) {
-          .skeleton {
-            animation: none;
-            background: var(--color-gray-600);
-          }
-        }
-      `}</style>
-    </div>
+    />
   );
 };
