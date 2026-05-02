@@ -6,8 +6,7 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 export const metadata: Metadata = {
   title: "BCN FiberOps",
-  description:
-    "Telecom network operations dashboard (frontend-first, mock-driven).",
+  description: "Telecom network operations dashboard (frontend-first, mock-driven).",
 };
 
 export default function RootLayout({
@@ -17,7 +16,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body suppressHydrationWarning>
+      <body suppressHydrationWarning data-atomix-color-mode="dark">
         <a href="#main-content" className="skip-to-main">
           Skip to main content
         </a>
