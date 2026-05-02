@@ -3,7 +3,7 @@
 import React from "react";
 import { Icon, Card, Badge } from "@shohojdhara/atomix";
 import type { NetworkNode } from "../types";
-import { NETWORK_STATUS_COLORS, NETWORK_STATUS_LABELS } from "../constants";
+import { NETWORK_STATUS_COLORS, NETWORK_STATUS_LABELS, NODE_TYPE_ICONS } from "../constants";
 import { StatusIndicator } from "./StatusIndicator";
 
 interface NodeTooltipProps {
@@ -26,12 +26,13 @@ export const NodeTooltip: React.FC<NodeTooltipProps> = ({
     name,
     status,
     type,
-    location,
     capacity,
     utilization,
-    lastSeen,
-    properties,
+    metadata
   } = node;
+
+  const address = metadata?.address || metadata?.location?.address;
+  const lastSeen = metadata?.lastSeen;
 
   const formatLastSeen = (timestamp?: string) => {
     if (!timestamp) return "Unknown";
@@ -49,22 +50,7 @@ export const NodeTooltip: React.FC<NodeTooltipProps> = ({
   };
 
   const getNodeIcon = () => {
-    switch (type) {
-      case "switch":
-        return "Server";
-      case "router":
-        return "Network";
-      case "server":
-        return "HardDrive";
-      case "access_point":
-        return "WifiHigh";
-      case "core":
-        return "Cpu";
-      case "distribution":
-        return "ShareNetwork";
-      default:
-        return "Circle";
-    }
+    return NODE_TYPE_ICONS[type] || "Circle";
   };
 
   return (
@@ -113,12 +99,12 @@ export const NodeTooltip: React.FC<NodeTooltipProps> = ({
             </span>
             <span className="u-text-sm u-font-bold ">{name}</span>
           </div>
-          {location?.address && (
+          {address && (
             <div className="u-flex u-flex-column u-gap-1">
               <span className="u-text-xs u-text-secondary-emphasis u-font-bold u-text-uppercase">
                 Location
               </span>
-              <span className="u-text-xs  u-opacity-80">{location.address}</span>
+              <span className="u-text-xs  u-opacity-80">{address}</span>
             </div>
           )}
         </div>
@@ -129,10 +115,10 @@ export const NodeTooltip: React.FC<NodeTooltipProps> = ({
             <h4 className="u-m-0 u-text-xs u-font-bold  u-text-uppercase u-mb-3">
               Live Metrics
             </h4>
-            {capacity && (
+            {capacity !== undefined && (
               <div className="u-flex u-justify-between u-items-center u-mb-2">
                 <span className="u-text-xs u-text-secondary-emphasis">Capacity</span>
-                <span className="u-text-xs u-font-bold ">{capacity.total} Gbps</span>
+                <span className="u-text-xs u-font-bold ">{capacity} Gbps</span>
               </div>
             )}
             {utilization !== undefined && (

@@ -24,6 +24,13 @@ export const NETWORK_STATUS_COLORS = {
   [NetworkStatus.ERROR]: '#ef4444'      // Red
 } as const;
 
+export const NETWORK_STATUS_LABELS = {
+  [NetworkStatus.ACTIVE]: 'Active',
+  [NetworkStatus.INACTIVE]: 'Inactive',
+  [NetworkStatus.WARNING]: 'Warning',
+  [NetworkStatus.ERROR]: 'Error'
+} as const;
+
 export const NODE_TYPE_ICONS = {
   [NetworkNodeType.CORE_NODE]: 'Server',
   [NetworkNodeType.DISTRIBUTION_NODE]: 'Cpu',

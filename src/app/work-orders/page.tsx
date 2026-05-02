@@ -103,9 +103,9 @@ export default function WorkOrdersPage() {
     const badgeVariant = getPriorityBadgeVariant(task.priority);
 
     return (
-      <Card
+      <div
         key={task.id}
-        className="u-mb-3 u-cursor-pointer u-border u-border-secondary-subtle u-transition-all u-duration-200"
+        className="u-mb-3 u-cursor-pointer u-transition-all u-duration-200"
         draggable
         onDragStart={() =>
           handleDragStart(
@@ -120,6 +120,7 @@ export default function WorkOrdersPage() {
         aria-grabbed={draggedTask?.task.id === task.id}
         tabIndex={0}
       >
+        <Card className="u-border u-border-secondary-subtle u-h-100">
         <div className="u-flex u-justify-between u-items-start u-mb-2">
           <Badge variant={badgeVariant} label={task.priority} />
           <Icon name="DotsThree" className="u-text-secondary-emphasis" />
@@ -131,7 +132,8 @@ export default function WorkOrdersPage() {
           </span>
           <Avatar initials={task.type} size="sm" />
         </div>
-      </Card>
+        </Card>
+      </div>
     );
   };
 

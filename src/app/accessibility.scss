@@ -104,7 +104,7 @@ input[type="radio"] {
 
 // Drag and drop visual feedback
 [draggable="true"] {
-  &:dragging {
+  &:active {
     opacity: 0.5;
     cursor: grabbing;
   }

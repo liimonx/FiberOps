@@ -13,7 +13,7 @@ interface ToolbarProps {
 
 interface ToolConfig {
   id: ToolType;
-  icon: string;
+  icon: any;
   label: string;
   description: string;
   shortcut?: string;

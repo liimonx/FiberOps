@@ -51,8 +51,7 @@ export {
 export { 
   ErrorBoundary, 
   DefaultErrorFallback, 
-  withErrorBoundary, 
-  useErrorBoundary 
+  withErrorBoundary 
 } from './ErrorBoundary';
 export type { ErrorBoundaryFallbackProps } from './ErrorBoundary';
 
@@ -84,10 +83,7 @@ export {
 // Task 9: Visual polish and animations
 export { 
   EnhancedLoadingState,
-  AnimatedSkeletonLoader,
-  ProgressRing,
-  LoadingDots,
-  LivePulseIndicator
+  AnimatedSkeletonLoader
 } from './EnhancedLoadingState';
 
 export { 
@@ -108,8 +104,7 @@ export {
   OfflineIndicator,
   OfflineStatusBadge,
   DataFreshnessIndicator,
-  ConnectionQualityIndicator,
-  offlineQueue
+  ConnectionQualityIndicator
 } from './OfflineIndicator';
 
 export { 
