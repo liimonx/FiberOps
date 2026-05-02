@@ -1,5 +1,6 @@
 "use client";
 
+import { useQuery } from "@tanstack/react-query";
 import {
   Card,
   Container,
@@ -13,7 +14,10 @@ import {
   AreaChart,
   Callout,
   DonutChart,
+  StatCard,
+  Avatar,
 } from "@shohojdhara/atomix";
+import { ClientOnly } from "@/components/ClientOnly";
 
 const recentWorkOrders = [
   { id: "WO-991", title: "Splice Repair", status: "In Progress", technician: "John Doe" },
@@ -27,29 +31,24 @@ const recentWorkOrders = [
   { id: "WO-994", title: "Signal Auditing", status: "Pending", technician: "Unassigned" },
 ];
 
-const networkTrends = [
-  { label: "00:00", value: 450 },
-  { label: "02:00", value: 380 },
-  { label: "04:00", value: 320 },
-  { label: "06:00", value: 550 },
-  { label: "08:00", value: 890 },
-  { label: "10:00", value: 1050 },
-  { label: "12:00", value: 1200 },
-  { label: "14:00", value: 1150 },
-  { label: "16:00", value: 1100 },
-  { label: "18:00", value: 1350 },
-  { label: "20:00", value: 1450 },
-  { label: "22:00", value: 950 },
-  { label: "23:59", value: 600 },
-];
-
 const customerSegments = [
   { label: "Residential", value: 8400, color: "var(--atomix-primary)" },
-  { label: "Business", value: 3200, color: "var(--atomix-success)" },
-  { label: "Enterprise", value: 892, color: "var(--atomix-warning)" },
+  { label: "Business", value: 3200, color: "var(--atomix-secondary)" },
+  { label: "Enterprise", value: 1200, color: "var(--atomix-accent)" },
+  { label: "Government", value: 600, color: "var(--atomix-warning)" },
 ];
 
 export default function DashboardPage() {
+  const { data: usageData, isLoading: isUsageLoading } = useQuery({
+    queryKey: ["network-trends"],
+    queryFn: async () => {
+      const res = await fetch("/api/stats/usage");
+      if (!res.ok) throw new Error("Failed to fetch usage stats");
+      return res.json();
+    },
+    refetchInterval: 30000,
+  });
+
   const workOrderColumns: DataTableColumn[] = [
     {
       key: "id",
@@ -143,29 +142,43 @@ export default function DashboardPage() {
       <Grid className="u-mb-6">
         <GridCol xs={12} lg={8}>
           <Card className="u-h-100" title="Network Usage Trends" glass>
-            <div className="u-w-100" style={{ height: "300px" }}>
-              <AreaChart
-                data={networkTrends}
-                variant="primary"
-                interactive={true}
-                showLegend={false}
-                areaOptions={{
-                  smooth: true,
-                  useGradient: true,
-                  showDataPoints: true,
-                }}
-                config={{
-                  xAxis: {
-                    showGrid: false,
-                    label: "Time (24h)",
-                  },
-                  yAxis: {
-                    showGrid: true,
-                    label: "Usage (Mbps)",
-                    formatter: (val) => `${val}M`,
-                  },
-                }}
-              />
+            <div className="u-h-100 u-min-h-300 u-flex u-items-center u-justify-center">
+              {isUsageLoading ? (
+                <div className="u-text-secondary-emphasis">Loading Trends...</div>
+              ) : (
+                <ClientOnly>
+                  <AreaChart
+                    datasets={[
+                      {
+                        label: "Network Usage",
+                        data: usageData || [],
+                        color: "var(--atomix-primary)",
+                      },
+                    ]}
+                    variant="primary"
+                    interactive={true}
+                    showLegend={false}
+                    height={300}
+                    width="100%"
+                    areaOptions={{
+                      smooth: true,
+                      useGradient: true,
+                      showDataPoints: true,
+                    }}
+                    config={{
+                      xAxis: {
+                        showGrid: false,
+                        label: "Time (24h)",
+                      },
+                      yAxis: {
+                        showGrid: true,
+                        label: "Usage (Mbps)",
+                        formatter: (val: any) => `${val}M`,
+                      },
+                    }}
+                  />
+                </ClientOnly>
+              )}
             </div>
           </Card>
         </GridCol>
@@ -205,8 +218,21 @@ export default function DashboardPage() {
       <Grid className="u-mb-6">
         <GridCol xs={12} lg={4}>
           <Card title="Customer Segments" className="u-h-100" glass>
-            <div style={{ height: "250px" }} className="u-w-100">
-              <DonutChart data={customerSegments} interactive={true} showLegend={true} />
+            <div style={{ height: "250px" }} className="u-w-100 u-flex u-items-center u-justify-center">
+              <ClientOnly>
+                <DonutChart 
+                  datasets={[
+                    {
+                      label: "Segments",
+                      data: customerSegments,
+                    }
+                  ]}
+                  interactive={true} 
+                  showLegend={true} 
+                  height={250}
+                  width={250}
+                />
+              </ClientOnly>
             </div>
           </Card>
         </GridCol>
