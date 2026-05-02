@@ -58,11 +58,12 @@ export const InspectorPanel: React.FC<InspectorPanelProps> = ({
           <Icon
             name="CursorClick"
             size={40}
-            className="u-text-secondary-emphasis u-opacity-30"
+            className="u-text-secondary-emphasis"
+            style={{ opacity: 0.3 }}
           />
           <div className="u-flex u-flex-column u-gap-1">
-            <h3 className="u-m-0 u-text-sm u-font-bold ">No Selection</h3>
-            <p className="u-m-0 u-text-xs u-text-secondary-emphasis">
+            <h3 className="u-m-0 u-fs-sm u-font-bold">No Selection</h3>
+            <p className="u-m-0 u-fs-xs u-text-secondary-emphasis">
               Select a node or link to view details
             </p>
           </div>
@@ -87,18 +88,35 @@ export const InspectorPanel: React.FC<InspectorPanelProps> = ({
       role="region"
       aria-label="Inspector panel"
       tabIndex={-1}
-      className="u-outline-none u-z-modal"
+      className="u-z-modal"
+      style={{ outline: "none" }}
     >
       <Card
-        glass={true}
-        className={`u-p-0 u-overflow-hidden u-transition-all u-bg-white-opacity-5 ${isCollapsed ? "u-h-auto" : ""} ${className}`}
-        style={{ width: isCollapsed ? "auto" : "320px" }}
+        glass={{ blurAmount: 5 }}
+        className={`u-p-0 ${isCollapsed ? "u-h-auto" : ""} ${className}`}
+        style={{
+          width: isCollapsed ? "auto" : "320px",
+          overflow: "hidden",
+        }}
+        size="sm"
       >
         {/* Header */}
-        <div className="u-flex u-items-center u-gap-3 u-p-4 u-border-bottom u-border-secondary-subtle u-bg-white-opacity-5">
+        <div
+          className="u-flex u-items-center u-gap-3 u-p-4"
+          style={{
+            borderBottom:
+              "1px solid var(--color-border-subtle, rgba(255, 255, 255, 0.1))",
+            backgroundColor: "rgba(255, 255, 255, 0.05)",
+          }}
+        >
           <div
-            className="u-w-10 u-h-10 u-rounded-circle u-flex u-items-center u-justify-center  u-flex-shrink-0 u-shadow-sm"
-            style={{ backgroundColor: NETWORK_STATUS_COLORS[status] }}
+            className="u-rounded-circle u-flex u-items-center u-justify-center u-shadow-sm"
+            style={{
+              backgroundColor: NETWORK_STATUS_COLORS[status],
+              width: "40px",
+              height: "40px",
+              flexShrink: 0,
+            }}
           >
             <Icon
               name={
@@ -109,11 +127,25 @@ export const InspectorPanel: React.FC<InspectorPanelProps> = ({
           </div>
 
           {!isCollapsed && (
-            <div className="u-flex-1 u-min-w-0">
-              <h3 className="u-m-0 u-text-sm u-font-bold  u-text-truncate">
+            <div className="u-flex-1" style={{ minWidth: 0 }}>
+              <h3
+                className="u-m-0 u-fs-sm u-font-bold"
+                style={{
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                }}
+              >
                 {selectedNode ? selectedNode.name : `Link ${selectedConnection?.id}`}
               </h3>
-              <span className="u-text-xs u-text-secondary-emphasis u-text-truncate u-block">
+              <span
+                className="u-fs-xs u-text-secondary-emphasis u-block"
+                style={{
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                }}
+              >
                 {selectedNode
                   ? getNodeTypeLabel(selectedNode.type)
                   : `${selectedConnection?.sourceNodeId} → ${selectedConnection?.targetNodeId}`}
@@ -125,7 +157,7 @@ export const InspectorPanel: React.FC<InspectorPanelProps> = ({
             <Button
               variant="secondary"
               size="sm"
-              iconName={isCollapsed ? "ArrowsInLineDown" : "ArrowsInLineUp"}
+              iconName={isCollapsed ? "ArrowUp" : "ArrowDown"}
               iconOnly
               onClick={() => setIsCollapsed(!isCollapsed)}
               aria-label={isCollapsed ? "Expand panel" : "Collapse panel"}
@@ -144,7 +176,14 @@ export const InspectorPanel: React.FC<InspectorPanelProps> = ({
         {!isCollapsed && (
           <>
             {/* Status Section */}
-            <div className="u-px-4 u-py-3 u-border-bottom u-border-secondary-subtle u-bg-white-opacity-5">
+            <div
+              className="u-px-4 u-py-3"
+              style={{
+                borderBottom:
+                  "1px solid var(--color-border-subtle, rgba(255, 255, 255, 0.1))",
+                backgroundColor: "rgba(255, 255, 255, 0.05)",
+              }}
+            >
               <StatusIndicator
                 status={status}
                 size="md"
@@ -154,37 +193,21 @@ export const InspectorPanel: React.FC<InspectorPanelProps> = ({
             </div>
 
             {/* Content Tabs */}
-            <Tabs
-              activeIndex={activeTab}
-              onTabChange={setActiveTab}
-              className="u-flex u-flex-column"
-            >
-              <div className="u-px-4 u-border-bottom u-border-secondary-subtle">
-                <Tabs.List className="u-flex u-gap-4">
-                  <Tabs.Trigger
-                    index={0}
-                    className="u-py-3 u-text-xs u-font-bold u-text-uppercase u-border-bottom-2 u-border-transparent data-[state=active]:u-border-primary data-[state=active]:"
-                  >
-                    Details
-                  </Tabs.Trigger>
-                  <Tabs.Trigger
-                    index={1}
-                    className="u-py-3 u-text-xs u-font-bold u-text-uppercase u-border-bottom-2 u-border-transparent data-[state=active]:u-border-primary data-[state=active]:"
-                  >
-                    Actions
-                  </Tabs.Trigger>
-                  {selectedNode && (
-                    <Tabs.Trigger
-                      index={2}
-                      className="u-py-3 u-text-xs u-font-bold u-text-uppercase u-border-bottom-2 u-border-transparent data-[state=active]:u-border-primary data-[state=active]:"
-                    >
-                      Links
-                    </Tabs.Trigger>
-                  )}
+            <Tabs activeIndex={activeTab} onTabChange={setActiveTab}>
+              <div
+                style={{
+                  borderBottom:
+                    "1px solid var(--color-border-subtle, rgba(255, 255, 255, 0.1))",
+                }}
+              >
+                <Tabs.List>
+                  <Tabs.Trigger index={0}>Details</Tabs.Trigger>
+                  <Tabs.Trigger index={1}>Actions</Tabs.Trigger>
+                  {selectedNode && <Tabs.Trigger index={2}>Links</Tabs.Trigger>}
                 </Tabs.List>
               </div>
 
-              <div className="u-overflow-y-auto u-p-4" style={{ maxHeight: "350px" }}>
+              <div className="u-p-4" style={{ maxHeight: "350px", overflowY: "auto" }}>
                 <Tabs.Panel index={0}>
                   <div className="u-flex u-flex-column u-gap-3">
                     {[
@@ -243,24 +266,50 @@ export const InspectorPanel: React.FC<InspectorPanelProps> = ({
                           key={i}
                           className="u-flex u-justify-between u-items-center u-gap-3"
                         >
-                          <span className="u-text-xs u-text-secondary-emphasis u-font-bold u-text-uppercase">
+                          <span
+                            className="u-fs-xs u-text-secondary-emphasis u-font-bold"
+                            style={{ textTransform: "uppercase" }}
+                          >
                             {item.label}
                           </span>
                           <div className="u-flex u-flex-column u-items-end u-gap-1">
                             {item.code ? (
-                              <code className="u-text-xs u-font-mono u-px-2 u-py-1 u-bg-white-opacity-10 u-rounded-sm ">
+                              <code
+                                className="u-fs-xs u-px-2 u-py-1 u-rounded-sm"
+                                style={{
+                                  fontFamily: "monospace",
+                                  backgroundColor: "rgba(255, 255, 255, 0.1)",
+                                }}
+                              >
                                 {item.value}
                               </code>
                             ) : (
-                              <span className="u-text-sm u-font-medium ">
+                              <span className="u-fs-sm" style={{ fontWeight: 500 }}>
                                 {item.value}
                               </span>
                             )}
                             {item.progress !== undefined && (
-                              <div className="u-w-20 u-h-1 u-bg-white-opacity-10 u-rounded-pill u-overflow-hidden">
+                              <div
+                                style={{
+                                  width: "80px",
+                                  height: "4px",
+                                  backgroundColor: "rgba(255, 255, 255, 0.1)",
+                                  borderRadius: "9999px",
+                                  overflow: "hidden",
+                                }}
+                              >
                                 <div
-                                  className={`u-h-100 u-transition-all ${item.progress > 80 ? "u-bg-error" : item.progress > 60 ? "u-bg-warning" : "u-bg-success"}`}
-                                  style={{ width: `${item.progress}%` }}
+                                  className="u-h-100"
+                                  style={{
+                                    width: `${item.progress}%`,
+                                    transition: "all 0.3s ease",
+                                    backgroundColor:
+                                      item.progress > 80
+                                        ? "var(--color-error, #f44336)"
+                                        : item.progress > 60
+                                          ? "var(--color-warning, #ff9800)"
+                                          : "var(--color-success, #4caf50)",
+                                  }}
                                 />
                               </div>
                             )}
@@ -321,17 +370,39 @@ export const InspectorPanel: React.FC<InspectorPanelProps> = ({
                         selectedNode.connectedNodes.map((nodeId) => (
                           <button
                             key={nodeId}
-                            className="u-flex u-items-center u-gap-3 u-p-3 u-bg-white-opacity-5 u-border u-border-solid u-border-secondary-subtle u-rounded u-transition-all hover:u-bg-white-opacity-10 hover:u-border-primary u-text-start u-w-100"
+                            className="u-flex u-items-center u-gap-3 u-p-3 u-border u-border-solid u-border-secondary-subtle u-rounded u-w-100"
+                            style={{
+                              backgroundColor: "rgba(255, 255, 255, 0.05)",
+                              cursor: "pointer",
+                              textAlign: "start",
+                              transition: "all 0.3s",
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.backgroundColor =
+                                "rgba(255, 255, 255, 0.1)";
+                              e.currentTarget.style.borderColor =
+                                "var(--color-primary, #1976d2)";
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.backgroundColor =
+                                "rgba(255, 255, 255, 0.05)";
+                              e.currentTarget.style.borderColor =
+                                "var(--color-border-subtle, rgba(255, 255, 255, 0.2))";
+                            }}
                             onClick={() => onNavigate?.(nodeId, "node")}
                           >
                             <Icon name="ArrowRight" size={14} className="" />
-                            <span className="u-flex-1 u-text-xs u-font-mono ">
+                            <span
+                              className="u-flex-1 u-fs-xs"
+                              style={{ fontFamily: "monospace" }}
+                            >
                               {nodeId}
                             </span>
                             <Icon
                               name="CaretRight"
                               size={12}
-                              className="u-text-secondary-emphasis u-opacity-50"
+                              className="u-text-secondary-emphasis"
+                              style={{ opacity: 0.5 }}
                             />
                           </button>
                         ))
