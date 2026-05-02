@@ -93,7 +93,7 @@ export default function IncidentsPage() {
     {
       key: "time",
       title: "Reported",
-      render: (val) => <span className="u-text-secondary-subtle u-text-sm">{val}</span>,
+      render: (val) => <span className="u-text-secondary-emphasis u-text-sm">{val}</span>,
     },
     {
       key: "actions",
@@ -107,7 +107,7 @@ export default function IncidentsPage() {
       <div className="u-flex u-justify-between u-items-center u-mb-6">
         <div>
           <h1 className="u-text-2xl u-font-bold u-mb-2">Incident Management</h1>
-          <p className="u-text-secondary-subtle u-text-sm">
+          <p className="u-text-secondary-emphasis u-text-sm">
             Track active outages, dispatch technicians, and document resolutions.
           </p>
         </div>
@@ -124,7 +124,7 @@ export default function IncidentsPage() {
               className="u-bg-dark u-rounded u-border u-border-secondary-subtle u-flex-grow-1 u-flex u-items-center u-justify-center u-relative"
               style={{ minHeight: "300px" }}
             >
-              <span className="u-text-secondary-subtle u-text-sm u-font-mono">
+              <span className="u-text-secondary-emphasis u-text-sm u-font-mono">
                 [ Mapbox GL Canvas ]
               </span>
 
@@ -139,7 +139,7 @@ export default function IncidentsPage() {
                   boxShadow: "0 0 0 4px rgba(220, 53, 69, 0.2)",
                 }}
               >
-                <Icon name="Warning" size="sm" className="u-text-white" />
+                <Icon name="Warning" size="sm" className="" />
               </div>
             </div>
           </Card>

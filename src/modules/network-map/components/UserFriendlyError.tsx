@@ -100,13 +100,13 @@ export function UserFriendlyError({
       </div>
 
       <h2
-        className="u-m-0 u-text-xl u-font-bold u-text-primary u-text-uppercase u-mb-2"
+        className="u-m-0 u-text-xl u-font-bold  u-text-uppercase u-mb-2"
         style={{ letterSpacing: "1px" }}
       >
         {title || errorConfig.title}
       </h2>
 
-      <p className="u-text-sm u-text-secondary-subtle u-mb-8 u-leading-normal">
+      <p className="u-text-sm u-text-secondary-emphasis u-mb-8 u-leading-normal">
         {message || appError?.userMessage || errorConfig.description}
       </p>
 
@@ -150,7 +150,7 @@ export function UserFriendlyError({
 
       {process.env.NODE_ENV === "development" && appError && (
         <details className="u-mt-8 u-text-start u-opacity-60">
-          <summary className="u-text-xs u-font-bold u-text-secondary-subtle u-cursor-pointer">
+          <summary className="u-text-xs u-font-bold u-text-secondary-emphasis u-cursor-pointer">
             Diagnostic Info
           </summary>
           <div className="u-mt-2 u-p-4 u-bg-black-opacity-20 u-rounded u-text-2xs u-font-mono u-text-error u-overflow-auto u-max-h-48">
@@ -224,7 +224,7 @@ export function InlineErrorMessage({
           size="sm"
           onClick={onRetry}
           iconName="ArrowsCounterClockwise"
-          className="u-bg-transparent u-border-0 u-text-primary u-p-0 hover:u-bg-transparent"
+          className="u-bg-transparent u-border-0  u-p-0 hover:u-bg-transparent"
         >
           Retry
         </Button>
@@ -257,10 +257,8 @@ export function ErrorToast({
             <Icon name="WarningCircle" size={20} className="u-text-error" />
           </div>
           <div className="u-flex-1">
-            <h4 className="u-m-0 u-text-sm u-font-bold u-text-primary u-mb-1">
-              Error Detected
-            </h4>
-            <p className="u-m-0 u-text-xs u-text-secondary-subtle">
+            <h4 className="u-m-0 u-text-sm u-font-bold  u-mb-1">Error Detected</h4>
+            <p className="u-m-0 u-text-xs u-text-secondary-emphasis">
               {appError.userMessage}
             </p>
           </div>
@@ -318,7 +316,7 @@ export function RetryWithCountdown({
       <div className="u-relative u-w-16 u-h-16 u-flex u-items-center u-justify-center">
         <svg className="u-absolute u-inset-0 u-w-100 u-h-100" viewBox="0 0 36 36">
           <circle
-            className="u-text-secondary-subtle u-opacity-10"
+            className="u-text-secondary-emphasis u-opacity-10"
             stroke="currentColor"
             strokeWidth="3"
             fill="transparent"
@@ -327,7 +325,7 @@ export function RetryWithCountdown({
             cy="18"
           />
           <circle
-            className="u-text-primary u-transition-all"
+            className=" u-transition-all"
             stroke="currentColor"
             strokeWidth="3"
             strokeDasharray="100"
@@ -340,10 +338,10 @@ export function RetryWithCountdown({
             style={{ transition: "stroke-dashoffset 1s linear" }}
           />
         </svg>
-        <span className="u-text-lg u-font-bold u-text-primary">{secondsLeft}</span>
+        <span className="u-text-lg u-font-bold ">{secondsLeft}</span>
       </div>
       <div className="u-text-center">
-        <p className="u-m-0 u-text-sm u-text-secondary-subtle u-mb-4">
+        <p className="u-m-0 u-text-sm u-text-secondary-emphasis u-mb-4">
           Retrying connection in {secondsLeft} seconds...
         </p>
         <Button variant="secondary" onClick={onRetry} iconName="ArrowsCounterClockwise">

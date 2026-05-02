@@ -75,7 +75,7 @@ export default function DashboardPage() {
       <div className="u-flex u-justify-between u-items-center u-mb-6">
         <div>
           <h1 className="u-text-2xl u-font-bold u-mb-2">Network Dashboard</h1>
-          <p className="u-text-secondary-subtle u-text-sm">
+          <p className="u-text-secondary-emphasis u-text-sm">
             Overview of network health, active incidents, and operational metrics.
           </p>
         </div>
@@ -88,10 +88,10 @@ export default function DashboardPage() {
         <GridCol xs={12} sm={6} lg={3}>
           <Card className="u-h-100" appearance="ghost" glass>
             <div className="u-flex u-justify-between u-items-center u-mb-4">
-              <span className="u-text-secondary-subtle u-text-sm u-font-bold">
+              <span className="u-text-secondary-emphasis u-text-sm u-font-bold">
                 Total Customers
               </span>
-              <Icon name="Users" className="u-text-primary-emphasis" />
+              <Icon name="Users" className="-emphasis" />
             </div>
             <div className="u-text-2xl u-font-bold">12,492</div>
             <div className="u-text-xs u-text-success u-mt-2">+124 this month</div>
@@ -101,7 +101,7 @@ export default function DashboardPage() {
         <GridCol xs={12} sm={6} lg={3}>
           <Card className="u-h-100" appearance="ghost" glass>
             <div className="u-flex u-justify-between u-items-center u-mb-4">
-              <span className="u-text-secondary-subtle u-text-sm u-font-bold">
+              <span className="u-text-secondary-emphasis u-text-sm u-font-bold">
                 Active Incidents
               </span>
               <Icon name="Warning" className="u-text-error" />
@@ -114,13 +114,13 @@ export default function DashboardPage() {
         <GridCol xs={12} sm={6} lg={3}>
           <Card className="u-h-100" appearance="ghost" glass>
             <div className="u-flex u-justify-between u-items-center u-mb-4">
-              <span className="u-text-secondary-subtle u-text-sm u-font-bold">
+              <span className="u-text-secondary-emphasis u-text-sm u-font-bold">
                 Avg. Signal Health
               </span>
               <Icon name="Pulse" className="u-text-success" />
             </div>
             <div className="u-text-2xl u-font-bold">94%</div>
-            <div className="u-text-xs u-text-secondary-subtle u-mt-2">
+            <div className="u-text-xs u-text-secondary-emphasis u-mt-2">
               Stable across all nodes
             </div>
           </Card>
@@ -129,7 +129,7 @@ export default function DashboardPage() {
         <GridCol xs={12} sm={6} lg={3}>
           <Card className="u-h-100" glass appearance="ghost">
             <div className="u-flex u-justify-between u-items-center u-mb-4">
-              <span className="u-text-secondary-subtle u-text-sm u-font-bold">
+              <span className="u-text-secondary-emphasis u-text-sm u-font-bold">
                 Open Work Orders
               </span>
               <Icon name="Clipboard" className="u-text-warning-emphasis" />
@@ -178,7 +178,7 @@ export default function DashboardPage() {
                 icon={<Icon name="Warning" />}
               >
                 <div className="u-flex u-justify-between u-items-center u-mb-1">
-                  <span className="u-text-xs u-text-secondary-subtle">10m ago</span>
+                  <span className="u-text-xs u-text-secondary-emphasis">10m ago</span>
                 </div>
                 <p className="u-text-sm u-mb-0">
                   Loss of signal reported on splitters 01-08 affecting 64 customers.
@@ -191,7 +191,7 @@ export default function DashboardPage() {
                 icon={<Icon name="CellSignalHigh" />}
               >
                 <div className="u-flex u-justify-between u-items-center u-mb-1">
-                  <span className="u-text-xs u-text-secondary-subtle">2h ago</span>
+                  <span className="u-text-xs u-text-secondary-emphasis">2h ago</span>
                 </div>
                 <p className="u-text-sm u-mb-0">
                   Node Gamma showing abnormal signal drop on downstream.

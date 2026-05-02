@@ -58,20 +58,23 @@ export const NetworkNode: React.FC<NetworkNodeProps> = ({
         {/* Node Indicator */}
         <div
           className={`u-w-8 u-h-8 u-rounded-circle u-border u-border-solid u-flex u-items-center u-justify-center u-shadow-md u-transition-all ${
-            selected ? "u-border-primary u-border-2" : hovered ? "u-border-white" : "u-border-white-opacity-20"
+            selected
+              ? "u-border-primary u-border-2"
+              : hovered
+                ? "u-border-white"
+                : "u-border-white-opacity-20"
           }`}
           style={{
             backgroundColor: statusColor,
-            boxShadow: selected ? `0 0 15px ${statusColor}` : hovered ? `0 0 10px ${statusColor}80` : 'none',
-            transform: hovered || selected ? 'scale(1.1)' : 'scale(1)'
+            boxShadow: selected
+              ? `0 0 15px ${statusColor}`
+              : hovered
+                ? `0 0 10px ${statusColor}80`
+                : "none",
+            transform: hovered || selected ? "scale(1.1)" : "scale(1)",
           }}
         >
-          <Icon
-            name={iconName as any}
-            size={16}
-            className="u-text-white"
-            aria-hidden="true"
-          />
+          <Icon name={iconName as any} size={16} className="" aria-hidden="true" />
         </div>
 
         {/* Utilization Ring */}
@@ -80,9 +83,9 @@ export const NetworkNode: React.FC<NetworkNodeProps> = ({
             className="u-absolute u-inset-n1 u-rounded-circle u-border u-border-solid u-animate-spin"
             style={{
               borderColor: statusColor,
-              borderLeftColor: 'transparent',
+              borderLeftColor: "transparent",
               opacity: 0.5,
-              animationDuration: '3s'
+              animationDuration: "3s",
             }}
           />
         )}

@@ -41,7 +41,7 @@ export function OfflineIndicator({ className = "" }: OfflineIndicatorProps) {
     >
       <div
         className={`u-px-6 u-py-3 u-text-center u-text-sm u-font-bold u-flex u-items-center u-justify-center u-gap-3 u-shadow-md ${
-          isOffline ? "u-bg-error u-text-white" : "u-bg-success u-text-white"
+          isOffline ? "u-bg-error " : "u-bg-success "
         }`}
       >
         <Icon

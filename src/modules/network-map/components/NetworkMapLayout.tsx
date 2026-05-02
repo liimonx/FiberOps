@@ -29,7 +29,7 @@ export const NetworkMapLayout: React.FC<NetworkMapLayoutProps> = ({
       {/* Skip link for keyboard users */}
       <a
         href="#map-main-content"
-        className="u-absolute u-z-modal u-bg-primary u-text-white u-px-4 u-py-2 u-text-sm u-font-bold u-rounded-bottom u-transition-all"
+        className="u-absolute u-z-modal u-bg-primary  u-px-4 u-py-2 u-text-sm u-font-bold u-rounded-bottom u-transition-all"
         style={{ top: "-100px", left: "20px" }}
       >
         Skip to map content

@@ -146,7 +146,7 @@ export const InteractiveTooltip: React.FC<InteractiveTooltipProps> = ({
         <div className="u-flex u-items-start u-gap-3 u-p-4 u-border-bottom u-border-secondary-subtle">
           <div className="u-flex-shrink-0">
             <div
-              className="u-w-10 u-h-10 u-rounded-circle u-flex u-items-center u-justify-center u-text-white u-shadow-sm"
+              className="u-w-10 u-h-10 u-rounded-circle u-flex u-items-center u-justify-center  u-shadow-sm"
               style={{ backgroundColor: NETWORK_STATUS_COLORS[content.status] }}
             >
               <Icon name={(node ? getNodeIcon() : "GitBranch") as any} size={20} />
@@ -154,16 +154,16 @@ export const InteractiveTooltip: React.FC<InteractiveTooltipProps> = ({
           </div>
 
           <div className="u-flex-1 u-min-w-0">
-            <h4 className="u-m-0 u-text-sm u-font-bold u-text-primary u-text-truncate">
+            <h4 className="u-m-0 u-text-sm u-font-bold  u-text-truncate">
               {content.title}
             </h4>
             {content.subtitle && (
-              <span className="u-block u-text-xs u-text-secondary-subtle u-mt-1">
+              <span className="u-block u-text-xs u-text-secondary-emphasis u-mt-1">
                 {content.subtitle}
               </span>
             )}
             {node && (
-              <span className="u-block u-text-xs u-text-secondary-subtle u-opacity-70 u-text-capitalize">
+              <span className="u-block u-text-xs u-text-secondary-emphasis u-opacity-70 u-text-capitalize">
                 {getNodeTypeLabel()}
               </span>
             )}
@@ -196,16 +196,16 @@ export const InteractiveTooltip: React.FC<InteractiveTooltipProps> = ({
                 <Icon
                   name={detail.icon as any}
                   size={14}
-                  className="u-text-secondary-subtle u-opacity-50"
+                  className="u-text-secondary-emphasis u-opacity-50"
                 />
               )}
               <span
-                className="u-text-secondary-subtle u-font-bold u-text-uppercase"
+                className="u-text-secondary-emphasis u-font-bold u-text-uppercase"
                 style={{ fontSize: "10px" }}
               >
                 {detail.label}:
               </span>
-              <span className="u-ms-auto u-font-bold u-text-primary">{detail.value}</span>
+              <span className="u-ms-auto u-font-bold ">{detail.value}</span>
             </div>
           ))}
         </div>
@@ -214,7 +214,7 @@ export const InteractiveTooltip: React.FC<InteractiveTooltipProps> = ({
         {content.metadata && Object.keys(content.metadata).length > 0 && (
           <div className="u-border-top u-border-secondary-subtle">
             <button
-              className="u-w-100 u-flex u-items-center u-justify-between u-px-4 u-py-2 u-bg-transparent u-border-0 u-text-secondary-subtle u-text-xs u-font-bold u-text-uppercase u-cursor-pointer hover:u-text-primary u-transition-all"
+              className="u-w-100 u-flex u-items-center u-justify-between u-px-4 u-py-2 u-bg-transparent u-border-0 u-text-secondary-emphasis u-text-xs u-font-bold u-text-uppercase u-cursor-pointer hover: u-transition-all"
               onClick={() => setIsExpanded(!isExpanded)}
             >
               <span>More Info</span>
@@ -225,8 +225,8 @@ export const InteractiveTooltip: React.FC<InteractiveTooltipProps> = ({
               <div className="u-px-4 u-pb-3 u-flex u-flex-column u-gap-1">
                 {Object.entries(content.metadata).map(([key, value]) => (
                   <div key={key} className="u-flex u-justify-between u-gap-2 u-text-xs">
-                    <span className="u-text-secondary-subtle u-opacity-60">{key}:</span>
-                    <span className="u-font-mono u-text-primary u-opacity-80 u-text-truncate u-max-w-60">
+                    <span className="u-text-secondary-emphasis u-opacity-60">{key}:</span>
+                    <span className="u-font-mono  u-opacity-80 u-text-truncate u-max-w-60">
                       {typeof value === "object" ? JSON.stringify(value) : String(value)}
                     </span>
                   </div>
@@ -285,12 +285,12 @@ export const SimpleTooltip: React.FC<{
       >
         <div className="u-flex u-flex-column u-gap-1">
           <strong
-            className="u-text-xs u-font-bold u-text-primary u-text-uppercase"
+            className="u-text-xs u-font-bold  u-text-uppercase"
             style={{ letterSpacing: "0.5px" }}
           >
             {title}
           </strong>
-          <div className="u-text-xs u-text-secondary-subtle u-leading-normal">
+          <div className="u-text-xs u-text-secondary-emphasis u-leading-normal">
             {content}
           </div>
         </div>

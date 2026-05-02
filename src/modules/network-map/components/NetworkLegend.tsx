@@ -83,10 +83,8 @@ export const NetworkLegend: React.FC<NetworkLegendProps> = ({
       <div
         className={`u-flex u-items-center u-gap-2 u-mb-3 u-pb-2 u-border-bottom u-border-secondary-subtle u-opacity-80 ${compact ? "u-mb-2 u-pb-1" : "u-mb-3 u-pb-2"}`}
       >
-        <Icon name="List" size={compact ? 16 : 18} className="u-text-primary" />
-        <h3
-          className={`u-m-0 u-font-bold u-text-primary ${compact ? "u-text-xs" : "u-text-sm"}`}
-        >
+        <Icon name="List" size={compact ? 16 : 18} className="" />
+        <h3 className={`u-m-0 u-font-bold  ${compact ? "u-text-xs" : "u-text-sm"}`}>
           Status Legend
         </h3>
       </div>
@@ -112,7 +110,7 @@ export const NetworkLegend: React.FC<NetworkLegendProps> = ({
             <div className="u-flex u-flex-column u-flex-1 u-min-w-0">
               <div className="u-flex u-items-center u-justify-between u-gap-2">
                 <span
-                  className={`u-font-bold u-text-primary u-text-truncate ${compact ? "u-text-xs" : "u-text-sm"}`}
+                  className={`u-font-bold  u-text-truncate ${compact ? "u-text-xs" : "u-text-sm"}`}
                 >
                   {item.label}
                 </span>
@@ -125,7 +123,7 @@ export const NetworkLegend: React.FC<NetworkLegendProps> = ({
               </div>
 
               {showCounts && (
-                <span className="u-text-xs u-text-secondary-subtle u-opacity-60 u-mt-1">
+                <span className="u-text-xs u-text-secondary-emphasis u-opacity-60 u-mt-1">
                   {getCountText(item.status)}
                 </span>
               )}

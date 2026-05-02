@@ -122,11 +122,13 @@ export default function WorkOrdersPage() {
       >
         <div className="u-flex u-justify-between u-items-start u-mb-2">
           <Badge variant={badgeVariant} label={task.priority} />
-          <Icon name="DotsThree" className="u-text-secondary-subtle" />
+          <Icon name="DotsThree" className="u-text-secondary-emphasis" />
         </div>
         <h4 className="u-text-base u-font-bold u-mb-1">{task.title}</h4>
         <div className="u-flex u-justify-between u-items-center u-mt-4">
-          <span className="u-font-mono u-text-xs u-text-secondary-subtle">{task.id}</span>
+          <span className="u-font-mono u-text-xs u-text-secondary-emphasis">
+            {task.id}
+          </span>
           <Avatar initials={task.type} size="sm" />
         </div>
       </Card>
@@ -138,7 +140,7 @@ export default function WorkOrdersPage() {
       <div className="u-flex u-justify-between u-items-center u-mb-6">
         <div>
           <h1 className="u-text-2xl u-font-bold u-mb-2">Work Orders</h1>
-          <p className="u-text-secondary-subtle u-text-sm">
+          <p className="u-text-secondary-emphasis u-text-sm">
             Drag-and-drop Kanban board for managing field operations.
           </p>
         </div>
@@ -177,7 +179,7 @@ export default function WorkOrdersPage() {
                 style={{ minHeight: "400px" }}
               >
                 {tasks.length === 0 ? (
-                  <div className="u-text-center u-py-8 u-text-secondary-subtle u-text-sm">
+                  <div className="u-text-center u-py-8 u-text-secondary-emphasis u-text-sm">
                     Drop tasks here
                   </div>
                 ) : (

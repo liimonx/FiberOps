@@ -77,7 +77,7 @@ export const StatusIndicator: React.FC<StatusIndicatorProps> = ({
       </div>
 
       {showLabel && (
-        <span className={`u-font-bold u-text-primary u-text-capitalize ${sizes.text}`}>
+        <span className={`u-font-bold  u-text-capitalize ${sizes.text}`}>
           {displayLabel}
         </span>
       )}

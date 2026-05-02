@@ -106,7 +106,7 @@ export const MobileLayout: React.FC<MobileLayoutProps> = ({
             role="tab"
             aria-selected={activeSheet === item.id}
             className={`u-flex u-flex-column u-items-center u-gap-1 u-p-2 u-border-0 u-bg-transparent u-transition-all u-flex-1 u-max-w-20 ${
-              activeSheet === item.id ? "u-text-primary" : "u-text-secondary-subtle"
+              activeSheet === item.id ? "" : "u-text-secondary-emphasis"
             } ${item.disabled ? "u-opacity-40 u-cursor-not-allowed" : "u-cursor-pointer"}`}
             onClick={() => !item.disabled && toggleSheet(item.id as BottomSheetType)}
             disabled={item.disabled}
@@ -152,7 +152,7 @@ export const MobileLayout: React.FC<MobileLayoutProps> = ({
             {/* Header */}
             <div className="u-flex u-justify-between u-items-center u-px-4 u-pb-4 u-border-bottom u-border-secondary-subtle">
               <h3
-                className="u-m-0 u-text-base u-font-bold u-text-primary u-text-uppercase"
+                className="u-m-0 u-text-base u-font-bold  u-text-uppercase"
                 style={{ letterSpacing: "1px" }}
               >
                 {activeSheet === "search" && "Search Assets"}

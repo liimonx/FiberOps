@@ -1,0 +1,11 @@
+.voltage {
+    @apply absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 overflow-visible;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.voltageScribbles {
+    @apply absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 overflow-visible;
+    pointer-events: none;
+    will-change: transform;
+}

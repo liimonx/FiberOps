@@ -1,0 +1,153 @@
+.shiny {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    overflow: hidden;
+    isolation: isolate;
+    will-change: transform;
+
+    @media (max-width: 619px) {
+        right: 10px;
+    }
+
+    @media (max-width: 619px) {
+        &::before {
+            content: '';
+            position: absolute;
+            top: 0px;
+            right: 0px;
+            bottom: 0px;
+            left: 0px;
+            z-index: 1;
+            border-radius: 6px;
+            pointer-events: none;
+
+            background: linear-gradient(90deg, rgba(65, 255, 252, 0.18) 0%, rgba(216, 255, 62, 0.18) 100%);
+
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask-composite: xor;
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            padding: 1px;
+
+            transform: translateZ(0);
+            backface-visibility: hidden;
+        }
+    }
+}
+
+.shinBorder {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    will-change: transform;
+    z-index: 2;
+
+    --gradient-percent: 5%;
+
+    --gradient-angle-top: -37deg;
+    --gradient-angle-bottom: 145deg;
+    --gradient-top-translate: 100%;
+    --gradient-bottom-translate: 100%;
+
+    &::before,
+    &::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+    }
+
+    &::before {
+        background: conic-gradient(
+            from var(--gradient-angle-top, 0deg),
+            transparent,
+            #3afcff var(--gradient-percent, 5%),
+            #ffffff calc(var(--gradient-percent, 5%) * 2),
+            #3afcff calc(var(--gradient-percent, 5%) * 3),
+            transparent calc(var(--gradient-percent, 5%) * 4)
+        );
+        transform: translateX(var(--gradient-top-translate, 0));
+    }
+
+    &::after {
+        background: conic-gradient(
+            from var(--gradient-angle-bottom, 0deg),
+            transparent,
+            #3afcff var(--gradient-percent, 5%),
+            #ffffff calc(var(--gradient-percent, 5%) * 2),
+            #3afcff calc(var(--gradient-percent, 5%) * 3),
+            transparent calc(var(--gradient-percent, 5%) * 4)
+        );
+        transform: translateX(var(--gradient-bottom-translate, 0));
+    }
+
+    @media (max-width: 619px) {
+        display: none;
+    }
+}
+
+.shinMainBg {
+    position: absolute;
+    inset: 1px 0 1px 0;
+    background: linear-gradient(90deg, #0a2723 0%, #293015 100%);
+    z-index: 3;
+    will-change: transform;
+    opacity: 0;
+    // transform: scaleX(0);
+
+    @media (max-width: 619px) {
+        inset: 1px;
+        border-radius: 6px;
+        background: linear-gradient(
+            98.03deg,
+            rgba(65, 255, 252, 0.1) 0%,
+            rgba(65, 255, 174, 0.1) 51.92%,
+            rgba(255, 233, 62, 0.1) 100%
+        );
+    }
+}
+
+.shinInnerGlowTop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    pointer-events: none;
+    z-index: 0;
+    background: linear-gradient(90deg, #3afcff 0%, #1fffc0 49.04%, #afff1f 100%);
+    // filter: blur(2px);
+    opacity: 0.5;
+    will-change: transform;
+    transform: translateX(-100%);
+
+    @media (max-width: 619px) {
+        display: none;
+    }
+}
+
+.shinInnerGlowBottom {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    pointer-events: none;
+    z-index: 0;
+    border-radius: 0 0 4px 4px;
+    opacity: 0.5;
+    background: linear-gradient(90deg, #3afcff 0%, #1fffc0 49.04%, #afff1f 100%);
+    // filter: blur(2px);
+    will-change: transform;
+    transform: translateX(100%);
+
+    @media (max-width: 619px) {
+        display: none;
+    }
+}

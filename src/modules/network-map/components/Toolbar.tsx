@@ -124,8 +124,8 @@ export const Toolbar: React.FC<ToolbarProps> = ({
               key={tool.id}
               content={
                 <div className="u-flex u-flex-column u-gap-1 u-p-1">
-                  <strong className="u-text-sm u-text-primary">{tool.label}</strong>
-                  <span className="u-text-xs u-text-secondary-subtle">
+                  <strong className="u-text-sm ">{tool.label}</strong>
+                  <span className="u-text-xs u-text-secondary-emphasis">
                     {tool.description}
                   </span>
                   {tool.shortcut && (
@@ -186,13 +186,11 @@ export const MobileToolbar: React.FC<{
               aria-label="Open tools menu"
               className="u-shadow-lg"
             />
-            <span className="u-text-sm u-font-bold u-text-primary">
-              {activeToolConfig.label}
-            </span>
+            <span className="u-text-sm u-font-bold ">{activeToolConfig.label}</span>
             <Icon
               name="CaretDown"
               size={12}
-              className="u-text-secondary-subtle u-opacity-50"
+              className="u-text-secondary-emphasis u-opacity-50"
             />
           </div>
         ) : (
@@ -203,8 +201,8 @@ export const MobileToolbar: React.FC<{
                   key={tool.id}
                   className={`u-flex u-items-center u-gap-3 u-p-3 u-rounded u-transition-all u-border-0 u-w-100 u-text-start ${
                     activeTool === tool.id
-                      ? "u-bg-primary u-text-white u-shadow-md"
-                      : "u-bg-transparent u-text-secondary-subtle"
+                      ? "u-bg-primary  u-shadow-md"
+                      : "u-bg-transparent u-text-secondary-emphasis"
                   }`}
                   onClick={() => {
                     setActiveTool(tool.id);

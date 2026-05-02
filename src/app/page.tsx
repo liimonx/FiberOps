@@ -82,7 +82,7 @@ export default function Home() {
           <Card appearance="ghost" glass={true} className="u-h-100">
             <div className="u-flex u-items-center u-gap-3 u-mb-3">
               <div className="u-bg-primary-subtle u-rounded u-p-2">
-                <Icon name="Users" className="u-text-primary" size="lg" />
+                <Icon name="Users" className="" size="lg" />
               </div>
               <div>
                 <div className="u-text-xs u-text-secondary-emphasis">Total Customers</div>

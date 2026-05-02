@@ -25,9 +25,9 @@ export function MeasurementOverlay({ onClose }: MeasurementOverlayProps) {
         <div className="u-flex u-justify-between u-items-center u-mb-4">
           <div className="u-flex u-items-center u-gap-3">
             <div className="u-w-8 u-h-8 u-rounded u-bg-primary-subtle u-flex u-items-center u-justify-center">
-              <Icon name="Ruler" size={18} className="u-text-primary" />
+              <Icon name="Ruler" size={18} className="" />
             </div>
-            <h3 className="u-font-bold u-text-sm u-text-primary">Measurement Tool</h3>
+            <h3 className="u-font-bold u-text-sm ">Measurement Tool</h3>
           </div>
           <div className="u-flex u-gap-2">
             <Button
@@ -52,12 +52,10 @@ export function MeasurementOverlay({ onClose }: MeasurementOverlayProps) {
 
         <div className="u-bg-primary-subtle u-rounded u-p-3 u-mb-4 u-border u-border-solid u-border-primary-subtle">
           <div className="u-flex u-justify-between u-items-center">
-            <span className="u-text-secondary-subtle u-text-xs u-font-bold u-text-uppercase">
+            <span className="u-text-secondary-emphasis u-text-xs u-font-bold u-text-uppercase">
               Total Distance
             </span>
-            <span className="u-font-bold u-text-lg u-text-primary">
-              {formattedDistance}
-            </span>
+            <span className="u-font-bold u-text-lg ">{formattedDistance}</span>
           </div>
         </div>
 
@@ -65,13 +63,13 @@ export function MeasurementOverlay({ onClose }: MeasurementOverlayProps) {
           <table className="u-w-100 u-text-xs">
             <thead className="u-border-bottom u-border-secondary-subtle">
               <tr>
-                <th className="u-text-start u-py-2 u-text-secondary-subtle u-font-bold">
+                <th className="u-text-start u-py-2 u-text-secondary-emphasis u-font-bold">
                   #
                 </th>
-                <th className="u-text-start u-py-2 u-text-secondary-subtle u-font-bold">
+                <th className="u-text-start u-py-2 u-text-secondary-emphasis u-font-bold">
                   Coordinates
                 </th>
-                <th className="u-text-end u-py-2 u-text-secondary-subtle u-font-bold">
+                <th className="u-text-end u-py-2 u-text-secondary-emphasis u-font-bold">
                   Segment
                 </th>
               </tr>
@@ -82,7 +80,7 @@ export function MeasurementOverlay({ onClose }: MeasurementOverlayProps) {
                   key={point.id}
                   className="u-border-bottom u-border-secondary-subtle u-opacity-80"
                 >
-                  <td className="u-py-2 u-font-bold u-text-primary">{index + 1}</td>
+                  <td className="u-py-2 u-font-bold ">{index + 1}</td>
                   <td className="u-py-2 u-font-mono u-opacity-70">
                     {point.position.lat.toFixed(5)}, {point.position.lng.toFixed(5)}
                   </td>
@@ -96,7 +94,7 @@ export function MeasurementOverlay({ onClose }: MeasurementOverlayProps) {
         </div>
 
         <div className="u-p-3 u-rounded u-bg-white-opacity-5 u-border u-border-solid u-border-secondary-subtle">
-          <p className="u-m-0 u-text-xs u-text-secondary-subtle u-leading-normal">
+          <p className="u-m-0 u-text-xs u-text-secondary-emphasis u-leading-normal">
             Click on map to add points. Press{" "}
             <kbd className="u-bg-white-opacity-10 u-px-1 u-rounded-sm">Esc</kbd> to remove
             last point.
@@ -157,7 +155,7 @@ export function TracePathOverlay({ onClose }: { onClose?: () => void }) {
               className={`u-flex-1 u-p-2 u-rounded u-bg-${stat.color}-subtle u-text-center u-border u-border-solid u-border-${stat.color}-subtle`}
             >
               <div
-                className="u-text-xs u-text-secondary-subtle u-font-bold u-text-uppercase u-mb-1"
+                className="u-text-xs u-text-secondary-emphasis u-font-bold u-text-uppercase u-mb-1"
                 style={{ fontSize: "10px" }}
               >
                 {stat.label}
@@ -170,7 +168,7 @@ export function TracePathOverlay({ onClose }: { onClose?: () => void }) {
         </div>
 
         <div className="u-overflow-y-auto" style={{ maxHeight: "150px" }}>
-          <div className="u-text-xs u-font-bold u-text-secondary-subtle u-text-uppercase u-mb-2 u-ms-1">
+          <div className="u-text-xs u-font-bold u-text-secondary-emphasis u-text-uppercase u-mb-2 u-ms-1">
             Route Path
           </div>
           <div className="u-flex u-flex-column u-gap-2">
@@ -188,10 +186,10 @@ export function TracePathOverlay({ onClose }: { onClose?: () => void }) {
                         : "u-bg-primary"
                   }`}
                 />
-                <span className="u-text-xs u-font-medium u-text-primary u-text-truncate">
+                <span className="u-text-xs u-font-medium  u-text-truncate">
                   {node.name}
                 </span>
-                <span className="u-text-xs u-text-secondary-subtle u-opacity-60">
+                <span className="u-text-xs u-text-secondary-emphasis u-opacity-60">
                   ({node.type})
                 </span>
               </div>
@@ -224,7 +222,7 @@ export function HeatmapLegend({ onClose }: { onClose?: () => void }) {
         <div className="u-flex u-justify-between u-items-center u-mb-4">
           <div className="u-flex u-items-center u-gap-2">
             <Icon name="Fire" size={18} className="u-text-error" />
-            <h4 className="u-font-bold u-text-sm u-text-primary">Heatmap Analysis</h4>
+            <h4 className="u-font-bold u-text-sm ">Heatmap Analysis</h4>
           </div>
           <Button
             variant="secondary"
@@ -245,14 +243,14 @@ export function HeatmapLegend({ onClose }: { onClose?: () => void }) {
                   .join(", ")})`,
               }}
             />
-            <div className="u-flex u-justify-between u-text-xs u-text-secondary-subtle u-font-medium">
+            <div className="u-flex u-justify-between u-text-xs u-text-secondary-emphasis u-font-medium">
               <span>Low Density</span>
               <span>High</span>
             </div>
           </div>
 
           <div className="u-flex u-flex-column u-gap-1 u-mt-2">
-            <span className="u-text-xs u-font-bold u-text-secondary-subtle u-text-uppercase u-mb-1">
+            <span className="u-text-xs u-font-bold u-text-secondary-emphasis u-text-uppercase u-mb-1">
               Analyze By
             </span>
             <div className="u-flex u-gap-1">

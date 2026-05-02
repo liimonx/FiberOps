@@ -1,13 +1,14 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
-import { Icon, Card } from "@shohojdhara/atomix";
+import React, { useRef } from "react";
+import { Icon, Card, Badge } from "@shohojdhara/atomix";
 import { NetworkNode, NetworkStatus } from "../types";
 import {
   getStatusColor,
   statusLabels,
   nodeTypeIcons,
   getNodeMarkerStyle,
+  statusIcons,
 } from "../utils/statusColors";
 
 interface EnhancedNetworkNodeProps {
@@ -21,6 +22,9 @@ interface EnhancedNetworkNodeProps {
   className?: string;
 }
 
+/**
+ * Enhanced Network Node component refactored for Atomix Design System.
+ */
 export function EnhancedNetworkNode({
   node,
   isSelected = false,
@@ -34,7 +38,6 @@ export function EnhancedNetworkNode({
   const nodeRef = useRef<HTMLDivElement>(null);
   const colors = getStatusColor(node.status);
   const icon = nodeTypeIcons[node.type] || "Circle";
-
   const markerStyle = getNodeMarkerStyle(node.status, size);
 
   return (
@@ -51,19 +54,17 @@ export function EnhancedNetworkNode({
       tabIndex={0}
       aria-label={`${node.name} - ${statusLabels[node.status]}`}
     >
-      {/* Glow effect */}
+      {/* Glow effect - centered using absolute positioning utilities */}
       {(isSelected || isHovered) && (
         <div
-          className="u-absolute u-rounded-circle u-backdrop-blur-sm"
+          className="u-absolute u-rounded-circle u-backdrop-blur-sm u-start-50 u-top-50 u-transform-center"
           style={{
-            width: `${size * 2}px`,
-            height: `${size * 2}px`,
-            left: "50%",
-            top: "50%",
-            transform: "translate(-50%, -50%)",
+            zIndex: 1,
+            width: `${size * 2.5}px`,
+            height: `${size * 2.5}px`,
             backgroundColor: colors.glow || "transparent",
-            opacity: isSelected ? 0.3 : 0.2,
-            filter: "blur(8px)",
+            opacity: isSelected ? 0.35 : 0.25,
+            filter: "blur(12px)",
           }}
         />
       )}
@@ -73,44 +74,41 @@ export function EnhancedNetworkNode({
         className="u-relative u-flex u-items-center u-justify-center u-rounded-circle u-transition-all u-shadow-md"
         style={{
           ...markerStyle,
+          zIndex: 2,
           width: `${size}px`,
           height: `${size}px`,
-          transform: isHovered ? "scale(1.2)" : "scale(1)",
+          transform: isHovered ? "scale(1.15)" : "scale(1)",
         }}
       >
-        {/* Status indicator ring */}
+        {/* Status indicator ring for alerts */}
         {node.status !== NetworkStatus.ACTIVE && (
           <div
             className="u-absolute u-inset-0 u-rounded-circle u-border u-border-solid u-animate-pulse"
             style={{
               borderColor: colors.primary,
-              borderWidth: "2px",
+              borderWidth: "1.5px",
             }}
           />
         )}
 
-        {/* Icon */}
-        {size >= 16 && (
-          <Icon
-            name={icon as any}
-            size={Math.max(size * 0.5, 10)}
-            className="u-text-white"
-          />
-        )}
+        {/* Icon (Phosphor via Atomix) */}
+        {size >= 16 && <Icon name={icon as any} size={Math.max(size * 0.55, 10)} />}
       </div>
 
-      {/* Label */}
+      {/* Label - Using Atomix Card with Glass UI */}
       {showLabel && (isHovered || isSelected) && (
-        <div
-          className="u-absolute u-start-50 u-transform-center-x u-mt-2 u-px-3 u-py-1 u-rounded u-bg-dark u-text-white u-text-2xs u-font-bold u-text-uppercase u-shadow-xl u-z-modal"
-          style={{
-            top: `${size}px`,
-            letterSpacing: "1px",
-            whiteSpace: "nowrap",
-          }}
+        <Card
+          glass={true}
+          className="u-absolute u-start-50 u-transform-center-x u-mt-2 u-px-2 u-py-0.5 u-z-modal"
+          style={{ top: `${size}px` }}
         >
-          {node.name}
-        </div>
+          <span
+            className="u-text-2xs u-font-bold u-text-uppercase u-leading-none u-text-nowrap"
+            style={{ letterSpacing: "1px" }}
+          >
+            {node.name}
+          </span>
+        </Card>
       )}
     </div>
   );
@@ -146,7 +144,7 @@ export function EnhancedConnectionLine({
   const lineWidth =
     isHovered || isSelected ? 4 : utilization ? 2 + (utilization / 100) * 2 : 2;
   const opacity =
-    isHovered || isSelected ? 1 : status === NetworkStatus.INACTIVE ? 0.4 : 0.8;
+    isHovered || isSelected ? 1 : status === NetworkStatus.INACTIVE ? 0.3 : 0.8;
 
   return (
     <g
@@ -158,13 +156,14 @@ export function EnhancedConnectionLine({
       tabIndex={0}
       aria-label={`Connection - ${status}`}
     >
+      {/* Invisible hit area for easier interaction */}
       <line
         x1={source.x}
         y1={source.y}
         x2={target.x}
         y2={target.y}
         stroke="transparent"
-        strokeWidth={lineWidth + 10}
+        strokeWidth={lineWidth + 12}
         fill="none"
       />
 
@@ -180,15 +179,15 @@ export function EnhancedConnectionLine({
         strokeLinecap="round"
         strokeDasharray={
           status === NetworkStatus.INACTIVE
-            ? "5,5"
+            ? "4,4"
             : animated && status === NetworkStatus.ACTIVE
-              ? "10,5"
+              ? "8,4"
               : "none"
         }
         className="u-transition-all"
         style={{
           filter:
-            isHovered || isSelected ? `drop-shadow(0 0 4px ${colors.glow})` : "none",
+            isHovered || isSelected ? `drop-shadow(0 0 6px ${colors.glow})` : "none",
         }}
       />
 
@@ -197,8 +196,12 @@ export function EnhancedConnectionLine({
         <circle
           cx={(source.x + target.x) / 2}
           cy={(source.y + target.y) / 2}
-          r={4}
-          fill={utilization > 90 ? "var(--color-error)" : "var(--color-warning)"}
+          r={3.5}
+          fill={
+            utilization > 90
+              ? "var(--color-error, #EF4444)"
+              : "var(--color-warning, #F59E0B)"
+          }
           className="u-animate-pulse"
         />
       )}
@@ -206,7 +209,9 @@ export function EnhancedConnectionLine({
   );
 }
 
-// Status badge component
+/**
+ * Animated Status Badge component refactored to use Atomix Badge.
+ */
 export function AnimatedStatusBadge({
   status,
   size = "md",
@@ -222,49 +227,38 @@ export function AnimatedStatusBadge({
 }) {
   const colors = getStatusColor(status);
 
-  const sizeMap = {
-    sm: { icon: 12, font: "u-text-2xs", p: "u-px-2 u-py-0.5" },
-    md: { icon: 16, font: "u-text-xs", p: "u-px-3 u-py-1" },
-    lg: { icon: 20, font: "u-text-sm", p: "u-px-4 u-py-1.5" },
-  };
-
-  const config = sizeMap[size];
+  // Map network status to Atomix semantic variants
+  const variantMap: Record<NetworkStatus, "success" | "warning" | "error" | "secondary"> =
+    {
+      [NetworkStatus.ACTIVE]: "success",
+      [NetworkStatus.WARNING]: "warning",
+      [NetworkStatus.ERROR]: "error",
+      [NetworkStatus.INACTIVE]: "secondary",
+    };
 
   return (
-    <div
-      className={`u-inline-flex u-items-center u-gap-2 u-rounded-pill u-border u-border-solid ${config.p} ${className}`}
-      style={{
-        backgroundColor: colors.background,
-        borderColor: colors.border,
-        color: colors.primary,
-      }}
-    >
-      <div className="u-relative u-flex u-items-center u-justify-center">
-        <Icon
-          name={
-            (status === "active"
-              ? "CheckCircle"
-              : status === "error"
-                ? "XCircle"
-                : "Warning") as any
-          }
-          size={config.icon}
-        />
-        {animated && status !== NetworkStatus.INACTIVE && (
-          <div
-            className="u-absolute u-top-n1 u-end-n1 u-w-2 u-h-2 u-rounded-circle u-animate-pulse"
-            style={{ backgroundColor: colors.primary }}
+    <div className="u-inline-flex u-relative">
+      <Badge
+        label={showLabel ? statusLabels[status] : ""}
+        variant={variantMap[status]}
+        size={size}
+        icon={
+          <Icon
+            name={statusIcons[status] as any}
+            size={size === "sm" ? 12 : size === "md" ? 16 : 20}
           />
-        )}
-      </div>
+        }
+        className={className}
+      />
 
-      {showLabel && (
-        <span
-          className={`${config.font} u-font-bold u-text-uppercase`}
-          style={{ letterSpacing: "0.5px" }}
-        >
-          {statusLabels[status]}
-        </span>
+      {animated && status !== NetworkStatus.INACTIVE && (
+        <div
+          className="u-absolute u-top-0 u-right-0 u-transform-center u-w-2 u-h-2 u-rounded-circle u-animate-pulse u-z-1"
+          style={{
+            backgroundColor: colors.primary,
+            transform: "translate(25%, -25%)",
+          }}
+        />
       )}
     </div>
   );

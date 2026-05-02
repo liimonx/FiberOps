@@ -61,7 +61,7 @@ export const MapControls: React.FC<MapControlsProps> = ({
 
   return (
     <div className={` ${positionClasses[position]} ${className}`}>
-      <Card glass={true}>
+      <Card glass={true} size="sm">
         <div
           className="u-flex u-flex-column u-gap-1"
           role="toolbar"
@@ -75,7 +75,7 @@ export const MapControls: React.FC<MapControlsProps> = ({
           >
             <Button
               variant="secondary"
-              size={isMobile ? "sm" : "md"}
+              size={"sm"}
               iconName="Plus"
               iconOnly
               onClick={handleZoomIn}
@@ -83,7 +83,7 @@ export const MapControls: React.FC<MapControlsProps> = ({
             />
             <Button
               variant="secondary"
-              size={isMobile ? "sm" : "md"}
+              size={"sm"}
               iconName="Minus"
               iconOnly
               onClick={handleZoomOut}
@@ -100,11 +100,11 @@ export const MapControls: React.FC<MapControlsProps> = ({
               role="group"
               aria-label="Orientation controls"
             >
-              <CompassControl size={isMobile ? "sm" : "md"} />
+              <CompassControl size={"sm"} />
               <Button
                 variant="secondary"
-                size={isMobile ? "sm" : "md"}
-                iconName="SlidersVertical"
+                size={"sm"}
+                iconName="GlobeHemisphereWest"
                 iconOnly
                 onClick={handleResetPitch}
                 aria-label="Reset pitch"
@@ -143,21 +143,17 @@ export const CompassControl: React.FC<{ size?: "sm" | "md" }> = ({ size = "md" }
     <Button
       variant="secondary"
       size={size}
-      iconOnly
       onClick={handleResetBearing}
       aria-label={`Reset map orientation, current bearing: ${Math.round(bearing)} degrees`}
-      className="u-relative"
     >
-      <div className="u-flex u-items-center u-justify-center u-w-5 u-h-5">
-        <div
-          className="u-flex u-items-center u-justify-center u-transition-all"
-          style={{
-            transform: `rotate(${-bearing}deg)`,
-          }}
-          aria-hidden="true"
-        >
-          <Icon name="NavigationArrow" size={16} className="u-text-primary" />
-        </div>
+      <div
+        className="u-flex u-items-center u-justify-center u-transition-all"
+        style={{
+          transform: `rotate(${-bearing}deg)`,
+        }}
+        aria-hidden="true"
+      >
+        <Icon name="NavigationArrow" size={16} />
       </div>
     </Button>
   );

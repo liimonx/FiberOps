@@ -114,11 +114,11 @@ export const LayerControls: React.FC<LayerControlsProps> = ({ className = "" }) 
       <div className="u-flex u-items-center u-justify-between u-p-4 u-bg-white-opacity-5">
         <div className="u-flex u-items-center u-gap-3">
           <div className="u-rounded u-flex u-items-center u-justify-center u-bg-primary-subtle u-shadow-sm u-w-8 u-h-8">
-            <Icon name="Stack" size={18} className="u-text-primary" />
+            <Icon name="Stack" size={18} className="" />
           </div>
           <div className="u-flex u-flex-column u-gap-1">
-            <span className="u-text-sm u-font-bold u-text-primary">Map Layers</span>
-            <span className="u-text-xs u-text-secondary-subtle">
+            <span className="u-text-sm u-font-bold ">Map Layers</span>
+            <span className="u-text-xs u-text-secondary-emphasis">
               {activeCount} of {totalLayers} active
             </span>
           </div>
@@ -134,7 +134,7 @@ export const LayerControls: React.FC<LayerControlsProps> = ({ className = "" }) 
               fill="none"
               stroke="currentColor"
               strokeWidth="3"
-              className="u-text-secondary-subtle u-opacity-10"
+              className="u-text-secondary-emphasis u-opacity-10"
             />
             <circle
               cx="20"
@@ -146,12 +146,12 @@ export const LayerControls: React.FC<LayerControlsProps> = ({ className = "" }) 
               strokeLinecap="round"
               strokeDasharray={`${progressPercentage} 100`}
               transform="rotate(-90 20 20)"
-              className="u-text-primary u-transition-all"
+              className=" u-transition-all"
             />
           </svg>
           <span
             className={`u-text-xs u-font-bold u-absolute ${
-              activeCount > 0 ? "u-text-primary" : "u-text-secondary-subtle"
+              activeCount > 0 ? "" : "u-text-secondary-emphasis"
             }`}
           >
             {activeCount}
@@ -213,7 +213,7 @@ export const LayerControls: React.FC<LayerControlsProps> = ({ className = "" }) 
                   <div className="u-flex u-flex-column u-min-w-0 u-flex-1">
                     <span
                       className={`u-text-sm u-font-semibold u-transition-colors u-text-truncate ${
-                        isVisible ? "u-text-primary" : "u-text-secondary-subtle"
+                        isVisible ? "" : "u-text-secondary-emphasis"
                       }`}
                     >
                       {config.name}
@@ -221,8 +221,8 @@ export const LayerControls: React.FC<LayerControlsProps> = ({ className = "" }) 
                     <span
                       className={`u-text-xs u-mt-1 u-text-truncate ${
                         isVisible
-                          ? "u-text-secondary-subtle"
-                          : "u-text-secondary-subtle u-opacity-50"
+                          ? "u-text-secondary-emphasis"
+                          : "u-text-secondary-emphasis u-opacity-50"
                       }`}
                     >
                       {config.description}

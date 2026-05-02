@@ -101,13 +101,13 @@ export class ErrorBoundary extends Component<Props, State> {
             </div>
 
             <h2
-              className="u-m-0 u-text-xl u-font-bold u-text-primary u-text-uppercase u-mb-2"
+              className="u-m-0 u-text-xl u-font-bold  u-text-uppercase u-mb-2"
               style={{ letterSpacing: "1px" }}
             >
               System Exception
             </h2>
 
-            <p className="u-text-sm u-text-secondary-subtle u-mb-8 u-leading-normal">
+            <p className="u-text-sm u-text-secondary-emphasis u-mb-8 u-leading-normal">
               An unexpected error occurred in the map interface. You can try to recover
               the component or return home.
             </p>
@@ -115,7 +115,7 @@ export class ErrorBoundary extends Component<Props, State> {
             {process.env.NODE_ENV === "development" && this.state.error && (
               <div className="u-text-start u-mb-8">
                 <details className="u-bg-black-opacity-20 u-rounded u-p-4 u-border u-border-solid u-border-secondary-subtle">
-                  <summary className="u-text-xs u-font-bold u-text-secondary-subtle u-cursor-pointer">
+                  <summary className="u-text-xs u-font-bold u-text-secondary-emphasis u-cursor-pointer">
                     Error Trace
                   </summary>
                   <pre className="u-mt-2 u-text-2xs u-font-mono u-text-error u-overflow-auto u-max-h-40">

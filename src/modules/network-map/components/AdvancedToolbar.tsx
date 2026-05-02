@@ -129,8 +129,8 @@ const StatusWrapper = ({ children, icon }: StatusWrapperProps) => (
     glass={true}
     className="u-px-3 u-py-1.5 u-bg-white-opacity-5 u-rounded-pill u-animate-fade-in"
   >
-    <div className="u-flex u-items-center u-gap-2 u-text-xs u-font-medium u-text-secondary-subtle">
-      <Icon name={icon as any} size={14} className="u-text-primary" />
+    <div className="u-flex u-items-center u-gap-2 u-text-xs u-font-medium u-text-secondary-emphasis">
+      <Icon name={icon as any} size={14} className="" />
       {children}
     </div>
   </Card>
@@ -164,7 +164,7 @@ export function ToolStatusBar() {
     return (
       <StatusWrapper icon="Ruler">
         {pointCount > 0 ? (
-          <span className="u-text-primary">
+          <span className="">
             {pointCount} points • Total: {formattedDistance}
           </span>
         ) : (
@@ -189,7 +189,7 @@ export function KeyboardShortcutsHelp() {
   return (
     <Card glass={true} className="u-p-4 u-shadow-lg u-bg-white-opacity-5 u-w-48">
       <h4
-        className="u-m-0 u-text-xs u-font-bold u-text-primary u-text-uppercase u-mb-3"
+        className="u-m-0 u-text-xs u-font-bold  u-text-uppercase u-mb-3"
         style={{ letterSpacing: "0.5px" }}
       >
         Shortcuts
@@ -197,10 +197,10 @@ export function KeyboardShortcutsHelp() {
       <div className="u-flex u-flex-column u-gap-2">
         {shortcuts.map(({ key, action }) => (
           <div key={key} className="u-flex u-justify-between u-items-center u-text-2xs">
-            <kbd className="u-px-1.5 u-py-0.5 u-bg-white-opacity-10 u-rounded u-font-mono u-text-primary u-border u-border-solid u-border-secondary-subtle">
+            <kbd className="u-px-1.5 u-py-0.5 u-bg-white-opacity-10 u-rounded u-font-mono  u-border u-border-solid u-border-secondary-subtle">
               {key}
             </kbd>
-            <span className="u-text-secondary-subtle">{action}</span>
+            <span className="u-text-secondary-emphasis">{action}</span>
           </div>
         ))}
       </div>

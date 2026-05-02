@@ -132,12 +132,12 @@ export const SearchPanel: React.FC<SearchPanelProps> = ({
           <Icon
             name="MagnifyingGlass"
             size={32}
-            className="u-text-secondary-subtle u-opacity-30 u-mb-4"
+            className="u-text-secondary-emphasis u-opacity-30 u-mb-4"
           />
-          <p className="u-m-0 u-mb-2 u-text-sm u-font-bold u-text-primary">
+          <p className="u-m-0 u-mb-2 u-text-sm u-font-bold ">
             No results found for "{query}"
           </p>
-          <span className="u-text-xs u-text-secondary-subtle">
+          <span className="u-text-xs u-text-secondary-emphasis">
             Try adjusting your keywords or categories
           </span>
         </div>

@@ -115,10 +115,10 @@ function NetworkMapDataSync({ children }: NetworkMapDataProps) {
           className="u-p-8 u-text-center u-max-w-md u-bg-white-opacity-5"
         >
           <Icon name="Warning" size={48} className="u-text-warning u-mb-4" />
-          <h2 className="u-m-0 u-text-xl u-font-bold u-text-primary u-text-uppercase u-mb-2">
+          <h2 className="u-m-0 u-text-xl u-font-bold  u-text-uppercase u-mb-2">
             Data Synchronization Error
           </h2>
-          <p className="u-text-sm u-text-secondary-subtle u-mb-8">
+          <p className="u-text-sm u-text-secondary-emphasis u-mb-8">
             {error instanceof Error
               ? error.message
               : "An unknown error occurred while fetching network topology."}

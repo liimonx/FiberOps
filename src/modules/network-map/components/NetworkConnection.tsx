@@ -140,12 +140,12 @@ export const NetworkConnection: React.FC<NetworkConnectionProps> = ({
                 style={{ color: statusColor }}
               />
               {connection.bandwidth && (
-                <span className="u-text-xs u-font-bold u-text-primary">
+                <span className="u-text-xs u-font-bold ">
                   {connection.bandwidth} Mbps
                 </span>
               )}
               {connection.utilization !== undefined && (
-                <span className="u-text-xs u-text-secondary-subtle u-opacity-70">
+                <span className="u-text-xs u-text-secondary-emphasis u-opacity-70">
                   {connection.utilization}%
                 </span>
               )}

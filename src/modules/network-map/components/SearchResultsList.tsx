@@ -36,7 +36,7 @@ export const SearchResultsList: React.FC<SearchResultsListProps> = ({
     >
       {results.map((result, index) => {
         const isHighlighted = index === highlightedIndex;
-        
+
         return (
           <div
             key={result.id}
@@ -44,14 +44,16 @@ export const SearchResultsList: React.FC<SearchResultsListProps> = ({
             role="option"
             aria-selected={isHighlighted}
             className={`u-flex u-items-center u-gap-3 u-py-3 u-px-4 u-rounded u-cursor-pointer u-transition-all ${
-              isHighlighted 
-                ? "u-bg-primary-subtle u-shadow-sm" 
+              isHighlighted
+                ? "u-bg-primary-subtle u-shadow-sm"
                 : "u-bg-transparent hover:u-bg-white-opacity-5"
             }`}
             onClick={() => onSelect(result)}
             onMouseEnter={() => onHighlight(index)}
           >
-            <div className={`u-flex-shrink-0 u-flex u-items-center u-justify-center u-w-8 u-h-8 u-rounded u-bg-white-opacity-5 ${isHighlighted ? "u-text-primary" : "u-text-secondary-subtle"}`}>
+            <div
+              className={`u-flex-shrink-0 u-flex u-items-center u-justify-center u-w-8 u-h-8 u-rounded u-bg-white-opacity-5 ${isHighlighted ? "" : "u-text-secondary-emphasis"}`}
+            >
               <Icon
                 name={
                   result.type === "node"
@@ -62,17 +64,21 @@ export const SearchResultsList: React.FC<SearchResultsListProps> = ({
               />
             </div>
             <div className="u-flex-1 u-flex u-flex-column u-min-w-0">
-              <span className={`u-text-sm u-font-semibold u-text-truncate ${isHighlighted ? "u-text-primary" : "u-text-primary-emphasis"}`}>
+              <span
+                className={`u-text-sm u-font-semibold u-text-truncate ${isHighlighted ? "" : "-emphasis"}`}
+              >
                 {result.name}
               </span>
-              <span className={`u-text-xs u-text-capitalize u-opacity-70 ${isHighlighted ? "u-text-primary" : "u-text-secondary-subtle"}`}>
+              <span
+                className={`u-text-xs u-text-capitalize u-opacity-70 ${isHighlighted ? "" : "u-text-secondary-emphasis"}`}
+              >
                 {result.type}
               </span>
             </div>
             <Icon
               name="ArrowRight"
               size={16}
-              className={`u-flex-shrink-0 u-transition-all ${isHighlighted ? "u-opacity-100 u-text-primary u-translate-x-1" : "u-opacity-0"}`}
+              className={`u-flex-shrink-0 u-transition-all ${isHighlighted ? "u-opacity-100  u-translate-x-1" : "u-opacity-0"}`}
             />
           </div>
         );

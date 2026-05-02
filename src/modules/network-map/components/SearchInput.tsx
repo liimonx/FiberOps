@@ -37,7 +37,7 @@ export const SearchInput: React.FC<SearchInputProps> = ({
         <Icon
           name="MagnifyingGlass"
           size={18}
-          className="u-text-secondary-subtle u-opacity-50"
+          className="u-text-secondary-emphasis u-opacity-50"
         />
       </div>
       <input
@@ -47,7 +47,7 @@ export const SearchInput: React.FC<SearchInputProps> = ({
         onChange={(e) => onChange(e.target.value)}
         onKeyDown={onKeyDown}
         placeholder={placeholder}
-        className="u-w-100 u-ps-9 u-pe-9 u-py-4 u-bg-transparent u-border-0 u-text-primary u-text-base u-font-medium u-outline-none"
+        className="u-w-100 u-ps-9 u-pe-9 u-py-4 u-bg-transparent u-border-0  u-text-base u-font-medium u-outline-none"
         aria-label="Search network assets"
         aria-controls={ariaControls}
         aria-activedescendant={ariaActiveDescendant}

@@ -29,13 +29,9 @@ export const LoadingState: React.FC<LoadingStateProps> = ({
   const content = (
     <div className={`u-flex u-items-center u-justify-center u-gap-3 ${className}`}>
       {showSpinner && (
-        <Icon
-          name="SpinnerGap"
-          size={currentSize.icon}
-          className="u-text-primary u-animate-spin"
-        />
+        <Icon name="SpinnerGap" size={currentSize.icon} className=" u-animate-spin" />
       )}
-      <span className={`${currentSize.text} u-font-bold u-text-primary`}>{message}</span>
+      <span className={`${currentSize.text} u-font-bold `}>{message}</span>
     </div>
   );
 
@@ -53,9 +49,9 @@ export const LoadingState: React.FC<LoadingStateProps> = ({
     return (
       <div className="u-fixed u-inset-0 u-flex u-items-center u-justify-center u-bg-dark u-z-modal">
         <div className="u-flex u-flex-column u-items-center u-gap-4">
-          <Icon name="SpinnerGap" size={48} className="u-text-primary u-animate-spin" />
+          <Icon name="SpinnerGap" size={48} className=" u-animate-spin" />
           <span
-            className="u-text-lg u-font-bold u-text-primary u-text-uppercase"
+            className="u-text-lg u-font-bold  u-text-uppercase"
             style={{ letterSpacing: "2px" }}
           >
             {message}

@@ -10,7 +10,7 @@ export default function SettingsPage() {
       <div className="u-flex u-justify-between u-items-center u-mb-6">
         <div>
           <h1 className="u-text-2xl u-font-bold u-mb-2">System Settings</h1>
-          <p className="u-text-secondary-subtle u-text-sm">
+          <p className="u-text-secondary-emphasis u-text-sm">
             Configure system parameters, integrations, and user access.
           </p>
         </div>
@@ -45,17 +45,17 @@ export default function SettingsPage() {
               </div>
             </Tabs.Panel>
             <Tabs.Panel index={1}>
-              <p className="u-text-secondary-subtle">
+              <p className="u-text-secondary-emphasis">
                 Configure external APIs and webhooks here.
               </p>
             </Tabs.Panel>
             <Tabs.Panel index={2}>
-              <p className="u-text-secondary-subtle">
+              <p className="u-text-secondary-emphasis">
                 Stripe and invoicing configurations.
               </p>
             </Tabs.Panel>
             <Tabs.Panel index={3}>
-              <p className="u-text-secondary-subtle">
+              <p className="u-text-secondary-emphasis">
                 Manage users, roles, and permissions.
               </p>
             </Tabs.Panel>

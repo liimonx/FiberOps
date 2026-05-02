@@ -58,11 +58,11 @@ export const InspectorPanel: React.FC<InspectorPanelProps> = ({
           <Icon
             name="CursorClick"
             size={40}
-            className="u-text-secondary-subtle u-opacity-30"
+            className="u-text-secondary-emphasis u-opacity-30"
           />
           <div className="u-flex u-flex-column u-gap-1">
-            <h3 className="u-m-0 u-text-sm u-font-bold u-text-primary">No Selection</h3>
-            <p className="u-m-0 u-text-xs u-text-secondary-subtle">
+            <h3 className="u-m-0 u-text-sm u-font-bold ">No Selection</h3>
+            <p className="u-m-0 u-text-xs u-text-secondary-emphasis">
               Select a node or link to view details
             </p>
           </div>
@@ -97,7 +97,7 @@ export const InspectorPanel: React.FC<InspectorPanelProps> = ({
         {/* Header */}
         <div className="u-flex u-items-center u-gap-3 u-p-4 u-border-bottom u-border-secondary-subtle u-bg-white-opacity-5">
           <div
-            className="u-w-10 u-h-10 u-rounded-circle u-flex u-items-center u-justify-center u-text-white u-flex-shrink-0 u-shadow-sm"
+            className="u-w-10 u-h-10 u-rounded-circle u-flex u-items-center u-justify-center  u-flex-shrink-0 u-shadow-sm"
             style={{ backgroundColor: NETWORK_STATUS_COLORS[status] }}
           >
             <Icon
@@ -110,10 +110,10 @@ export const InspectorPanel: React.FC<InspectorPanelProps> = ({
 
           {!isCollapsed && (
             <div className="u-flex-1 u-min-w-0">
-              <h3 className="u-m-0 u-text-sm u-font-bold u-text-primary u-text-truncate">
+              <h3 className="u-m-0 u-text-sm u-font-bold  u-text-truncate">
                 {selectedNode ? selectedNode.name : `Link ${selectedConnection?.id}`}
               </h3>
-              <span className="u-text-xs u-text-secondary-subtle u-text-truncate u-block">
+              <span className="u-text-xs u-text-secondary-emphasis u-text-truncate u-block">
                 {selectedNode
                   ? getNodeTypeLabel(selectedNode.type)
                   : `${selectedConnection?.sourceNodeId} → ${selectedConnection?.targetNodeId}`}
@@ -163,20 +163,20 @@ export const InspectorPanel: React.FC<InspectorPanelProps> = ({
                 <Tabs.List className="u-flex u-gap-4">
                   <Tabs.Trigger
                     index={0}
-                    className="u-py-3 u-text-xs u-font-bold u-text-uppercase u-border-bottom-2 u-border-transparent data-[state=active]:u-border-primary data-[state=active]:u-text-primary"
+                    className="u-py-3 u-text-xs u-font-bold u-text-uppercase u-border-bottom-2 u-border-transparent data-[state=active]:u-border-primary data-[state=active]:"
                   >
                     Details
                   </Tabs.Trigger>
                   <Tabs.Trigger
                     index={1}
-                    className="u-py-3 u-text-xs u-font-bold u-text-uppercase u-border-bottom-2 u-border-transparent data-[state=active]:u-border-primary data-[state=active]:u-text-primary"
+                    className="u-py-3 u-text-xs u-font-bold u-text-uppercase u-border-bottom-2 u-border-transparent data-[state=active]:u-border-primary data-[state=active]:"
                   >
                     Actions
                   </Tabs.Trigger>
                   {selectedNode && (
                     <Tabs.Trigger
                       index={2}
-                      className="u-py-3 u-text-xs u-font-bold u-text-uppercase u-border-bottom-2 u-border-transparent data-[state=active]:u-border-primary data-[state=active]:u-text-primary"
+                      className="u-py-3 u-text-xs u-font-bold u-text-uppercase u-border-bottom-2 u-border-transparent data-[state=active]:u-border-primary data-[state=active]:"
                     >
                       Links
                     </Tabs.Trigger>
@@ -243,16 +243,16 @@ export const InspectorPanel: React.FC<InspectorPanelProps> = ({
                           key={i}
                           className="u-flex u-justify-between u-items-center u-gap-3"
                         >
-                          <span className="u-text-xs u-text-secondary-subtle u-font-bold u-text-uppercase">
+                          <span className="u-text-xs u-text-secondary-emphasis u-font-bold u-text-uppercase">
                             {item.label}
                           </span>
                           <div className="u-flex u-flex-column u-items-end u-gap-1">
                             {item.code ? (
-                              <code className="u-text-xs u-font-mono u-px-2 u-py-1 u-bg-white-opacity-10 u-rounded-sm u-text-primary">
+                              <code className="u-text-xs u-font-mono u-px-2 u-py-1 u-bg-white-opacity-10 u-rounded-sm ">
                                 {item.value}
                               </code>
                             ) : (
-                              <span className="u-text-sm u-font-medium u-text-primary">
+                              <span className="u-text-sm u-font-medium ">
                                 {item.value}
                               </span>
                             )}
@@ -324,23 +324,19 @@ export const InspectorPanel: React.FC<InspectorPanelProps> = ({
                             className="u-flex u-items-center u-gap-3 u-p-3 u-bg-white-opacity-5 u-border u-border-solid u-border-secondary-subtle u-rounded u-transition-all hover:u-bg-white-opacity-10 hover:u-border-primary u-text-start u-w-100"
                             onClick={() => onNavigate?.(nodeId, "node")}
                           >
-                            <Icon
-                              name="ArrowRight"
-                              size={14}
-                              className="u-text-primary"
-                            />
-                            <span className="u-flex-1 u-text-xs u-font-mono u-text-primary">
+                            <Icon name="ArrowRight" size={14} className="" />
+                            <span className="u-flex-1 u-text-xs u-font-mono ">
                               {nodeId}
                             </span>
                             <Icon
                               name="CaretRight"
                               size={12}
-                              className="u-text-secondary-subtle u-opacity-50"
+                              className="u-text-secondary-emphasis u-opacity-50"
                             />
                           </button>
                         ))
                       ) : (
-                        <div className="u-py-8 u-text-center u-text-secondary-subtle">
+                        <div className="u-py-8 u-text-center u-text-secondary-emphasis">
                           <Icon
                             name="LinkBreak"
                             size={24}

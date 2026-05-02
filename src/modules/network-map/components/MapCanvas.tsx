@@ -230,10 +230,10 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({ onMapLoad, onMapError }) =
           <div className="u-inline-flex u-items-center u-justify-center u-w-16 u-h-16 u-rounded-circle u-bg-error-subtle u-border u-border-solid u-border-error u-mb-6">
             <Icon name="Warning" size={32} className="u-text-error" />
           </div>
-          <h3 className="u-m-0 u-text-xl u-font-bold u-text-primary u-text-uppercase u-mb-2">
+          <h3 className="u-m-0 u-text-xl u-font-bold  u-text-uppercase u-mb-2">
             Map Engine Error
           </h3>
-          <p className="u-text-sm u-text-secondary-subtle u-mb-8">{mapError}</p>
+          <p className="u-text-sm u-text-secondary-emphasis u-mb-8">{mapError}</p>
           <Button
             variant="primary"
             iconName="RefreshCw"
