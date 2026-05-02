@@ -32,6 +32,7 @@ export const SearchInput: React.FC<SearchInputProps> = ({
   return (
     <div
       className={`u-relative u-flex u-items-center u-w-100 u-bg-white-opacity-5 u-border-bottom u-border-secondary-subtle u-transition-all ${className}`}
+      onKeyDown={onKeyDown}
     >
       <div className="u-absolute u-ms-4 u-flex u-items-center u-pointer-events-none">
         <Icon
@@ -45,7 +46,6 @@ export const SearchInput: React.FC<SearchInputProps> = ({
         type="text"
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        onKeyDown={onKeyDown}
         placeholder={placeholder}
         className="u-w-100 u-ps-10"
         aria-label="Search network assets"
