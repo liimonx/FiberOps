@@ -164,7 +164,7 @@ function NetworkStatusIndicators({
   downNodes: number;
 }) {
   return (
-    <div className="u-absolute u-top-4 u-start-50 u-transform-center-x u-flex u-gap-2 u-z-20 u-pointer-events-none">
+    <div className="u-absolute u-top-4 u-start-50 u-transform-center-x u-flex u-items-center u-gap-2 u-z-20 u-pointer-events-none">
       {/* WebSocket Connection Status */}
       <Badge
         glass={true}
@@ -174,6 +174,7 @@ function NetworkStatusIndicators({
         icon={<Icon name={isConnected ? "WifiHigh" : "WifiSlash"} size={"sm"} />}
         label={isConnected ? "Live Feed" : "Static Map"}
         className="u-pointer-events-auto"
+        size="sm"
       />
 
       {/* Active Incidents Badge */}
@@ -184,6 +185,7 @@ function NetworkStatusIndicators({
           icon={<Icon name="Warning" size={"sm"} />}
           label={`${activeIncidents} Active Incidents`}
           className="u-pointer-events-auto"
+          size="sm"
         />
       )}
 
@@ -195,6 +197,7 @@ function NetworkStatusIndicators({
           icon={<Icon name="Warning" size={"sm"} />}
           label={`${degradedNodes} Degraded`}
           className="u-pointer-events-auto"
+          size="sm"
         />
       )}
 

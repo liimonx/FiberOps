@@ -110,7 +110,7 @@ export const InspectorPanel: React.FC<InspectorPanelProps> = ({
           }}
         >
           <div
-            className="u-rounded-circle u-flex u-items-center u-justify-center u-shadow-sm"
+            className="u-rounded-full u-flex u-items-center u-justify-center u-shadow-sm"
             style={{
               backgroundColor: NETWORK_STATUS_COLORS[status],
               width: "40px",
