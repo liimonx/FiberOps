@@ -1,0 +1,116 @@
+/**
+ * Callout Component Variable Overrides
+ * =============================================================================
+ *
+ * Premium alerts and toasts: generous padding, refined typography hierarchy,
+ * elevated shadow, and consistent icon/close sizing.
+ *
+ * @see https://atomix.design/docs/components/callout
+ */
+
+// =============================================================================
+// Callout Variable Configuration
+// =============================================================================
+@use "../../../../node_modules/@shohojdhara/atomix/src/styles/01-settings/settings.callout"
+  with (
+  // ---------------------------------------------------------------------------
+  // Container
+  // ---------------------------------------------------------------------------
+  $callout-width: 100%,
+  $callout-padding-x: 16px,
+  $callout-padding-y: 14px,
+  $callout-bg: var(--atomix-primary-bg-subtle),
+  $callout-border-radius: 0.875rem,
+  $callout-border-color: var(--atomix-border-color),
+  $callout-border-width: 1px,
+  $callout-box-shadow: (
+    0 4px 12px -2px rgba(0, 0, 0, 0.08),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06)
+  ),
+
+  // ---------------------------------------------------------------------------
+  // Title
+  // ---------------------------------------------------------------------------
+  $callout-title-font-size: 0.9375rem,
+  // 15px
+  $callout-title-font-weight: 700,
+  $callout-title-color: var(--atomix-body-color),
+  // ---------------------------------------------------------------------------
+  // Body text
+  // ---------------------------------------------------------------------------
+  $callout-text-font-size: 0.875rem,
+  // 14px
+  $callout-text-font-weight: 400,
+  $callout-text-color: var(--atomix-secondary-text-emphasis),
+  // ---------------------------------------------------------------------------
+  // Message spacer
+  // ---------------------------------------------------------------------------
+  $callout-message-spacer: 10px,
+
+  // ---------------------------------------------------------------------------
+  // Icon
+  // ---------------------------------------------------------------------------
+  $callout-icon-size: 20px,
+  $callout-icon-color: var(--atomix-primary),
+  // ---------------------------------------------------------------------------
+  // Close button
+  // ---------------------------------------------------------------------------
+  $callout-close-btn-size: 20px,
+
+  // ---------------------------------------------------------------------------
+  // Actions
+  // ---------------------------------------------------------------------------
+  $callout-actions-spacer: 8px,
+  $callout-actions-spacer-y: 12px,
+
+  // ---------------------------------------------------------------------------
+  // Toast-specific padding
+  // ---------------------------------------------------------------------------
+  $callout-tost-padding-x: 16px,
+  $callout-tost-padding-y: 14px,
+  $callout-toast-bg: var(--atomix-primary-bg-subtle),
+  // ---------------------------------------------------------------------------
+  // Toast z-index
+  // ---------------------------------------------------------------------------
+  $callout-toast-z-index: 1050
+);
+
+// =============================================================================
+// Additive Polish
+// =============================================================================
+.c-callout {
+  // Title + icon row — tighter alignment
+  &__title {
+    line-height: 1.3;
+    letter-spacing: -0.005em;
+  }
+
+  // Body text — comfortable reading lineheight
+  &__text {
+    line-height: 1.6;
+    margin-top: 4px;
+  }
+
+  // Timestamp / metadata slots
+  &__meta {
+    font-size: 0.75rem;
+    color: var(--atomix-tertiary-text-emphasis);
+    margin-top: 6px;
+  }
+
+  // Toast — entrance slide
+  &--toast {
+    animation: callout-in 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+}
+
+@keyframes callout-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}

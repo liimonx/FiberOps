@@ -1,0 +1,165 @@
+/**
+ * Navbar Component Variable Overrides
+ * =============================================================================
+ *
+ * Premium top-level navigation: full variable coverage for layout geometry,
+ * brand typography, toggler affordances, backdrop, and motion — with additive
+ * BEM polish for glassmorphism, active states, scroll-aware shadow, and a
+ * refined mobile experience.
+ *
+ * @see https://atomix.design/docs/components/navbar
+ */
+
+// =============================================================================
+// Navbar Variable Configuration
+// =============================================================================
+@use "../../../../node_modules/@shohojdhara/atomix/src/styles/01-settings/settings.navbar"
+  with (
+  // ---------------------------------------------------------------------------
+  // Container & Layout
+  // ---------------------------------------------------------------------------
+  $navbar-padding-x: 1rem,
+  // 16px — compact rails
+  $navbar-padding-y: 0.5rem,
+  // vertical rhythm controlled by height
+  $navbar-container-max-width: 1440px,
+  // cap at wide viewports
+  $navbar-height: 48px,
+
+  // slightly taller for breathing room
+  // ---------------------------------------------------------------------------
+  // Appearance
+  // ---------------------------------------------------------------------------
+  $navbar-bg: transparent,
+  $navbar-border-width: 1px,
+  $navbar-border-color: var(--atomix-border-color),
+  $navbar-box-shadow: null,
+
+  // ---------------------------------------------------------------------------
+  // Brand / Logo
+  // ---------------------------------------------------------------------------
+  $navbar-brand-margin-end: 1.5rem,
+  // 24px — space before nav links
+  $navbar-brand-font-size: 0.9375rem,
+  // 17px — confident but not heavy
+  $navbar-brand-font-weight: 700,
+  $navbar-brand-color: var(--atomix-body-color),
+  // ---------------------------------------------------------------------------
+  // Mobile Toggler
+  // ---------------------------------------------------------------------------
+  $navbar-toggler-size: 2rem,
+  // 36px — generous touch target
+  $navbar-toggler-color: var(--atomix-body-color),
+  $navbar-toggler-bg: transparent,
+  $navbar-toggler-border: 0,
+  $navbar-toggler-border-radius: 0.5rem,
+  $navbar-toggler-focus-shadow: 0 0 0 3px
+    rgba(var(--atomix-primary-rgb, 6, 182, 212), 0.25),
+  // ---------------------------------------------------------------------------
+  // Collapse / Mobile Menu
+  // ---------------------------------------------------------------------------
+  $navbar-collapse-padding-top: 0.5rem,
+  $navbar-collapse-transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1),
+  // ---------------------------------------------------------------------------
+  // Backdrop (mobile overlay)
+  // ---------------------------------------------------------------------------
+  $navbar-backdrop-bg: transparent,
+  $navbar-backdrop-z-index: 0,
+
+  // ---------------------------------------------------------------------------
+  // Z-index
+  // ---------------------------------------------------------------------------
+  $navbar-z-index: 1030,
+  $navbar-fixed-z-index: 1030,
+
+  // ---------------------------------------------------------------------------
+  // Dark mode
+  // ---------------------------------------------------------------------------
+  $navbar-bg-dark: transparent,
+  $navbar-border-color-dark: var(--atomix-gray-7),
+  $navbar-brand-color-dark: var(--atomix-gray-1),
+  $navbar-toggler-color-dark: var(--atomix-gray-1)
+);
+
+// =============================================================================
+// Additive BEM Polish
+// These selectors are purely additive — they extend the compiled Atomix output
+// without touching any internal BEM internals.
+// =============================================================================
+.c-navbar {
+  background: transparent !important;
+
+  &:hover {
+    background: transparent !important;
+  }
+  // --------------------------------------------------------------------------
+  // Container — centered gutter with safe min padding on small screens
+  // --------------------------------------------------------------------------
+  &__container {
+    // Ensure items are always vertically centred regardless of height override
+    align-items: center;
+  }
+
+  // --------------------------------------------------------------------------
+  // Brand — smooth colour transition + letter-spacing refinement
+  // --------------------------------------------------------------------------
+  &__brand {
+    letter-spacing: -0.02em;
+    transition: opacity 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+
+    &:hover {
+      opacity: 0.8;
+    }
+
+    // Logo image: remove any default vertical misalignment
+    img,
+    svg {
+      display: block;
+    }
+  }
+
+  // --------------------------------------------------------------------------
+  // Toggler — rounded pill with hover fill + active ripple
+  // --------------------------------------------------------------------------
+  &__toggler {
+    border-radius: 0.5rem;
+    transition:
+      background-color 0.3s cubic-bezier(0.23, 1, 0.32, 1),
+      opacity 0.3s cubic-bezier(0.23, 1, 0.32, 1),
+      transform 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+
+    &:hover {
+      background-color: var(--atomix-secondary-bg-subtle);
+    }
+
+    &:active {
+      transform: scale(0.92);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--atomix-primary);
+      outline-offset: 2px;
+    }
+
+    // Hamburger bars — smoother easing
+    &-icon {
+      &::before,
+      &::after,
+      & {
+        transition:
+          transform 0.3s cubic-bezier(0.23, 1, 0.32, 1),
+          opacity 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+      }
+    }
+  }
+
+  // --------------------------------------------------------------------------
+  // Collapse — vertical slide in on mobile
+  // --------------------------------------------------------------------------
+  &__collapse {
+    // Desktop: reset any mobile overrides
+    @media (min-width: 768px) {
+      display: flex !important;
+    }
+  }
+}

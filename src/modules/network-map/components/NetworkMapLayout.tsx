@@ -47,7 +47,7 @@ export const NetworkMapLayout: React.FC<NetworkMapLayoutProps> = ({
 
       {/* Desktop layout */}
       <div
-        className="u-absolute u-inset-0 u-w-100 u-h-100 u-pointer-events-none u-display-none u-display-md-block"
+        className="u-absolute u-inset-0 u-w-100 u-h-100 u-pointer-events-none u-none u-block-md"
         role="presentation"
       >
         {/* Top left - Search panel */}
@@ -89,7 +89,7 @@ export const NetworkMapLayout: React.FC<NetworkMapLayoutProps> = ({
 
       {/* Mobile layout */}
       <div
-        className="u-absolute u-bottom-0 u-start-0 u-w-100 u-pointer-events-auto u-display-block u-display-md-none"
+        className="u-absolute u-bottom-0 u-start-0 u-w-100 u-pointer-events-auto u-block u-none-md"
         role="presentation"
       >
         {mobileControls}

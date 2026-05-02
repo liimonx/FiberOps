@@ -1,0 +1,20 @@
+/**
+ * Index Styles
+ * 
+ * Main stylesheet that imports Atomix with custom variable overrides
+ * and runtime theme tokens (CSS custom properties).
+ */
+
+// Import Atomix with SCSS variable overrides
+// =============================================================================
+// All SCSS variable overrides are defined in styles/01-settings/ and styles/06-components/
+// Using @use - variables are loaded first, then Atomix loads and uses them
+
+// 1. Settings (Variables, Colors, Typography, etc.)
+@use "./01-settings/_settings.scss";
+
+// 2. Component Overrides (Variables for specific components)
+@use "./06-components/_components.scss";
+
+// 3. Atomix Design System (Core styles)
+@use "../../../node_modules/@shohojdhara/atomix/src/styles/index.scss";

@@ -1,0 +1,183 @@
+/**
+ * Glass Morphism Utilities
+ * =============================================================================
+ * CSS custom properties and utility classes for glass morphism effects
+ */
+
+// Glass effect variables
+:root {
+  --glass-background: rgba(255, 255, 255, 0.08);
+  --glass-background-dark: rgba(2, 6, 23, 0.25); // deeper slate dark mode
+  --glass-border: rgba(255, 255, 255, 0.2);
+  --glass-border-dark: rgba(255, 255, 255, 0.05);
+  --glass-blur: blur(16px);
+  --glass-backdrop-blur: blur(24px); // increased blur for premium feel
+}
+
+// Glass utility classes
+.u-glass {
+  background: var(--glass-background) !important;
+  backdrop-filter: var(--glass-backdrop-blur) !important;
+  -webkit-backdrop-filter: var(--glass-backdrop-blur) !important;
+  border: 1px solid var(--glass-border) !important;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.1) !important;
+}
+
+.u-glass-dark {
+  background: var(--glass-background-dark) !important;
+  backdrop-filter: var(--glass-backdrop-blur) !important;
+  -webkit-backdrop-filter: var(--glass-backdrop-blur) !important;
+  border: 1px solid var(--glass-border-dark) !important;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.05) !important;
+}
+
+.u-glass-card {
+  @extend .u-glass;
+  border-radius: 16px !important;
+  padding: 2rem !important;
+}
+
+.u-glass-panel {
+  @extend .u-glass;
+  border-radius: 12px !important;
+  padding: 1.5rem !important;
+}
+
+// Glass effect variants
+.u-glass-primary {
+  background: rgba(6, 182, 212, 0.1) !important; // Cyan-500
+  backdrop-filter: var(--glass-backdrop-blur) !important;
+  -webkit-backdrop-filter: var(--glass-backdrop-blur) !important;
+  border: 1px solid rgba(6, 182, 212, 0.2) !important;
+}
+
+.u-glass-purple {
+  background: rgba(147, 51, 234, 0.1) !important; // Purple-600
+  backdrop-filter: var(--glass-backdrop-blur) !important;
+  -webkit-backdrop-filter: var(--glass-backdrop-blur) !important;
+  border: 1px solid rgba(147, 51, 234, 0.2) !important;
+}
+
+.u-glass-green {
+  background: rgba(16, 185, 129, 0.1) !important; // Emerald-500
+  backdrop-filter: var(--glass-backdrop-blur) !important;
+  -webkit-backdrop-filter: var(--glass-backdrop-blur) !important;
+  border: 1px solid rgba(16, 185, 129, 0.2) !important;
+}
+
+// Glass hover effects
+.u-glass-hover {
+  transition: all 0.3s ease !important;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.15) !important;
+    border-color: rgba(255, 255, 255, 0.25) !important;
+    transform: translateY(-2px) !important;
+  }
+}
+
+// Glass backdrop utilities
+.u-backdrop-blur-sm {
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+}
+
+.u-backdrop-blur-md {
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+}
+
+.u-backdrop-blur-lg {
+  backdrop-filter: blur(24px) !important;
+  -webkit-backdrop-filter: blur(24px) !important;
+}
+
+// Standard Blur Utilities
+.u-blur-sm {
+  filter: blur(4px) !important;
+}
+
+.u-blur {
+  filter: blur(8px) !important;
+}
+
+.u-blur-md {
+  filter: blur(16px) !important;
+}
+
+.u-blur-lg {
+  filter: blur(24px) !important;
+}
+
+.u-blur-xl {
+  filter: blur(40px) !important;
+}
+
+.u-blur-2xl {
+  filter: blur(64px) !important;
+}
+
+.u-blur-3xl {
+  filter: blur(96px) !important;
+}
+
+// Glass border utilities
+.u-border-glass {
+  border: 1px solid var(--glass-border) !important;
+}
+
+.u-border-glass-dark {
+  border: 1px solid var(--glass-border-dark) !important;
+}
+
+// Ambient Background Effects
+@keyframes pulse-glow {
+  0% {
+    transform: scale(1) translate(0, 0);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(1.2) translate(50px, -50px);
+    opacity: 0.8;
+  }
+}
+
+.u-ambient-glow {
+  position: absolute !important;
+  width: 600px !important;
+  height: 600px !important;
+  border-radius: 50% !important;
+  filter: blur(80px) !important;
+  z-index: -1 !important;
+  animation: pulse-glow 10s infinite alternate !important;
+  pointer-events: none !important;
+}
+
+// Animation Utilities
+@keyframes u-ping {
+  75%,
+  100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+.u-animate-ping {
+  animation: u-ping 1s cubic-bezier(0, 0, 0.2, 1) infinite !important;
+}
+
+@keyframes u-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.u-animate-pulse {
+  animation: u-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite !important;
+}

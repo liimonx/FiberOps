@@ -1,0 +1,79 @@
+/**
+ * Popover Component Variable Overrides
+ * =============================================================================
+ *
+ * Premium floating popover: generous padding, glass-tinted surface, elevated
+ * multi-layer shadow, refined border radius, and a spring open animation.
+ *
+ * @see https://atomix.design/docs/components/popover
+ */
+
+// =============================================================================
+// Popover Variable Configuration
+// =============================================================================
+@use "../../../../node_modules/@shohojdhara/atomix/src/styles/01-settings/settings.popover"
+  with (
+  // ---------------------------------------------------------------------------
+  // Geometry
+  // ---------------------------------------------------------------------------
+  $popover-max-width: 320px,
+  $popover-padding-x: 16px,
+  $popover-padding-y: 14px,
+  $popover-inner-gap-x: 12px,
+  $popover-inner-gap-y: 10px,
+  $popover-arrow-size: 10px,
+  $popover-arrow-offset: 8px,
+
+  // ---------------------------------------------------------------------------
+  // Surface
+  // ---------------------------------------------------------------------------
+  $popover-bg: var(--atomix-primary-bg-subtle),
+  $popover-border-radius: 1rem,
+  $popover-box-shadow: (
+    0 20px 40px -6px rgba(0, 0, 0, 0.16),
+    0 6px 12px -3px rgba(0, 0, 0, 0.1)
+  )
+);
+
+// =============================================================================
+// Additive Polish
+// =============================================================================
+.c-popover {
+  // Content wrapper — entrance animation
+  &__content,
+  &__panel {
+    animation: popover-in 0.22s cubic-bezier(0.16, 1, 0.3, 1) both;
+    border: 1px solid var(--atomix-border-color);
+  }
+
+  // Title / header
+  &__title,
+  &__header {
+    font-size: 0.9375rem;
+    font-weight: 700;
+    letter-spacing: -0.005em;
+    color: var(--atomix-body-color);
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--atomix-border-color);
+    margin-bottom: 10px;
+  }
+
+  // Body text
+  &__body,
+  &__text {
+    font-size: 0.875rem;
+    line-height: 1.6;
+    color: var(--atomix-secondary-text-emphasis);
+  }
+}
+
+@keyframes popover-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}

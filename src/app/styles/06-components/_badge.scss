@@ -1,0 +1,60 @@
+/**
+ * Badge Component Variable Overrides
+ * =============================================================================
+ *
+ * Tight, premium badges: mono-weight labels, consistent vertical padding across
+ * all size variants, and clear icon alignment.
+ *
+ * @see https://atomix.design/docs/components/badge
+ */
+
+// =============================================================================
+// Badge Variable Configuration
+// =============================================================================
+@use "../../../../node_modules/@shohojdhara/atomix/src/styles/01-settings/settings.badge"
+  with (
+  // ---------------------------------------------------------------------------
+  // Typography
+  // ---------------------------------------------------------------------------
+  $badge-font-size: 0.625rem,
+  // 10px — micro label
+  $badge-font-weight: 600,
+
+  // ---------------------------------------------------------------------------
+  // Padding — base / sm / lg
+  // ---------------------------------------------------------------------------
+  $badge-padding-x: 6px,
+  $badge-padding-y: 2px,
+  $badge-padding-y-sm: 1px,
+  $badge-padding-y-lg: 4px,
+
+  // ---------------------------------------------------------------------------
+  // Border radius — pill by default
+  // ---------------------------------------------------------------------------
+  $badge-border-radius: 9999px,
+
+  // ---------------------------------------------------------------------------
+  // Icon
+  // ---------------------------------------------------------------------------
+  $badge-icon-size: 12px,
+  $badge-inner-items-gap: 3px
+);
+
+// =============================================================================
+// Additive Polish
+// =============================================================================
+.c-badge {
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  line-height: 1;
+  white-space: nowrap;
+
+  // Dot variant — circle icon badge
+  &--dot {
+    width: 8px;
+    height: 8px;
+    padding: 0;
+    border-radius: 50%;
+    min-width: unset;
+  }
+}

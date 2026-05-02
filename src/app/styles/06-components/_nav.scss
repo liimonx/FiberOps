@@ -1,0 +1,68 @@
+/**
+ * Nav Component Variable Overrides
+ * =============================================================================
+ *
+ * Refined horizontal/vertical nav links: consistent padding, clear active
+ * state, smooth hover transition, and proper icon sizing.
+ *
+ * @see https://atomix.design/docs/components/nav
+ */
+
+// =============================================================================
+// Nav Variable Configuration
+// =============================================================================
+@use "../../../../node_modules/@shohojdhara/atomix/src/styles/01-settings/settings.nav"
+  with (
+  // ---------------------------------------------------------------------------
+  // Link geometry
+  // ---------------------------------------------------------------------------
+  $nav-link-padding-x: 12px,
+  $nav-link-padding-y: 8px,
+  $nav-item-gap-x: 4px,
+  $nav-link-inner-gap: 6px,
+
+  // ---------------------------------------------------------------------------
+  // Typography
+  // ---------------------------------------------------------------------------
+  $nav-link-font-size: 0.875rem,
+  // 14px
+  $nav-link-font-weight: 500,
+
+  // ---------------------------------------------------------------------------
+  // Colors
+  // ---------------------------------------------------------------------------
+  $nav-link-color: var(--atomix-secondary-text-emphasis),
+  $nav-link-hover-color: var(--atomix-body-color),
+  $nav-link-bg: transparent,
+  $nav-link-hover-bg: var(--atomix-secondary-bg-subtle),
+  // ---------------------------------------------------------------------------
+  // Icon
+  // ---------------------------------------------------------------------------
+  $nav-icon-size: 18px
+);
+
+// =============================================================================
+// Additive Polish
+// =============================================================================
+.c-nav {
+  // Link — transitions + rounded
+  &__link {
+    border-radius: 0.5rem;
+    transition:
+      color 0.16s cubic-bezier(0.4, 0, 0.2, 1),
+      background-color 0.16s cubic-bezier(0.4, 0, 0.2, 1);
+
+    // Active / current page state
+    &.is-active {
+      color: var(--atomix-brand-text-emphasis);
+      background-color: var(--atomix-brand-bg-subtle);
+      font-weight: 600;
+    }
+
+    // Focus ring
+    &:focus-visible {
+      outline: 2px solid var(--atomix-primary);
+      outline-offset: 2px;
+    }
+  }
+}

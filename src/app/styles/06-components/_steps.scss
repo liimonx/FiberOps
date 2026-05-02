@@ -1,0 +1,117 @@
+/**
+ * Steps Component Variable Overrides
+ * =============================================================================
+ *
+ * Premium stepper: clear step number circles, brand active state,
+ * well-proportioned connector lines, and consistent label typography.
+ *
+ * @see https://atomix.design/docs/components/steps
+ */
+
+// =============================================================================
+// Steps Variable Configuration
+// =============================================================================
+@use "../../../../node_modules/@shohojdhara/atomix/src/styles/01-settings/settings.steps"
+  with (
+  // ---------------------------------------------------------------------------
+  // Container padding
+  // ---------------------------------------------------------------------------
+  $steps-padding-x: 0px,
+  $steps-padding-y: 0px,
+
+  // ---------------------------------------------------------------------------
+  // Item colours — default / active
+  // ---------------------------------------------------------------------------
+  $steps-item-color: var(--atomix-tertiary-text-emphasis),
+  $steps-item-bg: var(--atomix-secondary-bg-subtle),
+  $steps-item-active-color: var(--atomix-brand-text-emphasis),
+  $steps-item-active-bg: var(--atomix-primary),
+  // ---------------------------------------------------------------------------
+  // Step number circle
+  // ---------------------------------------------------------------------------
+  $steps-item-number-bg: var(--atomix-secondary-bg-subtle),
+  $steps-item-number-color: var(--atomix-tertiary-text-emphasis),
+  $steps-item-number-active-color: #ffffff,
+  $steps-item-number-size: 28px,
+  $steps-item-number-font-size: 0.8125rem,
+  // 13px
+  $steps-item-number-border-radius: 9999px,
+
+  // ---------------------------------------------------------------------------
+  // Item label typography
+  // ---------------------------------------------------------------------------
+  $steps-item-font-size: 0.875rem,
+  // 14px
+  $steps-item-content-gap: 8px,
+
+  // ---------------------------------------------------------------------------
+  // Connector line — horizontal
+  // ---------------------------------------------------------------------------
+  $steps-line-height: 2px,
+  $steps-line-width: 40px,
+  $steps-gap: 12px,
+
+  // ---------------------------------------------------------------------------
+  // Connector line — vertical
+  // ---------------------------------------------------------------------------
+  $steps-line-height-vertical: 40px,
+  $steps-line-width-vertical: 2px
+);
+
+// =============================================================================
+// Additive Polish
+// =============================================================================
+.c-steps {
+  // Step — transition on state change
+  &__item {
+    transition: color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  // Number circle — pop on active
+  &__number {
+    transition:
+      background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+      color 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+      box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+      transform 0.12s cubic-bezier(0.34, 1.4, 0.64, 1);
+    font-weight: 700;
+  }
+
+  // Active number — brand glow
+  &__item.is-active &__number,
+  &__item--active &__number {
+    box-shadow: 0 0 0 4px rgba(var(--atomix-primary-rgb, 6, 182, 212), 0.22);
+    transform: scale(1.08);
+  }
+
+  // Completed number — success tint
+  &__item.is-complete &__number,
+  &__item--complete &__number {
+    background-color: var(--atomix-success);
+    color: #ffffff;
+  }
+
+  // Label
+  &__label {
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  &__item.is-active &__label,
+  &__item--active &__label {
+    font-weight: 700;
+    color: var(--atomix-body-color);
+  }
+
+  // Connector line — colour progression
+  &__line {
+    background-color: var(--atomix-border-color);
+    border-radius: 9999px;
+    transition: background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  &__item.is-complete + &__line,
+  &__item--complete + &__line {
+    background-color: var(--atomix-success);
+  }
+}

@@ -115,14 +115,14 @@ export const LayerControls: React.FC<LayerControlsProps> = ({ className = "" }) 
       className={`u-overflow-hidden ${className}`}
     >
       {/* Header with Progress Indicator */}
-      <div className="u-flex u-items-center u-justify-between u-p-4 u-bg-white-opacity-5">
+      <div className="u-flex u-items-center u-justify-between u-p-4 u-bg-primary-subtle u-opacity-90">
         <div className="u-flex u-items-center u-gap-3">
           <div className="u-rounded u-flex u-items-center u-justify-center u-bg-primary-subtle u-shadow-sm u-w-8 u-h-8">
             <Icon name="Stack" size={18} className="" />
           </div>
           <div className="u-flex u-flex-column u-gap-1">
-            <span className="u-text-sm u-font-bold ">Map Layers</span>
-            <span className="u-text-xs u-text-secondary-emphasis">
+            <span className="u-fs-sm u-font-bold ">Map Layers</span>
+            <span className="u-fs-xs u-text-secondary-emphasis">
               {activeCount} of {totalLayers} active
             </span>
           </div>
@@ -150,12 +150,12 @@ export const LayerControls: React.FC<LayerControlsProps> = ({ className = "" }) 
               strokeLinecap="round"
               strokeDasharray={`${progressPercentage} 100`}
               transform="rotate(-90 20 20)"
-              className=" u-transition-all"
+              className="u-transition-base"
             />
           </svg>
           <span
-            className={`u-text-xs u-font-bold u-absolute ${
-              activeCount > 0 ? "" : "u-text-secondary-emphasis"
+            className={`u-fs-xs u-font-bold u-absolute ${
+              activeCount > 0 ? "" : "u-text-secondary"
             }`}
           >
             {activeCount}
@@ -168,7 +168,7 @@ export const LayerControls: React.FC<LayerControlsProps> = ({ className = "" }) 
         className="u-p-2 u-overflow-y-auto"
         role="group"
         aria-label="Map layers"
-        style={{ maxHeight: "360px" }} // Keeping this for layout constraint as per guidelines "dynamic runtime calculation is absolutely strictly required" - though this could be utility if available
+        style={{ maxHeight: "360px" }}
       >
         {LAYER_CONFIGS.map((config) => {
           const layer = layers.find((l) => l.id === config.id);
@@ -178,33 +178,24 @@ export const LayerControls: React.FC<LayerControlsProps> = ({ className = "" }) 
           return (
             <div
               key={config.id}
-              className={`u-mb-2 u-rounded u-transition-all ${
-                isVisible
-                  ? isHovered
-                    ? "u-bg-white-opacity-10"
-                    : "u-bg-white-opacity-5"
-                  : "u-opacity-50"
-              }`}
+              className={`u-mb-2 u-rounded u-transition-base ${isHovered ? "u-bg-surface-hover" : "u-bg-surface-subtle"}`}
+              style={{
+                opacity: isVisible ? 1 : 0.6,
+              }}
               onMouseEnter={() => setHoveredLayer(config.id)}
               onMouseLeave={() => setHoveredLayer(null)}
             >
               <div className="u-flex u-items-center u-justify-between u-gap-3 u-p-3">
-                {/* Color Indicator */}
                 <div
-                  className="u-rounded u-flex-shrink-0 u-w-1 u-h-8 u-transition-all"
-                  style={{
-                    backgroundColor: config.color,
-                    boxShadow: isVisible ? `0 0 12px ${config.color}40` : "none",
-                  }}
+                  className="u-rounded u-flex-shrink-0 u-w-1 u-h-8"
+                  style={{ backgroundColor: config.color }}
                 />
 
-                {/* Icon and Text */}
                 <div className="u-flex u-flex-1 u-items-center u-gap-3 u-min-w-0">
                   <div
                     className="u-rounded u-flex u-items-center u-justify-center u-flex-shrink-0 u-w-8 u-h-8"
                     style={{
                       backgroundColor: `${config.color}15`,
-                      border: `1px solid ${config.color}30`,
                     }}
                   >
                     <Icon
@@ -216,14 +207,14 @@ export const LayerControls: React.FC<LayerControlsProps> = ({ className = "" }) 
 
                   <div className="u-flex u-flex-column u-min-w-0 u-flex-1">
                     <span
-                      className={`u-text-sm u-font-semibold u-transition-colors u-text-truncate ${
-                        isVisible ? "" : "u-text-secondary-emphasis"
+                      className={`u-fs-sm u-font-semibold u-text-truncate u-transition-base ${
+                        isVisible ? "u-text-primary" : "u-text-secondary"
                       }`}
                     >
                       {config.name}
                     </span>
                     <span
-                      className={`u-text-xs u-mt-1 u-text-truncate ${
+                      className={`u-fs-xs u-mt-1 u-text-truncate ${
                         isVisible
                           ? "u-text-secondary-emphasis"
                           : "u-text-secondary-emphasis u-opacity-50"
@@ -249,7 +240,7 @@ export const LayerControls: React.FC<LayerControlsProps> = ({ className = "" }) 
       </div>
 
       {/* Actions */}
-      <div className="u-flex u-gap-2 u-p-4 u-border-top u-border-secondary-subtle u-opacity-80">
+      <div className="u-flex u-gap-2 u-p-4">
         <Button
           variant="success"
           fullWidth

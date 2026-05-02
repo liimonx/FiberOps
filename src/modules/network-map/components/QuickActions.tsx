@@ -35,13 +35,8 @@ export const QuickActions: React.FC<QuickActionsProps> = ({
   className = "",
 }) => {
   return (
-    <div
-      className={`u-p-4 u-bg-white-opacity-5 u-border-top u-border-secondary-subtle ${className}`}
-    >
-      <span
-        className="u-block u-text-xs u-text-secondary-emphasis u-font-bold u-text-uppercase u-mb-3 u-leading-none"
-        style={{ letterSpacing: "1px" }}
-      >
+    <div className={`u-p-4 u-bg-primary-subtle  ${className}`}>
+      <span className="u-block u-fs-xs u-text-secondary-emphasis u-font-bold u-text-uppercase u-mb-3 u-leading-none">
         Quick Actions
       </span>
       <div className="u-flex u-gap-2">
@@ -53,7 +48,8 @@ export const QuickActions: React.FC<QuickActionsProps> = ({
             iconName={action.icon}
             onClick={action.onClick}
             fullWidth
-            className="u-transition-all hover:u-shadow-sm"
+            className="hover:u-shadow-sm"
+            style={{ transition: "all 0.3s cubic-bezier(0.23, 1, 0.32, 1)" }}
           >
             {action.label}
           </Button>

@@ -1,0 +1,112 @@
+/**
+ * Checkbox Component Variable Overrides
+ * =============================================================================
+ *
+ * Premium checkbox: crisp 18px hit target, brand-tinted checked state,
+ * smooth border transitions, and accessible error/disabled colouring.
+ *
+ * @see https://atomix.design/docs/components/checkbox
+ */
+
+// =============================================================================
+// Checkbox Variable Configuration
+// =============================================================================
+@use "../../../../node_modules/@shohojdhara/atomix/src/styles/01-settings/settings.checkbox"
+  with (
+  // ---------------------------------------------------------------------------
+  // Geometry
+  // ---------------------------------------------------------------------------
+  $checkbox-width: 16px,
+  $checkbox-height: 16px,
+  $checkbox-spacer: 6px,
+
+  // ---------------------------------------------------------------------------
+  // Typography
+  // ---------------------------------------------------------------------------
+  $checkbox-font-size: 0.8125rem,
+
+  // 13px
+  // ---------------------------------------------------------------------------
+  // Text colors
+  // ---------------------------------------------------------------------------
+  $checkbox-text-color: var(--atomix-body-color),
+  $checkbox-checked-text-color: var(--atomix-body-color),
+  $checkbox-text-color-disabled: var(--atomix-tertiary-text-emphasis),
+  $checkbox-checked-text-color-disabled: var(--atomix-disabled-text-emphasis),
+  // ---------------------------------------------------------------------------
+  // Box colours
+  // ---------------------------------------------------------------------------
+  $checkbox-bg: var(--atomix-primary-bg-subtle),
+  $checkbox-checked-bg: var(--atomix-primary),
+  $checkbox-checked-bg-hover: var(--atomix-primary-hover, var(--atomix-primary)),
+  $checkbox-checked-bg-disabled: var(--atomix-disabled-text-emphasis),
+  // ---------------------------------------------------------------------------
+  // Border
+  // ---------------------------------------------------------------------------
+  $checkbox-border-width: 1px,
+  $checkbox-border-color: var(--atomix-border-color),
+  $checkbox-border-color-hover: var(--atomix-primary),
+  $checkbox-border-color-disabled: var(--atomix-disabled-text-emphasis),
+  $checkbox-border-color-error: var(--atomix-error)
+);
+
+// =============================================================================
+// Additive Polish
+// =============================================================================
+.c-checkbox {
+  align-items: flex-start;
+  gap: 6px;
+  cursor: pointer;
+
+  // Box — border + background transition
+  &__box,
+  &__input {
+    flex-shrink: 0;
+    border-radius: 4px;
+    transition:
+      border-color 0.3s cubic-bezier(0.23, 1, 0.32, 1),
+      background-color 0.3s cubic-bezier(0.23, 1, 0.32, 1),
+      box-shadow 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+  }
+
+  // Focus ring
+  &__box:focus-visible,
+  &__input:focus-visible {
+    outline: 2px solid var(--atomix-primary);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 3px rgba(var(--atomix-primary-rgb, 6, 182, 212), 0.16);
+  }
+
+  // Hover — border lift
+  &:hover:not(.is-disabled) &__box,
+  &:hover:not(.is-disabled) &__input {
+    border-color: var(--atomix-primary);
+  }
+
+  // Checked — bounce tick
+  &.is-checked &__box,
+  &__input:checked + &__box {
+    box-shadow: 0 0 0 3px rgba(var(--atomix-primary-rgb, 6, 182, 212), 0.14);
+  }
+
+  // Error state
+  &.is-invalid &__box,
+  &__input[aria-invalid="true"] + &__box {
+    border-color: var(--atomix-error);
+    box-shadow: 0 0 0 3px rgba(var(--atomix-error-rgb, 239, 68, 68), 0.14);
+  }
+
+  // Label
+  &__label {
+    line-height: 1.5;
+    font-weight: 450;
+    user-select: none;
+  }
+
+  // Disabled
+  &.is-disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+}

@@ -1,0 +1,125 @@
+/**
+ * Select Component Variable Overrides
+ * =============================================================================
+ *
+ * Premium custom select: consistent sizing with inputs, glass-tinted panel,
+ * refined item states, smooth chevron animation, and brand-tinted focus ring.
+ *
+ * @see https://atomix.design/docs/components/select
+ */
+
+// =============================================================================
+// Select Variable Configuration
+// =============================================================================
+@use "../../../../node_modules/@shohojdhara/atomix/src/styles/01-settings/settings.select"
+  with (
+  // ---------------------------------------------------------------------------
+  // Trigger / container
+  // ---------------------------------------------------------------------------
+  $select-width: 100%,
+  $select-padding-x: 0.75rem,
+  $select-padding-y: 0.4375rem,
+  // 7px — matches compact input/button
+  $select-color: var(--atomix-body-color),
+  $select-font-size: 0.8125rem,
+  // 13px
+  $select-font-size-lg: 0.875rem,
+  $select-bg: var(--atomix-primary-bg-subtle),
+  $select-expanded-bg: var(--atomix-secondary-bg-subtle),
+  $select-border-color: var(--atomix-border-color),
+  $select-border-color-hover: var(--atomix-primary-border-subtle),
+  $select-border-radius: 0.625rem,
+
+  // 10px — matches input
+  // ---------------------------------------------------------------------------
+  // Chevron/toggle icon
+  // ---------------------------------------------------------------------------
+  $select-icon-toggle-size: 18px,
+  $select-icon-toggle-color: var(--atomix-tertiary-text-emphasis),
+  $select-dropdown-icon-size: 20px,
+
+  // ---------------------------------------------------------------------------
+  // Placeholder
+  // ---------------------------------------------------------------------------
+  $select-placeholder-color: var(--atomix-tertiary-text-emphasis),
+  // ---------------------------------------------------------------------------
+  // Inner spacing
+  // ---------------------------------------------------------------------------
+  $select-inner-spacer: 6px,
+
+  // ---------------------------------------------------------------------------
+  // Panel (dropdown list)
+  // ---------------------------------------------------------------------------
+  $select-panel-padding-x: 6px,
+  $select-panel-padding-y: 6px,
+  $select-panel-spacer-y: 6px,
+  $select-panel-bg: var(--atomix-primary-bg-subtle),
+  $select-panel-border-radius: 0.875rem,
+  $select-panel-box-shadow: (
+    0 16px 32px -4px rgba(0, 0, 0, 0.14),
+    0 4px 8px -2px rgba(0, 0, 0, 0.08)
+  ),
+
+  // ---------------------------------------------------------------------------
+  // Panel items
+  // ---------------------------------------------------------------------------
+  $select-item-padding-x: 10px,
+  $select-item-padding-y: 6px,
+  $select-item-color: var(--atomix-body-color),
+  $select-item-bg: transparent,
+  $select-item-border-radius: 0.5rem,
+  $select-item-bg-hover: var(--atomix-secondary-bg-subtle)
+);
+
+// =============================================================================
+// Additive Polish
+// =============================================================================
+.c-select {
+  // Trigger — transitions for border + shadow
+  &__trigger,
+  &__control {
+    transition:
+      border-color 0.3s cubic-bezier(0.23, 1, 0.32, 1),
+      box-shadow 0.3s cubic-bezier(0.23, 1, 0.32, 1),
+      background-color 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+
+    &:focus,
+    &:focus-within {
+      outline: none;
+      border-color: var(--atomix-primary);
+      box-shadow: 0 0 0 3px rgba(var(--atomix-primary-rgb, 6, 182, 212), 0.16);
+    }
+  }
+
+  // Panel — open animation
+  &__panel,
+  &__menu {
+    animation: select-open 0.2s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  // Item
+  &__item,
+  &__option {
+    border-radius: 0.5rem;
+    transition:
+      background-color 0.3s cubic-bezier(0.23, 1, 0.32, 1),
+      color 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+
+    &.is-selected {
+      color: var(--atomix-brand-text-emphasis);
+      background-color: var(--atomix-brand-bg-subtle);
+      font-weight: 600;
+    }
+  }
+}
+
+@keyframes select-open {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}

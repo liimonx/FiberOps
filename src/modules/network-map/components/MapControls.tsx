@@ -91,7 +91,7 @@ export const MapControls: React.FC<MapControlsProps> = ({
             />
           </div>
 
-          <div className="u-border-top u-border-secondary-subtle u-opacity-20 u-my-1" />
+          <div className="u-border-top u-border-solid u-border-secondary-subtle u-opacity-20 u-my-1" />
 
           {/* Compass controls */}
           {showCompass && (
@@ -147,9 +147,10 @@ export const CompassControl: React.FC<{ size?: "sm" | "md" }> = ({ size = "md" }
       aria-label={`Reset map orientation, current bearing: ${Math.round(bearing)} degrees`}
     >
       <div
-        className="u-flex u-items-center u-justify-center u-transition-all"
+        className="u-flex u-items-center u-justify-center"
         style={{
           transform: `rotate(${-bearing}deg)`,
+          transition: "transform 0.3s cubic-bezier(0.23, 1, 0.32, 1)",
         }}
         aria-hidden="true"
       >

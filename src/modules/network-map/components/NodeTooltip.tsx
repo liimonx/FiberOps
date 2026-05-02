@@ -63,14 +63,13 @@ export const NodeTooltip: React.FC<NodeTooltipProps> = ({
       role="tooltip"
       aria-live="polite"
     >
-      <Card glass={true} style={{ width: "300px" }}>
+      <Card glass={true} className="u-w-auto" style={{ maxWidth: "300px" }}>
         {/* Header */}
         <div className="u-flex u-justify-between u-items-center u-mb-4 u-pb-2 u-border-bottom u-border-secondary-subtle">
-          <div className="u-flex u-items-center u-gap-2 u-px-2 u-py-1 u-bg-white-opacity-5 u-rounded u-border u-border-solid u-border-secondary-subtle">
+          <div className="u-flex u-items-center u-gap-2 u-px-2 u-py-1 u-bg-secondary-subtle u-rounded u-border u-border-solid u-border-secondary-subtle">
             <Icon name={getNodeIcon() as any} size={16} className="" />
             <span
-              className="u-text-xs u-font-bold u-text-uppercase "
-              style={{ letterSpacing: "0.5px" }}
+              className="u-fs-xs u-font-bold u-text-uppercase u-leading-none"
             >
               {type}
             </span>
@@ -86,51 +85,60 @@ export const NodeTooltip: React.FC<NodeTooltipProps> = ({
         {/* Node Info */}
         <div className="u-flex u-flex-column u-gap-3 u-mb-4">
           <div className="u-flex u-justify-between u-items-center">
-            <span className="u-text-xs u-text-secondary-emphasis u-font-bold u-text-uppercase">
+            <span className="u-fs-xs u-text-secondary-emphasis u-font-bold u-text-uppercase">
               Node ID
             </span>
-            <code className="u-text-xs u-font-mono u-px-2 u-py-1 u-bg-white-opacity-10 u-rounded-sm ">
+            <code className="u-fs-xs u-font-mono u-px-2 u-py-1 u-bg-secondary-subtle u-rounded-sm">
               {id}
             </code>
           </div>
           <div className="u-flex u-justify-between u-items-center">
-            <span className="u-text-xs u-text-secondary-emphasis u-font-bold u-text-uppercase">
+            <span className="u-fs-xs u-text-secondary-emphasis u-font-bold u-text-uppercase">
               Name
             </span>
-            <span className="u-text-sm u-font-bold ">{name}</span>
+            <span className="u-fs-sm u-font-bold ">{name}</span>
           </div>
           {address && (
             <div className="u-flex u-flex-column u-gap-1">
-              <span className="u-text-xs u-text-secondary-emphasis u-font-bold u-text-uppercase">
+              <span className="u-fs-xs u-text-secondary-emphasis u-font-bold u-text-uppercase">
                 Location
               </span>
-              <span className="u-text-xs  u-opacity-80">{address}</span>
+              <span className="u-fs-xs u-opacity-80">{address}</span>
             </div>
           )}
         </div>
 
         {/* Metrics */}
         {(capacity || utilization !== undefined) && (
-          <div className="u-p-3 u-bg-white-opacity-5 u-rounded u-border u-border-solid u-border-secondary-subtle u-mb-4">
-            <h4 className="u-m-0 u-text-xs u-font-bold  u-text-uppercase u-mb-3">
+          <div className="u-p-3 u-bg-secondary-subtle u-rounded u-border u-border-solid u-border-secondary-subtle u-mb-4">
+            <h4 className="u-m-0 u-fs-xs u-font-bold u-text-uppercase u-mb-3">
               Live Metrics
             </h4>
             {capacity !== undefined && (
               <div className="u-flex u-justify-between u-items-center u-mb-2">
-                <span className="u-text-xs u-text-secondary-emphasis">Capacity</span>
-                <span className="u-text-xs u-font-bold ">{capacity} Gbps</span>
+                <span className="u-fs-xs u-text-secondary-emphasis">Capacity</span>
+                <span className="u-fs-xs u-font-bold ">{capacity} Gbps</span>
               </div>
             )}
             {utilization !== undefined && (
               <div className="u-flex u-flex-column u-gap-2">
                 <div className="u-flex u-justify-between u-items-center">
-                  <span className="u-text-xs u-text-secondary-emphasis">Utilization</span>
-                  <span className="u-text-xs u-font-bold ">{utilization}%</span>
+                  <span className="u-fs-xs u-text-secondary-emphasis">Utilization</span>
+                  <span className="u-fs-xs u-font-bold ">{utilization}%</span>
                 </div>
-                <div className="u-w-100 u-h-1 u-bg-white-opacity-10 u-rounded-pill u-overflow-hidden">
+                <div className="u-w-100 u-h-1 u-bg-primary-subtle u-rounded-circle u-overflow-hidden">
                   <div
-                    className={`u-h-100 u-transition-all ${utilization > 80 ? "u-bg-error" : utilization > 60 ? "u-bg-warning" : "u-bg-success"}`}
-                    style={{ width: `${utilization}%` }}
+                    className={`u-h-100`}
+                    style={{
+                      width: `${utilization}%`,
+                      transition: "all 0.3s cubic-bezier(0.23, 1, 0.32, 1)",
+                      backgroundColor:
+                        utilization > 80
+                          ? "var(--atomix-error)"
+                          : utilization > 60
+                            ? "var(--atomix-warning)"
+                            : "var(--atomix-success)",
+                    }}
                   />
                 </div>
               </div>
@@ -139,7 +147,7 @@ export const NodeTooltip: React.FC<NodeTooltipProps> = ({
         )}
 
         {/* Metadata */}
-        <div className="u-flex u-items-center u-gap-2 u-text-xs u-text-secondary-emphasis u-opacity-60">
+        <div className="u-flex u-items-center u-gap-2 u-fs-xs u-text-secondary-emphasis u-opacity-60">
           <Icon name="Clock" size={12} />
           <span>Last seen: {formatLastSeen(lastSeen)}</span>
         </div>

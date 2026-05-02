@@ -1,0 +1,58 @@
+/**
+ * Skeleton Component Variable Overrides
+ * =============================================================================
+ *
+ * Refined loading skeleton: slightly warmer shimmer colours that read well on
+ * both light and dark surfaces without being too stark.
+ *
+ * @see https://atomix.design/docs/components/skeleton
+ */
+
+// =============================================================================
+// Skeleton Variable Configuration
+// =============================================================================
+@use "../../../../node_modules/@shohojdhara/atomix/src/styles/01-settings/settings.skeleton"
+  with (
+  // ---------------------------------------------------------------------------
+  // Size scale
+  // ---------------------------------------------------------------------------
+  $skeleton-sizes: (
+      sm: 12px,
+      md: 16px,
+      lg: 24px,
+      xl: 32px,
+      xxl: 40px,
+      3xl: 48px,
+      4xl: 56px
+    ),
+
+  // ---------------------------------------------------------------------------
+  // Shimmer colours — muted, works on glass surfaces
+  // ---------------------------------------------------------------------------
+  $skeleton-color: rgba(0, 0, 0, 0.05),
+  $skeleton-color-gradient-end: rgba(0, 0, 0, 0.1),
+  $skeleton-gradient-from-color: rgba(0, 0, 0, 0.05),
+  $skeleton-gradient-to-color: rgba(0, 0, 0, 0.1)
+);
+
+// =============================================================================
+// Additive Polish
+// =============================================================================
+.c-skeleton {
+  border-radius: 0.375rem;
+
+  // Text line variant — rounded ends
+  &--text {
+    border-radius: 9999px;
+  }
+
+  // Circle variant (avatars, icons)
+  &--circle {
+    border-radius: 50%;
+  }
+
+  // Rounded rect (cards, images)
+  &--rounded {
+    border-radius: 0.75rem;
+  }
+}

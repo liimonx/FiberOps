@@ -1,0 +1,87 @@
+/**
+ * Breadcrumb Component Variable Overrides
+ * =============================================================================
+ *
+ * Refined breadcrumb trail: compact typography, clear colour progression from
+ * muted ancestors to active current page, and a crisp chevron divider.
+ *
+ * @see https://atomix.design/docs/components/breadcrumb
+ */
+
+// =============================================================================
+// Breadcrumb Variable Configuration
+// =============================================================================
+@use "../../../../node_modules/@shohojdhara/atomix/src/styles/01-settings/settings.breadcrumb"
+  with (
+  // ---------------------------------------------------------------------------
+  // Typography
+  // ---------------------------------------------------------------------------
+  $breadcrumb-font-size: 0.75rem,
+
+  // 12px — compact trail label
+  // ---------------------------------------------------------------------------
+  // Link geometry
+  // ---------------------------------------------------------------------------
+  $breadcrumb-link-padding-y: 2px,
+  $breadcrumb-link-padding-x: 0px,
+  $breadcrumb-link-border-width: 0px,
+
+  // no underline until hover
+  // ---------------------------------------------------------------------------
+  // Spacing
+  // ---------------------------------------------------------------------------
+  $breadcrumb-items-gap: 6px,
+  $breadcrumb-margin-bottom: 0px,
+
+  // ---------------------------------------------------------------------------
+  // Surface
+  // ---------------------------------------------------------------------------
+  $breadcrumb-bg: null,
+
+  // transparent — inherits container
+  // ---------------------------------------------------------------------------
+  // Colors
+  // ---------------------------------------------------------------------------
+  $breadcrumb-color: var(--atomix-tertiary-text-emphasis),
+  $breadcrumb-hover-color: var(--atomix-body-color),
+  $breadcrumb-active-color: var(--atomix-body-color),
+  // ---------------------------------------------------------------------------
+  // Divider
+  // ---------------------------------------------------------------------------
+  $breadcrumb-divider: "\203A",
+  // ›
+  $breadcrumb-divider-size: 12px,
+  $breadcrumb-divider-gap: 3px,
+  $breadcrumb-divider-color: var(--atomix-tertiary-text-emphasis),
+  $breadcrumb-divider-active-color: var(--atomix-tertiary-text-emphasis)
+);
+
+// =============================================================================
+// Additive Polish
+// =============================================================================
+.c-breadcrumb {
+  // Link — hover underline + smooth color transition
+  &__link {
+    text-decoration: none;
+    transition: color 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+
+    &:hover {
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--atomix-primary);
+      outline-offset: 2px;
+      border-radius: 2px;
+    }
+  }
+
+  // Current item — bolder weight
+  &__item:last-child &__link,
+  &__item.is-active &__link {
+    font-weight: 600;
+    color: var(--atomix-body-color);
+    pointer-events: none;
+  }
+}

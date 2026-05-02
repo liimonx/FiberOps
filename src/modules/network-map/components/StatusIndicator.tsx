@@ -28,9 +28,9 @@ export const StatusIndicator: React.FC<StatusIndicatorProps> = ({
   const displayLabel = label || status.charAt(0).toUpperCase() + status.slice(1);
 
   const sizeMap = {
-    sm: { dot: "u-w-2 u-h-2", text: "u-text-xs" },
-    md: { dot: "u-w-3 u-h-3", text: "u-text-sm" },
-    lg: { dot: "u-w-4 u-h-4", text: "u-text-base" },
+    sm: { dot: "u-w-2 u-h-2", text: "u-fs-xs" },
+    md: { dot: "u-w-3 u-h-3", text: "u-fs-sm" },
+    lg: { dot: "u-w-4 u-h-4", text: "u-fs-base" },
   };
 
   const sizes = sizeMap[size];
@@ -97,7 +97,7 @@ export const StatusBadge: React.FC<{
 
   return (
     <span
-      className={`u-inline-flex u-items-center u-gap-2 u-px-3 u-py-1 u-rounded-pill u-border u-border-solid ${className}`}
+      className={`u-inline-flex u-items-center u-gap-2 u-px-3 u-py-1 u-rounded-circle u-border u-border-solid ${className}`}
       style={{
         backgroundColor: `${statusColor}15`,
         borderColor: `${statusColor}30`,
@@ -112,8 +112,7 @@ export const StatusBadge: React.FC<{
         pulse={status === NetworkStatus.ERROR}
       />
       <span
-        className={`u-font-bold u-text-uppercase ${size === "lg" ? "u-text-sm" : "u-text-xs"}`}
-        style={{ letterSpacing: "0.5px" }}
+        className={`u-font-bold u-text-uppercase ${size === "lg" ? "u-fs-sm" : "u-fs-xs"}`}
       >
         {displayText}
       </span>

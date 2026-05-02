@@ -1,0 +1,74 @@
+/**
+ * Tooltip Component Variable Overrides
+ * =============================================================================
+ *
+ * Crisp tooltip surface: dark glass background, compact typography, tight
+ * arrow size, generous max-width for longer labels.
+ *
+ * @see https://atomix.design/docs/components/tooltip
+ */
+
+// =============================================================================
+// Tooltip Variable Configuration
+// =============================================================================
+@use "../../../../node_modules/@shohojdhara/atomix/src/styles/01-settings/settings.tooltip"
+  with (
+  // ---------------------------------------------------------------------------
+  // Geometry
+  // ---------------------------------------------------------------------------
+  $tooltip-max-width: 220px,
+  $tooltip-padding-x: 10px,
+  $tooltip-padding-y: 6px,
+  $tooltip-arrow-size: 10px,
+
+  // ---------------------------------------------------------------------------
+  // Surface
+  // ---------------------------------------------------------------------------
+  $tooltip-bg: var(--atomix-invert-bg-subtle),
+  $tooltip-border-radius: 0.5rem,
+  $tooltip-border-width: null,
+  $tooltip-border-color: null,
+  $tooltip-box-shadow: (
+    0 4px 12px -2px rgba(0, 0, 0, 0.25),
+    0 2px 4px -1px rgba(0, 0, 0, 0.15)
+  ),
+
+  // ---------------------------------------------------------------------------
+  // Typography
+  // ---------------------------------------------------------------------------
+  $tooltip-font-size: 0.75rem,
+  // 12px — tight tooltip label
+  $tooltip-font-weight: 500,
+  $tooltip-color: var(--atomix-invert-text-emphasis)
+);
+
+// =============================================================================
+// Additive Polish
+// =============================================================================
+.c-tooltip {
+  // Surface — blur backdrop for glass feel
+  &__content {
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    letter-spacing: 0.01em;
+    line-height: 1.45;
+    white-space: nowrap;
+  }
+
+  // Entrance animation
+  &.is-visible &__content,
+  &[data-show] &__content {
+    animation: tooltip-in 0.16s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+}
+
+@keyframes tooltip-in {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

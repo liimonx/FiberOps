@@ -1,0 +1,113 @@
+/**
+ * Accordion Component Variable Overrides
+ * =============================================================================
+ *
+ * Premium accordion: generous padding, subtle glass background, refined header
+ * colour hierarchy, smooth panel and icon transitions.
+ *
+ * @see https://atomix.design/docs/components/accordion
+ */
+
+// =============================================================================
+// Accordion Variable Configuration
+// =============================================================================
+@use "../../../../node_modules/@shohojdhara/atomix/src/styles/01-settings/settings.accordion"
+  with (
+  // ---------------------------------------------------------------------------
+  // Dimensions
+  // ---------------------------------------------------------------------------
+  $accordion-width: 100%,
+  $accordion-padding-x: 16px,
+  $accordion-padding-y: 12px,
+
+  // ---------------------------------------------------------------------------
+  // Border
+  // ---------------------------------------------------------------------------
+  $accordion-border-width: 1px,
+  $accordion-border-color: var(--atomix-border-color),
+  $accordion-border-radius: 1rem,
+
+  // ---------------------------------------------------------------------------
+  // Body
+  // ---------------------------------------------------------------------------
+  $accordion-body-padding-x: 16px,
+  $accordion-body-padding-y: 6px,
+  $accordion-body-color: var(--atomix-body-color),
+  $accordion-body-bg: var(--atomix-primary-bg-subtle),
+  // ---------------------------------------------------------------------------
+  // Header
+  // ---------------------------------------------------------------------------
+  $accordion-header-padding-x: 16px,
+  $accordion-header-padding-y: 12px,
+  $accordion-header-color: var(--atomix-body-color),
+  $accordion-header-bg: var(--atomix-primary-bg-subtle),
+  $accordion-header-bg-hover: var(--atomix-secondary-bg-subtle),
+  $accordion-header-font-size: 0.8125rem,
+  // 13px
+  $accordion-header-font-weight: 600,
+  $accordion-header-inner-gap: 8px,
+
+  // ---------------------------------------------------------------------------
+  // Icon
+  // ---------------------------------------------------------------------------
+  $accordion-icon-size: 16px,
+  $accordion-icon-color: var(--atomix-tertiary-text-emphasis),
+  $accordion-icon-transform: 180deg,
+
+  // ---------------------------------------------------------------------------
+  // States
+  // ---------------------------------------------------------------------------
+  $accordion-disable-color: var(--atomix-disabled-text-emphasis),
+  $accordion-focus-border-color: var(--atomix-primary),
+  // ---------------------------------------------------------------------------
+  // Transitions
+  // ---------------------------------------------------------------------------
+  $accordion-transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1),
+  $accordion-panel-transition: height 0.3s cubic-bezier(0.23, 1, 0.32, 1),
+  // ---------------------------------------------------------------------------
+  // Item gap — flush by default, let border-radius do the grouping
+  // ---------------------------------------------------------------------------
+  $accordion-item-gap: 6px,
+
+  // ---------------------------------------------------------------------------
+  // Features
+  // ---------------------------------------------------------------------------
+  $accordion-enable-glass: true,
+  $accordion-enable-smooth-scroll: true,
+  $accordion-enable-focus-ring: true
+);
+
+// =============================================================================
+// Additive Polish
+// =============================================================================
+.c-accordion {
+  // Header — focus ring
+  &__header {
+    &:focus-visible {
+      outline: 2px solid var(--atomix-primary);
+      outline-offset: 2px;
+      border-radius: inherit;
+    }
+  }
+
+  // Icon — muted by default, brand-colour on open
+  &__icon {
+    color: var(--atomix-tertiary-text-emphasis);
+    transition:
+      transform 0.3s cubic-bezier(0.23, 1, 0.32, 1),
+      color 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+  }
+
+  // Open state — highlight icon
+  &.is-open &__icon,
+  &__item.is-open &__icon {
+    color: var(--atomix-primary);
+  }
+
+  // Body — entry animation
+  &__body {
+    font-size: 0.8125rem;
+    line-height: 1.6;
+    padding-bottom: 16px;
+  }
+}

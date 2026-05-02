@@ -1,0 +1,157 @@
+/**
+ * Side Menu Component Variable Overrides
+ * =============================================================================
+ *
+ * Premium side navigation with glass morphism styling, refined spacing,
+ * smooth transitions, and enhanced visual hierarchy.
+ *
+ * @see https://atomix.design/docs/components/side-menu
+ */
+
+// =============================================================================
+// Side Menu Configuration
+// =============================================================================
+@use "../../../../node_modules/@shohojdhara/atomix/src/styles/01-settings/settings.side-menu"
+  with (
+  // ---------------------------------------------------------------------------
+  // Container
+  // ---------------------------------------------------------------------------
+  $side-menu-padding-x: 16px,
+  $side-menu-padding-y: 16px,
+  $side-menu-bg: var(--atomix-primary-bg-subtle),
+  $side-menu-border-radius: 0,
+  $side-menu-border-width: 1px,
+  $side-menu-border-color: var(--atomix-border-color),
+  $side-menu-box-shadow: 0 4px 24px 0 rgba(0, 0, 0, 0.06),
+  // ---------------------------------------------------------------------------
+  // Title
+  // ---------------------------------------------------------------------------
+  $side-menu-title-font-size: 0.625rem,
+  // 10px – subtle label size
+  $side-menu-title-font-weight: 700,
+  $side-menu-title-color: var(--atomix-tertiary-text-emphasis),
+  $side-menu-title-spacer-y: 6px,
+
+  // ---------------------------------------------------------------------------
+  // Toggler (collapsible section header)
+  // ---------------------------------------------------------------------------
+  $side-menu-toggler-padding-x: 10px,
+  $side-menu-toggler-padding-y: 6px,
+  $side-menu-toggler-bg: transparent,
+  $side-menu-toggler-hover-bg: var(--atomix-secondary-bg-subtle),
+  $side-menu-toggler-border-radius: 0.625rem,
+  $side-menu-toggler-transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1),
+  // ---------------------------------------------------------------------------
+  // Items / Links
+  // ---------------------------------------------------------------------------
+  $side-menu-item-padding-x: 10px,
+  $side-menu-item-padding-y: 6px,
+  $side-menu-item-font-size: 0.8125rem,
+  // 13px
+  $side-menu-item-font-weight: 450,
+  $side-menu-item-color: var(--atomix-secondary-text-emphasis),
+  $side-menu-item-hover-color: var(--atomix-body-color),
+  $side-menu-item-active-color: var(--atomix-brand-text-emphasis),
+  $side-menu-item-disabled-color: var(--atomix-disabled-text-emphasis),
+  $side-menu-item-bg: transparent,
+  $side-menu-item-hover-bg: var(--atomix-secondary-bg-subtle),
+  $side-menu-item-active-bg: var(--atomix-brand-bg-subtle),
+  $side-menu-item-disabled-bg: transparent,
+  $side-menu-item-border-radius: 0.625rem,
+  $side-menu-item-transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1),
+  $side-menu-item-gap: 6px,
+
+  // ---------------------------------------------------------------------------
+  // List
+  // ---------------------------------------------------------------------------
+  $side-menu-list-margin-bottom: 12px,
+  $side-menu-list-gap: 2px,
+
+  // ---------------------------------------------------------------------------
+  // Wrapper (collapse animation)
+  // ---------------------------------------------------------------------------
+  $side-menu-wrapper-transition: height 0.3s cubic-bezier(0.23, 1, 0.32, 1),
+  $side-menu-inner-padding-top: 6px,
+
+  // ---------------------------------------------------------------------------
+  // Mobile
+  // ---------------------------------------------------------------------------
+  $side-menu-mobile-padding-x: 16px,
+  $side-menu-mobile-padding-y: 16px,
+
+  // ---------------------------------------------------------------------------
+  // Dark mode
+  // ---------------------------------------------------------------------------
+  $side-menu-bg-dark: var(--atomix-gray-9),
+  $side-menu-border-color-dark: var(--atomix-gray-7),
+  $side-menu-title-color-dark: var(--atomix-gray-4),
+  $side-menu-item-color-dark: var(--atomix-gray-4),
+  $side-menu-item-hover-color-dark: var(--atomix-gray-1),
+  $side-menu-item-active-color-dark: var(--atomix-brand-text-emphasis)
+);
+
+// =============================================================================
+// Enhanced Visual Overrides
+// These selectors extend the compiled Atomix component without touching BEM
+// internals — purely additive layer of polish.
+// =============================================================================
+
+.c-side-menu {
+  // ----------------------------------------------------------------------------
+  // Refined title — uppercase tracking for section labels
+  // ----------------------------------------------------------------------------
+  &__title {
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    font-size: 0.625rem;
+    padding: 0 4px;
+  }
+
+  // ----------------------------------------------------------------------------
+  // Link — left-accent indicator on active state
+  // ----------------------------------------------------------------------------
+  &__link {
+    // Decorative left accent bar (active indicator)
+    &::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%) scaleY(0);
+      width: 3px;
+      height: 60%;
+      border-radius: 0 2px 2px 0;
+      background-color: var(--atomix-brand-text-emphasis);
+      transition:
+        transform 0.3s cubic-bezier(0.23, 1, 0.32, 1),
+        opacity 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+      opacity: 0;
+    }
+
+    &.is-active {
+      font-weight: 600;
+
+      &::before {
+        transform: translateY(-50%) scaleY(1);
+        opacity: 1;
+      }
+    }
+  }
+
+  // ----------------------------------------------------------------------------
+  // Toggler icon — smoother chevron spin
+  // ----------------------------------------------------------------------------
+  &__toggler-icon {
+    transition: transform 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+    color: var(--atomix-tertiary-text-emphasis);
+  }
+
+  // ----------------------------------------------------------------------------
+  // Separator between sections (last list in a group gets a subtle divider)
+  // ----------------------------------------------------------------------------
+  &__list:not(:last-child) {
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--atomix-border-color);
+    margin-bottom: 12px;
+  }
+}

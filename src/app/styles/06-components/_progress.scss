@@ -1,0 +1,14 @@
+/**
+ * Progress Component Variable Overrides
+ * =============================================================================
+ * 
+ * Standard progress styling for Atomix documentation.
+ * 
+ * @see https://atomix.design/docs/components/progress
+ */
+
+@use "../../../../node_modules/@shohojdhara/atomix/src/styles/01-settings/settings.progress"
+  with (
+  $progress-height: 8px,
+  $progress-border-radius: 1rem
+);

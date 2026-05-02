@@ -1,0 +1,27 @@
+/**
+ * Z-Index Layer Overrides
+ * =============================================================================
+ *
+ * Explicit stacking order for all floating UI surfaces:
+ *
+ *   dropdown  1000 — menus, selects, comboboxes
+ *   sticky    1020 — sticky headers, pinned sidebars
+ *   fixed     1030 — fixed navbars, floating action buttons
+ *   modal     1050 — dialog overlays
+ *   popover   1060 — popovers, rich tooltips with actions
+ *   tooltip   1070 — plain text tooltips (above popovers)
+ *   drawer    1080 — edge/slide-in panels (highest persistent surface)
+ *
+ * @see https://atomix.design/docs/design-tokens/z-index
+ */
+
+@use "../../../../node_modules/@shohojdhara/atomix/src/styles/01-settings/settings.z-layers"
+  with (
+  $z-index-dropdown: 1000,
+  $z-index-sticky: 1020,
+  $z-index-fixed: 1030,
+  $z-index-modal: 1050,
+  $z-index-popover: 1060,
+  $z-index-tooltip: 1070,
+  $z-index-drawer: 1080
+);

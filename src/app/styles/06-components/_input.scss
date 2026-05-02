@@ -1,0 +1,111 @@
+/**
+ * Input Component Variable Overrides
+ * =============================================================================
+ *
+ * Refined form inputs: crisp typography, well-proportioned padding, clear
+ * border state progression (default → hover → focus → error/success),
+ * and smooth transitions throughout.
+ *
+ * @see https://atomix.design/docs/components/input
+ */
+
+// =============================================================================
+// Input Variable Configuration
+// =============================================================================
+@use "../../../../node_modules/@shohojdhara/atomix/src/styles/01-settings/settings.input"
+  with (
+  // ---------------------------------------------------------------------------
+  // Color & surface
+  // ---------------------------------------------------------------------------
+  $input-color: var(--atomix-body-color),
+  $input-bg: var(--atomix-primary-bg-subtle),
+  $input-bg-disabled: var(--atomix-secondary-bg-subtle),
+  $input-placeholder-color: var(--atomix-tertiary-text-emphasis),
+  $input-disabled-color: var(--atomix-disabled-text-emphasis),
+  $input-disabled-bg: var(--atomix-secondary-bg-subtle),
+  // ---------------------------------------------------------------------------
+  // Typography
+  // ---------------------------------------------------------------------------
+  $input-font-size: 0.8125rem,
+  // 13px
+  $input-font-size-sm: 0.75rem,
+  // 12px
+  $input-font-size-lg: 0.875rem,
+  // 14px
+  $input-line-height-md: 1.4,
+  $input-line-height-sm: 1.4,
+  $input-line-height-lg: 1.4,
+
+  // ---------------------------------------------------------------------------
+  // Padding
+  // ---------------------------------------------------------------------------
+  $input-padding-x: 0.75rem,
+  // 12px
+  $input-padding-y: 0.4375rem,
+  // 7px — matches compact btn height
+  $input-padding-x-sm: 0.625rem,
+  $input-padding-y-sm: 0.25rem,
+  $input-padding-x-lg: 0.875rem,
+  $input-padding-y-lg: 0.625rem,
+
+  // ---------------------------------------------------------------------------
+  // Border
+  // ---------------------------------------------------------------------------
+  $input-border-width: 1px,
+  $input-border-color: var(--atomix-border-color),
+  $input-hover-border-color: var(--atomix-primary-border-subtle),
+  $input-focus-border-color: var(--atomix-primary),
+  $input-invalid-border-color: var(--atomix-error),
+  $input-success-border-color: var(--atomix-success),
+  $input-border-radius: 0.625rem,
+
+  // 10px — matches button
+  // ---------------------------------------------------------------------------
+  // Textarea height
+  // ---------------------------------------------------------------------------
+  $input-textarea-height: auto,
+  $input-textarea-height-sm: auto,
+  $input-textarea-height-lg: auto
+);
+
+// =============================================================================
+// Additive Polish
+// =============================================================================
+.c-input {
+  transition:
+    border-color 0.3s cubic-bezier(0.23, 1, 0.32, 1),
+    box-shadow 0.3s cubic-bezier(0.23, 1, 0.32, 1),
+    background-color 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+
+  // Hover — gentle border lift
+  &:hover:not(:disabled):not(:focus) {
+    border-color: var(--atomix-primary-border-subtle);
+  }
+
+  // Focus — brand ring
+  &:focus {
+    border-color: var(--atomix-primary);
+    box-shadow: 0 0 0 3px rgba(var(--atomix-primary-rgb, 6, 182, 212), 0.16);
+    outline: none;
+  }
+
+  // Success state
+  &.is-valid,
+  &[aria-invalid="false"] {
+    border-color: var(--atomix-success);
+    box-shadow: 0 0 0 3px rgba(var(--atomix-success-rgb, 16, 185, 129), 0.14);
+  }
+
+  // Error state
+  &.is-invalid,
+  &[aria-invalid="true"] {
+    border-color: var(--atomix-error);
+    box-shadow: 0 0 0 3px rgba(var(--atomix-error-rgb, 239, 68, 68), 0.14);
+  }
+
+  // Disabled
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+}

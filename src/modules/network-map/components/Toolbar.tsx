@@ -124,12 +124,12 @@ export const Toolbar: React.FC<ToolbarProps> = ({
               key={tool.id}
               content={
                 <div className="u-flex u-flex-column u-gap-1 u-p-1">
-                  <strong className="u-text-sm ">{tool.label}</strong>
-                  <span className="u-text-xs u-text-secondary-emphasis">
+                  <strong className="u-fs-sm">{tool.label}</strong>
+                  <span className="u-fs-xs u-text-secondary-emphasis">
                     {tool.description}
                   </span>
                   {tool.shortcut && (
-                    <kbd className="u-mt-1 u-self-start u-px-2 u-py-0 u-bg-white-opacity-10 u-rounded-sm u-text-xs u-font-mono">
+                    <kbd className="u-mt-1 u-self-start u-px-2 u-py-0 u-bg-secondary-subtle u-rounded-sm u-fs-xs u-font-mono">
                       {tool.shortcut}
                     </kbd>
                   )}

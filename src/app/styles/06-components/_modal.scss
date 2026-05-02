@@ -1,0 +1,107 @@
+/**
+ * Modal Component Variable Overrides
+ * =============================================================================
+ *
+ * Premium modal design: generous padding, strong glass backdrop blur, refined
+ * typography hierarchy, and a complete set of size breakpoints.
+ *
+ * @see https://atomix.design/docs/components/modal
+ */
+
+// =============================================================================
+// Modal Variable Configuration
+// =============================================================================
+@use "../../../../node_modules/@shohojdhara/atomix/src/styles/01-settings/settings.modal"
+  with (
+  // ---------------------------------------------------------------------------
+  // Content area
+  // ---------------------------------------------------------------------------
+  $modal-inner-padding: 1.25rem,
+  $modal-content-bg: var(--atomix-primary-bg-subtle),
+  $modal-content-border-radius: 1rem,
+  $modal-content-box-shadow: (
+    0 24px 48px -8px rgba(0, 0, 0, 0.18),
+    0 8px 16px -4px rgba(0, 0, 0, 0.1)
+  ),
+
+  // ---------------------------------------------------------------------------
+  // Header
+  // ---------------------------------------------------------------------------
+  $modal-header-padding-bottom: 0.75rem,
+  $modal-title-font-size: 1.125rem,
+
+  // ---------------------------------------------------------------------------
+  // Sub-heading
+  // ---------------------------------------------------------------------------
+  $modal-sub-margin-top: 4px,
+  $modal-sub-font-size: 0.8125rem,
+  $modal-sub-color: var(--atomix-tertiary-text-emphasis),
+  // ---------------------------------------------------------------------------
+  // Footer
+  // ---------------------------------------------------------------------------
+  $modal-footer-items-gap: 0.5rem,
+
+  // ---------------------------------------------------------------------------
+  // Backdrop
+  // ---------------------------------------------------------------------------
+  $modal-backdrop-opacity: 0.55,
+  $modal-backdrop-blur: 14px,
+
+  // ---------------------------------------------------------------------------
+  // Close icon
+  // ---------------------------------------------------------------------------
+  $modal-close-icon-size: 24px,
+
+  // ---------------------------------------------------------------------------
+  // Sizes
+  // ---------------------------------------------------------------------------
+  $modal-sm: 340px,
+  $modal-md: 520px,
+  $modal-lg: 800px,
+  $modal-xl: 1100px
+);
+
+// =============================================================================
+// Additive Polish
+// =============================================================================
+.c-modal {
+  // Header — clear border between header and body
+  &__header {
+    border-bottom: 1px solid var(--atomix-border-color);
+    padding-bottom: 0.75rem;
+  }
+
+  // Footer — clear border above actions
+  &__footer {
+    border-top: 1px solid var(--atomix-border-color);
+    padding-top: 0.75rem;
+  }
+
+  // Title — strong visual hierarchy
+  &__title {
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: var(--atomix-headings-color, var(--atomix-body-color));
+  }
+
+  // Sub-heading — muted descriptor
+  &__sub {
+    line-height: 1.5;
+  }
+
+  // Content container — entrance animation
+  &__content {
+    animation: modal-slide-in 0.3s cubic-bezier(0.23, 1, 0.32, 1) both;
+  }
+}
+
+@keyframes modal-slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}

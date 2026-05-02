@@ -1,0 +1,239 @@
+/**
+ * Button Component Variable Overrides
+ * =============================================================================
+ *
+ * Premium button system: precise sizing scale, refined typography, multi-layer
+ * elevation hover lift, crisp focus rings, and clean disabled states — all via
+ * the Atomix @use variable override API.
+ *
+ * @see https://atomix.design/docs/components/button
+ */
+
+@use "sass:map";
+
+// =============================================================================
+// Button Variable Configuration
+// =============================================================================
+@use "../../../../node_modules/@shohojdhara/atomix/src/styles/01-settings/settings.button"
+  with (
+  // ---------------------------------------------------------------------------
+  // Base geometry & spacing
+  // ---------------------------------------------------------------------------
+  $btn-padding-y: 0.4375rem,
+  // 7px
+  $btn-padding-x: 0.875rem,
+  // 14px
+  $btn-line-height: 1.25,
+  $btn-border-width: 1px,
+  $btn-inner-gap: 5px,
+
+  // icon ↔ label gap
+  // ---------------------------------------------------------------------------
+  // Typography
+  // ---------------------------------------------------------------------------
+  $btn-font-size: 0.8125rem,
+  // 13px – tight, professional label
+  $btn-font-weight: 600,
+  $btn-letter-spacing: 0.01em,
+  // subtle tracking – aids readability
+  $btn-text-transform: none,
+  $btn-white-space: nowrap,
+
+  // ---------------------------------------------------------------------------
+  // Icon sizing per scale
+  // ---------------------------------------------------------------------------
+  $btn-icon-size: 15px,
+  $btn-icon-size-sm: 13px,
+  $btn-icon-size-lg: 18px,
+
+  // ---------------------------------------------------------------------------
+  // Size — sm
+  // ---------------------------------------------------------------------------
+  $btn-padding-y-sm: 0.25rem,
+  // 4px
+  $btn-padding-x-sm: 0.625rem,
+  // 10px
+  $btn-font-size-sm: 0.75rem,
+
+  // 12px
+  // ---------------------------------------------------------------------------
+  // Size — lg
+  // ---------------------------------------------------------------------------
+  $btn-padding-y-lg: 0.625rem,
+  // 10px
+  $btn-padding-x-lg: 1.375rem,
+  // 22px
+  $btn-font-size-lg: 0.875rem,
+
+  // 14px
+  // ---------------------------------------------------------------------------
+  // Border Radius — harmonised with global scale
+  // ---------------------------------------------------------------------------
+  $btn-border-radius: 0.625rem,
+  // 10px – mid-weight rounded, not pill
+  $btn-border-radius-sm: 0.5rem,
+  //  8px
+  $btn-border-radius-lg: 0.75rem,
+
+  // 12px
+  // ---------------------------------------------------------------------------
+  // Shadows — elevation tokens
+  // ---------------------------------------------------------------------------
+  $btn-box-shadow: (0 1px 2px 0 rgba(0, 0, 0, 0.05)),
+  $btn-hover-shadow: (
+    0 4px 8px -2px rgba(0, 0, 0, 0.12),
+    0 2px 4px -2px rgba(0, 0, 0, 0.08)
+  ),
+  $btn-active-shadow: (0 1px 2px 0 rgba(0, 0, 0, 0.06)),
+
+  // ---------------------------------------------------------------------------
+  // Hover & active micro-transforms
+  // ---------------------------------------------------------------------------
+  $btn-hover-transform: translateY(-1px),
+  $btn-active-transform: translateY(0px),
+  // ---------------------------------------------------------------------------
+  // Hover color blend amounts (controls how much shade/tint on hover)
+  // ---------------------------------------------------------------------------
+  $btn-hover-bg-shade-amount: 75%,
+  $btn-hover-bg-tint-amount: 80%,
+  $btn-hover-border-shade-amount: 18%,
+  $btn-hover-border-tint-amount: 8%,
+  $btn-active-bg-shade-amount: 18%,
+  $btn-active-bg-tint-amount: 18%,
+  $btn-active-border-shade-amount: 22%,
+  $btn-active-border-tint-amount: 8%,
+
+  // ---------------------------------------------------------------------------
+  // Focus ring
+  // ---------------------------------------------------------------------------
+  $btn-focus-width: 3px,
+  $btn-focus-shadow-opacity: 0.22,
+  $btn-focus-outline: 2px solid var(--atomix-primary),
+  $btn-focus-outline-offset: 2px,
+
+  // ---------------------------------------------------------------------------
+  // Disabled state
+  // ---------------------------------------------------------------------------
+  $btn-disabled-opacity: 0.5,
+  $btn-disabled-color: var(--atomix-disabled-text-emphasis),
+  $btn-disabled-bg: var(--atomix-secondary-bg-subtle),
+  $btn-disabled-border-color: var(--atomix-border-color),
+  // ---------------------------------------------------------------------------
+  // Link variant
+  // ---------------------------------------------------------------------------
+  $btn-link-color: var(--atomix-brand-text-emphasis),
+  $btn-link-color-hover: var(--atomix-primary-hover, var(--atomix-primary)),
+  $btn-link-font-weight: 500,
+  $btn-link-border-color: var(--atomix-brand-border-subtle),
+  $btn-link-border-color-hover: var(--atomix-primary),
+  // ---------------------------------------------------------------------------
+  // Transition — smooth cubic-bezier across all properties
+  // ---------------------------------------------------------------------------
+  $btn-transition: (
+      color 0.3s cubic-bezier(0.23, 1, 0.32, 1),
+      background-color 0.3s cubic-bezier(0.23, 1, 0.32, 1),
+      border-color 0.3s cubic-bezier(0.23, 1, 0.32, 1),
+      box-shadow 0.3s cubic-bezier(0.23, 1, 0.32, 1),
+      transform 0.3s cubic-bezier(0.23, 1, 0.32, 1),
+      opacity 0.3s cubic-bezier(0.23, 1, 0.32, 1)
+    ),
+
+  // ---------------------------------------------------------------------------
+  // Capabilities
+  // ---------------------------------------------------------------------------
+  $enable-button-pointers: true,
+  $enable-gradients: false
+);
+
+// =============================================================================
+// Additive Visual Polish
+// These rules layer on top of the compiled Atomix output — no BEM internals
+// are modified; only additive overrides that extend the component.
+// =============================================================================
+
+.c-btn {
+  // --------------------------------------------------------------------------
+  // Lift + shadow interaction layer
+  // Atomix already applies $btn-hover-transform, but we reinforce the shadow
+  // elevation via a box-shadow transition so it feels tactile.
+  // --------------------------------------------------------------------------
+  &:not(:disabled):not(.c-btn--disabled) {
+    &:hover {
+      box-shadow:
+        0 4px 8px -2px rgba(0, 0, 0, 0.12),
+        0 2px 4px -2px rgba(0, 0, 0, 0.08);
+      transform: translateY(-1px);
+    }
+
+    &:active {
+      box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+      transform: translateY(0);
+    }
+  }
+
+  // --------------------------------------------------------------------------
+  // Focus ring — matches primary brand colour
+  // --------------------------------------------------------------------------
+  &:focus-visible {
+    outline: 2px solid var(--atomix-primary);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 4px rgba(var(--atomix-primary-rgb, 6, 182, 212), 0.18);
+  }
+
+  // --------------------------------------------------------------------------
+  // Loading overlay — glass tint instead of hard white
+  // --------------------------------------------------------------------------
+  &--loading::before {
+    background-color: rgba(255, 255, 255, 0.35) !important;
+    backdrop-filter: blur(2px);
+  }
+
+  // --------------------------------------------------------------------------
+  // Selected state — double ring that matches brand
+  // --------------------------------------------------------------------------
+  &--selected {
+    box-shadow:
+      0 0 0 1px var(--atomix-primary),
+      0 0 0 3px rgba(var(--atomix-primary-rgb, 6, 182, 212), 0.22) !important;
+  }
+
+  // --------------------------------------------------------------------------
+  // Icon-only variant — enforce square proportions
+  // --------------------------------------------------------------------------
+  &--icon {
+    aspect-ratio: 1;
+    padding-inline: var(--atomix-btn-padding-y, 0.5625rem);
+  }
+
+  // --------------------------------------------------------------------------
+  // Rounded pill variant
+  // --------------------------------------------------------------------------
+  &--rounded {
+    letter-spacing: 0.02em;
+  }
+
+  // --------------------------------------------------------------------------
+  // Disabled — ensure cursor is locked across all techniques
+  // --------------------------------------------------------------------------
+  &:disabled,
+  &--disabled {
+    cursor: not-allowed !important;
+    pointer-events: auto !important; // keep cursor: not-allowed visible
+    transform: none !important;
+    box-shadow: none !important;
+  }
+
+  // --------------------------------------------------------------------------
+  // Reduced motion — collapse all transforms / transitions
+  // --------------------------------------------------------------------------
+  @media (prefers-reduced-motion: reduce) {
+    transition: opacity 0.18s linear !important;
+    transform: none !important;
+
+    &:hover,
+    &:active {
+      transform: none !important;
+      box-shadow: none !important;
+    }
+  }
+}

@@ -1,0 +1,16 @@
+/**
+ * Background Variable Overrides
+ * =============================================================================
+ * 
+ * Premium background configuration with glassmorphism support.
+ * 
+ * @see https://atomix.design/docs/design-tokens/background
+ */
+
+@use "../../../../node_modules/@shohojdhara/atomix/src/styles/01-settings/settings.background"
+  with (
+  $background-enable-gradient-overlay: true,
+  $background-transparency-enable: true,
+  $background-enable-with-shadow: true,
+  $background-transparency: 0.15
+);

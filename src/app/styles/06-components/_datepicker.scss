@@ -1,0 +1,193 @@
+/**
+ * Datepicker Component Variable Overrides
+ * =============================================================================
+ *
+ * Premium calendar picker: glass-tinted popup, brand selected cells,
+ * refined day/week sizing, crisp typography hierarchy, and smooth transitions.
+ *
+ * @see https://atomix.design/docs/components/datepicker
+ */
+
+// =============================================================================
+// Datepicker Variable Configuration
+// =============================================================================
+@use "../../../../node_modules/@shohojdhara/atomix/src/styles/01-settings/settings.datepicker"
+  with (
+  // ---------------------------------------------------------------------------
+  // Calendar popup padding
+  // ---------------------------------------------------------------------------
+  $datepicker-padding-x: 10px,
+  $datepicker-padding-y: 12px,
+
+  // ---------------------------------------------------------------------------
+  // Surface
+  // ---------------------------------------------------------------------------
+  $datepicker-border-radius: 0.875rem,
+  // 14px — generously rounded popup
+  $datepicker-border-width: 1px,
+  $datepicker-border-color: var(--atomix-border-color),
+  // ---------------------------------------------------------------------------
+  // Body inner padding
+  // ---------------------------------------------------------------------------
+  $datepicker-body-padding-x: 6px,
+  $datepicker-body-padding-y: 6px,
+
+  // ---------------------------------------------------------------------------
+  // Month header typography
+  // ---------------------------------------------------------------------------
+  $datepicker-month-font-size: 0.875rem,
+  // 14px
+  $datepicker-month-font-weight: 700,
+
+  // ---------------------------------------------------------------------------
+  // Year label typography
+  // ---------------------------------------------------------------------------
+  $datepicker-year-font-size: 0.875rem,
+  $datepicker-year-font-weight: 700,
+
+  // ---------------------------------------------------------------------------
+  // Weekday header row
+  // ---------------------------------------------------------------------------
+  $datepicker-week-font-size: 0.6875rem,
+  // 11px — small column labels
+  $datepicker-week-font-weight: 600,
+  $datepicker-week-width: 36px,
+  $datepicker-week-height: 32px,
+
+  // ---------------------------------------------------------------------------
+  // Day cells
+  // ---------------------------------------------------------------------------
+  $datepicker-day-font-size: 0.8125rem,
+  // 13px
+  $datepicker-day-font-weight: 400,
+  $datepicker-day-width: 36px,
+  $datepicker-day-height: 36px,
+  $datepicker-day-hover-bg: var(--atomix-secondary-bg-subtle),
+  $datepicker-day-border-radius: 9999px,
+
+  // pill day cells
+  // ---------------------------------------------------------------------------
+  // Special day states
+   // ---------------------------------------------------------------------------
+);
+
+// =============================================================================
+// Additive Polish
+// =============================================================================
+.c-datepicker {
+  // Calendar popup — entrance animation + border
+  &__calendar {
+    border: 1px solid var(--atomix-border-color);
+    animation: datepicker-open 0.2s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  // Header — tighter border
+  &__header {
+    padding-bottom: 8px;
+    margin-bottom: 4px;
+    border-bottom-color: var(--atomix-border-color);
+  }
+
+  // View-switch button — stronger weight for month/year label
+  &__view-switch {
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    border-radius: 0.5rem;
+    transition: background-color 0.14s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  // Nav buttons — tighter radius matching day cells
+  &__nav-button {
+    border-radius: 0.5rem;
+    transition: background-color 0.14s cubic-bezier(0.4, 0, 0.2, 1);
+
+    &:focus-visible {
+      outline: 2px solid var(--atomix-primary);
+      outline-offset: 2px;
+    }
+  }
+
+  // Weekday labels — uppercase tracking
+  &__weekday {
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--atomix-tertiary-text-emphasis);
+  }
+
+  // Day cell — smooth transitions
+  &__day {
+    transition:
+      background-color 0.14s cubic-bezier(0.4, 0, 0.2, 1),
+      color 0.14s cubic-bezier(0.4, 0, 0.2, 1),
+      transform 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+    font-weight: 450;
+
+    &:hover:not(&--disabled):not(&--selected):not(&--in-range) {
+      transform: scale(1.08);
+    }
+
+    // Today dot — brand colour
+    &--today {
+      font-weight: 700;
+    }
+
+    // Selected — glow ring
+    &--selected {
+      box-shadow: 0 2px 8px -1px rgba(var(--atomix-primary-rgb, 6, 182, 212), 0.45);
+      font-weight: 700;
+    }
+
+    // Range fill — soft brand tint
+    &--in-range {
+      border-radius: 0;
+    }
+
+    // Range start cap
+    &--start-range {
+      border-top-right-radius: 0 !important;
+      border-bottom-right-radius: 0 !important;
+    }
+
+    // Range end cap
+    &--end-range {
+      border-top-left-radius: 0 !important;
+      border-bottom-left-radius: 0 !important;
+    }
+  }
+
+  // Month/Year grid items — consistent with day cells
+  &__month,
+  &__year {
+    border-radius: 0.625rem;
+    transition: background-color 0.14s cubic-bezier(0.4, 0, 0.2, 1);
+
+    &--selected {
+      font-weight: 700;
+      box-shadow: 0 2px 8px -1px rgba(var(--atomix-primary-rgb, 6, 182, 212), 0.4);
+    }
+  }
+
+  // Footer — clear separator
+  &__footer {
+    border-top-color: var(--atomix-border-color);
+    margin-top: 8px;
+    padding-top: 10px;
+  }
+
+  // Input trigger — icon pointer
+  &__calendar-icon {
+    font-size: 1rem;
+    transition: color 0.16s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}
+
+@keyframes datepicker-open {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}

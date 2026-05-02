@@ -1,0 +1,114 @@
+/**
+ * Dropdown Component Variable Overrides
+ * =============================================================================
+ *
+ * Premium dropdown surface: floating glass-tinted background, elevated shadow,
+ * brand-tinted hover/active states, and a smooth spring-eased open animation.
+ *
+ * @see https://atomix.design/docs/components/dropdown
+ */
+
+// =============================================================================
+// Dropdown Variable Configuration
+// =============================================================================
+@use "../../../../node_modules/@shohojdhara/atomix/src/styles/01-settings/settings.dropdown"
+  with (
+  // ---------------------------------------------------------------------------
+  // Container
+  // ---------------------------------------------------------------------------
+  $dropdown-min-width: 200px,
+  $dropdown-font-size: 0.875rem,
+  // 14px
+  $dropdown-color: var(--atomix-body-color),
+  $dropdown-bg: var(--atomix-primary-bg-subtle),
+  $dropdown-border-color: var(--atomix-border-color),
+  $dropdown-border-radius: 0.875rem,
+  // 14px — rounder than buttons
+  $dropdown-border-width: 1px,
+  $dropdown-padding-x: 6px,
+  $dropdown-padding-y: 6px,
+  $dropdown-spacer: 4px,
+  $dropdown-box-shadow: (
+    0 16px 32px -4px rgba(0, 0, 0, 0.14),
+    0 4px 8px -2px rgba(0, 0, 0, 0.08)
+  ),
+
+  // ---------------------------------------------------------------------------
+  // Items
+  // ---------------------------------------------------------------------------
+  $dropdown-item-padding-x: 10px,
+  $dropdown-item-padding-y: 8px,
+  $dropdown-item-hover-color: var(--atomix-body-color),
+  $dropdown-item-hover-bg: var(--atomix-secondary-bg-subtle),
+  // ---------------------------------------------------------------------------
+  // Link states
+  // ---------------------------------------------------------------------------
+  $dropdown-link-color: var(--atomix-body-color),
+  $dropdown-link-hover-color: var(--atomix-brand-text-emphasis),
+  $dropdown-link-hover-bg: var(--atomix-brand-bg-subtle),
+  $dropdown-link-active-color: var(--atomix-brand-text-emphasis),
+  $dropdown-link-active-bg: var(--atomix-brand-bg-subtle),
+  $dropdown-link-border-radius: 0.5rem,
+
+  // ---------------------------------------------------------------------------
+  // Header
+  // ---------------------------------------------------------------------------
+  $dropdown-header-color: var(--atomix-tertiary-text-emphasis),
+  $dropdown-header-padding: 6px 10px,
+
+  // ---------------------------------------------------------------------------
+  // Divider
+  // ---------------------------------------------------------------------------
+  $dropdown-divider-margin-y: 6px,
+  $dropdown-divider-bg: var(--atomix-border-color),
+  // ---------------------------------------------------------------------------
+  // Animation
+  // ---------------------------------------------------------------------------
+  $dropdown-animation-duration: 0.22s,
+  $dropdown-animation-timing: cubic-bezier(0.16, 1, 0.3, 1)
+);
+
+// =============================================================================
+// Additive Polish
+// =============================================================================
+.c-dropdown {
+  // Menu surface — entry animation
+  &__menu {
+    transform-origin: top center;
+    animation: dropdown-open 0.22s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  // Individual link item
+  &__link,
+  &__item {
+    border-radius: 0.5rem;
+    transition:
+      background-color 0.14s cubic-bezier(0.4, 0, 0.2, 1),
+      color 0.14s cubic-bezier(0.4, 0, 0.2, 1);
+    font-weight: 450;
+  }
+
+  // Header label — uppercase section label treatment
+  &__header {
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  // Divider — refined opacity
+  &__divider {
+    opacity: 0.5;
+  }
+}
+
+@keyframes dropdown-open {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}

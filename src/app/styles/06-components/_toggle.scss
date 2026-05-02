@@ -1,0 +1,129 @@
+/**
+ * Toggle Component Variable Overrides
+ * =============================================================================
+ *
+ * Premium toggle switch: pill track with brand-blue on state, white handle,
+ * tight label typography, and a smooth spring slide transition.
+ *
+ * @see https://atomix.design/docs/components/toggle
+ */
+
+// =============================================================================
+// Toggle Variable Configuration
+// =============================================================================
+@use "../../../../node_modules/@shohojdhara/atomix/src/styles/01-settings/settings.toggle"
+  with (
+  // ---------------------------------------------------------------------------
+  // Label gap
+  // ---------------------------------------------------------------------------
+  $toggle-gap: 8px,
+
+  // ---------------------------------------------------------------------------
+  // Track colours
+  // ---------------------------------------------------------------------------
+  $toggle-switch-on-bg: var(--atomix-primary),
+  $toggle-switch-off-bg: var(--atomix-tertiary-bg-subtle),
+  $toggle-switch-disabled-bg: var(--atomix-secondary-bg-subtle),
+  $toggle-switch-border-radius: 9999px,
+
+  // pill track
+  // ---------------------------------------------------------------------------
+  // Track box-shadow (subtle depth)
+  // ---------------------------------------------------------------------------
+  $toggle-switch-box-shadow: (inset 0 1px 3px rgba(0, 0, 0, 0.15)),
+  // ---------------------------------------------------------------------------
+  // Track sizes — sm
+  // ---------------------------------------------------------------------------
+  $toggle-switch-width-sm: 44px,
+  $toggle-switch-height-sm: 24px,
+
+  // ---------------------------------------------------------------------------
+  // Track sizes — md (default)
+  // ---------------------------------------------------------------------------
+  $toggle-switch-width-md: 32px,
+  $toggle-switch-height-md: 18px,
+  $toggle-switch-width: 32px,
+  $toggle-switch-height: 18px,
+
+  // ---------------------------------------------------------------------------
+  // Handle
+  // ---------------------------------------------------------------------------
+  $toggle-switch-handle-bg: #ffffff,
+  $toggle-switch-handle-border-radius: 9999px,
+  $toggle-switch-handle-margin: 2px,
+
+  // ---------------------------------------------------------------------------
+  // Handle sizes — sm
+  // ---------------------------------------------------------------------------
+  $toggle-switch-handle-width-sm: 20px,
+  $toggle-switch-handle-height-sm: 20px,
+
+  // ---------------------------------------------------------------------------
+  // Handle sizes — md (default)
+  // ---------------------------------------------------------------------------
+  $toggle-switch-handle-width-md: 14px,
+  $toggle-switch-handle-height-md: 14px,
+  $toggle-switch-handle-width: 14px,
+  $toggle-switch-handle-height: 14px,
+
+  // ---------------------------------------------------------------------------
+  // Label
+  // ---------------------------------------------------------------------------
+  $toggle-label-font-size: 0.8125rem,
+  // 13px
+  $toggle-label-color: var(--atomix-body-color)
+);
+
+// =============================================================================
+// Additive Polish
+// =============================================================================
+.c-toggle {
+  align-items: center;
+
+  // Track — spring transition
+  &__track,
+  &__switch {
+    transition:
+      background-color 0.3s cubic-bezier(0.23, 1, 0.32, 1),
+      box-shadow 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+  }
+
+  // Handle — spring slide
+  &__handle,
+  &__thumb {
+    transition: transform 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+  }
+
+  // Focus ring on track
+  &__track:focus-visible,
+  &__switch:focus-visible {
+    outline: 2px solid var(--atomix-primary);
+    outline-offset: 2px;
+  }
+
+  // On state — glow shadow
+  &.is-on &__track,
+  &.is-checked &__switch,
+  input:checked + &__track {
+    box-shadow:
+      inset 0 1px 3px rgba(0, 0, 0, 0.15),
+      0 0 0 3px rgba(var(--atomix-primary-rgb, 6, 182, 212), 0.18);
+  }
+
+  // Label typography
+  &__label {
+    font-weight: 450;
+    line-height: 1.4;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  // Disabled
+  &.is-disabled,
+  &:has(input:disabled) {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+}

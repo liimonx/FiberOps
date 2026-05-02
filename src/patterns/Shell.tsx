@@ -68,7 +68,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
             <div className={styles.brand}>BCN FiberOps</div>
             <Badge variant="info" label="Mocked" />
           </div>
-          
+
           <SideMenu glass>
             <SideMenuList>
               {nav.map((item) => (
@@ -79,7 +79,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
                   className={`${styles.navItem} ${isActive(item.href) ? styles.navItemActive : ""}`}
                   onClick={() => setSidebarOpen(false)}
                 >
-                  <Icon name={item.icon as any} className={styles.navIcon} />
+                  <Icon name={item.icon} className="u-me-2" />
                   <span>{item.label}</span>
                 </SideMenuItem>
               ))}
