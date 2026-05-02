@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useRef } from "react";
-import { Icon, Button } from "@shohojdhara/atomix";
+import { Icon, Button, Input } from "@shohojdhara/atomix";
 
 interface SearchInputProps {
   value: string;
@@ -40,14 +40,14 @@ export const SearchInput: React.FC<SearchInputProps> = ({
           className="u-text-secondary-emphasis u-opacity-50"
         />
       </div>
-      <input
+      <Input
         ref={inputRef}
         type="text"
         value={value}
         onChange={(e) => onChange(e.target.value)}
         onKeyDown={onKeyDown}
         placeholder={placeholder}
-        className="u-w-100 u-ps-9 u-pe-9 u-py-4 u-bg-transparent u-border-0  u-text-base u-font-medium u-outline-none"
+        className="u-w-100 u-ps-10"
         aria-label="Search network assets"
         aria-controls={ariaControls}
         aria-activedescendant={ariaActiveDescendant}

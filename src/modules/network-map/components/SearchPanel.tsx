@@ -98,8 +98,9 @@ export const SearchPanel: React.FC<SearchPanelProps> = ({
 
   return (
     <Card
-      glass={true}
-      className={`u-w-100 u-p-0 u-overflow-hidden u-flex u-flex-column ${className}`}
+      glass={{ blurAmount: 5, mode: "shader", shaderVariant: "plasma" }}
+      appearance="ghost"
+      className={` ${className}`}
     >
       <SearchInput
         value={query}

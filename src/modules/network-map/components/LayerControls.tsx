@@ -109,7 +109,11 @@ export const LayerControls: React.FC<LayerControlsProps> = ({ className = "" }) 
   const progressPercentage = (activeCount / totalLayers) * 100;
 
   return (
-    <Card glass={true} className={`u-overflow-hidden ${className}`}>
+    <Card
+      glass={{ blurAmount: 5, mode: "shader", shaderVariant: "plasma" }}
+      appearance="ghost"
+      className={`u-overflow-hidden ${className}`}
+    >
       {/* Header with Progress Indicator */}
       <div className="u-flex u-items-center u-justify-between u-p-4 u-bg-white-opacity-5">
         <div className="u-flex u-items-center u-gap-3">

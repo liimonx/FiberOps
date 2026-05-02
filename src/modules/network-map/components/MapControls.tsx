@@ -61,7 +61,7 @@ export const MapControls: React.FC<MapControlsProps> = ({
 
   return (
     <div className={` ${positionClasses[position]} ${className}`}>
-      <Card glass={true} size="sm">
+      <Card glass={{ blurAmount: 5 }} appearance="ghost" size="sm">
         <div
           className="u-flex u-flex-column u-gap-1"
           role="toolbar"

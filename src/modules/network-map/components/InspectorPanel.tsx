@@ -53,7 +53,12 @@ export const InspectorPanel: React.FC<InspectorPanelProps> = ({
 
   if (!hasSelection) {
     return (
-      <Card glass={true} className={`${className}`} style={{ width: "280px" }}>
+      <Card
+        glass={{ blurAmount: 5 }}
+        appearance="ghost"
+        className={`${className}`}
+        style={{ width: "280px" }}
+      >
         <div className="u-flex u-flex-column u-items-center u-gap-4">
           <Icon
             name="CursorClick"

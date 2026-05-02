@@ -141,7 +141,11 @@ export const InteractiveTooltip: React.FC<InteractiveTooltipProps> = ({
       role="dialog"
       aria-label={`${content.title} details`}
     >
-      <Card glass={true} className="u-p-0 u-overflow-hidden u-bg-white-opacity-5">
+      <Card
+        glass={{ blurAmount: 5 }}
+        appearance="ghost"
+        className="u-p-0 u-overflow-hidden u-bg-white-opacity-5"
+      >
         {/* Header */}
         <div className="u-flex u-items-start u-gap-3 u-p-4 u-border-bottom u-border-secondary-subtle">
           <div className="u-flex-shrink-0">

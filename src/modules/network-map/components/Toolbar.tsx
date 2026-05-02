@@ -112,7 +112,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
       role="toolbar"
       aria-label="Map tools"
     >
-      <Card glass={true} size="sm">
+      <Card glass={{ blurAmount: 5 }} appearance="ghost" size="sm">
         <div
           className="u-flex u-flex-column u-flex-md-row u-gap-1"
           role="group"
