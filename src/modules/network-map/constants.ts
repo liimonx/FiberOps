@@ -34,8 +34,8 @@ export const NETWORK_STATUS_LABELS = {
 export const NODE_TYPE_ICONS = {
   [NetworkNodeType.CORE_NODE]: 'Server',
   [NetworkNodeType.DISTRIBUTION_NODE]: 'Cpu',
-  [NetworkNodeType.ACCESS_NODE]: 'Router',
-  [NetworkNodeType.SPLITTER]: 'ShareNetwork',
+  [NetworkNodeType.ACCESS_NODE]: 'Network',
+  [NetworkNodeType.SPLITTER]: 'Split',
   [NetworkNodeType.CUSTOMER]: 'User'
 } as const;
 
