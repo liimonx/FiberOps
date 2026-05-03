@@ -103,8 +103,7 @@ export function EnhancedNetworkNode({
           style={{ top: `${size}px` }}
         >
           <span
-            className="u-text-xs u-font-bold u-text-uppercase u-leading-none u-text-nowrap"
-            style={{ letterSpacing: "1px" }}
+            className="u-text-xs u-font-bold u-text-uppercase u-leading-none u-text-nowrap u-tracking-widest"
           >
             {node.name}
           </span>

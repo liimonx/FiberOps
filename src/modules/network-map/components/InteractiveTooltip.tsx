@@ -64,7 +64,7 @@ export const InteractiveTooltip: React.FC<InteractiveTooltipProps> = ({
       height: window.innerHeight,
     };
 
-    let adjusted = { ...position };
+    const adjusted = { ...position };
 
     if (rect.right > viewport.width) {
       adjusted.x = position.x - rect.width - offset;
@@ -153,7 +153,7 @@ export const InteractiveTooltip: React.FC<InteractiveTooltipProps> = ({
               className="u-w-10 u-h-10 u-rounded-circle u-flex u-items-center u-justify-center  u-shadow-sm"
               style={{ backgroundColor: NETWORK_STATUS_COLORS[content.status] }}
             >
-              <Icon name={(node ? getNodeIcon() : "GitBranch") as any} size={20} />
+              <Icon name={node ? getNodeIcon() : "GitBranch"} size={20} />
             </div>
           </div>
 
@@ -198,15 +198,12 @@ export const InteractiveTooltip: React.FC<InteractiveTooltipProps> = ({
             <div key={index} className="u-flex u-items-center u-gap-2 u-text-xs">
               {detail.icon && (
                 <Icon
-                  name={detail.icon as any}
+                  name={detail.icon}
                   size={14}
                   className="u-text-secondary-emphasis u-opacity-50"
                 />
               )}
-              <span
-                className="u-text-secondary-emphasis u-font-bold u-text-uppercase"
-                style={{ fontSize: "10px" }}
-              >
+              <span className="u-text-secondary-emphasis u-font-bold u-text-uppercase">
                 {detail.label}:
               </span>
               <span className="u-ms-auto u-font-bold ">{detail.value}</span>
@@ -248,7 +245,7 @@ export const InteractiveTooltip: React.FC<InteractiveTooltipProps> = ({
                 key={index}
                 variant={action.variant || "secondary"}
                 size="sm"
-                iconName={action.icon as any}
+                iconName={action.icon}
                 onClick={action.onClick}
                 fullWidth
               >
@@ -282,18 +279,9 @@ export const SimpleTooltip: React.FC<{
       }}
       role="tooltip"
     >
-      <Card
-        glass={true}
-        className="u-p-3 u-bg-white-opacity-10 u-shadow-lg"
-        style={{ maxWidth: "240px" }}
-      >
+      <Card glass={true} className="u-p-3 u-bg-white-opacity-10 u-shadow-lg">
         <div className="u-flex u-flex-column u-gap-1">
-          <strong
-            className="u-text-xs u-font-bold  u-text-uppercase"
-            style={{ letterSpacing: "0.5px" }}
-          >
-            {title}
-          </strong>
+          <strong className="u-text-xs u-font-bold u-text-uppercase">{title}</strong>
           <div className="u-text-xs u-text-secondary-emphasis u-leading-normal">
             {content}
           </div>

@@ -51,8 +51,7 @@ export const LoadingState: React.FC<LoadingStateProps> = ({
         <div className="u-flex u-flex-column u-items-center u-gap-4">
           <Icon name="SpinnerGap" size={48} className=" u-animate-spin" />
           <span
-            className="u-text-lg u-font-bold  u-text-uppercase"
-            style={{ letterSpacing: "2px" }}
+            className="u-text-lg u-font-bold u-text-uppercase u-tracking-widest"
           >
             {message}
           </span>

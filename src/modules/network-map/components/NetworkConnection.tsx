@@ -154,12 +154,6 @@ export const NetworkConnection: React.FC<NetworkConnectionProps> = ({
         </div>
       )}
 
-      <style jsx>{`
-        div:focus {
-          outline: 2px solid var(--color-primary);
-          outline-offset: 4px;
-        }
-      `}</style>
     </div>
   );
 };

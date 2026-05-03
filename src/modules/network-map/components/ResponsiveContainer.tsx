@@ -49,7 +49,6 @@ export const ResponsiveHide: React.FC<{ children: React.ReactNode; at: Breakpoin
   return <>{children}</>;
 };
 
-// Component for responsive grid layouts
 export const ResponsiveGrid: React.FC<{
   children: React.ReactNode;
   className?: string;
@@ -65,27 +64,22 @@ export const ResponsiveGrid: React.FC<{
   desktopColumns = 3,
   gap = 4
 }) => {
+  const { breakpoint } = useResponsive();
+  const columns =
+    breakpoint === 'desktop' ? desktopColumns
+    : breakpoint === 'tablet' ? tabletColumns
+    : mobileColumns;
+
   return (
-    <div 
+    <div
       className={`u-grid u-gap-${gap} ${className}`}
-      style={{
-        gridTemplateColumns: `repeat(${mobileColumns}, 1fr)`,
-      }}
+      style={{ gridTemplateColumns: `repeat(${columns}, 1fr)` }}
     >
-      <style jsx>{`
-        @media (min-width: 768px) {
-          div { grid-template-columns: repeat(${tabletColumns}, 1fr) !important; }
-        }
-        @media (min-width: 1024px) {
-          div { grid-template-columns: repeat(${desktopColumns}, 1fr) !important; }
-        }
-      `}</style>
       {children}
     </div>
   );
 };
 
-// Component for responsive stack layouts
 export const ResponsiveStack: React.FC<{
   children: React.ReactNode;
   className?: string;
@@ -105,20 +99,19 @@ export const ResponsiveStack: React.FC<{
   align = 'stretch',
   justify = 'start'
 }) => {
+  const { breakpoint } = useResponsive();
+  const direction =
+    breakpoint === 'desktop' ? desktopDirection
+    : breakpoint === 'tablet' ? tabletDirection
+    : mobileDirection;
+
   const getAlignClass = (val: string) => `u-items-${val === 'stretch' ? 'stretch' : val}`;
   const getJustifyClass = (val: string) => `u-justify-${val}`;
 
   return (
-    <div className={`u-flex u-gap-${gap} ${getAlignClass(align)} ${getJustifyClass(justify)} ${className}`}>
-      <style jsx>{`
-        div { flex-direction: ${mobileDirection === 'vertical' ? 'column' : 'row'}; }
-        @media (min-width: 768px) {
-          div { flex-direction: ${tabletDirection === 'vertical' ? 'column' : 'row'}; }
-        }
-        @media (min-width: 1024px) {
-          div { flex-direction: ${desktopDirection === 'vertical' ? 'column' : 'row'}; }
-        }
-      `}</style>
+    <div
+      className={`u-flex u-gap-${gap} ${direction === 'vertical' ? 'u-flex-column' : 'u-flex-row'} ${getAlignClass(align)} ${getJustifyClass(justify)} ${className}`}
+    >
       {children}
     </div>
   );

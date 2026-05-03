@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useMemo } from "react";
-import { Icon, Card, Toggle, Button, Badge } from "@shohojdhara/atomix";
+import { Icon, Card, Toggle, Button, Badge, Accordion } from "@shohojdhara/atomix";
 import { useNetworkMapStore, useLayers } from "../stores/useNetworkMapStore";
 import { NetworkMapLayer, NetworkStatus } from "../types";
 
@@ -177,179 +177,131 @@ export const LayerControls: React.FC<LayerControlsProps> = ({ className = "" }) 
   };
 
   return (
-    <Card
-      glass={{ blurAmount: 12, mode: "shader", shaderVariant: "plasma" }}
-      appearance="ghost"
-      className={`u-overflow-hidden u-border-primary-subtle u-shadow-lg ${className}`}
-      style={{ width: "320px" }}
+    <Accordion
+      title=""
+      icon={<Icon name="Stack" />}
+      className={`${className} u-w-100`}
+      glass={{ blurAmount: 5 }}
     >
-      {/* Premium Header */}
-      <div className="u-relative u-p-4 u-bg-primary-subtle u-opacity-95 u-border-bottom u-border-primary-subtle">
-        <div className="u-flex u-items-center u-justify-between">
-          <div className="u-flex u-items-center u-gap-3">
-            <div className="u-rounded-circle u-flex u-items-center u-justify-center u-bg-primary u-text-white u-shadow-lg u-w-9 u-h-9">
+      <Accordion.Header>
+        <div className="u-relative u-w-100">
+          <div className="u-flex u-items-center u-justify-start u-gap-3">
+            <div className="u-rounded-circle u-bg-primary u-text-white u-shadow-lg u-p-2">
               <Icon name="Stack" size={20} weight="bold" />
             </div>
-            <div className="u-flex u-flex-column">
+            <div className="u-sm-flex u-none u-flex-column u-text-start">
               <span className="u-text-base u-font-bold u-text-primary">Map Layers</span>
               <span className="u-text-xs u-text-secondary-emphasis u-opacity-75">
                 {activeCount} of {totalLayers} visibility layers
               </span>
             </div>
           </div>
-
-          {/* Realistic Progress Ring */}
-          <div className="u-relative u-flex u-items-center u-justify-center u-w-12 u-h-12">
-            <svg
-              width="48"
-              height="48"
-              viewBox="0 0 40 40"
-              className="u-transform-rotate--90"
-            >
-              <circle
-                cx="20"
-                cy="20"
-                r="16"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.5"
-                className="u-text-primary-subtle u-opacity-20"
-              />
-              <circle
-                cx="20"
-                cy="20"
-                r="16"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                strokeDasharray={circumference}
-                style={{
-                  strokeDashoffset,
-                  transition: "stroke-dashoffset 0.6s cubic-bezier(0.4, 0, 0.2, 1)",
-                  color: "var(--atomix-primary)",
-                }}
-              />
-            </svg>
-            <span className="u-text-xs u-font-bold u-absolute u-text-primary">
-              {Math.round(progressPercentage)}%
-            </span>
-          </div>
         </div>
-      </div>
+      </Accordion.Header>
 
-      {/* Meaningful Layer List */}
-      <div
-        className="u-p-2 u-overflow-y-auto u-flex u-flex-column u-gap-2"
-        role="group"
-        aria-label="Map layers"
-        style={{ maxHeight: "400px", scrollbarWidth: "none" }}
-      >
-        {LAYER_CONFIGS.map((config) => {
-          const layer = layers.find((l) => l.id === config.id);
-          const isVisible = layer?.visible ?? config.visible;
-          const isHovered = hoveredLayer === config.id;
-          const hasAlerts = config.stats && config.stats.alerts > 0;
+      <Accordion.Body className="u-border-primary-subtle u-shadow-lg">
+        {/* Meaningful Layer List */}
+        <div
+          className="u-p-2 u-overflow-y-auto u-flex u-flex-column u-gap-2 u-max-h-100"
+          role="group"
+          aria-label="Map layers"
+        >
+          {LAYER_CONFIGS.map((config) => {
+            const layer = layers.find((l) => l.id === config.id);
+            const isVisible = layer?.visible ?? config.visible;
+            const isHovered = hoveredLayer === config.id;
+            const hasAlerts = config.stats && config.stats.alerts > 0;
 
-          return (
-            <div
-              key={config.id}
-              className={`u-rounded-sm u-transition-base u-border u-border-transparent ${
-                isHovered
-                  ? "u-bg-surface-hover u-border-primary-subtle u-shadow-sm"
-                  : "u-bg-surface-subtle"
-              }`}
-              style={{
-                opacity: isVisible ? 1 : 0.5,
-              }}
-              onMouseEnter={() => setHoveredLayer(config.id)}
-              onMouseLeave={() => setHoveredLayer(null)}
-            >
-              <div className="u-flex u-items-center u-gap-3 u-p-2">
-                {/* Visual Identity */}
-                <div className="u-relative">
-                  <div
-                    className="u-rounded u-flex u-items-center u-justify-center u-w-10 u-h-10 u-shadow-sm"
-                    style={{
-                      backgroundColor: `${config.color}15`,
-                      border: `1px solid ${config.color}30`,
-                    }}
-                  >
-                    <Icon
-                      name={config.icon as any}
-                      size={18}
-                      style={{ color: config.color }}
-                      weight={isVisible ? "duotone" : "regular"}
-                    />
-                  </div>
-                  {hasAlerts && isVisible && (
+            return (
+              <div
+                key={config.id}
+                className={`u-rounded-sm u-transition-base u-border u-border-transparent ${
+                  isHovered
+                    ? "u-bg-surface-hover u-border-primary-subtle u-shadow-sm"
+                    : "u-bg-surface-subtle"
+                } ${isVisible ? "u-opacity-100" : "u-opacity-50"}`}
+                onMouseEnter={() => setHoveredLayer(config.id)}
+                onMouseLeave={() => setHoveredLayer(null)}
+              >
+                <div className="u-flex u-items-center u-gap-3 u-p-2">
+                  {/* Visual Identity */}
+                  <div className="u-relative">
                     <div
-                      className="u-absolute u-top-0 u-right-0 u-w-3 u-h-3 u-rounded-circle u-border-white u-border-solid u-border-2"
+                      className="u-rounded u-flex u-items-center u-justify-center u-w-10 u-h-10 u-shadow-sm"
                       style={{
-                        backgroundColor: "#ef4444",
-                        transform: "translate(25%, -25%)",
+                        backgroundColor: `${config.color}15`,
+                        border: `1px solid ${config.color}30`,
                       }}
-                    />
-                  )}
-                </div>
-
-                <div className="u-flex u-flex-column u-flex-1 u-min-w-0">
-                  <div className="u-flex u-items-center u-justify-between u-gap-2">
-                    <span
-                      className={`u-text-sm u-font-bold u-text-truncate ${isVisible ? "u-text-primary" : "u-text-secondary"}`}
                     >
-                      {config.name}
-                    </span>
-                    {config.stats && isVisible && (
-                      <Badge
-                        variant={hasAlerts ? "error" : "success"}
-                        label={hasAlerts ? `${config.stats.alerts} Issues` : "Healthy"}
-                        className="u-text-xs"
-                        style={{ fontSize: "10px", padding: "1px 4px" }}
+                      <Icon
+                        name={config.icon as any}
+                        size={18}
+                        style={{ color: config.color }}
+                        weight={isVisible ? "duotone" : "regular"}
                       />
+                    </div>
+                    {hasAlerts && isVisible && (
+                      <div className="u-absolute u-top-0 u-end-0 u-w-3 u-h-3 u-rounded-circle u-border-white u-border-solid u-border-2 u-bg-error u-translate-middle" />
                     )}
                   </div>
-                  <span className="u-text-xs u-text-secondary-emphasis u-text-truncate u-opacity-70">
-                    {config.description}
-                  </span>
-                </div>
 
-                {/* Compact Toggle */}
-                <div className="u-ms-auto">
-                  <Toggle
-                    checked={isVisible}
-                    onChange={() => handleToggle(config.id)}
-                  />
+                  <div className="u-flex u-flex-column u-flex-1 u-min-w-0">
+                    <div className="u-flex u-items-center u-justify-between u-gap-2">
+                      <span
+                        className={`u-text-sm u-font-bold u-text-truncate ${isVisible ? "u-text-primary" : "u-text-secondary"}`}
+                      >
+                        {config.name}
+                      </span>
+                      {config.stats && isVisible && (
+                        <Badge
+                          variant={hasAlerts ? "error" : "success"}
+                          label={hasAlerts ? `${config.stats.alerts} Issues` : "Healthy"}
+                          className="u-text-xs u-py-0 u-px-1"
+                        />
+                      )}
+                    </div>
+                    <span className="u-text-xs u-text-secondary-emphasis u-text-truncate u-opacity-70">
+                      {config.description}
+                    </span>
+                  </div>
+
+                  {/* Compact Toggle */}
+                  <div className="u-ms-auto">
+                    <Toggle
+                      checked={isVisible}
+                      onChange={() => handleToggle(config.id)}
+                    />
+                  </div>
                 </div>
               </div>
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
 
-      {/* Action Footer */}
-      <div className="u-flex u-gap-2 u-p-3 u-bg-surface-subtle u-border-top u-border-primary-subtle">
-        <Button
-          variant="primary"
-          fullWidth
-          size="sm"
-          onClick={() => handleToggleAll(true)}
-          disabled={activeCount === totalLayers}
-          iconName="Eye"
-        >
-          Enable All
-        </Button>
-        <Button
-          variant="secondary"
-          fullWidth
-          size="sm"
-          onClick={() => handleToggleAll(false)}
-          disabled={activeCount === 0}
-          iconName="EyeSlash"
-        >
-          Disable All
-        </Button>
-      </div>
-    </Card>
+        {/* Action Footer */}
+        <div className="u-flex u-gap-2 u-p-3">
+          <Button
+            variant="primary"
+            fullWidth
+            size="sm"
+            onClick={() => handleToggleAll(true)}
+            disabled={activeCount === totalLayers}
+            iconName="Eye"
+          >
+            Enable All
+          </Button>
+          <Button
+            variant="secondary"
+            fullWidth
+            size="sm"
+            onClick={() => handleToggleAll(false)}
+            disabled={activeCount === 0}
+            iconName="EyeSlash"
+          >
+            Disable All
+          </Button>
+        </div>
+      </Accordion.Body>
+    </Accordion>
   );
 };

@@ -111,7 +111,9 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({ onMapLoad, onMapError }) =
           : allConnections.filter((c) => connTypeSet.has(String(c.type)));
 
       const nodeFeatures = filteredNodes.map(createNodeFeature);
-      const nodesSource = map.getSource("network-nodes") as mapboxgl.GeoJSONSource | undefined;
+      const nodesSource = map.getSource("network-nodes") as
+        | mapboxgl.GeoJSONSource
+        | undefined;
       if (nodesSource)
         nodesSource.setData({ type: "FeatureCollection", features: nodeFeatures });
 
@@ -133,7 +135,9 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({ onMapLoad, onMapError }) =
       const outageFeatures = outageConnections
         .map((conn) => createConnectionFeature(conn, allNodes))
         .filter((f): f is GeoJSON.Feature => f != null);
-      const outagesSource = map.getSource("network-outages") as mapboxgl.GeoJSONSource | undefined;
+      const outagesSource = map.getSource("network-outages") as
+        | mapboxgl.GeoJSONSource
+        | undefined;
       if (outagesSource)
         outagesSource.setData({ type: "FeatureCollection", features: outageFeatures });
 
@@ -156,7 +160,9 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({ onMapLoad, onMapError }) =
         },
         properties: { id: `coverage-${node.id}`, name: `${node.name} Coverage` },
       }));
-      const coverageSource = map.getSource("network-coverage") as mapboxgl.GeoJSONSource | undefined;
+      const coverageSource = map.getSource("network-coverage") as
+        | mapboxgl.GeoJSONSource
+        | undefined;
       if (coverageSource)
         coverageSource.setData({ type: "FeatureCollection", features: coverageFeatures });
 
@@ -179,15 +185,27 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({ onMapLoad, onMapError }) =
       }
       ["network-connections-layer", "network-connections-casing"].forEach((id) => {
         if (map.getLayer(id)) {
-          map.setLayoutProperty(id, "visibility", connTypes.length === 0 ? "none" : "visible");
+          map.setLayoutProperty(
+            id,
+            "visibility",
+            connTypes.length === 0 ? "none" : "visible"
+          );
         }
       });
 
       if (map.getLayer("network-outages-layer")) {
-        updateLayerVisibility(map, "network-outages-layer", isOutagesLayerVisible(layerState));
+        updateLayerVisibility(
+          map,
+          "network-outages-layer",
+          isOutagesLayerVisible(layerState)
+        );
       }
       if (map.getLayer("network-coverage-layer")) {
-        updateLayerVisibility(map, "network-coverage-layer", isCoverageLayerVisible(layerState));
+        updateLayerVisibility(
+          map,
+          "network-coverage-layer",
+          isCoverageLayerVisible(layerState)
+        );
       }
     } catch (error) {
       console.error("[MapCanvas] Update failed:", error);
@@ -226,11 +244,11 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({ onMapLoad, onMapError }) =
       // Re-initialize layers when style changes (e.g., satellite/dark mode toggle)
       map.on("style.load", () => {
         console.log("[MapCanvas] Style changed, re-initializing layers...");
-        
+
         try {
           // Re-add custom layers and sources
           initializeLayers(map);
-          
+
           // Wait for the style to be fully loaded before updating data
           const waitForStyleAndUpdate = () => {
             if (!mapRef.current || !map.isStyleLoaded()) {
@@ -238,35 +256,42 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({ onMapLoad, onMapError }) =
               setTimeout(waitForStyleAndUpdate, 50);
               return;
             }
-            
+
             const currentState = useNetworkMapStore.getState();
             console.log("[MapCanvas] Restoring data:", {
               nodes: currentState.nodes.length,
               connections: currentState.connections.length,
-              layers: currentState.layers.filter(l => l.visible).length + "/" + currentState.layers.length + " visible"
+              layers:
+                currentState.layers.filter((l) => l.visible).length +
+                "/" +
+                currentState.layers.length +
+                " visible",
             });
-            
+
             updateMapData(
               map,
               currentState.nodes,
               currentState.connections,
               currentState.layers
             );
-            
+
             // Ensure map resizes properly
             requestAnimationFrame(() => {
               if (mapRef.current) {
                 mapRef.current.resize();
               }
             });
-            
+
             console.log("[MapCanvas] Layers and data restored successfully");
           };
-          
+
           // Start the wait loop
           waitForStyleAndUpdate();
         } catch (error) {
-          console.error("[MapCanvas] Failed to restore layers after style change:", error);
+          console.error(
+            "[MapCanvas] Failed to restore layers after style change:",
+            error
+          );
         }
       });
 
@@ -360,7 +385,7 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({ onMapLoad, onMapError }) =
   }
 
   return (
-    <div className="u-relative u-w-100 u-h-100">
+    <div className="u-relative u-w-100 u-h-100 map-canvas-container">
       <div
         ref={mapContainer}
         className="u-w-100 u-h-100 u-bg-dark u-transition-all"
@@ -372,12 +397,6 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({ onMapLoad, onMapError }) =
         <LoadingState message="Initializing Neural Map..." variant="overlay" />
       )}
 
-      <style jsx>{`
-        div:focus-within {
-          outline: 2px solid var(--color-primary);
-          outline-offset: -2px;
-        }
-      `}</style>
     </div>
   );
 };

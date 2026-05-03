@@ -116,8 +116,12 @@
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 /* Accessibility */
@@ -144,7 +148,7 @@
   .network-map-container {
     height: 100dvh;
   }
-  
+
   .network-node {
     min-width: 14px;
     min-height: 14px;
@@ -163,7 +167,7 @@
     background: #fff;
     color: #000;
   }
-  
+
   .network-node {
     fill: #000 !important;
     stroke: #000 !important;
@@ -176,7 +180,7 @@
     fill: #000;
     stroke: #000;
   }
-  
+
   .network-connection--active {
     stroke: #000;
     stroke-width: 2px;
@@ -189,11 +193,9 @@
   .network-connection {
     transition: none;
   }
-  
+
   .network-loading--spinner {
     animation: none;
     border-top-color: transparent;
   }
 }
-
-

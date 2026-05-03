@@ -86,10 +86,7 @@ export function UserFriendlyError({
     >
       <div className="u-mb-6">
         <div
-          className="u-inline-flex u-items-center u-justify-center u-w-20 u-h-20 u-rounded-circle u-bg-white-opacity-5 u-border u-border-solid u-shadow-lg"
-          style={{
-            borderColor: isOffline ? "var(--atomix-error)" : "var(--atomix-warning)",
-          }}
+          className={`u-inline-flex u-items-center u-justify-center u-w-20 u-h-20 u-rounded-circle u-bg-white-opacity-5 u-border u-border-solid u-shadow-lg ${isOffline ? "u-border-error" : "u-border-warning"}`}
         >
           <Icon
             name={getIcon() as any}
@@ -100,8 +97,7 @@ export function UserFriendlyError({
       </div>
 
       <h2
-        className="u-m-0 u-text-xl u-font-bold  u-text-uppercase u-mb-2"
-        style={{ letterSpacing: "1px" }}
+        className="u-m-0 u-text-xl u-font-bold u-text-uppercase u-mb-2"
       >
         {title || errorConfig.title}
       </h2>
@@ -272,23 +268,15 @@ export function ErrorToast({
           />
         </div>
         <div
-          className="u-absolute u-bottom-0 u-start-0 u-h-1 u-bg-error"
+          className="u-absolute u-bottom-0 u-start-0 u-h-1 u-bg-error u-w-100"
           style={{
-            width: "100%",
-            animation: `shrinkWidth ${duration}ms linear forwards`,
+            animationName: 'shrinkWidth',
+            animationDuration: `${duration}ms`,
+            animationTimingFunction: 'linear',
+            animationFillMode: 'forwards',
           }}
         />
       </Card>
-      <style jsx>{`
-        @keyframes shrinkWidth {
-          from {
-            width: 100%;
-          }
-          to {
-            width: 0%;
-          }
-        }
-      `}</style>
     </div>
   );
 }

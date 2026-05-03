@@ -3,7 +3,11 @@
 import React from "react";
 import { Icon, Card, Badge } from "@shohojdhara/atomix";
 import type { NetworkNode } from "../types";
-import { NETWORK_STATUS_COLORS, NETWORK_STATUS_LABELS, NODE_TYPE_ICONS } from "../constants";
+import {
+  NETWORK_STATUS_COLORS,
+  NETWORK_STATUS_LABELS,
+  NODE_TYPE_ICONS,
+} from "../constants";
 import { StatusIndicator } from "./StatusIndicator";
 
 interface NodeTooltipProps {
@@ -21,15 +25,7 @@ export const NodeTooltip: React.FC<NodeTooltipProps> = ({
 }) => {
   if (!visible) return null;
 
-  const {
-    id,
-    name,
-    status,
-    type,
-    capacity,
-    utilization,
-    metadata
-  } = node;
+  const { id, name, status, type, capacity, utilization, metadata } = node;
 
   const address = metadata?.address || metadata?.location?.address;
   const lastSeen = metadata?.lastSeen;
@@ -63,14 +59,12 @@ export const NodeTooltip: React.FC<NodeTooltipProps> = ({
       role="tooltip"
       aria-live="polite"
     >
-      <Card glass={true} className="u-w-auto" style={{ maxWidth: "300px" }}>
+      <Card glass={true} className="u-w-auto">
         {/* Header */}
         <div className="u-flex u-justify-between u-items-center u-mb-4 u-pb-2 u-border-bottom u-border-secondary-subtle">
           <div className="u-flex u-items-center u-gap-2 u-px-2 u-py-1 u-bg-secondary-subtle u-rounded u-border u-border-solid u-border-secondary-subtle">
             <Icon name={getNodeIcon() as any} size={16} className="" />
-            <span
-              className="u-text-xs u-font-bold u-text-uppercase u-leading-none"
-            >
+            <span className="u-text-xs u-font-bold u-text-uppercase u-leading-none">
               {type}
             </span>
           </div>
@@ -128,10 +122,9 @@ export const NodeTooltip: React.FC<NodeTooltipProps> = ({
                 </div>
                 <div className="u-w-100 u-h-1 u-bg-primary-subtle u-rounded-circle u-overflow-hidden">
                   <div
-                    className={`u-h-100`}
+                    className="u-h-100 u-transition-all"
                     style={{
                       width: `${utilization}%`,
-                      transition: "all 0.3s cubic-bezier(0.23, 1, 0.32, 1)",
                       backgroundColor:
                         utilization > 80
                           ? "var(--atomix-error)"

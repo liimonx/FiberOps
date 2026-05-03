@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { useMeasurementTool } from "../hooks/useMapTools";
+import { useMeasurementTool, useTraceTool, useHeatmapTool } from "../hooks/useMapTools";
 import { Button, Card, Icon } from "@shohojdhara/atomix";
 
 interface MeasurementOverlayProps {
@@ -16,11 +16,9 @@ export function MeasurementOverlay({ onClose }: MeasurementOverlayProps) {
   }
 
   return (
-    <div className="u-absolute u-bottom-4 u-start-50 u-translate-middle-x u-z-modal">
-      <Card
+    <Card
         glass={true}
         className="u-shadow-lg u-p-4 u-bg-white-opacity-5"
-        style={{ minWidth: "320px" }}
       >
         <div className="u-flex u-justify-between u-items-center u-mb-4">
           <div className="u-flex u-items-center u-gap-3">
@@ -59,7 +57,7 @@ export function MeasurementOverlay({ onClose }: MeasurementOverlayProps) {
           </div>
         </div>
 
-        <div className="u-overflow-y-auto u-mb-4" style={{ maxHeight: "180px" }}>
+        <div className="u-overflow-y-auto u-mb-4">
           <table className="u-w-100 u-text-xs">
             <thead className="u-border-bottom u-border-secondary-subtle">
               <tr>
@@ -101,13 +99,12 @@ export function MeasurementOverlay({ onClose }: MeasurementOverlayProps) {
           </p>
         </div>
       </Card>
-    </div>
   );
 }
 
 // Trace path overlay component
 export function TracePathOverlay({ onClose }: { onClose?: () => void }) {
-  const traceData = require("../hooks/useMapTools").useTraceTool();
+  const traceData = useTraceTool();
   const {
     tracePath,
     hasTrace,
@@ -122,12 +119,10 @@ export function TracePathOverlay({ onClose }: { onClose?: () => void }) {
   }
 
   return (
-    <div className="u-absolute u-bottom-4 u-start-50 u-translate-middle-x u-z-modal">
-      <Card
-        glass={true}
-        className="u-shadow-lg u-p-4 u-bg-white-opacity-5"
-        style={{ minWidth: "350px" }}
-      >
+    <Card
+      glass={true}
+      className="u-shadow-lg u-p-4 u-bg-white-opacity-5"
+    >
         <div className="u-flex u-justify-between u-items-center u-mb-4">
           <div className="u-flex u-items-center u-gap-3">
             <div className="u-w-8 u-h-8 u-rounded u-bg-success-subtle u-flex u-items-center u-justify-center">
@@ -156,7 +151,6 @@ export function TracePathOverlay({ onClose }: { onClose?: () => void }) {
             >
               <div
                 className="u-text-xs u-text-secondary-emphasis u-font-bold u-text-uppercase u-mb-1"
-                style={{ fontSize: "10px" }}
               >
                 {stat.label}
               </div>
@@ -167,7 +161,7 @@ export function TracePathOverlay({ onClose }: { onClose?: () => void }) {
           ))}
         </div>
 
-        <div className="u-overflow-y-auto" style={{ maxHeight: "150px" }}>
+        <div className="u-overflow-y-auto">
           <div className="u-text-xs u-font-bold u-text-secondary-emphasis u-text-uppercase u-mb-2 u-ms-1">
             Route Path
           </div>
@@ -197,14 +191,14 @@ export function TracePathOverlay({ onClose }: { onClose?: () => void }) {
           </div>
         </div>
       </Card>
-    </div>
   );
 }
 
 // Heatmap legend component
 export function HeatmapLegend({ onClose }: { onClose?: () => void }) {
-  const { heatmapData, hasHeatmap, setHeatmapType, clearHeatmap, activeHeatmapType } =
-    require("../hooks/useMapTools").useHeatmapTool();
+  const { heatmapData, hasHeatmap, setHeatmapType, clearHeatmap } =
+    useHeatmapTool();
+  const [activeHeatmapType, setActiveHeatmapType] = React.useState<'density' | 'utilization' | 'incidents'>('density');
 
   if (!hasHeatmap || !heatmapData) {
     return null;
@@ -213,11 +207,9 @@ export function HeatmapLegend({ onClose }: { onClose?: () => void }) {
   const gradientStops = Object.entries(heatmapData.gradient || {});
 
   return (
-    <div className="u-absolute u-bottom-4 u-end-4 u-z-modal">
-      <Card
+    <Card
         glass={true}
         className="u-shadow-lg u-p-4 u-bg-white-opacity-5"
-        style={{ width: "260px" }}
       >
         <div className="u-flex u-justify-between u-items-center u-mb-4">
           <div className="u-flex u-items-center u-gap-2">
@@ -263,7 +255,11 @@ export function HeatmapLegend({ onClose }: { onClose?: () => void }) {
                   key={type.id}
                   size="sm"
                   variant={activeHeatmapType === type.id ? "primary" : "secondary"}
-                  onClick={() => setHeatmapType(type.id)}
+                  onClick={() => {
+                    const t = type.id as 'density' | 'utilization' | 'incidents';
+                    setHeatmapType(t);
+                    setActiveHeatmapType(t);
+                  }}
                   fullWidth
                   className="u-p-1 u-text-xs"
                 >
@@ -274,6 +270,5 @@ export function HeatmapLegend({ onClose }: { onClose?: () => void }) {
           </div>
         </div>
       </Card>
-    </div>
   );
 }

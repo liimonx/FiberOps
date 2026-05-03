@@ -53,10 +53,7 @@ export const InspectorPanel: React.FC<InspectorPanelProps> = ({
 
   if (!hasSelection) {
     return (
-      <Card
-        glass={{ blurAmount: 5 }}
-        className={`u-w-auto ${className}`}
-      >
+      <Card glass={true} className={`u-w-auto ${className}`}>
         <div className="u-flex u-flex-column u-items-center u-gap-4">
           <Icon
             name="CursorClick"
@@ -90,26 +87,19 @@ export const InspectorPanel: React.FC<InspectorPanelProps> = ({
       role="region"
       aria-label="Inspector panel"
       tabIndex={-1}
-      style={{ outline: "none" }}
+      className="u-outline-none"
     >
       <Card
-        glass={{ blurAmount: 10, mode: "shader"}}
-        className={`u-p-0 u-overflow-hidden ${isCollapsed ? "u-h-auto" : "u-h-100"} ${className}`}
-        style={{
-          width: isCollapsed ? "auto" : "320px",
-        }}
+        glass={true}
+        className={`u-p-0 u-overflow-hidden ${isCollapsed ? "u-h-auto u-w-auto" : "u-h-100 u-w-100"} ${className}`}
         size="sm"
       >
         {/* Header */}
-        <div
-          className="u-flex u-items-center u-gap-3 u-p-4  u-bg-primary-subtle u-opacity-90"
-        >
+        <div className="u-flex u-items-center u-justify-between u-gap-3 u-p-4  u-bg-primary-subtle ">
           <div
-            className="u-rounded-circle u-flex u-items-center u-justify-center u-shadow-sm u-flex-shrink-0"
+            className="u-rounded-circle u-flex u-items-center u-justify-center u-shadow-sm u-flex-shrink-0 u-w-10 u-h-10"
             style={{
               backgroundColor: NETWORK_STATUS_COLORS[status],
-              width: "40px",
-              height: "40px",
             }}
           >
             <Icon
@@ -122,14 +112,10 @@ export const InspectorPanel: React.FC<InspectorPanelProps> = ({
 
           {!isCollapsed && (
             <div className="u-flex-1 u-min-w-0">
-              <h3
-                className="u-m-0 u-text-sm u-font-bold u-text-truncate"
-              >
+              <h3 className="u-m-0 u-text-sm u-font-bold u-text-truncate">
                 {selectedNode ? selectedNode.name : `Link ${selectedConnection?.id}`}
               </h3>
-              <span
-                className="u-text-xs u-text-secondary-emphasis u-block u-text-truncate"
-              >
+              <span className="u-text-xs u-text-secondary-emphasis u-block u-text-truncate">
                 {selectedNode
                   ? getNodeTypeLabel(selectedNode.type)
                   : `${selectedConnection?.sourceNodeId} → ${selectedConnection?.targetNodeId}`}
@@ -160,9 +146,7 @@ export const InspectorPanel: React.FC<InspectorPanelProps> = ({
         {!isCollapsed && (
           <>
             {/* Status Section */}
-            <div
-              className="u-px-4 u-py-3  u-opacity-90"
-            >
+            <div className="u-px-4 u-py-3  ">
               <StatusIndicator
                 status={status}
                 size="md"
@@ -173,8 +157,7 @@ export const InspectorPanel: React.FC<InspectorPanelProps> = ({
 
             {/* Content Tabs */}
             <Tabs activeIndex={activeTab} onTabChange={setActiveTab}>
-              <div
-              >
+              <div>
                 <Tabs.List>
                   <Tabs.Trigger index={0}>Details</Tabs.Trigger>
                   <Tabs.Trigger index={1}>Actions</Tabs.Trigger>
@@ -182,7 +165,7 @@ export const InspectorPanel: React.FC<InspectorPanelProps> = ({
                 </Tabs.List>
               </div>
 
-              <div className="u-p-4" style={{ maxHeight: "350px", overflowY: "auto" }}>
+              <div className="u-p-4 u-max-h-100 u-overflow-y-auto">
                 <Tabs.Panel index={0}>
                   <div className="u-flex u-flex-column u-gap-3">
                     {[
@@ -241,16 +224,12 @@ export const InspectorPanel: React.FC<InspectorPanelProps> = ({
                           key={i}
                           className="u-flex u-justify-between u-items-center u-gap-3"
                         >
-                          <span
-                            className="u-text-xs u-text-secondary-emphasis u-font-bold u-text-uppercase"
-                          >
+                          <span className="u-text-xs u-text-secondary-emphasis u-font-bold u-text-uppercase">
                             {item.label}
                           </span>
                           <div className="u-flex u-flex-column u-items-end u-gap-1">
                             {item.code ? (
-                              <code
-                                className="u-text-xs u-px-2 u-py-1 u-rounded-sm u-font-mono u-bg-secondary-subtle"
-                              >
+                              <code className="u-text-xs u-px-2 u-py-1 u-rounded-sm u-font-mono u-bg-secondary-subtle">
                                 {item.value}
                               </code>
                             ) : (
@@ -260,11 +239,7 @@ export const InspectorPanel: React.FC<InspectorPanelProps> = ({
                             )}
                             {item.progress !== undefined && (
                               <div
-                                className="u-w-100 u-rounded-circle u-overflow-hidden u-bg-secondary-subtle"
-                                style={{
-                                  width: "80px",
-                                  height: "4px",
-                                }}
+                                className="u-w-25 u-h-1 u-rounded-circle u-overflow-hidden u-bg-secondary-subtle"
                               >
                                 <div
                                   className="u-h-100"
@@ -336,36 +311,22 @@ export const InspectorPanel: React.FC<InspectorPanelProps> = ({
                       {selectedNode.connectedNodes &&
                       selectedNode.connectedNodes.length > 0 ? (
                         selectedNode.connectedNodes.map((nodeId) => (
-                          <button
+                          <Button
                             key={nodeId}
-                            className="u-flex u-items-center u-gap-3 u-p-3 u-border u-border-solid u-border-secondary-subtle u-rounded u-w-100 u-bg-primary-subtle u-text-start"
-                            style={{
-                              cursor: "pointer",
-                              transition: "all 0.3s cubic-bezier(0.23, 1, 0.32, 1)",
-                            }}
-                            onMouseEnter={(e) => {
-                              e.currentTarget.classList.add("u-bg-secondary-subtle");
-                              e.currentTarget.style.borderColor = "var(--atomix-primary)";
-                            }}
-                            onMouseLeave={(e) => {
-                              e.currentTarget.classList.remove("u-bg-secondary-subtle");
-                              e.currentTarget.style.borderColor = "var(--atomix-border-color)";
-                            }}
+                            variant="secondary"
+                            className="u-flex u-items-center u-justify-start u-gap-3 u-w-100 u-text-start"
                             onClick={() => onNavigate?.(nodeId, "node")}
                           >
-                            <Icon name="ArrowRight" size={14} className="" />
-                            <span
-                              className="u-flex-1 u-text-xs u-font-mono"
-                            >
+                            <Icon name="ArrowRight" size={14} />
+                            <span className="u-flex-1 u-text-xs u-font-mono u-text-start">
                               {nodeId}
                             </span>
                             <Icon
                               name="CaretRight"
                               size={12}
-                              className="u-text-secondary-emphasis"
-                              style={{ opacity: 0.5 }}
+                              className="u-text-secondary-emphasis u-opacity-50"
                             />
-                          </button>
+                          </Button>
                         ))
                       ) : (
                         <div className="u-py-8 u-text-center u-text-secondary-emphasis">

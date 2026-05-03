@@ -52,11 +52,10 @@ export function EnhancedLoadingState({
       </div>
 
       {showProgress && progress !== undefined && (
-        <div className="u-w-100 u-mt-4" style={{ minWidth: "200px" }}>
+        <div className="u-w-100 u-mt-4">
           <div className="u-flex u-justify-between u-text-xs u-text-secondary-emphasis u-mb-2">
             <span
               className="u-font-bold u-text-uppercase"
-              style={{ fontSize: "10px", letterSpacing: "1px" }}
             >
               Progress
             </span>
@@ -90,8 +89,7 @@ export function EnhancedLoadingState({
           <Icon name="SpinnerGap" size={64} className=" u-animate-spin" />
           <div className="u-text-center">
             <h2
-              className="u-m-0 u-text-xxl u-font-bold  u-text-uppercase"
-              style={{ letterSpacing: "4px" }}
+              className="u-m-0 u-text-xxl u-font-bold u-text-uppercase"
             >
               {message}
             </h2>

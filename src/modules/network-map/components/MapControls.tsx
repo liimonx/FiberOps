@@ -179,10 +179,9 @@ export const CompassControl: React.FC<{ size?: "sm" | "md" }> = ({ size = "md" }
       aria-label={`Reset map orientation, current bearing: ${Math.round(bearing)} degrees`}
     >
       <div
-        className="u-flex u-items-center u-justify-center"
+        className="u-flex u-items-center u-justify-center u-transition-all"
         style={{
           transform: `rotate(${-bearing}deg)`,
-          transition: "transform 0.3s cubic-bezier(0.23, 1, 0.32, 1)",
         }}
         aria-hidden="true"
       >

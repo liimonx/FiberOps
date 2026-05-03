@@ -97,11 +97,7 @@ export const SearchPanel: React.FC<SearchPanelProps> = ({
   if (!isOpen) return null;
 
   return (
-    <Card
-      glass={{ blurAmount: 5, mode: "shader", shaderVariant: "plasma" }}
-      appearance="ghost"
-      className={` ${className}`}
-    >
+    <Card glass={true} appearance="ghost" className={` ${className}`}>
       <SearchInput
         value={query}
         onChange={setQuery}

@@ -91,13 +91,6 @@ export const NetworkNode: React.FC<NetworkNodeProps> = ({
         )}
       </div>
 
-      {/* Focus Indicator */}
-      <style jsx>{`
-        div:focus {
-          outline: 2px solid var(--color-primary);
-          outline-offset: 4px;
-        }
-      `}</style>
     </div>
   );
 };

@@ -113,8 +113,7 @@ export const MobileLayout: React.FC<MobileLayoutProps> = ({
           >
             <Icon name={item.icon as any} size={20} />
             <span
-              className="u-text-xs u-font-bold u-text-uppercase"
-              style={{ letterSpacing: "0.5px" }}
+              className="u-text-xs u-font-bold u-text-uppercase u-tracking-widest"
             >
               {item.label}
             </span>
@@ -152,8 +151,7 @@ export const MobileLayout: React.FC<MobileLayoutProps> = ({
             {/* Header */}
             <div className="u-flex u-justify-between u-items-center u-px-4 u-pb-4 u-border-bottom u-border-secondary-subtle">
               <h3
-                className="u-m-0 u-text-base u-font-bold  u-text-uppercase"
-                style={{ letterSpacing: "1px" }}
+                className="u-m-0 u-text-base u-font-bold u-text-uppercase u-tracking-widest"
               >
                 {activeSheet === "search" && "Search Assets"}
                 {activeSheet === "layers" && "Map Layers"}

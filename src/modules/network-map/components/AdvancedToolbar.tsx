@@ -189,8 +189,7 @@ export function KeyboardShortcutsHelp() {
   return (
     <Card glass={true} className="u-p-4 u-shadow-lg u-bg-white-opacity-5 u-w-48">
       <h4
-        className="u-m-0 u-text-xs u-font-bold  u-text-uppercase u-mb-3"
-        style={{ letterSpacing: "0.5px" }}
+        className="u-m-0 u-text-xs u-font-bold u-text-uppercase u-mb-3 u-tracking-widest"
       >
         Shortcuts
       </h4>

@@ -38,8 +38,7 @@ export const AccessibilityProvider: React.FC<{ children: React.ReactNode }> = ({
       <div
         aria-live="polite"
         aria-atomic="true"
-        className="u-absolute u-w-0 u-h-0 u-p-0 u-m-n1 u-overflow-hidden u-pointer-events-none"
-        style={{ clip: 'rect(0, 0, 0, 0)', whiteSpace: 'nowrap', border: '0' }}
+        className="sr-only"
       >
         {announcements
           .filter(a => a.priority === 'polite')
@@ -50,8 +49,7 @@ export const AccessibilityProvider: React.FC<{ children: React.ReactNode }> = ({
       <div
         aria-live="assertive"
         aria-atomic="true"
-        className="u-absolute u-w-0 u-h-0 u-p-0 u-m-n1 u-overflow-hidden u-pointer-events-none"
-        style={{ clip: 'rect(0, 0, 0, 0)', whiteSpace: 'nowrap', border: '0' }}
+        className="sr-only"
       >
         {announcements
           .filter(a => a.priority === 'assertive')

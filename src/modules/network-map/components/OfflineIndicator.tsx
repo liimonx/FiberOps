@@ -49,7 +49,7 @@ export function OfflineIndicator({ className = "" }: OfflineIndicatorProps) {
           size={18}
           className={isOffline ? "" : "u-animate-spin"}
         />
-        <span className="u-text-uppercase" style={{ letterSpacing: "1px" }}>
+        <span className="u-text-uppercase">
           {isOffline
             ? "Network Offline: Some features may be limited"
             : "Reconnected: Synchronizing your changes"}
@@ -146,9 +146,7 @@ export function DataFreshnessIndicator({
           isStale ? "u-bg-warning u-animate-pulse" : "u-bg-success"
         }`}
       />
-      <span className="u-text-uppercase" style={{ letterSpacing: "0.5px" }}>
-        {lastUpdateText}
-      </span>
+      <span className="u-text-uppercase">{lastUpdateText}</span>
     </div>
   );
 }
@@ -200,12 +198,7 @@ export function ConnectionQualityIndicator({
           />
         ))}
       </div>
-      <span
-        className={`u-text-xs u-font-bold u-text-uppercase ${color}`}
-        style={{ letterSpacing: "0.5px" }}
-      >
-        {label}
-      </span>
+      <span className={`u-text-xs u-font-bold u-text-uppercase ${color}`}>{label}</span>
     </div>
   );
 }

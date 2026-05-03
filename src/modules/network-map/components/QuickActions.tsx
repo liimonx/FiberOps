@@ -48,8 +48,6 @@ export const QuickActions: React.FC<QuickActionsProps> = ({
             iconName={action.icon}
             onClick={action.onClick}
             fullWidth
-            className="hover:u-shadow-sm"
-            style={{ transition: "all 0.3s cubic-bezier(0.23, 1, 0.32, 1)" }}
           >
             {action.label}
           </Button>

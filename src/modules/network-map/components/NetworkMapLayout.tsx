@@ -29,8 +29,7 @@ export const NetworkMapLayout: React.FC<NetworkMapLayoutProps> = ({
       {/* Skip link for keyboard users */}
       <a
         href="#map-main-content"
-        className="u-absolute u-z-modal u-bg-primary  u-px-4 u-py-2 u-text-sm u-font-bold u-rounded-bottom u-transition-all"
-        style={{ top: "-100px", left: "20px" }}
+        className="skip-link u-absolute u-z-modal u-bg-primary u-px-4 u-py-2 u-text-sm u-font-bold u-rounded-bottom u-transition-all"
       >
         Skip to map content
       </a>
@@ -47,7 +46,7 @@ export const NetworkMapLayout: React.FC<NetworkMapLayoutProps> = ({
 
       {/* Desktop layout */}
       <div
-        className="u-absolute u-inset-0 u-w-100 u-h-100 u-pointer-events-none u-none u-block-md"
+        className="u-absolute u-inset-0 u-w-100 u-h-100 u-pointer-events-none"
         role="presentation"
       >
         {/* Top left - Search panel */}
@@ -70,10 +69,10 @@ export const NetworkMapLayout: React.FC<NetworkMapLayoutProps> = ({
 
         {/* Bottom left - Layer controls */}
         <aside
-          className="u-absolute u-bottom-4 u-start-4 u-pointer-events-auto"
+          className="u-absolute u-bottom-4 u-start-4 u-pointer-events-auto u-w-80"
           aria-label="Layer controls"
         >
-          <Card glass={true} className="u-p-0 u-shadow-xl" style={{ width: "240px" }}>
+          <Card glass={true} className="u-p-0 u-shadow-xl">
             {layerControls}
           </Card>
         </aside>
@@ -89,19 +88,12 @@ export const NetworkMapLayout: React.FC<NetworkMapLayoutProps> = ({
 
       {/* Mobile layout */}
       <div
-        className="u-absolute u-bottom-0 u-start-0 u-w-100 u-pointer-events-auto u-block u-none-md"
+        className="u-absolute u-bottom-0 u-start-0 u-w-100 u-pointer-events-auto"
         role="presentation"
       >
         {mobileControls}
       </div>
 
-      <style jsx>{`
-        a:focus {
-          top: 0 !important;
-          outline: 2px solid white;
-          outline-offset: 2px;
-        }
-      `}</style>
     </div>
   );
 };

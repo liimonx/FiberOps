@@ -78,7 +78,6 @@ export const NetworkLegend: React.FC<NetworkLegendProps> = ({
       className={`u-overflow-hidden u-transition-all ${compact ? "u-p-2" : "u-p-4"} ${className}`}
       role="region"
       aria-label="Network Status Legend"
-      style={{ minWidth: compact ? "160px" : "240px" }}
     >
       <div
         className={`u-flex u-items-center u-gap-2 u-mb-3 u-pb-2 u-border-bottom u-border-secondary-subtle u-opacity-80 ${compact ? "u-mb-2 u-pb-1" : "u-mb-3 u-pb-2"}`}
@@ -93,7 +92,7 @@ export const NetworkLegend: React.FC<NetworkLegendProps> = ({
         {legendItems.map((item) => (
           <div
             key={item.status}
-            className={`u-flex u-items-center u-gap-3 u-p-2 u-rounded u-transition-all hover:u-bg-white-opacity-5`}
+            className={`u-flex u-items-center u-gap-3 u-p-2 u-rounded u-transition-all`}
             role="listitem"
             aria-label={`${item.label} status indicator`}
           >
