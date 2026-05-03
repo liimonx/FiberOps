@@ -223,6 +223,53 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({ onMapLoad, onMapError }) =
         onMapLoad?.(map);
       });
 
+      // Re-initialize layers when style changes (e.g., satellite/dark mode toggle)
+      map.on("style.load", () => {
+        console.log("[MapCanvas] Style changed, re-initializing layers...");
+        
+        try {
+          // Re-add custom layers and sources
+          initializeLayers(map);
+          
+          // Wait for the style to be fully loaded before updating data
+          const waitForStyleAndUpdate = () => {
+            if (!mapRef.current || !map.isStyleLoaded()) {
+              // If not ready yet, wait a bit and try again
+              setTimeout(waitForStyleAndUpdate, 50);
+              return;
+            }
+            
+            const currentState = useNetworkMapStore.getState();
+            console.log("[MapCanvas] Restoring data:", {
+              nodes: currentState.nodes.length,
+              connections: currentState.connections.length,
+              layers: currentState.layers.filter(l => l.visible).length + "/" + currentState.layers.length + " visible"
+            });
+            
+            updateMapData(
+              map,
+              currentState.nodes,
+              currentState.connections,
+              currentState.layers
+            );
+            
+            // Ensure map resizes properly
+            requestAnimationFrame(() => {
+              if (mapRef.current) {
+                mapRef.current.resize();
+              }
+            });
+            
+            console.log("[MapCanvas] Layers and data restored successfully");
+          };
+          
+          // Start the wait loop
+          waitForStyleAndUpdate();
+        } catch (error) {
+          console.error("[MapCanvas] Failed to restore layers after style change:", error);
+        }
+      });
+
       map.on("error", (e) => {
         const error = `Map error: ${e.error?.message || "Unknown error"}`;
         setMapError(error);

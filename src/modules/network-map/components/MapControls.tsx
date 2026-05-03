@@ -19,6 +19,7 @@ export const MapControls: React.FC<MapControlsProps> = ({
 }) => {
   const { isMobile } = useResponsive();
   const { announce } = useAccessibilityAnnounce();
+  const [isSatelliteView, setIsSatelliteView] = useState(false);
 
   const handleZoomIn = useCallback(() => {
     const map = getMapInstance();
@@ -51,6 +52,19 @@ export const MapControls: React.FC<MapControlsProps> = ({
       announce("Map pitch reset", "polite");
     }
   }, [announce]);
+
+  const handleToggleSatellite = useCallback(() => {
+    const map = getMapInstance();
+    if (!map) return;
+
+    const newStyle = isSatelliteView 
+      ? "mapbox://styles/mapbox/dark-v11"
+      : "mapbox://styles/mapbox/satellite-streets-v12";
+
+    map.setStyle(newStyle);
+    setIsSatelliteView(!isSatelliteView);
+    announce(isSatelliteView ? "Switched to dark map view" : "Switched to satellite view", "polite");
+  }, [isSatelliteView, announce]);
 
   const positionClasses = {
     "top-right": "u-absolute u-top-0 u-end-0 u-mt-4 u-me-4",
@@ -88,6 +102,24 @@ export const MapControls: React.FC<MapControlsProps> = ({
               iconOnly
               onClick={handleZoomOut}
               aria-label="Zoom out"
+            />
+          </div>
+
+          <div className="u-border-top u-border-solid u-border-secondary-subtle u-opacity-20 u-my-1" />
+
+          {/* View mode controls */}
+          <div
+            className="u-flex u-flex-column u-gap-1"
+            role="group"
+            aria-label="View mode controls"
+          >
+            <Button
+              variant={isSatelliteView ? "primary" : "secondary"}
+              size={"sm"}
+              iconName={isSatelliteView ? "GlobeHemisphereWest" : "Globe"}
+              iconOnly
+              onClick={handleToggleSatellite}
+              aria-label={isSatelliteView ? "Switch to dark map view" : "Switch to satellite view"}
             />
           </div>
 
