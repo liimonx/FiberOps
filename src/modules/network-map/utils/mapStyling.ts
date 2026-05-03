@@ -1,7 +1,7 @@
 // Map styling utilities for Mapbox GL JS
 
 import { MAPBOX_CONFIG } from '../constants';
-import type { LayerSpecification } from 'mapbox-gl';
+import type { ExpressionSpecification, LayerSpecification } from 'mapbox-gl';
 import type { NetworkNode, NetworkConnection } from '../types';
 
 export interface MapStyleConfig {
@@ -38,6 +38,90 @@ export const AVAILABLE_STYLES: MapStyleConfig[] = [
   }
 ];
 
+/**
+ * Purpose-driven map styling: reads like field / GIS fiber documentation —
+ * backbone vs drops, plant assets (poles, cabinets), and status as overlay.
+ */
+const NODE_FILL_ACTIVE: ExpressionSpecification = [
+  'match',
+  ['get', 'type'],
+  'core_node',
+  '#1e3a8a',
+  'pop',
+  '#3730a3',
+  'distribution_node',
+  '#0f766e',
+  'access_node',
+  '#047857',
+  'splitter',
+  '#b45309',
+  'junction_box',
+  '#57534e',
+  'pole',
+  '#92400e',
+  'onu',
+  '#0369a1',
+  'customer',
+  '#6d28d9',
+  '#64748b',
+];
+
+const NODE_FILL_INACTIVE: ExpressionSpecification = [
+  'match',
+  ['get', 'type'],
+  'core_node',
+  '#475569',
+  'pop',
+  '#475569',
+  'distribution_node',
+  '#475569',
+  'access_node',
+  '#475569',
+  'splitter',
+  '#78716c',
+  'junction_box',
+  '#78716c',
+  'pole',
+  '#78716c',
+  'onu',
+  '#64748b',
+  'customer',
+  '#64748b',
+  '#94a3b8',
+];
+
+// Connection colors: backbone trunk (buried / aerial bundle) vs last-mile drop
+const LINE_COLOR: ExpressionSpecification = [
+  'case',
+  ['==', ['get', 'status'], 'inactive'],
+  '#64748b',
+  ['==', ['get', 'status'], 'error'],
+  '#b91c1c',
+  ['==', ['get', 'status'], 'warning'],
+  '#d97706',
+  [
+    'match',
+    ['get', 'type'],
+    'fiber_route',
+    '#ea580c',
+    'customer_connection',
+    '#38bdf8',
+    '#94a3b8',
+  ],
+];
+
+const COVERAGE_FILL_OPACITY: ExpressionSpecification = [
+  'interpolate',
+  ['linear'],
+  ['zoom'],
+  5,
+  0.06,
+  12,
+  0.1,
+  16,
+  0.14,
+];
+
 // Custom layer configurations for network visualization
 export const CUSTOM_LAYERS = {
   // Node layer configuration
@@ -50,91 +134,322 @@ export const CUSTOM_LAYERS = {
         'interpolate',
         ['linear'],
         ['zoom'],
-        5, 4,   // At zoom 5, radius 4px
-        10, 8,  // At zoom 10, radius 8px
-        15, 12  // At zoom 15, radius 12px
+        5,
+        [
+          'match',
+          ['get', 'type'],
+          'core_node',
+          6,
+          'pop',
+          6,
+          'distribution_node',
+          4,
+          'access_node',
+          3,
+          'onu',
+          3,
+          'splitter',
+          2.5,
+          'junction_box',
+          2.5,
+          'customer',
+          2,
+          'pole',
+          2,
+          3,
+        ],
+        12,
+        [
+          'match',
+          ['get', 'type'],
+          'core_node',
+          14,
+          'pop',
+          14,
+          'distribution_node',
+          10,
+          'access_node',
+          8,
+          'onu',
+          8,
+          'splitter',
+          6,
+          'junction_box',
+          6,
+          'customer',
+          5,
+          'pole',
+          5,
+          8,
+        ],
+        18,
+        [
+          'match',
+          ['get', 'type'],
+          'core_node',
+          24,
+          'pop',
+          24,
+          'distribution_node',
+          18,
+          'access_node',
+          14,
+          'onu',
+          14,
+          'splitter',
+          10,
+          'junction_box',
+          10,
+          'customer',
+          8,
+          'pole',
+          8,
+          14,
+        ],
       ],
       'circle-color': [
-        'match',
-        ['get', 'status'],
-        'active', '#10b981',
-        'inactive', '#6b7280',
-        'warning', '#f59e0b',
-        'error', '#ef4444',
-        '#6b7280' // Default
+        'case',
+        ['==', ['get', 'status'], 'inactive'],
+        NODE_FILL_INACTIVE,
+        ['==', ['get', 'status'], 'error'],
+        [
+          'match',
+          ['get', 'type'],
+          'customer',
+          '#991b1b',
+          '#b91c1c',
+        ],
+        ['==', ['get', 'status'], 'warning'],
+        [
+          'match',
+          ['get', 'type'],
+          'core_node',
+          '#f59e0b',
+          'pop',
+          '#f59e0b',
+          'distribution_node',
+          '#fbbf24',
+          'pole',
+          '#fbbf24',
+          '#d97706',
+        ],
+        NODE_FILL_ACTIVE,
       ],
       'circle-stroke-width': [
         'case',
-        ['boolean', ['feature-state', 'selected'], false], 3,
-        ['boolean', ['feature-state', 'hovered'], false], 2,
-        1
+        ['boolean', ['feature-state', 'selected'], false],
+        3,
+        ['boolean', ['feature-state', 'hovered'], false],
+        2.5,
+        [
+          'match',
+          ['get', 'type'],
+          'core_node',
+          2,
+          'pop',
+          2,
+          'customer',
+          1,
+          1.5,
+        ],
       ],
       'circle-stroke-color': [
         'case',
-        ['boolean', ['feature-state', 'selected'], false], '#f59e0b',
-        ['boolean', ['feature-state', 'hovered'], false], '#3b82f6',
-        '#ffffff'
+        ['boolean', ['feature-state', 'selected'], false],
+        '#fefce8',
+        ['boolean', ['feature-state', 'hovered'], false],
+        '#fde68a',
+        'rgba(252, 252, 250, 0.85)',
       ],
-      'circle-opacity': 0.9
-    }
+      'circle-opacity': 0.97,
+      'circle-stroke-opacity': 0.92,
+    },
   } as LayerSpecification,
 
-  // Connection layer configuration
-  connections: {
-    id: 'network-connections-layer',
+  connectionCasing: {
+    id: 'network-connections-casing',
     type: 'line' as const,
     source: 'network-connections',
+    layout: {
+      'line-cap': 'round',
+      'line-join': 'round',
+    },
     paint: {
       'line-width': [
         'interpolate',
         ['linear'],
         ['zoom'],
-        5, 1,
-        10, 2,
-        15, 3
+        5,
+        [
+          '+',
+          [
+            'match',
+            ['get', 'type'],
+            'fiber_route',
+            2,
+            'customer_connection',
+            1,
+            1.5,
+          ],
+          1.5,
+        ],
+        10,
+        [
+          '+',
+          [
+            'match',
+            ['get', 'type'],
+            'fiber_route',
+            4,
+            'customer_connection',
+            2,
+            3,
+          ],
+          2.5,
+        ],
+        15,
+        [
+          '+',
+          [
+            'match',
+            ['get', 'type'],
+            'fiber_route',
+            7,
+            'customer_connection',
+            3.5,
+            5,
+          ],
+          3,
+        ],
       ],
-      'line-color': [
-        'match',
-        ['get', 'status'],
-        'active', '#10b981',
-        'inactive', '#6b7280',
-        'warning', '#f59e0b',
-        'error', '#ef4444',
-        '#6b7280' // Default
-      ],
-      'line-opacity': 0.8,
-      'line-dasharray': [
-        'case',
-        ['==', ['get', 'status'], 'inactive'], [2, 2],
-        [1, 0]
-      ]
-    }
+      'line-color': '#0f172a',
+      'line-opacity': 0.45,
+    },
   } as LayerSpecification,
 
-  // Outage highlights
+  connections: {
+    id: 'network-connections-layer',
+    type: 'line' as const,
+    source: 'network-connections',
+    layout: {
+      'line-cap': 'round',
+      'line-join': 'round',
+    },
+    paint: {
+      'line-width': [
+        'interpolate',
+        ['linear'],
+        ['zoom'],
+        5,
+        [
+          'match',
+          ['get', 'type'],
+          'fiber_route',
+          1.25,
+          'customer_connection',
+          0.65,
+          0.9,
+        ],
+        10,
+        [
+          'match',
+          ['get', 'type'],
+          'fiber_route',
+          2.75,
+          'customer_connection',
+          1.35,
+          2,
+        ],
+        15,
+        [
+          'match',
+          ['get', 'type'],
+          'fiber_route',
+          4.5,
+          'customer_connection',
+          2,
+          3.25,
+        ],
+      ],
+      'line-color': LINE_COLOR,
+      'line-opacity': 0.92,
+      'line-dasharray': [
+        'case',
+        ['==', ['get', 'status'], 'inactive'],
+        [2, 2],
+        ['==', ['get', 'type'], 'customer_connection'],
+        [4, 3],
+        ['==', ['get', 'status'], 'warning'],
+        [6, 2],
+        [1, 0],
+      ],
+    },
+  } as LayerSpecification,
+
+  /** Soft corridor under outage segments (LineString data — not fill). */
+  outagesGlow: {
+    id: 'network-outages-glow',
+    type: 'line' as const,
+    source: 'network-outages',
+    layout: {
+      'line-cap': 'round',
+      'line-join': 'round',
+    },
+    paint: {
+      'line-width': [
+        'interpolate',
+        ['linear'],
+        ['zoom'],
+        5,
+        6,
+        10,
+        12,
+        15,
+        18,
+      ],
+      'line-color': '#f87171',
+      'line-opacity': 0.35,
+      'line-blur': 2,
+    },
+  } as LayerSpecification,
+
   outages: {
     id: 'network-outages-layer',
-    type: 'fill' as const,
+    type: 'line' as const,
     source: 'network-outages',
+    layout: {
+      'line-cap': 'round',
+      'line-join': 'round',
+    },
     paint: {
-      'fill-color': '#ef4444',
-      'fill-opacity': 0.3,
-      'fill-outline-color': '#ef4444'
-    }
-  },
-  
-  // Coverage area visualization
+      'line-width': [
+        'interpolate',
+        ['linear'],
+        ['zoom'],
+        5,
+        2,
+        10,
+        3.5,
+        15,
+        5,
+      ],
+      'line-color': '#fecaca',
+      'line-opacity': 0.95,
+    },
+  } as LayerSpecification,
+
   coverage: {
     id: 'network-coverage-layer',
     type: 'fill' as const,
     source: 'network-coverage',
     paint: {
-      'fill-color': '#8b5cf6',
-      'fill-opacity': 0.2,
-      'fill-outline-color': '#8b5cf6'
-    }
-  }
+      'fill-color': '#14b8a6',
+      'fill-opacity': COVERAGE_FILL_OPACITY,
+      'fill-outline-color': '#5eead4',
+    },
+  } as LayerSpecification,
 };
+
 
 // Style utility functions
 export const addCustomLayers = (map: mapboxgl.Map) => {
@@ -180,6 +495,10 @@ export const addCustomLayers = (map: mapboxgl.Map) => {
   }
 
   // Add custom layers (only if they don't already exist)
+  if (!map.getLayer('network-connections-casing')) {
+    map.addLayer(CUSTOM_LAYERS.connectionCasing);
+  }
+
   if (!map.getLayer('network-connections-layer')) {
     map.addLayer(CUSTOM_LAYERS.connections);
   }
@@ -188,19 +507,39 @@ export const addCustomLayers = (map: mapboxgl.Map) => {
     map.addLayer(CUSTOM_LAYERS.nodes);
   }
   
+  if (!map.getLayer('network-outages-glow')) {
+    map.addLayer(CUSTOM_LAYERS.outagesGlow);
+  }
+
   if (!map.getLayer('network-outages-layer')) {
     map.addLayer(CUSTOM_LAYERS.outages);
   }
 
   if (!map.getLayer('network-coverage-layer')) {
-    map.addLayer(CUSTOM_LAYERS.coverage as any);
+    map.addLayer(CUSTOM_LAYERS.coverage);
   }
 };
 
 export const updateLayerVisibility = (map: mapboxgl.Map, layerId: string, visible: boolean) => {
   const visibility = visible ? 'visible' : 'none';
-  map.setLayoutProperty(layerId, 'visibility', visibility);
+
+  if (layerId === 'network-connections-layer') {
+    if (map.getLayer('network-connections-casing')) {
+      map.setLayoutProperty('network-connections-casing', 'visibility', visibility);
+    }
+  }
+
+  if (layerId === 'network-outages-layer') {
+    if (map.getLayer('network-outages-glow')) {
+      map.setLayoutProperty('network-outages-glow', 'visibility', visibility);
+    }
+  }
+
+  if (map.getLayer(layerId)) {
+    map.setLayoutProperty(layerId, 'visibility', visibility);
+  }
 };
+
 
 export const setFeatureState = (
   map: mapboxgl.Map,
@@ -279,14 +618,18 @@ export const createNodeFeature = (node: NetworkNode): GeoJSON.Feature => ({
   properties: {
     id: node.id,
     name: node.name,
-    type: node.type,
-    status: node.status,
+    // Mapbox workers expect JSON-serializable strings for match/get filters
+    type: String(node.type),
+    status: String(node.status),
     capacity: node.capacity,
     utilization: node.utilization
   }
 });
 
-export const createConnectionFeature = (connection: NetworkConnection, nodes?: NetworkNode[]): GeoJSON.Feature => {
+export const createConnectionFeature = (
+  connection: NetworkConnection,
+  nodes?: NetworkNode[]
+): GeoJSON.Feature | null => {
   let coordinates: [number, number][] = [];
   
   // If route is provided, use it
@@ -306,6 +649,10 @@ export const createConnectionFeature = (connection: NetworkConnection, nodes?: N
     }
   }
   
+  if (coordinates.length < 2) {
+    return null;
+  }
+
   return {
     type: 'Feature' as const,
     geometry: {
@@ -316,7 +663,8 @@ export const createConnectionFeature = (connection: NetworkConnection, nodes?: N
       id: connection.id,
       sourceNodeId: connection.sourceNodeId,
       targetNodeId: connection.targetNodeId,
-      status: connection.status,
+      type: String(connection.type),
+      status: String(connection.status),
       bandwidth: connection.bandwidth,
       utilization: connection.utilization
     }

@@ -1,85 +1,10 @@
-/* Global styles for network map components */
-:root {
-  /* Color tokens */
-  --color-primary-50: #eff6ff;
-  --color-primary-100: #dbeafe;
-  --color-primary-200: #bfdbfe;
-  --color-primary-300: #93c5fd;
-  --color-primary-400: #60a5fa;
-  --color-primary-500: #3b82f6;
-  --color-primary-600: #2563eb;
-  --color-primary-700: #1d4ed8;
-  --color-primary-800: #1e40af;
-  --color-primary-900: #1e3a8a;
-
-  --color-status-active: #10b981;
-  --color-status-inactive: #6b7280;
-  --color-status-warning: #f59e0b;
-  --color-status-error: #ef4444;
-  --color-status-info: #3b82f6;
-
-  --color-gray-50: #f9fafb;
-  --color-gray-100: #f3f4f6;
-  --color-gray-200: #e5e7eb;
-  --color-gray-300: #d1d5db;
-  --color-gray-400: #9ca3af;
-  --color-gray-500: #6b7280;
-  --color-gray-600: #4b5563;
-  --color-gray-700: #374151;
-  --color-gray-800: #1f2937;
-  --color-gray-900: #111827;
-
-  --color-map-background: #1f2937;
-  --color-map-canvas: #111827;
-  --color-map-grid: #374151;
-  --color-map-highlight: #3b82f6;
-  --color-map-selection: #f59e0b;
-
-  /* Spacing tokens */
-  --spacing-xs: 4px;
-  --spacing-sm: 8px;
-  --spacing-md: 16px;
-  --spacing-lg: 24px;
-  --spacing-xl: 32px;
-  --spacing-xxl: 48px;
-
-  /* Typography tokens */
-  --font-size-xs: 12px;
-  --font-size-sm: 14px;
-  --font-size-md: 16px;
-  --font-size-lg: 18px;
-  --font-size-xl: 20px;
-  --font-size-xxl: 24px;
-
-  --font-weight-normal: 400;
-  --font-weight-medium: 500;
-  --font-weight-semibold: 600;
-  --font-weight-bold: 700;
-
-  /* Motion tokens */
-  --duration-fast: 150ms;
-  --duration-normal: 300ms;
-  --duration-slow: 500ms;
-
-  /* Shadow tokens */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
-  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
-  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.15);
-
-  /* Breakpoint tokens for media queries */
-  --breakpoint-mobile: 768px;
-  --breakpoint-tablet: 1024px;
-  --breakpoint-desktop: 1280px;
-}
-
 /* Component-specific styles */
 .network-map-container {
   position: relative;
   width: 100%;
   height: 100vh;
-  background-color: var(--color-map-background);
-  font-family: "Inter", system-ui, sans-serif;
+  background-color: var(--atomix-body-bg);
+  font-family: var(--atomix-font-family-base);
 }
 
 /* Node styling */
@@ -87,79 +12,83 @@
   position: absolute;
   transform: translate(-50%, -50%);
   cursor: pointer;
-  transition: all var(--duration-normal) ease;
+  transition: var(--atomix-transition-base);
 }
 
 .network-node--active {
-  fill: var(--color-status-active);
-  stroke: var(--color-status-active);
+  fill: var(--atomix-success);
+  stroke: var(--atomix-success);
 }
 
 .network-node--inactive {
-  fill: var(--color-status-inactive);
-  stroke: var(--color-status-inactive);
+  fill: var(--atomix-secondary-text-emphasis);
+  stroke: var(--atomix-secondary-text-emphasis);
 }
 
 .network-node--warning {
-  fill: var(--color-status-warning);
-  stroke: var(--color-status-warning);
+  fill: var(--atomix-warning);
+  stroke: var(--atomix-warning);
 }
 
 .network-node--error {
-  fill: var(--color-status-error);
-  stroke: var(--color-status-error);
+  fill: var(--atomix-error);
+  stroke: var(--atomix-error);
 }
 
 .network-node--selected {
-  stroke: var(--color-map-selection);
+  stroke: var(--atomix-primary);
   stroke-width: 3px;
-  filter: drop-shadow(0 0 8px var(--color-map-highlight));
+  filter: drop-shadow(0 0 12px var(--atomix-primary));
 }
 
 .network-node--hover {
-  filter: drop-shadow(0 0 4px var(--color-primary-400));
-  transform: translate(-50%, -50%) scale(1.1);
+  filter: drop-shadow(0 0 6px var(--atomix-primary));
+  transform: translate(-50%, -50%) scale(1.15);
 }
 
 /* Connection styling */
 .network-connection {
   stroke-linecap: round;
-  transition: all var(--duration-normal) ease;
+  transition: var(--atomix-transition-base);
 }
 
 .network-connection--active {
-  stroke: var(--color-status-active);
+  stroke: var(--atomix-success);
 }
 
 .network-connection--inactive {
-  stroke: var(--color-status-inactive);
+  stroke: var(--atomix-secondary-text-emphasis);
 }
 
 .network-connection--warning {
-  stroke: var(--color-status-warning);
+  stroke: var(--atomix-warning);
 }
 
 .network-connection--error {
-  stroke: var(--color-status-error);
+  stroke: var(--atomix-error);
 }
 
 .network-connection--selected {
   stroke-width: 4px;
-  filter: drop-shadow(0 0 4px var(--color-primary-400));
+  filter: drop-shadow(0 0 6px var(--atomix-primary));
 }
 
-/* Tooltip styling */
+/* Tooltip styling - Enhanced with Glassmorphism */
 .network-tooltip {
   position: absolute;
-  background: var(--color-gray-800);
-  border: 1px solid var(--color-gray-600);
-  border-radius: 8px;
-  padding: var(--spacing-md);
-  color: white;
-  font-size: var(--font-size-sm);
+  background: var(--glass-background-dark);
+  backdrop-filter: var(--glass-backdrop-blur);
+  -webkit-backdrop-filter: var(--glass-backdrop-blur);
+  border: 1px solid var(--glass-border-dark);
+  border-radius: var(--atomix-border-radius-lg);
+  padding: var(--atomix-spacing-4);
+  color: var(--atomix-primary-text-dark);
+  font-size: var(--atomix-font-size-sm);
   max-width: 300px;
   pointer-events: none;
-  box-shadow: var(--shadow-lg);
+  box-shadow: var(--atomix-shadow-lg);
+  z-index: var(--atomix-z-tooltip);
+  transition: opacity 0.2s var(--atomix-transition-easing);
 }
 
 /* Loading states */
@@ -172,26 +101,23 @@
   align-items: center;
   justify-content: center;
   flex-direction: column;
-  gap: var(--spacing-md);
-  color: var(--color-gray-400);
+  gap: var(--atomix-spacing-4);
+  color: var(--atomix-secondary-text-emphasis);
 }
 
 .network-loading--spinner {
-  width: 32px;
-  height: 32px;
-  border: 3px solid var(--color-gray-600);
-  border-top: 3px solid var(--color-primary-500);
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
+  width: 40px;
+  height: 40px;
+  border: 4px solid var(--atomix-border-color);
+  border-top: 4px solid var(--atomix-primary);
+  border-radius: var(--atomix-border-radius-pill);
+  animation: spin 0.8s linear infinite;
+  box-shadow: 0 0 15px rgba(var(--atomix-primary-rgb), 0.2);
 }
 
 @keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 /* Accessibility */
@@ -209,50 +135,50 @@
 
 /* Focus management */
 .network-map-container:focus-within .focus-indicator {
-  outline: 2px solid var(--color-primary-500);
+  outline: 2px solid var(--atomix-primary);
   outline-offset: 2px;
 }
 
 /* Responsive utilities */
 @media (max-width: 768px) {
   .network-map-container {
-    height: 100dvh; /* Use dynamic viewport height for mobile */
+    height: 100dvh;
   }
-
+  
   .network-node {
-    min-width: 12px;
-    min-height: 12px;
+    min-width: 14px;
+    min-height: 14px;
   }
 }
 
 @media (max-width: 1024px) {
   .network-map-container {
-    font-size: var(--font-size-sm);
+    font-size: var(--atomix-font-size-sm);
   }
 }
 
 /* Print styles */
 @media print {
   .network-map-container {
-    background: white;
-    color: black;
+    background: #fff;
+    color: #000;
   }
-
+  
   .network-node {
-    fill: black !important;
-    stroke: black !important;
+    fill: #000 !important;
+    stroke: #000 !important;
   }
 }
 
 /* High contrast mode support */
 @media (prefers-contrast: high) {
   .network-node--active {
-    fill: #000000;
-    stroke: #000000;
+    fill: #000;
+    stroke: #000;
   }
-
+  
   .network-connection--active {
-    stroke: #000000;
+    stroke: #000;
     stroke-width: 2px;
   }
 }
@@ -263,9 +189,11 @@
   .network-connection {
     transition: none;
   }
-
+  
   .network-loading--spinner {
     animation: none;
     border-top-color: transparent;
   }
 }
+
+

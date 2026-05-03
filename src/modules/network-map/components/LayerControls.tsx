@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { Icon, Card, Toggle, Button } from "@shohojdhara/atomix";
+import React, { useEffect, useState, useMemo } from "react";
+import { Icon, Card, Toggle, Button, Badge } from "@shohojdhara/atomix";
 import { useNetworkMapStore, useLayers } from "../stores/useNetworkMapStore";
-import { NetworkMapLayer } from "../types";
+import { NetworkMapLayer, NetworkStatus } from "../types";
 
 interface LayerControlsProps {
   className?: string;
@@ -14,6 +14,11 @@ interface LayerConfig extends NetworkMapLayer {
   icon: string;
   description: string;
   color: string;
+  stats?: {
+    total: number;
+    active: number;
+    alerts: number;
+  };
 }
 
 const LAYER_CONFIGS: LayerConfig[] = [
@@ -23,44 +28,109 @@ const LAYER_CONFIGS: LayerConfig[] = [
     visible: true,
     type: "connections",
     icon: "GitBranch",
-    description: "Show fiber optic cable routes",
-    color: "#10b981",
+    description: "Fiber optic backbone & distribution",
+    color: "#06b6d4",
+    stats: { total: 124, active: 120, alerts: 4 },
   },
   {
-    id: "nodes-splitters",
-    name: "Nodes & Splitters",
+    id: "infrastructure",
+    name: "Core Nodes",
     visible: true,
     type: "nodes",
-    icon: "HardDrives",
-    description: "Display network nodes and splitters",
-    color: "#3b82f6",
+    icon: "HardDrive",
+    description: "Core and Distribution infrastructure",
+    color: "#8b5cf6",
+    stats: { total: 12, active: 12, alerts: 0 },
   },
   {
-    id: "outages",
-    name: "Outages",
+    id: "pops",
+    name: "Points of Presence",
     visible: true,
-    type: "outages",
-    icon: "WarningCircle",
-    description: "Highlight current service outages",
-    color: "#ef4444",
+    type: "nodes",
+    icon: "Pulse",
+    description: "Network service hubs",
+    color: "#ec4899",
+    stats: { total: 8, active: 7, alerts: 1 },
+  },
+  {
+    id: "splitters",
+    name: "Splitters",
+    visible: true,
+    type: "nodes",
+    icon: "GitFork",
+    description: "Passive optical splitters",
+    color: "#8b5cf6",
+    stats: { total: 32, active: 30, alerts: 2 },
+  },
+  {
+    id: "junction-boxes",
+    name: "Junction Boxes",
+    visible: true,
+    type: "nodes",
+    icon: "Package",
+    description: "Fiber termination points",
+    color: "#94a3b8",
+    stats: { total: 45, active: 44, alerts: 1 },
+  },
+  {
+    id: "poles",
+    name: "Utility Poles",
+    visible: true,
+    type: "nodes",
+    icon: "MapPin",
+    description: "Aerial distribution points",
+    color: "#64748b",
+    stats: { total: 156, active: 150, alerts: 6 },
+  },
+  {
+    id: "onus",
+    name: "ONU Units",
+    visible: true,
+    type: "nodes",
+    icon: "HardDrive",
+    description: "Optical Network Units",
+    color: "#f59e0b",
+    stats: { total: 85, active: 82, alerts: 3 },
   },
   {
     id: "customers",
-    name: "Customers",
+    name: "Client Endpoints",
     visible: true,
     type: "nodes",
     icon: "Users",
-    description: "Show customer connection points",
+    description: "Customer connection points",
     color: "#f59e0b",
+    stats: { total: 1240, active: 1198, alerts: 42 },
+  },
+  {
+    id: "customer-connections",
+    name: "Drop Cables",
+    visible: true,
+    type: "connections",
+    icon: "Link",
+    description: "Last-mile customer connections",
+    color: "#38bdf8",
+    stats: { total: 1240, active: 1198, alerts: 42 },
+  },
+  {
+    id: "outages",
+    name: "Active Outages",
+    visible: true,
+    type: "outages",
+    icon: "WarningCircle",
+    description: "Current service interruptions",
+    color: "#ef4444",
+    stats: { total: 8, active: 8, alerts: 8 },
   },
   {
     id: "coverage",
-    name: "Coverage Area",
+    name: "Service Coverage",
     visible: true,
-    type: "nodes",
+    type: "coverage",
     icon: "MapTrifold",
-    description: "Display network coverage zones",
-    color: "#8b5cf6",
+    description: "Regional network availability",
+    color: "#10b981",
+    stats: { total: 12, active: 12, alerts: 0 },
   },
 ];
 
@@ -71,7 +141,7 @@ export const LayerControls: React.FC<LayerControlsProps> = ({ className = "" }) 
   const updateLayers = useNetworkMapStore((state) => state.updateLayers);
   const [hoveredLayer, setHoveredLayer] = useState<string | null>(null);
 
-  // Sync configured layers with store layers to ensure new layers are added
+  // Sync configured layers with store layers
   useEffect(() => {
     const missingLayers = LAYER_CONFIGS.filter(
       (config) => !layers.some((l) => l.id === config.id)
@@ -94,9 +164,11 @@ export const LayerControls: React.FC<LayerControlsProps> = ({ className = "" }) 
     toggleLayer(layerId);
   };
 
-  const getActiveLayerCount = () => {
-    return layers.filter((l) => l.visible).length;
-  };
+  const activeCount = useMemo(() => layers.filter((l) => l.visible).length, [layers]);
+  const totalLayers = LAYER_CONFIGS.length;
+  const progressPercentage = (activeCount / totalLayers) * 100;
+  const circumference = 2 * Math.PI * 16;
+  const strokeDashoffset = circumference - (progressPercentage / 100) * circumference;
 
   const handleToggleAll = (visible: boolean) => {
     layers.forEach((layer) => {
@@ -104,133 +176,152 @@ export const LayerControls: React.FC<LayerControlsProps> = ({ className = "" }) 
     });
   };
 
-  const totalLayers = LAYER_CONFIGS.length;
-  const activeCount = getActiveLayerCount();
-  const progressPercentage = (activeCount / totalLayers) * 100;
-
   return (
     <Card
-      glass={{ blurAmount: 5, mode: "shader", shaderVariant: "plasma" }}
+      glass={{ blurAmount: 12, mode: "shader", shaderVariant: "plasma" }}
       appearance="ghost"
-      className={`u-overflow-hidden ${className}`}
+      className={`u-overflow-hidden u-border-primary-subtle u-shadow-lg ${className}`}
+      style={{ width: "320px" }}
     >
-      {/* Header with Progress Indicator */}
-      <div className="u-flex u-items-center u-justify-between u-p-4 u-bg-primary-subtle u-opacity-90">
-        <div className="u-flex u-items-center u-gap-3">
-          <div className="u-rounded u-flex u-items-center u-justify-center u-bg-primary-subtle u-shadow-sm u-w-8 u-h-8">
-            <Icon name="Stack" size={18} className="" />
+      {/* Premium Header */}
+      <div className="u-relative u-p-4 u-bg-primary-subtle u-opacity-95 u-border-bottom u-border-primary-subtle">
+        <div className="u-flex u-items-center u-justify-between">
+          <div className="u-flex u-items-center u-gap-3">
+            <div className="u-rounded-circle u-flex u-items-center u-justify-center u-bg-primary u-text-white u-shadow-lg u-w-9 u-h-9">
+              <Icon name="Stack" size={20} weight="bold" />
+            </div>
+            <div className="u-flex u-flex-column">
+              <span className="u-fs-base u-font-bold u-text-primary">Map Layers</span>
+              <span className="u-fs-xs u-text-secondary-emphasis u-opacity-75">
+                {activeCount} of {totalLayers} visibility layers
+              </span>
+            </div>
           </div>
-          <div className="u-flex u-flex-column u-gap-1">
-            <span className="u-fs-sm u-font-bold ">Map Layers</span>
-            <span className="u-fs-xs u-text-secondary-emphasis">
-              {activeCount} of {totalLayers} active
+
+          {/* Realistic Progress Ring */}
+          <div className="u-relative u-flex u-items-center u-justify-center u-w-12 u-h-12">
+            <svg
+              width="48"
+              height="48"
+              viewBox="0 0 40 40"
+              className="u-transform-rotate--90"
+            >
+              <circle
+                cx="20"
+                cy="20"
+                r="16"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                className="u-text-primary-subtle u-opacity-20"
+              />
+              <circle
+                cx="20"
+                cy="20"
+                r="16"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeDasharray={circumference}
+                style={{
+                  strokeDashoffset,
+                  transition: "stroke-dashoffset 0.6s cubic-bezier(0.4, 0, 0.2, 1)",
+                  color: "var(--atomix-primary)",
+                }}
+              />
+            </svg>
+            <span className="u-fs-xs u-font-bold u-absolute u-text-primary">
+              {Math.round(progressPercentage)}%
             </span>
           </div>
         </div>
-
-        {/* Progress Bar */}
-        <div className="u-rounded u-relative u-flex u-items-center u-justify-center u-w-10 u-h-10">
-          <svg width="40" height="40" viewBox="0 0 40 40">
-            <circle
-              cx="20"
-              cy="20"
-              r="16"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="3"
-              className="u-text-secondary-emphasis u-opacity-10"
-            />
-            <circle
-              cx="20"
-              cy="20"
-              r="16"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="3"
-              strokeLinecap="round"
-              strokeDasharray={`${progressPercentage} 100`}
-              transform="rotate(-90 20 20)"
-              className="u-transition-base"
-            />
-          </svg>
-          <span
-            className={`u-fs-xs u-font-bold u-absolute ${
-              activeCount > 0 ? "" : "u-text-secondary"
-            }`}
-          >
-            {activeCount}
-          </span>
-        </div>
       </div>
 
-      {/* Layer List */}
+      {/* Meaningful Layer List */}
       <div
-        className="u-p-2 u-overflow-y-auto"
+        className="u-p-2 u-overflow-y-auto u-flex u-flex-column u-gap-2"
         role="group"
         aria-label="Map layers"
-        style={{ maxHeight: "360px" }}
+        style={{ maxHeight: "400px", scrollbarWidth: "none" }}
       >
         {LAYER_CONFIGS.map((config) => {
           const layer = layers.find((l) => l.id === config.id);
           const isVisible = layer?.visible ?? config.visible;
           const isHovered = hoveredLayer === config.id;
+          const hasAlerts = config.stats && config.stats.alerts > 0;
 
           return (
             <div
               key={config.id}
-              className={`u-mb-2 u-rounded u-transition-base ${isHovered ? "u-bg-surface-hover" : "u-bg-surface-subtle"}`}
+              className={`u-rounded-sm u-transition-base u-border u-border-transparent ${
+                isHovered
+                  ? "u-bg-surface-hover u-border-primary-subtle u-shadow-sm"
+                  : "u-bg-surface-subtle"
+              }`}
               style={{
-                opacity: isVisible ? 1 : 0.6,
+                opacity: isVisible ? 1 : 0.5,
               }}
               onMouseEnter={() => setHoveredLayer(config.id)}
               onMouseLeave={() => setHoveredLayer(null)}
             >
-              <div className="u-flex u-items-center u-justify-between u-gap-3 u-p-3">
-                <div
-                  className="u-rounded u-flex-shrink-0 u-w-1 u-h-8"
-                  style={{ backgroundColor: config.color }}
-                />
-
-                <div className="u-flex u-flex-1 u-items-center u-gap-3 u-min-w-0">
+              <div className="u-flex u-items-center u-gap-3 u-p-2">
+                {/* Visual Identity */}
+                <div className="u-relative">
                   <div
-                    className="u-rounded u-flex u-items-center u-justify-center u-flex-shrink-0 u-w-8 u-h-8"
+                    className="u-rounded u-flex u-items-center u-justify-center u-w-10 u-h-10 u-shadow-sm"
                     style={{
                       backgroundColor: `${config.color}15`,
+                      border: `1px solid ${config.color}30`,
                     }}
                   >
                     <Icon
                       name={config.icon as any}
-                      size={16}
+                      size={18}
                       style={{ color: config.color }}
+                      weight={isVisible ? "duotone" : "regular"}
                     />
                   </div>
+                  {hasAlerts && isVisible && (
+                    <div
+                      className="u-absolute u-top-0 u-right-0 u-w-3 u-h-3 u-rounded-circle u-border-white u-border-solid u-border-2"
+                      style={{
+                        backgroundColor: "#ef4444",
+                        transform: "translate(25%, -25%)",
+                      }}
+                    />
+                  )}
+                </div>
 
-                  <div className="u-flex u-flex-column u-min-w-0 u-flex-1">
+                <div className="u-flex u-flex-column u-flex-1 u-min-w-0">
+                  <div className="u-flex u-items-center u-justify-between u-gap-2">
                     <span
-                      className={`u-fs-sm u-font-semibold u-text-truncate u-transition-base ${
-                        isVisible ? "u-text-primary" : "u-text-secondary"
-                      }`}
+                      className={`u-fs-sm u-font-bold u-text-truncate ${isVisible ? "u-text-primary" : "u-text-secondary"}`}
                     >
                       {config.name}
                     </span>
-                    <span
-                      className={`u-fs-xs u-mt-1 u-text-truncate ${
-                        isVisible
-                          ? "u-text-secondary-emphasis"
-                          : "u-text-secondary-emphasis u-opacity-50"
-                      }`}
-                    >
-                      {config.description}
-                    </span>
+                    {config.stats && isVisible && (
+                      <Badge
+                        variant={hasAlerts ? "error" : "success"}
+                        appearance="subtle"
+                        className="u-fs-xs"
+                        style={{ fontSize: "10px", padding: "1px 4px" }}
+                      >
+                        {hasAlerts ? `${config.stats.alerts} Issues` : "Healthy"}
+                      </Badge>
+                    )}
                   </div>
+                  <span className="u-fs-xs u-text-secondary-emphasis u-text-truncate u-opacity-70">
+                    {config.description}
+                  </span>
                 </div>
 
-                {/* Toggle Switch */}
-                <div className="u-flex-shrink-0">
+                {/* Compact Toggle */}
+                <div className="u-ms-auto">
                   <Toggle
                     checked={isVisible}
                     onChange={() => handleToggle(config.id)}
-                    aria-label={`Toggle ${config.name} layer`}
+                    size="sm"
                   />
                 </div>
               </div>
@@ -239,27 +330,27 @@ export const LayerControls: React.FC<LayerControlsProps> = ({ className = "" }) 
         })}
       </div>
 
-      {/* Actions */}
-      <div className="u-flex u-gap-2 u-p-4">
+      {/* Action Footer */}
+      <div className="u-flex u-gap-2 u-p-3 u-bg-surface-subtle u-border-top u-border-primary-subtle">
         <Button
-          variant="success"
+          variant="primary"
           fullWidth
           size="sm"
           onClick={() => handleToggleAll(true)}
           disabled={activeCount === totalLayers}
           iconName="Eye"
         >
-          Show All
+          Enable All
         </Button>
         <Button
-          variant="error"
+          variant="secondary"
           fullWidth
           size="sm"
           onClick={() => handleToggleAll(false)}
           disabled={activeCount === 0}
           iconName="EyeSlash"
         >
-          Hide All
+          Disable All
         </Button>
       </div>
     </Card>

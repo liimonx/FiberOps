@@ -3,7 +3,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { services } from '@/services/serviceLocator';
 import { Asset, Customer, Incident } from '@/types/domain';
-import { NetworkNode, NetworkConnection, NetworkStatus, NetworkNodeType } from '../types';
+import { NetworkNode, NetworkConnection, NetworkStatus, NetworkNodeType, ConnectionType } from '../types';
 
 // Query keys for better organization and cache management
 export const networkQueryKeys = {
@@ -41,12 +41,12 @@ export const networkQueryKeys = {
 // Transform domain assets to network nodes
 const transformAssetToNode = (asset: Asset): NetworkNode => {
   const nodeTypeMap: Record<string, NetworkNodeType> = {
-    pop: NetworkNodeType.CORE_NODE,
-    junction_box: NetworkNodeType.DISTRIBUTION_NODE,
+    pop: NetworkNodeType.POP,
+    junction_box: NetworkNodeType.JUNCTION_BOX,
     splitter: NetworkNodeType.SPLITTER,
-    onu: NetworkNodeType.CUSTOMER,
-    pole: NetworkNodeType.ACCESS_NODE,
-    fiber_route: NetworkNodeType.ACCESS_NODE
+    onu: NetworkNodeType.ONU,
+    pole: NetworkNodeType.POLE,
+    fiber_route: NetworkNodeType.ACCESS_NODE // fiber_route as a node is rare, but keep fallback
   };
 
   const statusMap: Record<string, NetworkStatus> = {
@@ -193,10 +193,13 @@ export function useNetworkConnections() {
     queryKey: networkQueryKeys.connections.list(),
     queryFn: async () => {
       // In production, this would fetch from a real endpoint
-      // For now, we'll generate mock connections based on assets and hierarchy
-      const result = await services.assets.list();
-      const assets = result.items;
+      const [assetsResult, customersResult] = await Promise.all([
+        services.assets.list(),
+        services.customers.list()
+      ]);
       
+      const assets = assetsResult.items;
+      const customers = customersResult.items;
       const connections: NetworkConnection[] = [];
       
       // Categorize assets for hierarchical connection generation
@@ -204,6 +207,7 @@ export function useNetworkConnections() {
       const junctionBoxes = assets.filter(a => a.kind === 'junction_box');
       const splitters = assets.filter(a => a.kind === 'splitter');
       const poles = assets.filter(a => a.kind === 'pole');
+      const onus = assets.filter(a => a.kind === 'onu');
       
       // 1. Connect PoPs to each other (Core Ring)
       for (let i = 0; i < pops.length; i++) {
@@ -214,8 +218,9 @@ export function useNetworkConnections() {
             id: `conn_${source.id}_${target.id}`,
             sourceNodeId: source.id,
             targetNodeId: target.id,
+            type: ConnectionType.FIBER_ROUTE,
             status: NetworkStatus.ACTIVE,
-            bandwidth: 10000, // 10 Gbps core
+            bandwidth: 10000,
             utilization: 20 + Math.random() * 30
           });
         }
@@ -234,6 +239,7 @@ export function useNetworkConnections() {
             id: `conn_${nearestPop.id}_${jb.id}`,
             sourceNodeId: nearestPop.id,
             targetNodeId: jb.id,
+            type: ConnectionType.FIBER_ROUTE,
             status: jb.status === 'degraded' ? NetworkStatus.WARNING : NetworkStatus.ACTIVE,
             bandwidth: 2000,
             utilization: 30 + Math.random() * 40
@@ -254,6 +260,7 @@ export function useNetworkConnections() {
             id: `conn_${nearestJB.id}_${split.id}`,
             sourceNodeId: nearestJB.id,
             targetNodeId: split.id,
+            type: ConnectionType.FIBER_ROUTE,
             status: NetworkStatus.ACTIVE,
             bandwidth: 1000,
             utilization: 10 + Math.random() * 60
@@ -274,9 +281,53 @@ export function useNetworkConnections() {
             id: `conn_${nearestSplit.id}_${pole.id}`,
             sourceNodeId: nearestSplit.id,
             targetNodeId: pole.id,
+            type: ConnectionType.FIBER_ROUTE,
             status: pole.status === 'down' ? NetworkStatus.ERROR : NetworkStatus.ACTIVE,
             bandwidth: 1000,
             utilization: Math.random() * 90
+          });
+        }
+      });
+
+      // 5. Connect each ONU to the nearest Pole
+      onus.forEach(onu => {
+        const nearestPole = poles.reduce((prev, curr) => {
+          const distPrev = Math.sqrt(Math.pow(onu.location.lat - prev.location.lat, 2) + Math.pow(onu.location.lng - prev.location.lng, 2));
+          const distCurr = Math.sqrt(Math.pow(onu.location.lat - curr.location.lat, 2) + Math.pow(onu.location.lng - curr.location.lng, 2));
+          return distCurr < distPrev ? curr : prev;
+        }, poles[0]);
+        
+        if (nearestPole) {
+          connections.push({
+            id: `conn_${nearestPole.id}_${onu.id}`,
+            sourceNodeId: nearestPole.id,
+            targetNodeId: onu.id,
+            type: ConnectionType.FIBER_ROUTE,
+            status: NetworkStatus.ACTIVE,
+            bandwidth: 100,
+            utilization: Math.random() * 50
+          });
+        }
+      });
+
+      // 6. Connect Customers to nearest ONU
+      customers.forEach(customer => {
+        if (!customer.location) return;
+        const nearestONU = onus.reduce((prev, curr) => {
+          const distPrev = Math.sqrt(Math.pow(customer.location!.lat - prev.location.lat, 2) + Math.pow(customer.location!.lng - prev.location.lng, 2));
+          const distCurr = Math.sqrt(Math.pow(customer.location!.lat - curr.location.lat, 2) + Math.pow(customer.location!.lng - curr.location.lng, 2));
+          return distCurr < distPrev ? curr : prev;
+        }, onus[0]);
+        
+        if (nearestONU) {
+          connections.push({
+            id: `conn_${nearestONU.id}_${customer.id}`,
+            sourceNodeId: nearestONU.id,
+            targetNodeId: customer.id,
+            type: ConnectionType.CUSTOMER_CONNECTION,
+            status: customer.status === 'offline' ? NetworkStatus.ERROR : NetworkStatus.ACTIVE,
+            bandwidth: 50,
+            utilization: Math.random() * 80
           });
         }
       });
@@ -304,6 +355,7 @@ export function useConnectionsByNode(nodeId: string) {
             id: `conn_${result.items[index - 1].id}_${asset.id}`,
             sourceNodeId: result.items[index - 1].id,
             targetNodeId: asset.id,
+            type: ConnectionType.FIBER_ROUTE,
             status: NetworkStatus.ACTIVE,
             bandwidth: 1000
           });
@@ -314,6 +366,7 @@ export function useConnectionsByNode(nodeId: string) {
             id: `conn_${asset.id}_${result.items[index + 1].id}`,
             sourceNodeId: asset.id,
             targetNodeId: result.items[index + 1].id,
+            type: ConnectionType.FIBER_ROUTE,
             status: NetworkStatus.ACTIVE,
             bandwidth: 1000
           });

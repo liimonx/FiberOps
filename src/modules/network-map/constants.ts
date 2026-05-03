@@ -32,18 +32,28 @@ export const NETWORK_STATUS_LABELS = {
 } as const;
 
 export const NODE_TYPE_ICONS = {
-  [NetworkNodeType.CORE_NODE]: 'Server',
+  [NetworkNodeType.CORE_NODE]: 'HardDrive',
   [NetworkNodeType.DISTRIBUTION_NODE]: 'Cpu',
-  [NetworkNodeType.ACCESS_NODE]: 'Network',
-  [NetworkNodeType.SPLITTER]: 'Split',
-  [NetworkNodeType.CUSTOMER]: 'User'
+  [NetworkNodeType.ACCESS_NODE]: 'Desktop',
+  [NetworkNodeType.SPLITTER]: 'GitFork',
+  [NetworkNodeType.CUSTOMER]: 'User',
+  [NetworkNodeType.POLE]: 'MapPin',
+  [NetworkNodeType.JUNCTION_BOX]: 'Package',
+  [NetworkNodeType.ONU]: 'HardDrive',
+  [NetworkNodeType.POP]: 'Pulse'
 } as const;
 
 export const DEFAULT_LAYERS: NetworkMapLayer[] = [
+  { id: 'infrastructure', name: 'Core Infrastructure', visible: true, type: 'nodes' },
+  { id: 'pops', name: 'POPs', visible: true, type: 'nodes' },
   { id: 'fiber-routes', name: 'Fiber Routes', visible: true, type: 'connections' },
-  { id: 'nodes-splitters', name: 'Nodes & Splitters', visible: true, type: 'nodes' },
+  { id: 'poles', name: 'Poles', visible: true, type: 'nodes' },
+  { id: 'junction-boxes', name: 'Junction Boxes', visible: true, type: 'nodes' },
+  { id: 'splitters', name: 'Splitters', visible: true, type: 'nodes' },
+  { id: 'onus', name: 'ONUs', visible: true, type: 'nodes' },
+  { id: 'customers', name: 'Customers', visible: true, type: 'nodes' },
+  { id: 'customer-connections', name: 'Customer Connections', visible: true, type: 'connections' },
   { id: 'outages', name: 'Outages', visible: true, type: 'outages' },
-  { id: 'customers', name: 'Customers', visible: true, type: 'customers' },
   { id: 'coverage', name: 'Coverage Area', visible: true, type: 'coverage' }
 ];
 

@@ -334,13 +334,25 @@ export const useNetworkMapStore = create<NetworkMapStore>()(
           }, false, 'reset')
       }),
       {
-        name: 'network-map-store',
+        name: 'network-map-store-v3',
         partialize: (state) => ({
-          // Persist only essential state, exclude transient UI state
           viewport: state.viewport,
           layers: state.layers,
           searchQuery: state.searchQuery
-        })
+        }),
+        onRehydrateStorage: () => (state) => {
+          if (state) {
+            // Merge persisted visibility onto canonical DEFAULT_LAYERS only.
+            // Use ?? so missing/stale `visible` does not become Boolean(undefined) → false (all layers off).
+            const currentLayers = state.layers || [];
+            const persistedById = new Map(currentLayers.map((l) => [l.id, l]));
+
+            state.layers = DEFAULT_LAYERS.map((def) => ({
+              ...def,
+              visible: persistedById.get(def.id)?.visible ?? def.visible,
+            }));
+          }
+        }
       }
     ),
     {

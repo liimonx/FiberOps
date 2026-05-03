@@ -105,6 +105,15 @@
   min-width: 0;
 }
 
+/* Full-bleed map: avoid inset padding and nested scroll; canvas sizes to flex height */
+.main:has(.network-map-page) {
+  padding: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
 /* Responsive Design */
 @media (max-width: 1024px) {
   .sidebar {

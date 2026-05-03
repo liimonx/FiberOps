@@ -24,7 +24,16 @@ export enum NetworkNodeType {
   DISTRIBUTION_NODE = 'distribution_node',
   ACCESS_NODE = 'access_node',
   SPLITTER = 'splitter',
-  CUSTOMER = 'customer'
+  CUSTOMER = 'customer',
+  POLE = 'pole',
+  JUNCTION_BOX = 'junction_box',
+  ONU = 'onu',
+  POP = 'pop'
+}
+
+export enum ConnectionType {
+  FIBER_ROUTE = 'fiber_route',
+  CUSTOMER_CONNECTION = 'customer_connection'
 }
 
 export enum NetworkStatus {
@@ -50,6 +59,7 @@ export interface NetworkConnection {
   id: string;
   sourceNodeId: string;
   targetNodeId: string;
+  type: ConnectionType;
   status: NetworkStatus;
   bandwidth?: number;
   utilization?: number;

@@ -155,7 +155,7 @@ function NetworkMapContent() {
   }, []);
 
   return (
-    <div className="network-map-page" style={{ minHeight: "calc(100vh - 64px)" }}>
+    <div className="network-map-page">
       {/* Map Canvas - Full Screen Background */}
       <MapCanvas />
 
@@ -246,6 +246,8 @@ function NetworkMapContent() {
         .network-map-page {
           position: relative;
           width: 100%;
+          flex: 1;
+          min-height: 0;
           height: 100%;
           background: #111827;
           overflow: hidden;

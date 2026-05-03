@@ -44,15 +44,11 @@ function NetworkMapDataSync({ children }: NetworkMapDataProps) {
   );
   const setConnectionQuality = useNetworkMapStore((state) => state.setConnectionQuality);
 
+  // Single merge: avoids asset-only effect overwriting customer nodes when queries resolve out of order.
   useEffect(() => {
-    if (nodes.data && nodes.data.length > 0) {
-      setNodes(nodes.data);
-    }
-  }, [nodes.data, setNodes]);
-
-  useEffect(() => {
-    if (customers.data && customers.data.length > 0) {
-      const customerNodes = customers.data.map((customer: any) => ({
+    const assetNodes = nodes.data ?? [];
+    const customerNodes =
+      customers.data?.map((customer: any) => ({
         id: customer.id,
         name: customer.name,
         type: NetworkNodeType.CUSTOMER,
@@ -68,14 +64,15 @@ function NetworkMapDataSync({ children }: NetworkMapDataProps) {
           plan: customer.plan,
           originalStatus: customer.status,
         },
-      }));
-      const allNodes = [...(nodes.data || []), ...customerNodes];
-      setNodes(allNodes);
-    }
-  }, [customers.data, nodes.data, setNodes]);
+      })) ?? [];
+
+    if (assetNodes.length === 0 && customerNodes.length === 0) return;
+
+    setNodes([...assetNodes, ...customerNodes]);
+  }, [nodes.data, customers.data, setNodes]);
 
   useEffect(() => {
-    if (connections.data && connections.data.length > 0) {
+    if (connections.data !== undefined) {
       setConnections(connections.data);
     }
   }, [connections.data, setConnections]);
