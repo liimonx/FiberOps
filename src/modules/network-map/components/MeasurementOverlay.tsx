@@ -16,10 +16,8 @@ export function MeasurementOverlay({ onClose }: MeasurementOverlayProps) {
   }
 
   return (
-    <Card
-        glass={true}
-        className="u-shadow-lg u-p-4 u-bg-white-opacity-5"
-      >
+    <div className="u-absolute u-bottom-4 u-start-50 u-translate-middle-x u-z-modal">
+      <Card glass={true} className="u-shadow-lg u-p-4 u-bg-white-opacity-5">
         <div className="u-flex u-justify-between u-items-center u-mb-4">
           <div className="u-flex u-items-center u-gap-3">
             <div className="u-w-8 u-h-8 u-rounded u-bg-primary-subtle u-flex u-items-center u-justify-center">
@@ -99,6 +97,7 @@ export function MeasurementOverlay({ onClose }: MeasurementOverlayProps) {
           </p>
         </div>
       </Card>
+    </div>
   );
 }
 
@@ -119,10 +118,8 @@ export function TracePathOverlay({ onClose }: { onClose?: () => void }) {
   }
 
   return (
-    <Card
-      glass={true}
-      className="u-shadow-lg u-p-4 u-bg-white-opacity-5"
-    >
+    <div className="u-absolute u-bottom-4 u-start-50 u-translate-middle-x u-z-modal">
+      <Card glass={true} className="u-shadow-lg u-p-4 u-bg-white-opacity-5">
         <div className="u-flex u-justify-between u-items-center u-mb-4">
           <div className="u-flex u-items-center u-gap-3">
             <div className="u-w-8 u-h-8 u-rounded u-bg-success-subtle u-flex u-items-center u-justify-center">
@@ -149,9 +146,7 @@ export function TracePathOverlay({ onClose }: { onClose?: () => void }) {
               key={stat.label}
               className={`u-flex-1 u-p-2 u-rounded u-bg-${stat.color}-subtle u-text-center u-border u-border-solid u-border-${stat.color}-subtle`}
             >
-              <div
-                className="u-text-xs u-text-secondary-emphasis u-font-bold u-text-uppercase u-mb-1"
-              >
+              <div className="u-text-xs u-text-secondary-emphasis u-font-bold u-text-uppercase u-mb-1">
                 {stat.label}
               </div>
               <div className={`u-font-bold u-text-base u-text-${stat.color}`}>
@@ -191,14 +186,16 @@ export function TracePathOverlay({ onClose }: { onClose?: () => void }) {
           </div>
         </div>
       </Card>
+    </div>
   );
 }
 
 // Heatmap legend component
 export function HeatmapLegend({ onClose }: { onClose?: () => void }) {
-  const { heatmapData, hasHeatmap, setHeatmapType, clearHeatmap } =
-    useHeatmapTool();
-  const [activeHeatmapType, setActiveHeatmapType] = React.useState<'density' | 'utilization' | 'incidents'>('density');
+  const { heatmapData, hasHeatmap, setHeatmapType, clearHeatmap } = useHeatmapTool();
+  const [activeHeatmapType, setActiveHeatmapType] = React.useState<
+    "density" | "utilization" | "incidents"
+  >("density");
 
   if (!hasHeatmap || !heatmapData) {
     return null;
@@ -207,10 +204,8 @@ export function HeatmapLegend({ onClose }: { onClose?: () => void }) {
   const gradientStops = Object.entries(heatmapData.gradient || {});
 
   return (
-    <Card
-        glass={true}
-        className="u-shadow-lg u-p-4 u-bg-white-opacity-5"
-      >
+    <div className="u-absolute u-bottom-4 u-end-4 u-z-modal">
+      <Card glass={true} className="u-shadow-lg u-p-4 u-bg-white-opacity-5">
         <div className="u-flex u-justify-between u-items-center u-mb-4">
           <div className="u-flex u-items-center u-gap-2">
             <Icon name="Fire" size={18} className="u-text-error" />
@@ -256,7 +251,7 @@ export function HeatmapLegend({ onClose }: { onClose?: () => void }) {
                   size="sm"
                   variant={activeHeatmapType === type.id ? "primary" : "secondary"}
                   onClick={() => {
-                    const t = type.id as 'density' | 'utilization' | 'incidents';
+                    const t = type.id as "density" | "utilization" | "incidents";
                     setHeatmapType(t);
                     setActiveHeatmapType(t);
                   }}
@@ -270,5 +265,6 @@ export function HeatmapLegend({ onClose }: { onClose?: () => void }) {
           </div>
         </div>
       </Card>
+    </div>
   );
 }

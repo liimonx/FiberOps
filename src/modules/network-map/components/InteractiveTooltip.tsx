@@ -64,7 +64,7 @@ export const InteractiveTooltip: React.FC<InteractiveTooltipProps> = ({
       height: window.innerHeight,
     };
 
-    const adjusted = { ...position };
+    let adjusted = { ...position };
 
     if (rect.right > viewport.width) {
       adjusted.x = position.x - rect.width - offset;
