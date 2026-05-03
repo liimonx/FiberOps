@@ -137,7 +137,7 @@ export default function CustomersPage() {
           <Card appearance="outlined">
             <div className="u-flex u-justify-between u-items-center u-mb-6">
               <div>
-                <h1 className="u-text-2xl u-font-bold u-mb-2">Customers</h1>
+                <h1 className="u-text-xxl u-font-bold u-mb-2">Customers</h1>
                 <p className="u-text-secondary-emphasis u-text-sm">
                   Manage customer profiles, check signal health, and track incident
                   history.

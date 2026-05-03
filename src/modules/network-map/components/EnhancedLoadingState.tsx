@@ -90,7 +90,7 @@ export function EnhancedLoadingState({
           <Icon name="SpinnerGap" size={64} className=" u-animate-spin" />
           <div className="u-text-center">
             <h2
-              className="u-m-0 u-text-2xl u-font-bold  u-text-uppercase"
+              className="u-m-0 u-text-xxl u-font-bold  u-text-uppercase"
               style={{ letterSpacing: "4px" }}
             >
               {message}

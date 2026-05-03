@@ -72,7 +72,7 @@ export default function DashboardPage() {
     <Container className="u-py-6 u-w-100">
       <div className="u-flex u-justify-between u-items-center u-mb-6">
         <div>
-          <h1 className="u-text-2xl u-font-bold u-mb-2">Network Dashboard</h1>
+          <h1 className="u-text-xxl u-font-bold u-mb-2">Network Dashboard</h1>
           <p className="u-text-secondary-emphasis u-text-sm">
             Overview of network health, active incidents, and operational metrics.
           </p>
@@ -91,7 +91,7 @@ export default function DashboardPage() {
               </span>
               <Icon name="Users" className="-emphasis" />
             </div>
-            <div className="u-text-2xl u-font-bold">12,492</div>
+            <div className="u-text-xxl u-font-bold">12,492</div>
             <div className="u-text-xs u-text-success u-mt-2">+124 this month</div>
           </Card>
         </GridCol>
@@ -104,7 +104,7 @@ export default function DashboardPage() {
               </span>
               <Icon name="Warning" className="u-text-error" />
             </div>
-            <div className="u-text-2xl u-font-bold">3</div>
+            <div className="u-text-xxl u-font-bold">3</div>
             <div className="u-text-xs u-text-danger u-mt-2">-1 since yesterday</div>
           </Card>
         </GridCol>
@@ -117,7 +117,7 @@ export default function DashboardPage() {
               </span>
               <Icon name="Pulse" className="u-text-success" />
             </div>
-            <div className="u-text-2xl u-font-bold">94%</div>
+            <div className="u-text-xxl u-font-bold">94%</div>
             <div className="u-text-xs u-text-secondary-emphasis u-mt-2">
               Stable across all nodes
             </div>
@@ -132,7 +132,7 @@ export default function DashboardPage() {
               </span>
               <Icon name="Clipboard" className="u-text-warning-emphasis" />
             </div>
-            <div className="u-text-2xl u-font-bold">28</div>
+            <div className="u-text-xxl u-font-bold">28</div>
             <div className="u-text-xs u-text-warning u-mt-2">5 high priority</div>
           </Card>
         </GridCol>

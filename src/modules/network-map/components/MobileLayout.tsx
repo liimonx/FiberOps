@@ -113,7 +113,7 @@ export const MobileLayout: React.FC<MobileLayoutProps> = ({
           >
             <Icon name={item.icon as any} size={20} />
             <span
-              className="u-text-2xs u-font-bold u-text-uppercase"
+              className="u-text-xs u-font-bold u-text-uppercase"
               style={{ letterSpacing: "0.5px" }}
             >
               {item.label}

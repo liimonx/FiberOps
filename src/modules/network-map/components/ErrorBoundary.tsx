@@ -118,7 +118,7 @@ export class ErrorBoundary extends Component<Props, State> {
                   <summary className="u-text-xs u-font-bold u-text-secondary-emphasis u-cursor-pointer">
                     Error Trace
                   </summary>
-                  <pre className="u-mt-2 u-text-2xs u-font-mono u-text-error u-overflow-auto u-max-h-40">
+                  <pre className="u-mt-2 u-text-xs u-font-mono u-text-error u-overflow-auto u-max-h-40">
                     {this.state.error.toString()}
                   </pre>
                 </details>

@@ -153,7 +153,7 @@ export function UserFriendlyError({
           <summary className="u-text-xs u-font-bold u-text-secondary-emphasis u-cursor-pointer">
             Diagnostic Info
           </summary>
-          <div className="u-mt-2 u-p-4 u-bg-black-opacity-20 u-rounded u-text-2xs u-font-mono u-text-error u-overflow-auto u-max-h-48">
+          <div className="u-mt-2 u-p-4 u-bg-black-opacity-20 u-rounded u-text-xs u-font-mono u-text-error u-overflow-auto u-max-h-48">
             <pre className="u-m-0">{JSON.stringify(appError, null, 2)}</pre>
           </div>
         </details>
@@ -213,7 +213,7 @@ export function InlineErrorMessage({
       <Icon name="Warning" size={compact ? 16 : 20} className="u-text-error" />
       <div className="u-flex-1">
         <p
-          className={`u-m-0 u-text-error u-font-bold ${compact ? "u-text-2xs" : "u-text-xs"}`}
+          className={`u-m-0 u-text-error u-font-bold ${compact ? "u-text-xs" : "u-text-xs"}`}
         >
           {message || appError?.userMessage || "An error occurred"}
         </p>

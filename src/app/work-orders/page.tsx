@@ -141,7 +141,7 @@ export default function WorkOrdersPage() {
     <Container className="u-py-4 u-w-100" type="fluid">
       <div className="u-flex u-justify-between u-items-center u-mb-6">
         <div>
-          <h1 className="u-text-2xl u-font-bold u-mb-2">Work Orders</h1>
+          <h1 className="u-text-xxl u-font-bold u-mb-2">Work Orders</h1>
           <p className="u-text-secondary-emphasis u-text-sm">
             Drag-and-drop Kanban board for managing field operations.
           </p>

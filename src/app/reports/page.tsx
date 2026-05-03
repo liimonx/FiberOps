@@ -7,7 +7,7 @@ export default function ReportsPage() {
     <Container className="u-py-6 u-w-100">
       <div className="u-flex u-justify-between u-items-center u-mb-6">
         <div>
-          <h1 className="u-text-2xl u-font-bold u-mb-2">Reports & Analytics</h1>
+          <h1 className="u-text-xxl u-font-bold u-mb-2">Reports & Analytics</h1>
           <p className="u-text-secondary-emphasis u-text-sm">
             Generate insights on network performance, billing, and incidents.
           </p>

@@ -196,7 +196,7 @@ export function KeyboardShortcutsHelp() {
       </h4>
       <div className="u-flex u-flex-column u-gap-2">
         {shortcuts.map(({ key, action }) => (
-          <div key={key} className="u-flex u-justify-between u-items-center u-text-2xs">
+          <div key={key} className="u-flex u-justify-between u-items-center u-text-xs">
             <kbd className="u-px-1.5 u-py-0.5 u-bg-white-opacity-10 u-rounded u-font-mono  u-border u-border-solid u-border-secondary-subtle">
               {key}
             </kbd>

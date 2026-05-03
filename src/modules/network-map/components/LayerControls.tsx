@@ -191,8 +191,8 @@ export const LayerControls: React.FC<LayerControlsProps> = ({ className = "" }) 
               <Icon name="Stack" size={20} weight="bold" />
             </div>
             <div className="u-flex u-flex-column">
-              <span className="u-fs-base u-font-bold u-text-primary">Map Layers</span>
-              <span className="u-fs-xs u-text-secondary-emphasis u-opacity-75">
+              <span className="u-text-base u-font-bold u-text-primary">Map Layers</span>
+              <span className="u-text-xs u-text-secondary-emphasis u-opacity-75">
                 {activeCount} of {totalLayers} visibility layers
               </span>
             </div>
@@ -231,7 +231,7 @@ export const LayerControls: React.FC<LayerControlsProps> = ({ className = "" }) 
                 }}
               />
             </svg>
-            <span className="u-fs-xs u-font-bold u-absolute u-text-primary">
+            <span className="u-text-xs u-font-bold u-absolute u-text-primary">
               {Math.round(progressPercentage)}%
             </span>
           </div>
@@ -296,7 +296,7 @@ export const LayerControls: React.FC<LayerControlsProps> = ({ className = "" }) 
                 <div className="u-flex u-flex-column u-flex-1 u-min-w-0">
                   <div className="u-flex u-items-center u-justify-between u-gap-2">
                     <span
-                      className={`u-fs-sm u-font-bold u-text-truncate ${isVisible ? "u-text-primary" : "u-text-secondary"}`}
+                      className={`u-text-sm u-font-bold u-text-truncate ${isVisible ? "u-text-primary" : "u-text-secondary"}`}
                     >
                       {config.name}
                     </span>
@@ -304,12 +304,12 @@ export const LayerControls: React.FC<LayerControlsProps> = ({ className = "" }) 
                       <Badge
                         variant={hasAlerts ? "error" : "success"}
                         label={hasAlerts ? `${config.stats.alerts} Issues` : "Healthy"}
-                        className="u-fs-xs"
+                        className="u-text-xs"
                         style={{ fontSize: "10px", padding: "1px 4px" }}
                       />
                     )}
                   </div>
-                  <span className="u-fs-xs u-text-secondary-emphasis u-text-truncate u-opacity-70">
+                  <span className="u-text-xs u-text-secondary-emphasis u-text-truncate u-opacity-70">
                     {config.description}
                   </span>
                 </div>
