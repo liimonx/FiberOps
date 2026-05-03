@@ -55,7 +55,6 @@ export const InspectorPanel: React.FC<InspectorPanelProps> = ({
     return (
       <Card
         glass={{ blurAmount: 5 }}
-        appearance="ghost"
         className={`u-w-auto ${className}`}
       >
         <div className="u-flex u-flex-column u-items-center u-gap-4">
@@ -65,8 +64,8 @@ export const InspectorPanel: React.FC<InspectorPanelProps> = ({
             className="u-text-secondary-emphasis u-opacity-30"
           />
           <div className="u-flex u-flex-column u-gap-1">
-            <h3 className="u-m-0 u-fs-sm u-font-bold">No Selection</h3>
-            <p className="u-m-0 u-fs-xs u-text-secondary-emphasis">
+            <h3 className="u-m-0 u-text-sm u-font-bold">No Selection</h3>
+            <p className="u-m-0 u-text-xs u-text-secondary-emphasis">
               Select a node or link to view details
             </p>
           </div>
@@ -91,13 +90,11 @@ export const InspectorPanel: React.FC<InspectorPanelProps> = ({
       role="region"
       aria-label="Inspector panel"
       tabIndex={-1}
-      className="u-z-modal"
       style={{ outline: "none" }}
     >
       <Card
-        glass={{ blurAmount: 5 }}
+        glass={{ blurAmount: 10, mode: "shader"}}
         className={`u-p-0 u-overflow-hidden ${isCollapsed ? "u-h-auto" : "u-h-100"} ${className}`}
-        className="u-p-0 u-overflow-hidden"
         style={{
           width: isCollapsed ? "auto" : "320px",
         }}
@@ -105,7 +102,7 @@ export const InspectorPanel: React.FC<InspectorPanelProps> = ({
       >
         {/* Header */}
         <div
-          className="u-flex u-items-center u-gap-3 u-p-4 u-border-bottom u-border-solid u-border-secondary-subtle u-bg-primary-subtle u-opacity-90"
+          className="u-flex u-items-center u-gap-3 u-p-4  u-bg-primary-subtle u-opacity-90"
         >
           <div
             className="u-rounded-circle u-flex u-items-center u-justify-center u-shadow-sm u-flex-shrink-0"
@@ -126,12 +123,12 @@ export const InspectorPanel: React.FC<InspectorPanelProps> = ({
           {!isCollapsed && (
             <div className="u-flex-1 u-min-w-0">
               <h3
-                className="u-m-0 u-fs-sm u-font-bold u-text-truncate"
+                className="u-m-0 u-text-sm u-font-bold u-text-truncate"
               >
                 {selectedNode ? selectedNode.name : `Link ${selectedConnection?.id}`}
               </h3>
               <span
-                className="u-fs-xs u-text-secondary-emphasis u-block u-text-truncate"
+                className="u-text-xs u-text-secondary-emphasis u-block u-text-truncate"
               >
                 {selectedNode
                   ? getNodeTypeLabel(selectedNode.type)
@@ -164,7 +161,7 @@ export const InspectorPanel: React.FC<InspectorPanelProps> = ({
           <>
             {/* Status Section */}
             <div
-              className="u-px-4 u-py-3 u-border-bottom u-border-solid u-border-secondary-subtle u-bg-primary-subtle u-opacity-90"
+              className="u-px-4 u-py-3  u-opacity-90"
             >
               <StatusIndicator
                 status={status}
@@ -177,7 +174,6 @@ export const InspectorPanel: React.FC<InspectorPanelProps> = ({
             {/* Content Tabs */}
             <Tabs activeIndex={activeTab} onTabChange={setActiveTab}>
               <div
-                className="u-border-bottom u-border-solid u-border-secondary-subtle"
               >
                 <Tabs.List>
                   <Tabs.Trigger index={0}>Details</Tabs.Trigger>
@@ -246,19 +242,19 @@ export const InspectorPanel: React.FC<InspectorPanelProps> = ({
                           className="u-flex u-justify-between u-items-center u-gap-3"
                         >
                           <span
-                            className="u-fs-xs u-text-secondary-emphasis u-font-bold u-text-uppercase"
+                            className="u-text-xs u-text-secondary-emphasis u-font-bold u-text-uppercase"
                           >
                             {item.label}
                           </span>
                           <div className="u-flex u-flex-column u-items-end u-gap-1">
                             {item.code ? (
                               <code
-                                className="u-fs-xs u-px-2 u-py-1 u-rounded-sm u-font-mono u-bg-secondary-subtle"
+                                className="u-text-xs u-px-2 u-py-1 u-rounded-sm u-font-mono u-bg-secondary-subtle"
                               >
                                 {item.value}
                               </code>
                             ) : (
-                              <span className="u-fs-sm u-font-medium">
+                              <span className="u-text-sm u-font-medium">
                                 {item.value}
                               </span>
                             )}
@@ -359,7 +355,7 @@ export const InspectorPanel: React.FC<InspectorPanelProps> = ({
                           >
                             <Icon name="ArrowRight" size={14} className="" />
                             <span
-                              className="u-flex-1 u-fs-xs u-font-mono"
+                              className="u-flex-1 u-text-xs u-font-mono"
                             >
                               {nodeId}
                             </span>
@@ -378,7 +374,7 @@ export const InspectorPanel: React.FC<InspectorPanelProps> = ({
                             size={24}
                             className="u-opacity-30 u-mb-2"
                           />
-                          <span className="u-fs-xs u-block">No linked nodes found</span>
+                          <span className="u-text-xs u-block">No linked nodes found</span>
                         </div>
                       )}
                     </div>

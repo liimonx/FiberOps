@@ -79,7 +79,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
                   className={`${styles.navItem} ${isActive(item.href) ? styles.navItemActive : ""}`}
                   onClick={() => setSidebarOpen(false)}
                 >
-                  <Icon name={item.icon} className="u-me-2" />
+                  <Icon name={item.icon as any} className="u-me-2" />
                   <span>{item.label}</span>
                 </SideMenuItem>
               ))}

@@ -14,7 +14,6 @@ import {
   AreaChart,
   Callout,
   DonutChart,
-  StatCard,
   Avatar,
 } from "@shohojdhara/atomix";
 import { ClientOnly } from "@/components/ClientOnly";
@@ -158,8 +157,6 @@ export default function DashboardPage() {
                     variant="primary"
                     interactive={true}
                     showLegend={false}
-                    height={300}
-                    width="100%"
                     areaOptions={{
                       smooth: true,
                       useGradient: true,
@@ -228,9 +225,7 @@ export default function DashboardPage() {
                     }
                   ]}
                   interactive={true} 
-                  showLegend={true} 
-                  height={250}
-                  width={250}
+                  showLegend={true}
                 />
               </ClientOnly>
             </div>

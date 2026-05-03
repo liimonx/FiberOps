@@ -28,7 +28,7 @@ export { CategoryFilterTabs } from './CategoryFilterTabs';
 export { SearchResultsList } from './SearchResultsList';
 export { QuickActions } from './QuickActions';
 
-export { Toolbar, MobileToolbar } from './Toolbar';
+export { Toolbar } from './Toolbar';
 
 export { LayerControls } from './LayerControls';
 

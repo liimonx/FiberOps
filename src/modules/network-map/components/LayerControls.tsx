@@ -303,12 +303,10 @@ export const LayerControls: React.FC<LayerControlsProps> = ({ className = "" }) 
                     {config.stats && isVisible && (
                       <Badge
                         variant={hasAlerts ? "error" : "success"}
-                        appearance="subtle"
+                        label={hasAlerts ? `${config.stats.alerts} Issues` : "Healthy"}
                         className="u-fs-xs"
                         style={{ fontSize: "10px", padding: "1px 4px" }}
-                      >
-                        {hasAlerts ? `${config.stats.alerts} Issues` : "Healthy"}
-                      </Badge>
+                      />
                     )}
                   </div>
                   <span className="u-fs-xs u-text-secondary-emphasis u-text-truncate u-opacity-70">
@@ -321,7 +319,6 @@ export const LayerControls: React.FC<LayerControlsProps> = ({ className = "" }) 
                   <Toggle
                     checked={isVisible}
                     onChange={() => handleToggle(config.id)}
-                    size="sm"
                   />
                 </div>
               </div>
