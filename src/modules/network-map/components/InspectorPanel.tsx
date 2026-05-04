@@ -90,14 +90,14 @@ export const InspectorPanel: React.FC<InspectorPanelProps> = ({
       className="u-outline-none"
     >
       <Card
-        glass={true}
-        className={`u-p-0 u-overflow-hidden ${isCollapsed ? "u-h-auto u-w-auto" : "u-h-100 u-w-100"} ${className}`}
-        size="sm"
+        glass={{ blurAmount: 5, mode: "shader" }}
+        className={`u-overflow-hidden ${isCollapsed ? "u-h-auto u-w-auto" : "u-h-100 u-w-100"} ${className}`}
+        variant={selectedNode?.status == "active" ? "success" : `${selectedNode?.status}`}
       >
         {/* Header */}
-        <div className="u-flex u-items-center u-justify-between u-gap-3 u-p-4  u-bg-primary-subtle ">
+        <Card.Header className="u-flex u-items-center u-gap-3">
           <div
-            className="u-rounded-circle u-flex u-items-center u-justify-center u-shadow-sm u-flex-shrink-0 u-w-10 u-h-10"
+            className="u-rounded-circle u-flex u-items-center u-justify-center u-shadow-sm u-flex-shrink-0 u-p-3"
             style={{
               backgroundColor: NETWORK_STATUS_COLORS[status],
             }}
@@ -106,7 +106,6 @@ export const InspectorPanel: React.FC<InspectorPanelProps> = ({
               name={
                 (selectedNode ? NODE_TYPE_ICONS[selectedNode.type] : "GitBranch") as any
               }
-              size={20}
             />
           </div>
 
@@ -123,7 +122,7 @@ export const InspectorPanel: React.FC<InspectorPanelProps> = ({
             </div>
           )}
 
-          <div className="u-flex u-gap-1">
+          <div className="u-flex u-gap-1 u-ms-auto">
             <Button
               variant="secondary"
               size="sm"
@@ -141,20 +140,10 @@ export const InspectorPanel: React.FC<InspectorPanelProps> = ({
               aria-label="Close panel"
             />
           </div>
-        </div>
+        </Card.Header>
 
         {!isCollapsed && (
           <>
-            {/* Status Section */}
-            <div className="u-px-4 u-py-3  ">
-              <StatusIndicator
-                status={status}
-                size="md"
-                showLabel={true}
-                pulse={status === NetworkStatus.ERROR}
-              />
-            </div>
-
             {/* Content Tabs */}
             <Tabs activeIndex={activeTab} onTabChange={setActiveTab}>
               <div>
@@ -165,8 +154,15 @@ export const InspectorPanel: React.FC<InspectorPanelProps> = ({
                 </Tabs.List>
               </div>
 
-              <div className="u-p-4 u-max-h-100 u-overflow-y-auto">
+              <div className="u-max-h-90 u-overflow-y-auto">
                 <Tabs.Panel index={0}>
+                  {/* Status Section */}
+                  <StatusIndicator
+                    status={status}
+                    size="md"
+                    showLabel={true}
+                    pulse={status === NetworkStatus.ERROR}
+                  />
                   <div className="u-flex u-flex-column u-gap-3">
                     {[
                       {
@@ -238,9 +234,7 @@ export const InspectorPanel: React.FC<InspectorPanelProps> = ({
                               </span>
                             )}
                             {item.progress !== undefined && (
-                              <div
-                                className="u-w-25 u-h-1 u-rounded-circle u-overflow-hidden u-bg-secondary-subtle"
-                              >
+                              <div className="u-w-25 u-h-1 u-rounded-circle u-overflow-hidden u-bg-secondary-subtle">
                                 <div
                                   className="u-h-100"
                                   style={{

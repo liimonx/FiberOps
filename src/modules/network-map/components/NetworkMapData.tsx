@@ -161,27 +161,29 @@ function NetworkStatusIndicators({
   downNodes: number;
 }) {
   return (
-    <div className="u-absolute u-top-4 u-start-50 u-transform-center-x u-flex u-items-center u-gap-2 u-z-20 u-pointer-events-none">
+    <div className="u-absolute u-mt-4 u-start-50 u-flex u-items-center  u-gap-2">
       {/* WebSocket Connection Status */}
       <Badge
-        glass={true}
+        glass={{
+          blurAmount: 10,
+        }}
         variant={
           isConnected ? (connectionQuality === "good" ? "success" : "warning") : "error"
         }
         icon={<Icon name={isConnected ? "WifiHigh" : "WifiSlash"} size={"sm"} />}
         label={isConnected ? "Live Feed" : "Static Map"}
-        className="u-pointer-events-auto"
         size="sm"
       />
 
       {/* Active Incidents Badge */}
       {activeIncidents > 0 && (
         <Badge
-          glass={true}
+          glass={{
+            blurAmount: 10,
+          }}
           variant="error"
           icon={<Icon name="Warning" size={"sm"} />}
           label={`${activeIncidents} Active Incidents`}
-          className="u-pointer-events-auto"
           size="sm"
         />
       )}
@@ -189,11 +191,12 @@ function NetworkStatusIndicators({
       {/* Node Status Summary - Degraded */}
       {degradedNodes > 0 && (
         <Badge
-          glass={true}
+          glass={{
+            blurAmount: 10,
+          }}
           variant="warning"
           icon={<Icon name="Warning" size={"sm"} />}
           label={`${degradedNodes} Degraded`}
-          className="u-pointer-events-auto"
           size="sm"
         />
       )}
@@ -201,11 +204,12 @@ function NetworkStatusIndicators({
       {/* Node Status Summary - Down */}
       {downNodes > 0 && (
         <Badge
-          glass={true}
+          glass={{
+            blurAmount: 10,
+          }}
           variant="error"
           icon={<Icon name="Warning" size={"sm"} />}
           label={`${downNodes} Down`}
-          className="u-pointer-events-auto"
         />
       )}
     </div>

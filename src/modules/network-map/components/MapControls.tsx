@@ -70,7 +70,7 @@ export const MapControls: React.FC<MapControlsProps> = ({
   }, [isSatelliteView, announce]);
 
   const positionClasses = {
-    "top-right": "u-absolute u-top-0 u-end-0 u-mt-4 u-me-4",
+    "top-right": "u-absolute u-top-0 u-end-0 u-mt-40 u-me-2",
     "bottom-right": "u-absolute u-bottom-0 u-end-0 u-mb-4 u-me-4",
     "top-left": "u-absolute u-top-0 u-start-0 u-mt-4 u-ms-4",
     "bottom-left": "u-absolute u-bottom-0 u-start-0 u-mb-4 u-ms-4",

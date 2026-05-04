@@ -16,8 +16,8 @@ export function MeasurementOverlay({ onClose }: MeasurementOverlayProps) {
   }
 
   return (
-    <div className="u-absolute u-bottom-4 u-start-50 u-translate-middle-x u-z-modal">
-      <Card glass={true} className="u-shadow-lg u-p-4 u-bg-white-opacity-5">
+    <div className="overlay-measurement">
+      <Card glass={{ blurAmount: 5, mode: "shader" }}>
         <div className="u-flex u-justify-between u-items-center u-mb-4">
           <div className="u-flex u-items-center u-gap-3">
             <div className="u-w-8 u-h-8 u-rounded u-bg-primary-subtle u-flex u-items-center u-justify-center">
@@ -55,7 +55,7 @@ export function MeasurementOverlay({ onClose }: MeasurementOverlayProps) {
           </div>
         </div>
 
-        <div className="u-overflow-y-auto u-mb-4">
+        <div className="u-overflow-y-auto u-mb-4" style={{ maxHeight: "200px" }}>
           <table className="u-w-100 u-text-xs">
             <thead className="u-border-bottom u-border-secondary-subtle">
               <tr>
@@ -118,12 +118,12 @@ export function TracePathOverlay({ onClose }: { onClose?: () => void }) {
   }
 
   return (
-    <div className="u-absolute u-bottom-4 u-start-50 u-translate-middle-x u-z-modal">
-      <Card glass={true} className="u-shadow-lg u-p-4 u-bg-white-opacity-5">
+    <div className="overlay-trace">
+      <Card glass={{ blurAmount: 5, mode: "shader" }}>
         <div className="u-flex u-justify-between u-items-center u-mb-4">
           <div className="u-flex u-items-center u-gap-3">
-            <div className="u-w-8 u-h-8 u-rounded u-bg-success-subtle u-flex u-items-center u-justify-center">
-              <Icon name="GitBranch" size={18} className="u-text-success" />
+            <div className="u-p-2 u-p-2 u-rounded u-bg-success-subtle u-flex u-items-center u-justify-center">
+              <Icon name="GitBranch" size={"lg"} className="u-text-success" />
             </div>
             <h3 className="u-font-bold u-text-sm u-text-success">Connection Trace</h3>
           </div>
@@ -156,12 +156,12 @@ export function TracePathOverlay({ onClose }: { onClose?: () => void }) {
           ))}
         </div>
 
-        <div className="u-overflow-y-auto">
+        <div className="u-overflow-y-auto" style={{ maxHeight: "200px" }}>
           <div className="u-text-xs u-font-bold u-text-secondary-emphasis u-text-uppercase u-mb-2 u-ms-1">
             Route Path
           </div>
           <div className="u-flex u-flex-column u-gap-2">
-            {tracePath.path.map((node: any, index: number) => (
+            {tracePath.path.map((node, index) => (
               <div
                 key={node.id}
                 className="u-flex u-items-center u-gap-3 u-p-2 u-rounded u-bg-white-opacity-5"
@@ -204,8 +204,8 @@ export function HeatmapLegend({ onClose }: { onClose?: () => void }) {
   const gradientStops = Object.entries(heatmapData.gradient || {});
 
   return (
-    <div className="u-absolute u-bottom-4 u-end-4 u-z-modal">
-      <Card glass={true} className="u-shadow-lg u-p-4 u-bg-white-opacity-5">
+    <div className="overlay-heatmap">
+      <Card glass={{ blurAmount: 5, mode: "shader" }}>
         <div className="u-flex u-justify-between u-items-center u-mb-4">
           <div className="u-flex u-items-center u-gap-2">
             <Icon name="Fire" size={18} className="u-text-error" />

@@ -12,6 +12,8 @@ interface SearchInputProps {
   ariaControls?: string;
   ariaActiveDescendant?: string;
   className?: string;
+  onFocus: () => void;
+  onBlur: () => void;
 }
 
 /**
@@ -26,20 +28,18 @@ export const SearchInput: React.FC<SearchInputProps> = ({
   ariaControls,
   ariaActiveDescendant,
   className = "",
+  onFocus,
+  onBlur,
 }) => {
   const inputRef = useRef<HTMLInputElement>(null);
 
   return (
     <div
-      className={`u-relative u-flex u-items-center u-w-100 u-bg-white-opacity-5 u-border-bottom u-border-secondary-subtle u-transition-all ${className}`}
+      className={`u-relative u-flex u-items-center u-w-100  u-transition-all ${className}`}
       onKeyDown={onKeyDown}
     >
-      <div className="u-absolute u-ms-4 u-flex u-items-center u-pointer-events-none">
-        <Icon
-          name="MagnifyingGlass"
-          size={18}
-          className="u-text-secondary-emphasis u-opacity-50"
-        />
+      <div className="u-absolute u-ms-4 u-flex u-items-center u-opacity-50">
+        <Icon name="MagnifyingGlass" size={18} className="u-text-secondary-emphasis" />
       </div>
       <Input
         ref={inputRef}
@@ -51,6 +51,8 @@ export const SearchInput: React.FC<SearchInputProps> = ({
         aria-label="Search network assets"
         aria-controls={ariaControls}
         aria-activedescendant={ariaActiveDescendant}
+        onFocus={onFocus}
+        onBlur={onBlur}
       />
       {value && (
         <div className="u-absolute u-end-0 u-me-2 u-flex u-items-center">

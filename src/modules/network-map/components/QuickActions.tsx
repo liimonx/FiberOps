@@ -35,7 +35,7 @@ export const QuickActions: React.FC<QuickActionsProps> = ({
   className = "",
 }) => {
   return (
-    <div className={`u-p-4 u-bg-primary-subtle  ${className}`}>
+    <div className={`u-p-4 ${className}`}>
       <span className="u-block u-text-xs u-text-secondary-emphasis u-font-bold u-text-uppercase u-mb-3 u-leading-none">
         Quick Actions
       </span>

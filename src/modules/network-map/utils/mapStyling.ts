@@ -1,672 +1,539 @@
 // Map styling utilities for Mapbox GL JS
 
-import { MAPBOX_CONFIG } from '../constants';
-import type { ExpressionSpecification, LayerSpecification } from 'mapbox-gl';
-import type { NetworkNode, NetworkConnection } from '../types';
+import type { ExpressionSpecification, LayerSpecification } from "mapbox-gl";
+import type { NetworkNode, NetworkConnection } from "../types";
 
-export interface MapStyleConfig {
-  id: string;
-  name: string;
-  url: string;
-  isDark?: boolean;
-}
-
-export const AVAILABLE_STYLES: MapStyleConfig[] = [
-  {
-    id: 'dark',
-    name: 'Dark',
-    url: 'mapbox://styles/mapbox/dark-v11',
-    isDark: true
-  },
-  {
-    id: 'light',
-    name: 'Light',
-    url: 'mapbox://styles/mapbox/light-v11',
-    isDark: false
-  },
-  {
-    id: 'satellite',
-    name: 'Satellite',
-    url: 'mapbox://styles/mapbox/satellite-v9',
-    isDark: false
-  },
-  {
-    id: 'streets',
-    name: 'Streets',
-    url: 'mapbox://styles/mapbox/streets-v12',
-    isDark: false
-  }
-];
+/* ─────────────────────────────────────────────────────────────────────────────
+ * DESIGN TOKENS
+ * ───────────────────────────────────────────────────────────────────────────── */
 
 /**
- * Purpose-driven map styling: reads like field / GIS fiber documentation —
- * backbone vs drops, plant assets (poles, cabinets), and status as overlay.
+ * Curated color palette for network infrastructure.
+ * These follow a logical hierarchy: Core (Dark Blue), Distribution (Teal),
+ * Plant (Amber/Stone), and Edge (Sky/Violet).
  */
-const NODE_FILL_ACTIVE: ExpressionSpecification = [
-  'match',
-  ['get', 'type'],
-  'core_node',
-  '#1e3a8a',
-  'pop',
-  '#3730a3',
-  'distribution_node',
-  '#0f766e',
-  'access_node',
-  '#047857',
-  'splitter',
-  '#b45309',
-  'junction_box',
-  '#57534e',
-  'pole',
-  '#92400e',
-  'onu',
-  '#0369a1',
-  'customer',
-  '#6d28d9',
-  '#64748b',
+export const MAP_COLORS = {
+  // Nodes
+  core: "#1e3a8a", // Deep Indigo
+  pop: "#3730a3", // Violet 800
+  distribution: "#0f766e", // Teal 700
+  access: "#047857", // Emerald 700
+  splitter: "#b45309", // Amber 700
+  junction: "#57534e", // Stone 600
+  pole: "#92400e", // Brown 800
+  onu: "#0369a1", // Sky 700
+  customer: "#6d28d9", // Violet 700
+
+  // Connections
+  fiber_route: "#ee8952", // Orange 600
+  customer_connection: "#38bdf8", // Sky 400
+
+  // Status
+  inactive: "#64748b", // Slate 500
+  error: "#b91c1c", // Red 700
+  warning: "#d97706", // Amber 600
+  selected: "#fefce8", // Warm White
+  hovered: "#fde68a", // Soft Gold
+
+  // Backgrounds
+  casing: "#0f172a", // Slate 900
+  coverage: "#14b8a6", // Teal 500
+} as const;
+
+/** Sizing hierarchy for different zoom levels */
+const NODE_SIZES = {
+  min: {
+    core: 6,
+    pop: 6,
+    distribution: 4,
+    access: 3,
+    onu: 3,
+    splitter: 2.5,
+    junction: 2.5,
+    customer: 2,
+    pole: 2,
+  },
+  mid: {
+    core: 14,
+    pop: 14,
+    distribution: 10,
+    access: 8,
+    onu: 8,
+    splitter: 6,
+    junction: 6,
+    customer: 5,
+    pole: 5,
+  },
+  max: {
+    core: 24,
+    pop: 24,
+    distribution: 18,
+    access: 14,
+    onu: 14,
+    splitter: 10,
+    junction: 10,
+    customer: 8,
+    pole: 8,
+  },
+} as const;
+
+/* ─────────────────────────────────────────────────────────────────────────────
+ * EXPRESSION BUILDERS
+ * ───────────────────────────────────────────────────────────────────────────── */
+
+/** Helper to build a node type-based match expression */
+const matchNodeType = (
+  values: Record<string, any>,
+  defaultValue: any
+): ExpressionSpecification => [
+  "match",
+  ["get", "type"],
+  "core_node",
+  values.core,
+  "pop",
+  values.pop,
+  "distribution_node",
+  values.distribution,
+  "access_node",
+  values.access,
+  "splitter",
+  values.splitter,
+  "junction_box",
+  values.junction,
+  "pole",
+  values.pole,
+  "onu",
+  values.onu,
+  "customer",
+  values.customer,
+  defaultValue,
 ];
 
-const NODE_FILL_INACTIVE: ExpressionSpecification = [
-  'match',
-  ['get', 'type'],
-  'core_node',
-  '#475569',
-  'pop',
-  '#475569',
-  'distribution_node',
-  '#475569',
-  'access_node',
-  '#475569',
-  'splitter',
-  '#78716c',
-  'junction_box',
-  '#78716c',
-  'pole',
-  '#78716c',
-  'onu',
-  '#64748b',
-  'customer',
-  '#64748b',
-  '#94a3b8',
-];
-
-// Connection colors: backbone trunk (buried / aerial bundle) vs last-mile drop
-const LINE_COLOR: ExpressionSpecification = [
-  'case',
-  ['==', ['get', 'status'], 'inactive'],
-  '#64748b',
-  ['==', ['get', 'status'], 'error'],
-  '#b91c1c',
-  ['==', ['get', 'status'], 'warning'],
-  '#d97706',
+/** Node fill expression accounting for status */
+const NODE_FILL: ExpressionSpecification = [
+  "case",
+  ["==", ["get", "status"], "inactive"],
+  MAP_COLORS.inactive,
+  ["==", ["get", "status"], "error"],
+  ["match", ["get", "type"], "customer", "#991b1b", MAP_COLORS.error],
+  ["==", ["get", "status"], "warning"],
   [
-    'match',
-    ['get', 'type'],
-    'fiber_route',
-    '#ea580c',
-    'customer_connection',
-    '#38bdf8',
-    '#94a3b8',
+    "match",
+    ["get", "type"],
+    "core_node",
+    MAP_COLORS.warning,
+    "pop",
+    MAP_COLORS.warning,
+    "#fbbf24", // distribution/pole warning color
+  ],
+  matchNodeType(MAP_COLORS, "#94a3b8"),
+];
+
+/** Connection stroke expression */
+const LINE_COLOR: ExpressionSpecification = [
+  "case",
+  ["==", ["get", "status"], "inactive"],
+  MAP_COLORS.inactive,
+  ["==", ["get", "status"], "error"],
+  MAP_COLORS.error,
+  ["==", ["get", "status"], "warning"],
+  MAP_COLORS.warning,
+  [
+    "match",
+    ["get", "type"],
+    "fiber_route",
+    MAP_COLORS.fiber_route,
+    "customer_connection",
+    MAP_COLORS.customer_connection,
+    "#94a3b8",
   ],
 ];
 
-const COVERAGE_FILL_OPACITY: ExpressionSpecification = [
-  'interpolate',
-  ['linear'],
-  ['zoom'],
-  5,
-  0.06,
-  12,
-  0.1,
-  16,
-  0.14,
+/* ─────────────────────────────────────────────────────────────────────────────
+ * LAYER SPECIFICATIONS
+ * ───────────────────────────────────────────────────────────────────────────── */
+
+export const AVAILABLE_STYLES = [
+  { id: "dark", name: "Dark", url: "mapbox://styles/mapbox/dark-v11", isDark: true },
+  { id: "light", name: "Light", url: "mapbox://styles/mapbox/light-v11", isDark: false },
+  {
+    id: "satellite",
+    name: "Satellite",
+    url: "mapbox://styles/mapbox/satellite-v9",
+    isDark: false,
+  },
+  {
+    id: "streets",
+    name: "Streets",
+    url: "mapbox://styles/mapbox/streets-v12",
+    isDark: false,
+  },
 ];
 
-// Custom layer configurations for network visualization
-export const CUSTOM_LAYERS = {
-  // Node layer configuration
-  nodes: {
-    id: 'network-nodes-layer',
-    type: 'circle' as const,
-    source: 'network-nodes',
+export const CUSTOM_LAYERS: Record<string, LayerSpecification> = {
+  /** Soft halo behind every node for better visibility and status feedback */
+  nodeGlow: {
+    id: "network-nodes-glow",
+    type: "circle",
+    source: "network-nodes",
     paint: {
-      'circle-radius': [
-        'interpolate',
-        ['linear'],
-        ['zoom'],
+      "circle-radius": [
+        "interpolate",
+        ["exponential", 1.5],
+        ["zoom"],
         5,
-        [
-          'match',
-          ['get', 'type'],
-          'core_node',
-          6,
-          'pop',
-          6,
-          'distribution_node',
-          4,
-          'access_node',
-          3,
-          'onu',
-          3,
-          'splitter',
-          2.5,
-          'junction_box',
-          2.5,
-          'customer',
-          2,
-          'pole',
-          2,
-          3,
-        ],
+        matchNodeType(
+          {
+            core: 12,
+            pop: 12,
+            distribution: 8,
+            access: 6,
+            onu: 5,
+            splitter: 5,
+            junction: 4,
+            customer: 4,
+            pole: 4,
+          },
+          5
+        ),
         12,
-        [
-          'match',
-          ['get', 'type'],
-          'core_node',
-          14,
-          'pop',
-          14,
-          'distribution_node',
-          10,
-          'access_node',
-          8,
-          'onu',
-          8,
-          'splitter',
-          6,
-          'junction_box',
-          6,
-          'customer',
-          5,
-          'pole',
-          5,
-          8,
-        ],
+        matchNodeType(
+          {
+            core: 24,
+            pop: 24,
+            distribution: 16,
+            access: 14,
+            onu: 12,
+            splitter: 10,
+            junction: 9,
+            customer: 8,
+            pole: 8,
+          },
+          12
+        ),
         18,
-        [
-          'match',
-          ['get', 'type'],
-          'core_node',
-          24,
-          'pop',
-          24,
-          'distribution_node',
-          18,
-          'access_node',
-          14,
-          'onu',
-          14,
-          'splitter',
-          10,
-          'junction_box',
-          10,
-          'customer',
-          8,
-          'pole',
-          8,
-          14,
-        ],
+        matchNodeType(
+          {
+            core: 40,
+            pop: 40,
+            distribution: 30,
+            access: 24,
+            onu: 20,
+            splitter: 16,
+            junction: 14,
+            customer: 12,
+            pole: 12,
+          },
+          20
+        ),
       ],
-      'circle-color': [
-        'case',
-        ['==', ['get', 'status'], 'inactive'],
-        NODE_FILL_INACTIVE,
-        ['==', ['get', 'status'], 'error'],
-        [
-          'match',
-          ['get', 'type'],
-          'customer',
-          '#991b1b',
-          '#b91c1c',
-        ],
-        ['==', ['get', 'status'], 'warning'],
-        [
-          'match',
-          ['get', 'type'],
-          'core_node',
-          '#f59e0b',
-          'pop',
-          '#f59e0b',
-          'distribution_node',
-          '#fbbf24',
-          'pole',
-          '#fbbf24',
-          '#d97706',
-        ],
-        NODE_FILL_ACTIVE,
+      "circle-color": NODE_FILL,
+      "circle-opacity": [
+        "case",
+        ["==", ["get", "status"], "error"],
+        0.35,
+        ["==", ["get", "status"], "warning"],
+        0.25,
+        ["==", ["get", "status"], "inactive"],
+        0.05,
+        0.15,
       ],
-      'circle-stroke-width': [
-        'case',
-        ['boolean', ['feature-state', 'selected'], false],
-        3,
-        ['boolean', ['feature-state', 'hovered'], false],
-        2.5,
-        [
-          'match',
-          ['get', 'type'],
-          'core_node',
-          2,
-          'pop',
-          2,
-          'customer',
-          1,
-          1.5,
-        ],
-      ],
-      'circle-stroke-color': [
-        'case',
-        ['boolean', ['feature-state', 'selected'], false],
-        '#fefce8',
-        ['boolean', ['feature-state', 'hovered'], false],
-        '#fde68a',
-        'rgba(252, 252, 250, 0.85)',
-      ],
-      'circle-opacity': 0.97,
-      'circle-stroke-opacity': 0.92,
+      "circle-blur": 1,
     },
-  } as LayerSpecification,
+  },
 
-  connectionCasing: {
-    id: 'network-connections-casing',
-    type: 'line' as const,
-    source: 'network-connections',
-    layout: {
-      'line-cap': 'round',
-      'line-join': 'round',
-    },
+  /** Primary node visualization */
+  nodes: {
+    id: "network-nodes-layer",
+    type: "circle",
+    source: "network-nodes",
     paint: {
-      'line-width': [
-        'interpolate',
-        ['linear'],
-        ['zoom'],
+      "circle-radius": [
+        "interpolate",
+        ["exponential", 1.5],
+        ["zoom"],
+        5,
+        matchNodeType(NODE_SIZES.min, 3),
+        12,
+        matchNodeType(NODE_SIZES.mid, 8),
+        18,
+        matchNodeType(NODE_SIZES.max, 14),
+      ],
+      "circle-color": NODE_FILL,
+      "circle-stroke-width": [
+        "case",
+        ["boolean", ["feature-state", "selected"], false],
+        3,
+        ["boolean", ["feature-state", "hovered"], false],
+        2.5,
+        ["match", ["get", "type"], "core_node", 2, "pop", 2, "customer", 1, 1.5],
+      ],
+      "circle-stroke-color": [
+        "case",
+        ["boolean", ["feature-state", "selected"], false],
+        MAP_COLORS.selected,
+        ["boolean", ["feature-state", "hovered"], false],
+        MAP_COLORS.hovered,
+        "rgba(255, 255, 255, 0.8)",
+      ],
+      "circle-opacity": 0.98,
+      "circle-stroke-opacity": 0.9,
+    },
+  },
+
+  /** Dark casing under connections for visual depth */
+  connectionCasing: {
+    id: "network-connections-casing",
+    type: "line",
+    source: "network-connections",
+    layout: { "line-cap": "round", "line-join": "round" },
+    paint: {
+      "line-width": [
+        "interpolate",
+        ["linear"],
+        ["zoom"],
         5,
         [
-          '+',
-          [
-            'match',
-            ['get', 'type'],
-            'fiber_route',
-            2,
-            'customer_connection',
-            1,
-            1.5,
-          ],
+          "+",
+          ["match", ["get", "type"], "fiber_route", 2, "customer_connection", 1, 1.5],
           1.5,
         ],
         10,
         [
-          '+',
-          [
-            'match',
-            ['get', 'type'],
-            'fiber_route',
-            4,
-            'customer_connection',
-            2,
-            3,
-          ],
+          "+",
+          ["match", ["get", "type"], "fiber_route", 4, "customer_connection", 2, 3],
           2.5,
         ],
         15,
         [
-          '+',
-          [
-            'match',
-            ['get', 'type'],
-            'fiber_route',
-            7,
-            'customer_connection',
-            3.5,
-            5,
-          ],
+          "+",
+          ["match", ["get", "type"], "fiber_route", 7, "customer_connection", 3.5, 5],
           3,
         ],
       ],
-      'line-color': '#0f172a',
-      'line-opacity': 0.45,
+      "line-color": MAP_COLORS.casing,
+      "line-opacity": 0.4,
     },
-  } as LayerSpecification,
+  },
 
+  /** Primary connection lines */
   connections: {
-    id: 'network-connections-layer',
-    type: 'line' as const,
-    source: 'network-connections',
-    layout: {
-      'line-cap': 'round',
-      'line-join': 'round',
-    },
+    id: "network-connections-layer",
+    type: "line",
+    source: "network-connections",
+    layout: { "line-cap": "round", "line-join": "round" },
     paint: {
-      'line-width': [
-        'interpolate',
-        ['linear'],
-        ['zoom'],
+      "line-width": [
+        "interpolate",
+        ["exponential", 1.5],
+        ["zoom"],
         5,
-        [
-          'match',
-          ['get', 'type'],
-          'fiber_route',
-          1.25,
-          'customer_connection',
-          0.65,
-          0.9,
-        ],
-        10,
-        [
-          'match',
-          ['get', 'type'],
-          'fiber_route',
-          2.75,
-          'customer_connection',
-          1.35,
-          2,
-        ],
-        15,
-        [
-          'match',
-          ['get', 'type'],
-          'fiber_route',
-          4.5,
-          'customer_connection',
-          2,
-          3.25,
-        ],
+        ["match", ["get", "type"], "fiber_route", 1.25, "customer_connection", 0.65, 0.9],
+        12,
+        ["match", ["get", "type"], "fiber_route", 3, "customer_connection", 1.5, 2.2],
+        18,
+        ["match", ["get", "type"], "fiber_route", 5, "customer_connection", 2.2, 3.5],
       ],
-      'line-color': LINE_COLOR,
-      'line-opacity': 0.92,
-      'line-dasharray': [
-        'case',
-        ['==', ['get', 'status'], 'inactive'],
+      "line-color": LINE_COLOR,
+      "line-opacity": 0.9,
+      "line-dasharray": [
+        "case",
+        ["==", ["get", "status"], "inactive"],
         [2, 2],
-        ['==', ['get', 'type'], 'customer_connection'],
+        ["==", ["get", "type"], "customer_connection"],
         [4, 3],
-        ['==', ['get', 'status'], 'warning'],
-        [6, 2],
+        ["==", ["get", "status"], "warning"],
+        [6, 2.5],
         [1, 0],
       ],
     },
-  } as LayerSpecification,
+  },
 
-  /** Soft corridor under outage segments (LineString data — not fill). */
+  /** Glowing corridor for outage identification */
   outagesGlow: {
-    id: 'network-outages-glow',
-    type: 'line' as const,
-    source: 'network-outages',
-    layout: {
-      'line-cap': 'round',
-      'line-join': 'round',
-    },
+    id: "network-outages-glow",
+    type: "line",
+    source: "network-outages",
+    layout: { "line-cap": "round", "line-join": "round" },
     paint: {
-      'line-width': [
-        'interpolate',
-        ['linear'],
-        ['zoom'],
-        5,
-        6,
-        10,
-        12,
-        15,
-        18,
-      ],
-      'line-color': '#f87171',
-      'line-opacity': 0.35,
-      'line-blur': 2,
+      "line-width": ["interpolate", ["linear"], ["zoom"], 5, 8, 10, 14, 15, 22],
+      "line-color": MAP_COLORS.error,
+      "line-opacity": 0.3,
+      "line-blur": 3,
     },
-  } as LayerSpecification,
+  },
 
+  /** Distinctive dashed lines for outages */
   outages: {
-    id: 'network-outages-layer',
-    type: 'line' as const,
-    source: 'network-outages',
-    layout: {
-      'line-cap': 'round',
-      'line-join': 'round',
-    },
+    id: "network-outages-layer",
+    type: "line",
+    source: "network-outages",
+    layout: { "line-cap": "round", "line-join": "round" },
     paint: {
-      'line-width': [
-        'interpolate',
-        ['linear'],
-        ['zoom'],
-        5,
-        2,
-        10,
-        3.5,
-        15,
-        5,
-      ],
-      'line-color': '#fecaca',
-      'line-opacity': 0.95,
+      "line-width": ["interpolate", ["linear"], ["zoom"], 5, 2, 10, 3.5, 15, 5],
+      "line-color": "#fca5a5",
+      "line-opacity": 0.95,
+      "line-dasharray": [3, 2],
     },
-  } as LayerSpecification,
+  },
 
+  /** Coverage/Regional availability areas */
   coverage: {
-    id: 'network-coverage-layer',
-    type: 'fill' as const,
-    source: 'network-coverage',
+    id: "network-coverage-layer",
+    type: "fill",
+    source: "network-coverage",
     paint: {
-      'fill-color': '#14b8a6',
-      'fill-opacity': COVERAGE_FILL_OPACITY,
-      'fill-outline-color': '#5eead4',
+      "fill-color": MAP_COLORS.coverage,
+      "fill-opacity": ["interpolate", ["linear"], ["zoom"], 5, 0.06, 12, 0.1, 16, 0.14],
+      "fill-outline-color": "rgba(94, 234, 212, 0.35)",
     },
-  } as LayerSpecification,
+  },
 };
 
+/* ─────────────────────────────────────────────────────────────────────────────
+ * UTILITY FUNCTIONS
+ * ───────────────────────────────────────────────────────────────────────────── */
 
-// Style utility functions
+/** Initialize all network sources and layers on the map */
 export const addCustomLayers = (map: mapboxgl.Map) => {
-  // Add custom sources (only if they don't already exist)
-  if (!map.getSource('network-nodes')) {
-    map.addSource('network-nodes', {
-      type: 'geojson',
-      data: {
-        type: 'FeatureCollection',
-        features: []
-      }
-    });
-  }
+  const sources = [
+    { id: "network-nodes", type: "geojson" },
+    { id: "network-connections", type: "geojson" },
+    { id: "network-outages", type: "geojson" },
+    { id: "network-coverage", type: "geojson" },
+  ];
 
-  if (!map.getSource('network-connections')) {
-    map.addSource('network-connections', {
-      type: 'geojson',
-      data: {
-        type: 'FeatureCollection',
-        features: []
-      }
-    });
-  }
+  // Add sources
+  sources.forEach((src) => {
+    if (!map.getSource(src.id)) {
+      map.addSource(src.id, {
+        type: "geojson",
+        data: { type: "FeatureCollection", features: [] },
+      });
+    }
+  });
 
-  if (!map.getSource('network-outages')) {
-    map.addSource('network-outages', {
-      type: 'geojson',
-      data: {
-        type: 'FeatureCollection',
-        features: []
-      }
-    });
-  }
+  // Add layers in specific order for correct stacking
+  const layers = [
+    CUSTOM_LAYERS.coverage,
+    CUSTOM_LAYERS.connectionCasing,
+    CUSTOM_LAYERS.connections,
+    CUSTOM_LAYERS.outagesGlow,
+    CUSTOM_LAYERS.outages,
+    CUSTOM_LAYERS.nodeGlow,
+    CUSTOM_LAYERS.nodes,
+  ];
 
-  if (!map.getSource('network-coverage')) {
-    map.addSource('network-coverage', {
-      type: 'geojson',
-      data: {
-        type: 'FeatureCollection',
-        features: []
-      }
-    });
-  }
-
-  // Add custom layers (only if they don't already exist)
-  if (!map.getLayer('network-connections-casing')) {
-    map.addLayer(CUSTOM_LAYERS.connectionCasing);
-  }
-
-  if (!map.getLayer('network-connections-layer')) {
-    map.addLayer(CUSTOM_LAYERS.connections);
-  }
-  
-  if (!map.getLayer('network-nodes-layer')) {
-    map.addLayer(CUSTOM_LAYERS.nodes);
-  }
-  
-  if (!map.getLayer('network-outages-glow')) {
-    map.addLayer(CUSTOM_LAYERS.outagesGlow);
-  }
-
-  if (!map.getLayer('network-outages-layer')) {
-    map.addLayer(CUSTOM_LAYERS.outages);
-  }
-
-  if (!map.getLayer('network-coverage-layer')) {
-    map.addLayer(CUSTOM_LAYERS.coverage);
-  }
+  layers.forEach((layer) => {
+    if (!map.getLayer(layer.id)) {
+      map.addLayer(layer);
+    }
+  });
 };
 
-export const updateLayerVisibility = (map: mapboxgl.Map, layerId: string, visible: boolean) => {
-  const visibility = visible ? 'visible' : 'none';
+/** Toggle visibility for a layer and its associated sub-layers (glows, casings) */
+export const updateLayerVisibility = (
+  map: mapboxgl.Map,
+  layerId: string,
+  visible: boolean
+) => {
+  const visibility = visible ? "visible" : "none";
 
-  if (layerId === 'network-connections-layer') {
-    if (map.getLayer('network-connections-casing')) {
-      map.setLayoutProperty('network-connections-casing', 'visibility', visibility);
+  // Map primary layers to their auxiliary layers
+  const auxiliaryMap: Record<string, string[]> = {
+    "network-nodes-layer": ["network-nodes-glow"],
+    "network-connections-layer": ["network-connections-casing"],
+    "network-outages-layer": ["network-outages-glow"],
+  };
+
+  const layersToUpdate = [layerId, ...(auxiliaryMap[layerId] || [])];
+
+  layersToUpdate.forEach((id) => {
+    if (map.getLayer(id)) {
+      map.setLayoutProperty(id, "visibility", visibility);
     }
-  }
-
-  if (layerId === 'network-outages-layer') {
-    if (map.getLayer('network-outages-glow')) {
-      map.setLayoutProperty('network-outages-glow', 'visibility', visibility);
-    }
-  }
-
-  if (map.getLayer(layerId)) {
-    map.setLayoutProperty(layerId, 'visibility', visibility);
-  }
+  });
 };
 
-
+/** Set feature state for interaction (hover, selected) */
 export const setFeatureState = (
   map: mapboxgl.Map,
   source: string,
-  featureId: string | number,
+  id: string | number,
   state: Record<string, any>
 ) => {
-  map.setFeatureState({
-    source,
-    id: featureId
-  }, state);
+  map.setFeatureState({ source, id }, state);
 };
 
+/** Clear all feature states or for a specific feature */
 export const clearFeatureState = (
   map: mapboxgl.Map,
   source: string,
-  featureId?: string | number
+  id?: string | number
 ) => {
-  if (featureId) {
-    map.setFeatureState({
-      source,
-      id: featureId
-    }, {});
+  if (id !== undefined) {
+    map.setFeatureState({ source, id }, {});
   } else {
-    // Clear all feature states for the source
-    // Check if source exists before querying
-    if (!map.getSource(source)) {
-      return;
-    }
-    
+    // Note: Mapbox doesn't have a direct 'clear all' that is reliable without specific IDs
+    // unless using internal methods. We query visible features as a best-effort.
+    if (!map.getSource(source)) return;
     const features = map.querySourceFeatures(source);
-    features.forEach(feature => {
-      map.setFeatureState({
-        source,
-        id: feature.id as number
-      }, {});
-    });
+    features.forEach((f) => map.setFeatureState({ source, id: f.id as number }, {}));
   }
 };
 
-// Performance optimization utilities
-export const optimizeMapPerformance = (map: mapboxgl.Map) => {
-  // Note: Mapbox GL JS doesn't expose setMaxTileCacheSize in public API
-  // Tile cache management is handled internally by Mapbox
-  
-  // Enable progressive enhancement for raster tiles
-  if (map.getStyle().sources?.['raster']) {
-    map.setPaintProperty('raster-layer', 'raster-fade-duration', 300);
-  }
-  
-  // Optimize layer updates
-  map.on('idle', () => {
-    // Batch updates during idle periods
-  });
+/** Apply a specific map style/theme */
+export const applyTheme = (map: mapboxgl.Map, themeId: string) => {
+  const style = AVAILABLE_STYLES.find((s) => s.id === themeId) || AVAILABLE_STYLES[0];
+  map.setStyle(style.url);
+  map.once("style.load", () => addCustomLayers(map));
 };
 
-// Theme management
-export const applyTheme = (map: mapboxgl.Map, theme: 'light' | 'dark') => {
-  const styleConfig = AVAILABLE_STYLES.find(s => s.id === theme) || AVAILABLE_STYLES[0];
-  
-  map.setStyle(styleConfig.url);
-  
-  // Re-add custom layers after style change
-  map.once('style.load', () => {
-    addCustomLayers(map);
-  });
-};
+/* ─────────────────────────────────────────────────────────────────────────────
+ * FEATURE CREATORS
+ * ───────────────────────────────────────────────────────────────────────────── */
 
-// Export utility for creating GeoJSON features
 export const createNodeFeature = (node: NetworkNode): GeoJSON.Feature => ({
-  type: 'Feature' as const,
+  type: "Feature",
   geometry: {
-    type: 'Point' as const,
-    coordinates: [node.position.lng, node.position.lat]
+    type: "Point",
+    coordinates: [node.position.lng, node.position.lat],
   },
   properties: {
-    id: node.id,
-    name: node.name,
-    // Mapbox workers expect JSON-serializable strings for match/get filters
+    ...node,
+    // Ensure Mapbox expressions receive string types for match filters
     type: String(node.type),
     status: String(node.status),
-    capacity: node.capacity,
-    utilization: node.utilization
-  }
+  },
 });
 
 export const createConnectionFeature = (
   connection: NetworkConnection,
   nodes?: NetworkNode[]
 ): GeoJSON.Feature | null => {
-  let coordinates: [number, number][] = [];
-  
-  // If route is provided, use it
-  if (connection.route && connection.route.length > 0) {
-    coordinates = connection.route.map((pos) => [pos.lng, pos.lat]);
-  } 
-  // Otherwise, create a straight line between source and target nodes
-  else if (nodes) {
-    const sourceNode = nodes.find((n) => n.id === connection.sourceNodeId);
-    const targetNode = nodes.find((n) => n.id === connection.targetNodeId);
-    
-    if (sourceNode && targetNode) {
-      coordinates = [
-        [sourceNode.position.lng, sourceNode.position.lat],
-        [targetNode.position.lng, targetNode.position.lat]
+  let coords: [number, number][] = [];
+
+  if (connection.route?.length) {
+    coords = connection.route.map((p) => [p.lng, p.lat]);
+  } else if (nodes) {
+    const s = nodes.find((n) => n.id === connection.sourceNodeId);
+    const t = nodes.find((n) => n.id === connection.targetNodeId);
+    if (s && t)
+      coords = [
+        [s.position.lng, s.position.lat],
+        [t.position.lng, t.position.lat],
       ];
-    }
-  }
-  
-  if (coordinates.length < 2) {
-    return null;
   }
 
+  if (coords.length < 2) return null;
+
   return {
-    type: 'Feature' as const,
-    geometry: {
-      type: 'LineString' as const,
-      coordinates
-    },
+    type: "Feature",
+    geometry: { type: "LineString", coordinates: coords },
     properties: {
-      id: connection.id,
-      sourceNodeId: connection.sourceNodeId,
-      targetNodeId: connection.targetNodeId,
+      ...connection,
       type: String(connection.type),
       status: String(connection.status),
-      bandwidth: connection.bandwidth,
-      utilization: connection.utilization
-    }
+    },
   };
 };

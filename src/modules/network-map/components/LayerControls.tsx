@@ -202,7 +202,7 @@ export const LayerControls: React.FC<LayerControlsProps> = ({ className = "" }) 
       <Accordion.Body className="u-border-primary-subtle u-shadow-lg">
         {/* Meaningful Layer List */}
         <div
-          className="u-p-2 u-overflow-y-auto u-flex u-flex-column u-gap-2 u-max-h-100"
+          className="u-overflow-y-auto u-flex u-flex-column u-gap-2 u-h-90"
           role="group"
           aria-label="Map layers"
         >
@@ -234,8 +234,8 @@ export const LayerControls: React.FC<LayerControlsProps> = ({ className = "" }) 
                       }}
                     >
                       <Icon
-                        name={config.icon as any}
-                        size={18}
+                        name={config.icon}
+                        size={"sm"}
                         style={{ color: config.color }}
                         weight={isVisible ? "duotone" : "regular"}
                       />

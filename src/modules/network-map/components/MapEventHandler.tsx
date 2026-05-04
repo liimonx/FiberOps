@@ -4,6 +4,7 @@ import React, { useEffect, useRef } from 'react';
 import { getMapInstance } from './MapCanvas';
 import { useNetworkMapStore } from '../stores/useNetworkMapStore';
 import { useAccessibilityAnnounce } from './AccessibilityAnnouncer';
+import { getToolManager } from '../tools/toolManager';
 
 interface MapEventHandlerProps {
   onNodeClick?: (nodeId: string, event: mapboxgl.MapMouseEvent) => void;
@@ -27,35 +28,48 @@ export const MapEventHandler: React.FC<MapEventHandlerProps> = ({
   const { announce } = useAccessibilityAnnounce();
   const prevToolRef = useRef(activeTool);
 
+  // Sync tool manager with store's active tool
+  useEffect(() => {
+    const toolManager = getToolManager();
+    if (activeTool !== toolManager.getActiveTool()?.id) {
+      toolManager.setActiveTool(activeTool);
+    }
+  }, [activeTool]);
+
   useEffect(() => {
     const map = getMapInstance();
     if (!map) return;
+    const toolManager = getToolManager();
 
     // Handle map click events
     const handleMapClick = (event: mapboxgl.MapMouseEvent) => {
       // Check if layers exist before querying
-      if (!map.getLayer('network-nodes-layer') || !map.getLayer('network-connections-layer')) {
-        return;
+      let features: mapboxgl.MapboxGeoJSONFeature[] = [];
+      if (map.getLayer('network-nodes-layer') && map.getLayer('network-connections-layer')) {
+        features = map.queryRenderedFeatures(event.point, {
+          layers: ['network-nodes-layer', 'network-connections-layer']
+        });
       }
 
-      // Check if any network element was clicked
-      const features = map.queryRenderedFeatures(event.point, {
-        layers: ['network-nodes-layer', 'network-connections-layer']
+      // Delegate to ToolManager
+      toolManager.handleEvent('onClick', {
+        lngLat: event.lngLat,
+        point: event.point,
+        originalEvent: event.originalEvent,
+        features: features
       });
 
+      // Still fire callbacks for external components if needed
       if (features.length > 0) {
         const feature = features[0];
         const elementId = feature.properties?.id;
         
         if (feature.layer && feature.layer.id === 'network-nodes-layer') {
-          setSelectedElement(elementId);
           onNodeClick?.(elementId, event);
         } else if (feature.layer && feature.layer.id === 'network-connections-layer') {
           onConnectionClick?.(elementId, event);
         }
       } else {
-        // Clicked on empty space - deselect
-        setSelectedElement(null);
         onMapClick?.(event);
       }
     };

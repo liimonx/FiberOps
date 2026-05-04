@@ -31,12 +31,19 @@ import {
 import { CategorizedResult } from "@/modules/network-map/hooks/useAssetSearch";
 import { flyToLocation } from "@/modules/network-map/components/MapEventHandler";
 import { getMapInstance } from "@/modules/network-map/components/MapCanvas";
+import {
+  MeasurementOverlay,
+  TracePathOverlay,
+  HeatmapLegend,
+} from "@/modules/network-map/components/MeasurementOverlay";
+import { ToolVisualizations } from "@/modules/network-map/components/ToolVisualizations";
 
 // Wrapper component to access store hooks
 function NetworkMapContent() {
   const nodes = useNodes();
   const connections = useConnections();
   const selectedNode = useSelectedNode();
+  const activeTool = useNetworkMapStore((state) => state.interaction.activeTool);
 
   const selectedElementId = useNetworkMapStore(
     (state) => state.interaction.selectedElementId
@@ -46,6 +53,20 @@ function NetworkMapContent() {
   const addToSelectionHistory = useNetworkMapStore(
     (state) => state.addToSelectionHistory
   );
+
+  // Track the live map instance for ToolVisualizations
+  const [mapInstance, setMapInstance] = useState<mapboxgl.Map | null>(null);
+  useEffect(() => {
+    // Poll until the map is ready (MapCanvas mounts it asynchronously)
+    const interval = setInterval(() => {
+      const map = getMapInstance();
+      if (map) {
+        setMapInstance(map);
+        clearInterval(interval);
+      }
+    }, 200);
+    return () => clearInterval(interval);
+  }, []);
 
   // Resolve selected connection from store
   const selectedConnection = useConnectionById(selectedNode ? null : selectedElementId);
@@ -122,9 +143,13 @@ function NetworkMapContent() {
     [nodes]
   );
 
-  // Node click → fly to location + select
+  // Node click → behaviour depends on active tool
   const handleNodeClick = useCallback(
     (nodeId: string) => {
+      // Trace and Measure tools handle their own click logic via ToolManager.
+      // Don't override their state by forcing a selection/fly-to here.
+      if (activeTool === "trace" || activeTool === "measure") return;
+
       setSelectedElement(nodeId);
       addToSelectionHistory(nodeId);
 
@@ -133,7 +158,7 @@ function NetworkMapContent() {
         flyToLocation([node.position.lng, node.position.lat], 15);
       }
     },
-    [nodes, setSelectedElement, addToSelectionHistory]
+    [activeTool, nodes, setSelectedElement, addToSelectionHistory]
   );
 
   // Connection click → select
@@ -174,18 +199,17 @@ function NetworkMapContent() {
             nodes={nodes}
             connections={connections}
             onSelectResult={handleSelectResult}
-            isOpen={true}
           />
         </div>
 
         {/* Toolbar — Top Right */}
         <div className="overlay-top-right">
-          <Toolbar position="top-right" className="u-relative u-top-0 u-end-0" />
+          <Toolbar position="top-right" />
         </div>
 
         {/* Map Controls (Zoom/Compass) — Right Side, below Toolbar */}
-        <div className="overlay-controls">
-          <MapControls position="top-right" className="u-relative u-top-0 u-end-0" />
+        <div className="overlay-bottom-right">
+          <MapControls position="bottom-right" />
         </div>
 
         {/* Layer Controls — Bottom Left */}
@@ -205,13 +229,22 @@ function NetworkMapContent() {
             />
           </div>
         )}
+        <div className="overlay-bottom-center">
+          {/* Tool overlays — shown when the relevant tool is active */}
+          {activeTool === "measure" && <MeasurementOverlay />}
+          {activeTool === "trace" && <TracePathOverlay />}
+          {activeTool === "heatmap" && <HeatmapLegend />}
+        </div>
 
         {/* Zoom Level Indicator */}
         <ZoomLevelIndicator />
       </div>
 
+      {/* Mapbox GL layer visualizations (measurement lines, trace path, heatmap) */}
+      {mapInstance && <ToolVisualizations mapInstance={mapInstance} />}
+
       {/* Interactive Tooltip — follows mouse on hover */}
-      {tooltip && (
+      {tooltip && !selectedNode && !selectedConnection && (
         <div
           className="map-tooltip-anchor"
           style={{
@@ -274,9 +307,9 @@ function NetworkMapContent() {
           pointer-events: auto;
         }
 
-        .overlay-controls {
+        .overlay-bottom-right {
           position: absolute;
-          top: 80px;
+          bottom: 16px;
           right: 16px;
           pointer-events: auto;
         }
@@ -288,11 +321,18 @@ function NetworkMapContent() {
           pointer-events: auto;
         }
 
+        .overlay-bottom-center {
+          position: absolute;
+          width: 320px;
+          bottom: 16px;
+          left: calc(50% - 160px);
+          pointer-events: auto;
+        }
+
         .overlay-inspector {
           position: absolute;
-          top: 200px;
+          top: 30vh;
           right: 16px;
-          max-height: calc(100vh - 260px);
           overflow-y: auto;
           pointer-events: auto;
         }

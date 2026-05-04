@@ -62,71 +62,64 @@ export const NetworkLegend: React.FC<NetworkLegendProps> = ({
     if (!showCounts) return null;
 
     if (nodeCount > 0 && connectionCount > 0) {
-      return `${nodeCount}N, ${connectionCount}C`;
+      return `${nodeCount}N · ${connectionCount}C`;
     } else if (nodeCount > 0) {
       return `${nodeCount} nodes`;
     } else if (connectionCount > 0) {
       return `${connectionCount} conn`;
     } else {
-      return "0";
+      return "—";
     }
   };
 
   return (
     <Card
       glass={true}
-      className={`u-overflow-hidden u-transition-all ${compact ? "u-p-2" : "u-p-4"} ${className}`}
+      className={`u-overflow-hidden u-transition-all ${compact ? "u-p-2" : "u-p-3"} ${className}`}
       role="region"
       aria-label="Network Status Legend"
     >
       <div
-        className={`u-flex u-items-center u-gap-2 u-mb-3 u-pb-2 u-border-bottom u-border-secondary-subtle u-opacity-80 ${compact ? "u-mb-2 u-pb-1" : "u-mb-3 u-pb-2"}`}
+        className={`u-flex u-items-center u-gap-2 u-pb-2 u-border-bottom u-border-secondary-subtle u-opacity-70 ${compact ? "u-mb-2" : "u-mb-3"}`}
       >
-        <Icon name="List" size={compact ? 16 : 18} className="" />
-        <h3 className={`u-m-0 u-font-bold  ${compact ? "u-text-xs" : "u-text-sm"}`}>
-          Status Legend
+        <Icon name="CircleHalf" size={compact ? 14 : 16} className="u-opacity-60" />
+        <h3 className={`u-m-0 u-font-bold ${compact ? "u-text-xs" : "u-text-sm"}`}>
+          Status
         </h3>
       </div>
 
-      <div className="u-flex u-flex-column u-gap-2">
+      <div className={`u-flex ${compact ? "u-flex-row u-flex-wrap u-gap-3" : "u-flex-column u-gap-1"}`}>
         {legendItems.map((item) => (
           <div
             key={item.status}
-            className={`u-flex u-items-center u-gap-3 u-p-2 u-rounded u-transition-all`}
+            className={`u-flex u-items-center u-gap-2 ${compact ? "" : "u-p-1"} u-rounded u-transition-all`}
             role="listitem"
-            aria-label={`${item.label} status indicator`}
+            aria-label={`${item.label} status`}
           >
-            <div className="u-flex u-items-center u-gap-2 u-flex-shrink-0">
-              <div
-                className={`u-rounded-circle u-border u-border-solid u-border-secondary-subtle u-flex-shrink-0 ${compact ? "u-w-3 u-h-3" : "u-w-4 u-h-4"}`}
-                style={{
-                  backgroundColor: item.color,
-                  boxShadow: `0 0 8px ${item.color}40`,
-                }}
-              />
-            </div>
+            {/* Status dot */}
+            <span
+              className="u-rounded-circle u-flex-shrink-0"
+              style={{
+                width: compact ? 8 : 10,
+                height: compact ? 8 : 10,
+                backgroundColor: item.color,
+                boxShadow: `0 0 6px ${item.color}40`,
+              }}
+            />
 
-            <div className="u-flex u-flex-column u-flex-1 u-min-w-0">
-              <div className="u-flex u-items-center u-justify-between u-gap-2">
-                <span
-                  className={`u-font-bold  u-text-truncate ${compact ? "u-text-xs" : "u-text-sm"}`}
-                >
-                  {item.label}
-                </span>
-                <Icon
-                  name={item.icon as any}
-                  size={compact ? 12 : 14}
-                  style={{ color: item.color }}
-                  className="u-opacity-80"
-                />
-              </div>
+            <span
+              className={`u-font-bold u-text-truncate ${compact ? "u-text-xs" : "u-text-sm"}`}
+            >
+              {item.label}
+            </span>
 
-              {showCounts && (
-                <span className="u-text-xs u-text-secondary-emphasis u-opacity-60 u-mt-1">
-                  {getCountText(item.status)}
-                </span>
-              )}
-            </div>
+            {showCounts && !compact && (
+              <span className="u-ms-auto u-text-xs u-text-secondary-emphasis u-opacity-50 u-font-normal"
+                style={{ fontVariantNumeric: "tabular-nums" }}
+              >
+                {getCountText(item.status)}
+              </span>
+            )}
           </div>
         ))}
       </div>

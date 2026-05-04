@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { Card, Button, Icon } from "@shohojdhara/atomix";
@@ -58,159 +58,163 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({ onMapLoad, onMapError }) =
     if (tokenError) onMapError?.(new Error(tokenError));
   }, [tokenError, onMapError]);
 
-  const createCircleCoordinates = (
-    lng: number,
-    lat: number,
-    radius: number,
-    points = 32
-  ) => {
-    const coords = [];
-    for (let i = 0; i < points; i++) {
-      const angle = (i / points) * Math.PI * 2;
-      coords.push([lng + radius * Math.cos(angle), lat + radius * Math.sin(angle)]);
-    }
-    coords.push(coords[0]);
-    return coords;
-  };
+  const createCircleCoordinates = useCallback(
+    (lng: number, lat: number, radius: number, points = 32) => {
+      const coords = [];
+      for (let i = 0; i < points; i++) {
+        const angle = (i / points) * Math.PI * 2;
+        coords.push([lng + radius * Math.cos(angle), lat + radius * Math.sin(angle)]);
+      }
+      coords.push(coords[0]);
+      return coords;
+    },
+    []
+  );
 
-  const initializeLayers = (map: mapboxgl.Map) => {
+  const initializeLayers = useCallback((map: mapboxgl.Map) => {
     try {
       addCustomLayers(map);
     } catch (error) {
       console.error("[MapCanvas] Layer init failed:", error);
       throw error;
     }
-  };
+  }, []);
 
-  const updateMapData = (
-    map: mapboxgl.Map,
-    allNodes: NetworkNode[],
-    allConnections: NetworkConnection[],
-    layerState: NetworkMapLayer[]
-  ) => {
-    try {
-      if (!map.isStyleLoaded()) return;
+  const updateMapData = useCallback(
+    (
+      map: mapboxgl.Map,
+      allNodes: NetworkNode[],
+      allConnections: NetworkConnection[],
+      layerState: NetworkMapLayer[]
+    ) => {
+      try {
+        if (!map.isStyleLoaded()) return;
 
-      if (!map.getSource("network-nodes")) {
-        initializeLayers(map);
-      }
+        if (!map.getSource("network-nodes")) {
+          initializeLayers(map);
+        }
 
-      const nodeTypes = visibleNodeTypesFromLayers(layerState);
-      const connTypes = visibleConnectionTypesFromLayers(layerState);
-      const nodeTypeSet = new Set(nodeTypes.map(String));
+        const nodeTypes = visibleNodeTypesFromLayers(layerState);
+        const connTypes = visibleConnectionTypesFromLayers(layerState);
+        const nodeTypeSet = new Set(nodeTypes.map(String));
 
-      const filteredNodes =
-        nodeTypes.length === 0
-          ? []
-          : allNodes.filter((n) => nodeTypeSet.has(String(n.type)));
+        const filteredNodes =
+          nodeTypes.length === 0
+            ? []
+            : allNodes.filter((n) => nodeTypeSet.has(String(n.type)));
 
-      const connTypeSet = new Set(connTypes.map(String));
-      const filteredConnections =
-        connTypes.length === 0
-          ? []
-          : allConnections.filter((c) => connTypeSet.has(String(c.type)));
+        const connTypeSet = new Set(connTypes.map(String));
+        const filteredConnections =
+          connTypes.length === 0
+            ? []
+            : allConnections.filter((c) => connTypeSet.has(String(c.type)));
 
-      const nodeFeatures = filteredNodes.map(createNodeFeature);
-      const nodesSource = map.getSource("network-nodes") as
-        | mapboxgl.GeoJSONSource
-        | undefined;
-      if (nodesSource)
-        nodesSource.setData({ type: "FeatureCollection", features: nodeFeatures });
+        const nodeFeatures = filteredNodes.map(createNodeFeature);
+        const nodesSource = map.getSource("network-nodes") as
+          | mapboxgl.GeoJSONSource
+          | undefined;
+        if (nodesSource)
+          nodesSource.setData({ type: "FeatureCollection", features: nodeFeatures });
 
-      const connectionFeatures = filteredConnections
-        .map((conn) => createConnectionFeature(conn, allNodes))
-        .filter((f): f is GeoJSON.Feature => f != null);
-      const connectionsSource = map.getSource("network-connections") as
-        | mapboxgl.GeoJSONSource
-        | undefined;
-      if (connectionsSource)
-        connectionsSource.setData({
-          type: "FeatureCollection",
-          features: connectionFeatures,
+        const connectionFeatures = filteredConnections
+          .map((conn) => createConnectionFeature(conn, allNodes))
+          .filter((f): f is GeoJSON.Feature => f != null);
+        const connectionsSource = map.getSource("network-connections") as
+          | mapboxgl.GeoJSONSource
+          | undefined;
+        if (connectionsSource)
+          connectionsSource.setData({
+            type: "FeatureCollection",
+            features: connectionFeatures,
+          });
+
+        const outageConnections = isOutagesLayerVisible(layerState)
+          ? allConnections.filter((c) => c.status === NetworkStatus.ERROR)
+          : [];
+        const outageFeatures = outageConnections
+          .map((conn) => createConnectionFeature(conn, allNodes))
+          .filter((f): f is GeoJSON.Feature => f != null);
+        const outagesSource = map.getSource("network-outages") as
+          | mapboxgl.GeoJSONSource
+          | undefined;
+        if (outagesSource)
+          outagesSource.setData({ type: "FeatureCollection", features: outageFeatures });
+
+        const coverageNodes =
+          isCoverageLayerVisible(layerState) && nodeTypes.length > 0
+            ? filteredNodes.filter(
+                (n) =>
+                  n.type === NetworkNodeType.CORE_NODE ||
+                  n.type === NetworkNodeType.DISTRIBUTION_NODE ||
+                  n.type === NetworkNodeType.POP
+              )
+            : [];
+        const coverageFeatures = coverageNodes.map((node) => ({
+          type: "Feature" as const,
+          geometry: {
+            type: "Polygon" as const,
+            coordinates: [
+              createCircleCoordinates(node.position.lng, node.position.lat, 0.015),
+            ],
+          },
+          properties: { id: `coverage-${node.id}`, name: `${node.name} Coverage` },
+        }));
+        const coverageSource = map.getSource("network-coverage") as
+          | mapboxgl.GeoJSONSource
+          | undefined;
+        if (coverageSource)
+          coverageSource.setData({
+            type: "FeatureCollection",
+            features: coverageFeatures,
+          });
+
+        // Avoid stale Mapbox filters (previously hid all features in GL JS 3)
+        const clearFilterIds = [
+          "network-nodes-layer",
+          "network-nodes-glow",
+          "network-connections-layer",
+          "network-connections-casing",
+        ];
+        clearFilterIds.forEach((id) => {
+          if (map.getLayer(id)) map.setFilter(id, null);
         });
 
-      const outageConnections = isOutagesLayerVisible(layerState)
-        ? allConnections.filter((c) => c.status === NetworkStatus.ERROR)
-        : [];
-      const outageFeatures = outageConnections
-        .map((conn) => createConnectionFeature(conn, allNodes))
-        .filter((f): f is GeoJSON.Feature => f != null);
-      const outagesSource = map.getSource("network-outages") as
-        | mapboxgl.GeoJSONSource
-        | undefined;
-      if (outagesSource)
-        outagesSource.setData({ type: "FeatureCollection", features: outageFeatures });
+        const nodesVis = nodeTypes.length === 0 ? "none" : "visible";
+        ["network-nodes-layer", "network-nodes-glow"].forEach((id) => {
+          if (map.getLayer(id)) {
+            map.setLayoutProperty(id, "visibility", nodesVis);
+          }
+        });
+        ["network-connections-layer", "network-connections-casing"].forEach((id) => {
+          if (map.getLayer(id)) {
+            map.setLayoutProperty(
+              id,
+              "visibility",
+              connTypes.length === 0 ? "none" : "visible"
+            );
+          }
+        });
 
-      const coverageNodes =
-        isCoverageLayerVisible(layerState) && nodeTypes.length > 0
-          ? filteredNodes.filter(
-              (n) =>
-                n.type === NetworkNodeType.CORE_NODE ||
-                n.type === NetworkNodeType.DISTRIBUTION_NODE ||
-                n.type === NetworkNodeType.POP
-            )
-          : [];
-      const coverageFeatures = coverageNodes.map((node) => ({
-        type: "Feature" as const,
-        geometry: {
-          type: "Polygon" as const,
-          coordinates: [
-            createCircleCoordinates(node.position.lng, node.position.lat, 0.015),
-          ],
-        },
-        properties: { id: `coverage-${node.id}`, name: `${node.name} Coverage` },
-      }));
-      const coverageSource = map.getSource("network-coverage") as
-        | mapboxgl.GeoJSONSource
-        | undefined;
-      if (coverageSource)
-        coverageSource.setData({ type: "FeatureCollection", features: coverageFeatures });
-
-      // Avoid stale Mapbox filters (previously hid all features in GL JS 3)
-      const clearFilterIds = [
-        "network-nodes-layer",
-        "network-connections-layer",
-        "network-connections-casing",
-      ];
-      clearFilterIds.forEach((id) => {
-        if (map.getLayer(id)) map.setFilter(id, null);
-      });
-
-      if (map.getLayer("network-nodes-layer")) {
-        map.setLayoutProperty(
-          "network-nodes-layer",
-          "visibility",
-          nodeTypes.length === 0 ? "none" : "visible"
-        );
-      }
-      ["network-connections-layer", "network-connections-casing"].forEach((id) => {
-        if (map.getLayer(id)) {
-          map.setLayoutProperty(
-            id,
-            "visibility",
-            connTypes.length === 0 ? "none" : "visible"
+        if (map.getLayer("network-outages-layer")) {
+          updateLayerVisibility(
+            map,
+            "network-outages-layer",
+            isOutagesLayerVisible(layerState)
           );
         }
-      });
-
-      if (map.getLayer("network-outages-layer")) {
-        updateLayerVisibility(
-          map,
-          "network-outages-layer",
-          isOutagesLayerVisible(layerState)
-        );
+        if (map.getLayer("network-coverage-layer")) {
+          updateLayerVisibility(
+            map,
+            "network-coverage-layer",
+            isCoverageLayerVisible(layerState)
+          );
+        }
+      } catch (error) {
+        console.error("[MapCanvas] Update failed:", error);
       }
-      if (map.getLayer("network-coverage-layer")) {
-        updateLayerVisibility(
-          map,
-          "network-coverage-layer",
-          isCoverageLayerVisible(layerState)
-        );
-      }
-    } catch (error) {
-      console.error("[MapCanvas] Update failed:", error);
-    }
-  };
+    },
+    [initializeLayers, createCircleCoordinates]
+  );
 
   useEffect(() => {
     if (!mapContainer.current || mapRef.current || tokenError) return;
@@ -358,7 +362,7 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({ onMapLoad, onMapError }) =
     };
 
     apply();
-  }, [nodes, connections, isReady, layers]);
+  }, [nodes, connections, isReady, layers, updateMapData]);
 
   if (mapError) {
     return (
@@ -398,7 +402,6 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({ onMapLoad, onMapError }) =
       {mapLoading && (
         <LoadingState message="Initializing Neural Map..." variant="overlay" />
       )}
-
     </div>
   );
 };

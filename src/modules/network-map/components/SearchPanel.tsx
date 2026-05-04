@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { Card, Icon } from "@shohojdhara/atomix";
 import { NetworkNode, NetworkConnection } from "../types";
 import {
@@ -17,7 +17,6 @@ interface SearchPanelProps {
   connections: NetworkConnection[];
   onSelectResult: (result: CategorizedResult) => void;
   className?: string;
-  isOpen?: boolean;
 }
 
 export const SearchPanel: React.FC<SearchPanelProps> = ({
@@ -25,7 +24,6 @@ export const SearchPanel: React.FC<SearchPanelProps> = ({
   connections,
   onSelectResult,
   className = "",
-  isOpen = true,
 }) => {
   const {
     query,
@@ -88,40 +86,51 @@ export const SearchPanel: React.FC<SearchPanelProps> = ({
       onClick: () => setQuery("node"),
     },
     {
-      label: "Trace Routes",
+      label: "Find Connections",
       icon: "GitBranch",
-      onClick: () => setQuery("route"),
+      onClick: () => setQuery("pon"),
     },
   ];
 
-  if (!isOpen) return null;
+  const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <Card glass={{ blurAmount: 5 }} appearance="ghost" className={` ${className}`}>
+    <Card glass={{ blurAmount: 5, mode: "shader" }} className={`  ${className}`}>
       <SearchInput
         value={query}
         onChange={setQuery}
         onKeyDown={handleKeyDown}
-        onClear={clearSearch}
+        onFocus={() => setIsOpen(true)}
+        onBlur={() => setTimeout(() => setIsOpen(false), 500)}
+        onClear={() => {
+          clearSearch();
+          setIsOpen(false);
+        }}
         ariaControls="search-results"
         ariaActiveDescendant={
           highlightedIndex >= 0 ? `search-result-${highlightedIndex}` : undefined
         }
       />
 
-      <CategoryFilterTabs
-        selectedCategory={selectedCategory}
-        onCategoryChange={setSelectedCategory}
-        categoryCounts={categoryCounts}
-      />
+      {query && (
+        <>
+          <CategoryFilterTabs
+            selectedCategory={selectedCategory}
+            onCategoryChange={setSelectedCategory}
+            categoryCounts={categoryCounts}
+          />
 
-      {/* Search results */}
-      <SearchResultsList
-        results={results}
-        highlightedIndex={highlightedIndex}
-        onSelect={handleSelectResult}
-        onHighlight={setHighlightedIndex}
-      />
+          {/* Search results */}
+          <SearchResultsList
+            results={results}
+            highlightedIndex={highlightedIndex}
+            onSelect={handleSelectResult}
+            onHighlight={setHighlightedIndex}
+          />
+        </>
+      )}
+
+      {!query && isOpen && <QuickActions actions={quickActions} />}
 
       {/* Empty state */}
       {query && results.length === 0 && (
@@ -132,16 +141,13 @@ export const SearchPanel: React.FC<SearchPanelProps> = ({
             className="u-text-secondary-emphasis u-opacity-30 u-mb-4"
           />
           <p className="u-m-0 u-mb-2 u-text-sm u-font-bold ">
-            No results found for "{query}"
+            No results found for &ldquo;{query}&rdquo;
           </p>
           <span className="u-text-xs u-text-secondary-emphasis">
             Try adjusting your keywords or categories
           </span>
         </div>
       )}
-
-      {/* Quick actions */}
-      {!query && <QuickActions actions={quickActions} />}
     </Card>
   );
 };

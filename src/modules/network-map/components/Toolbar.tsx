@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useRef, useCallback } from "react";
-import { Button, Card, Tooltip, Icon } from "@shohojdhara/atomix";
+import React, { useRef, useCallback, useEffect } from "react";
+import { Button, Card, Tooltip } from "@shohojdhara/atomix";
 import { useNetworkMapStore } from "../stores/useNetworkMapStore";
 import { useAccessibilityAnnounce } from "./AccessibilityAnnouncer";
 import { ToolType } from "../types";
@@ -13,7 +13,7 @@ interface ToolbarProps {
 
 interface ToolConfig {
   id: ToolType;
-  icon: any;
+  icon: string;
   label: string;
   description: string;
   shortcut?: string;
@@ -99,12 +99,40 @@ export const Toolbar: React.FC<ToolbarProps> = ({
     }
   }, []);
 
+  // Global keyboard shortcuts
+  useEffect(() => {
+    const handleGlobalKeyDown = (e: KeyboardEvent) => {
+      // Don't trigger shortcuts if user is typing in an input
+      if (
+        document.activeElement?.tagName === "INPUT" ||
+        document.activeElement?.tagName === "TEXTAREA" ||
+        (document.activeElement as HTMLElement)?.isContentEditable
+      ) {
+        return;
+      }
+
+      const key = e.key.toUpperCase();
+      const tool = TOOLS.find(t => t.shortcut === key);
+      
+      if (tool) {
+        e.preventDefault();
+        setActiveTool(tool.id);
+        announce(`${tool.label} tool activated`, "polite");
+      }
+    };
+
+    window.addEventListener("keydown", handleGlobalKeyDown);
+    return () => window.removeEventListener("keydown", handleGlobalKeyDown);
+  }, [setActiveTool, announce]);
+
   const positionClasses = {
     "top-right": "u-absolute u-top-0 u-end-0 u-mt-2 u-me-2",
     "bottom-right": "u-absolute u-bottom-0 u-end-0 u-mb-2 u-me-2",
     "top-left": "u-absolute u-top-0 u-start-0 u-mt-2 u-ms-2",
     "bottom-left": "u-absolute u-bottom-0 u-start-0 u-mb-2 u-ms-2",
   };
+
+  const tooltipPosition = position.includes('left') ? 'right' : 'left';
 
   return (
     <div
@@ -114,7 +142,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
     >
       <Card glass={true}>
         <div
-          className="u-flex u-flex-column u-flex-md-row u-gap-1"
+          className="u-flex u-flex-column u-gap-1"
           role="group"
           aria-label="Tool selection"
           onKeyDown={handleToolbarKeyDown}
@@ -135,10 +163,10 @@ export const Toolbar: React.FC<ToolbarProps> = ({
                   )}
                 </div>
               }
-              position="left"
+              position={tooltipPosition}
             >
               <Button
-                ref={(el: any) => {
+                ref={(el: HTMLButtonElement | null) => {
                   buttonRefs.current[index] = el;
                 }}
                 variant={activeTool === tool.id ? "primary" : "secondary"}

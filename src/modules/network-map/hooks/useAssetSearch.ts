@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useEffect, useCallback } from 'react';
-import { NetworkNode, NetworkConnection, SearchResult, NetworkNodeType } from '../types';
+import { useState, useEffect, useCallback } from "react";
+import { NetworkNode, NetworkConnection, SearchResult, NetworkNodeType } from "../types";
 
-export type AssetCategory = 'all' | 'nodes' | 'connections' | 'customers';
+export type AssetCategory = "all" | "nodes" | "connections" | "customers";
 
 /**
  * Extended search result with category information for filtering
@@ -40,10 +40,10 @@ export const useAssetSearch = ({
   nodes,
   connections,
   debounceMs = 150,
-  maxResults = 10
+  maxResults = 10,
 }: UseAssetSearchProps): UseAssetSearchReturn => {
-  const [query, setQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<AssetCategory>('all');
+  const [query, setQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState<AssetCategory>("all");
   const [results, setResults] = useState<CategorizedResult[]>([]);
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
 
@@ -54,82 +54,89 @@ export const useAssetSearch = ({
   const calculateMatchScore = useCallback((text: string, query: string): number => {
     const normalizedText = text.toLowerCase();
     const normalizedQuery = query.toLowerCase();
-    
+
     // Exact match
     if (normalizedText === normalizedQuery) return 1;
-    
+
     // Starts with query
     if (normalizedText.startsWith(normalizedQuery)) return 0.8;
-    
+
     // Contains query
     if (normalizedText.includes(normalizedQuery)) return 0.6;
-    
+
     // Fuzzy match - check if all query characters appear in order
     let queryIndex = 0;
-    for (let i = 0; i < normalizedText.length && queryIndex < normalizedQuery.length; i++) {
+    for (
+      let i = 0;
+      i < normalizedText.length && queryIndex < normalizedQuery.length;
+      i++
+    ) {
       if (normalizedText[i] === normalizedQuery[queryIndex]) {
         queryIndex++;
       }
     }
     if (queryIndex === normalizedQuery.length) return 0.4;
-    
+
     return 0;
   }, []);
 
   /**
    * Perform search across nodes and connections based on query and category
    */
-  const performSearch = useCallback((searchQuery: string, category: AssetCategory) => {
-    if (!searchQuery.trim()) {
-      setResults([]);
-      return;
-    }
+  const performSearch = useCallback(
+    (searchQuery: string, category: AssetCategory) => {
+      if (!searchQuery.trim()) {
+        setResults([]);
+        return;
+      }
 
-    const normalizedQuery = searchQuery.toLowerCase();
-    const searchResults: CategorizedResult[] = [];
+      const normalizedQuery = searchQuery.toLowerCase();
+      const searchResults: CategorizedResult[] = [];
 
-    // Search nodes
-    if (category === 'all' || category === 'nodes') {
-      nodes.forEach(node => {
-        const matchScore = calculateMatchScore(node.name, normalizedQuery);
-        if (matchScore > 0) {
-          searchResults.push({
-            id: node.id,
-            name: node.name,
-            type: 'node',
-            matchScore,
-            category: node.type === NetworkNodeType.CUSTOMER ? 'customers' : 'nodes'
-          });
-        }
-      });
-    }
+      // Search nodes
+      if (category === "all" || category === "nodes") {
+        nodes.forEach((node) => {
+          const matchScore = calculateMatchScore(node.name, normalizedQuery);
+          if (matchScore > 0) {
+            searchResults.push({
+              id: node.id,
+              name: node.name,
+              type: "node",
+              matchScore,
+              category: node.type === NetworkNodeType.CUSTOMER ? "customers" : "nodes",
+            });
+          }
+        });
+      }
 
-    // Search connections
-    if (category === 'all' || category === 'connections') {
-      connections.forEach(conn => {
-        const matchScore = calculateMatchScore(conn.id, normalizedQuery);
-        if (matchScore > 0) {
-          searchResults.push({
-            id: conn.id,
-            name: `Connection ${conn.id}`,
-            type: 'connection',
-            matchScore,
-            category: 'connections'
-          });
-        }
-      });
-    }
+      // Search connections
+      if (category === "all" || category === "connections") {
+        connections.forEach((conn) => {
+          const matchScore = calculateMatchScore(conn.id, normalizedQuery);
+          if (matchScore > 0) {
+            searchResults.push({
+              id: conn.id,
+              name: `Connection ${conn.id}`,
+              type: "connection",
+              matchScore,
+              category: "connections",
+            });
+          }
+        });
+      }
 
-    // Sort by match score and limit results
-    searchResults.sort((a, b) => b.matchScore - a.matchScore);
-    setResults(searchResults.slice(0, maxResults));
-  }, [nodes, connections, calculateMatchScore, maxResults]);
+      // Sort by match score and limit results
+      searchResults.sort((a, b) => b.matchScore - a.matchScore);
+      setResults(searchResults.slice(0, maxResults));
+    },
+    [nodes, connections, calculateMatchScore, maxResults]
+  );
 
   /**
    * Handle result selection - clears search state
    */
   const handleSelectResult = useCallback((result: CategorizedResult) => {
-    setQuery('');
+    setQuery("");
     setResults([]);
     setHighlightedIndex(-1);
   }, []);
@@ -138,7 +145,7 @@ export const useAssetSearch = ({
    * Clear all search state
    */
   const clearSearch = useCallback(() => {
-    setQuery('');
+    setQuery("");
     setResults([]);
     setHighlightedIndex(-1);
   }, []);
@@ -148,7 +155,7 @@ export const useAssetSearch = ({
     const timer = setTimeout(() => {
       performSearch(query, selectedCategory);
     }, debounceMs);
-    
+
     return () => clearTimeout(timer);
   }, [query, selectedCategory, performSearch, debounceMs]);
 
@@ -161,6 +168,6 @@ export const useAssetSearch = ({
     highlightedIndex,
     setHighlightedIndex,
     handleSelectResult,
-    clearSearch
+    clearSearch,
   };
 };

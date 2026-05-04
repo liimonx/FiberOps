@@ -1,40 +1,41 @@
 "use client";
 
 import { useEffect, useRef } from 'react';
+import mapboxgl from 'mapbox-gl';
 import { useNetworkMapStore } from '../stores/useNetworkMapStore';
 import { MeasurementPoint, TracePath, HeatmapData } from '../types';
 
 interface ToolVisualizationsProps {
-  mapInstance?: any; // Mapbox GL JS map instance
+  mapInstance?: mapboxgl.Map | null;
 }
 
 // Render measurement lines and points on the map
 export function MeasurementVisualization({ mapInstance }: ToolVisualizationsProps) {
   const measurements = useNetworkMapStore((state) => state.measurements);
-  const markersRef = useRef<any[]>([]);
-  const sourceId = 'measurements';
-  const lineLayerId = 'measurements-line';
-  const pointLayerId = 'measurements-points';
-  const labelLayerId = 'measurements-labels';
 
   useEffect(() => {
-    if (!mapInstance || measurements.length === 0) return;
+    if (!mapInstance) return;
 
-    // Clear existing markers
-    markersRef.current.forEach(marker => marker.remove());
-    markersRef.current = [];
-
-    // Update GeoJSON source
-    if (mapInstance.getSource(sourceId)) {
+    // Always sync the source (even when empty, so layers show nothing)
+    if (mapInstance.getSource('measurements')) {
       updateMeasurementSource(mapInstance, measurements);
-    } else {
+    } else if (measurements.length > 0) {
+      // Only add layers when we have the first point
       addMeasurementLayers(mapInstance, measurements);
     }
 
+    // Only clean up on true unmount, not on every measurements change
     return () => {
-      cleanupMeasurementLayers(mapInstance);
+      // noop - cleanup happens in the dedicated unmount effect below
     };
   }, [mapInstance, measurements]);
+
+  // Separate effect for unmount cleanup only
+  useEffect(() => {
+    return () => {
+      if (mapInstance) cleanupMeasurementLayers(mapInstance);
+    };
+  }, [mapInstance]);
 
   return null;
 }
@@ -42,8 +43,6 @@ export function MeasurementVisualization({ mapInstance }: ToolVisualizationsProp
 // Render trace path on the map
 export function TracePathVisualization({ mapInstance }: ToolVisualizationsProps) {
   const tracePath = useNetworkMapStore((state) => state.tracePath);
-  const selectedElementId = useNetworkMapStore((state) => state.interaction.selectedElementId);
-  const sourceId = 'trace-path';
 
   useEffect(() => {
     if (!mapInstance) return;
@@ -55,11 +54,16 @@ export function TracePathVisualization({ mapInstance }: ToolVisualizationsProps)
     }
 
     return () => {
-      if (!tracePath) {
-        cleanupTracePath(mapInstance);
-      }
+      // noop - cleanup on unmount handled below
     };
   }, [mapInstance, tracePath]);
+
+  // Separate unmount cleanup
+  useEffect(() => {
+    return () => {
+      if (mapInstance) cleanupTracePath(mapInstance);
+    };
+  }, [mapInstance]);
 
   return null;
 }
@@ -67,8 +71,6 @@ export function TracePathVisualization({ mapInstance }: ToolVisualizationsProps)
 // Render heatmap on the map
 export function HeatmapVisualization({ mapInstance }: ToolVisualizationsProps) {
   const heatmapData = useNetworkMapStore((state) => state.heatmapData);
-  const sourceId = 'heatmap';
-  const layerId = 'heatmap-layer';
 
   useEffect(() => {
     if (!mapInstance) return;
@@ -80,17 +82,21 @@ export function HeatmapVisualization({ mapInstance }: ToolVisualizationsProps) {
     }
 
     return () => {
-      if (!heatmapData) {
-        cleanupHeatmap(mapInstance);
-      }
+      // noop
     };
   }, [mapInstance, heatmapData]);
+
+  useEffect(() => {
+    return () => {
+      if (mapInstance) cleanupHeatmap(mapInstance);
+    };
+  }, [mapInstance]);
 
   return null;
 }
 
 // Helper functions for measurements
-function addMeasurementLayers(map: any, measurements: MeasurementPoint[]) {
+function addMeasurementLayers(map: mapboxgl.Map, measurements: MeasurementPoint[]) {
   // Add GeoJSON source
   map.addSource('measurements', {
     type: 'geojson',
@@ -145,20 +151,22 @@ function addMeasurementLayers(map: any, measurements: MeasurementPoint[]) {
   });
 }
 
-function updateMeasurementSource(map: any, measurements: MeasurementPoint[]) {
-  const source = map.getSource('measurements');
+function updateMeasurementSource(map: mapboxgl.Map, measurements: MeasurementPoint[]) {
+  const source = map.getSource('measurements') as mapboxgl.GeoJSONSource;
   if (source) {
     source.setData(createMeasurementGeoJSON(measurements));
   }
 }
 
-function createMeasurementGeoJSON(measurements: MeasurementPoint[]) {
-  return {
-    type: 'FeatureCollection',
-    features: measurements.map((point, index) => ({
-      type: 'Feature',
+function createMeasurementGeoJSON(measurements: MeasurementPoint[]): GeoJSON.FeatureCollection {
+  const coords = measurements.map(p => [p.position.lng, p.position.lat]);
+
+  const features: GeoJSON.Feature[] = [
+    // Points
+    ...measurements.map((point, index) => ({
+      type: 'Feature' as const,
       geometry: {
-        type: 'Point',
+        type: 'Point' as const,
         coordinates: [point.position.lng, point.position.lat]
       },
       properties: {
@@ -167,10 +175,24 @@ function createMeasurementGeoJSON(measurements: MeasurementPoint[]) {
         distance: point.distance ? `${Math.round(point.distance)}m` : ''
       }
     }))
-  };
+  ];
+
+  // Add a LineString only when there are 2+ points
+  if (coords.length >= 2) {
+    features.unshift({
+      type: 'Feature' as const,
+      geometry: {
+        type: 'LineString' as const,
+        coordinates: coords
+      },
+      properties: { id: 'measurement-line', distance: '' }
+    });
+  }
+
+  return { type: 'FeatureCollection', features };
 }
 
-function cleanupMeasurementLayers(map: any) {
+function cleanupMeasurementLayers(map: mapboxgl.Map) {
   ['measurements-labels', 'measurements-points', 'measurements-line'].forEach(layerId => {
     if (map.getLayer(layerId)) {
       map.removeLayer(layerId);
@@ -183,29 +205,29 @@ function cleanupMeasurementLayers(map: any) {
 }
 
 // Helper functions for trace path
-function renderTracePath(map: any, tracePath: TracePath) {
+function renderTracePath(map: mapboxgl.Map, tracePath: TracePath) {
   const coordinates = tracePath.path.map(node => [
     node.position.lng,
     node.position.lat
   ]);
 
   // Create GeoJSON for the path
-  const geojson = {
-    type: 'FeatureCollection',
+  const geojson: GeoJSON.FeatureCollection = {
+    type: 'FeatureCollection' as const,
     features: [
       {
-        type: 'Feature',
+        type: 'Feature' as const,
         geometry: {
-          type: 'LineString',
+          type: 'LineString' as const,
           coordinates: coordinates
         },
         properties: {}
       },
       // Add nodes as points
       ...tracePath.path.map((node, index) => ({
-        type: 'Feature',
+        type: 'Feature' as const,
         geometry: {
-          type: 'Point',
+          type: 'Point' as const,
           coordinates: [node.position.lng, node.position.lat]
         },
         properties: {
@@ -268,9 +290,11 @@ function renderTracePath(map: any, tracePath: TracePath) {
 
   // Fit map to show entire path
   if (coordinates.length > 0) {
-    const bounds = coordinates.reduce((bounds: any, coord: any) => {
-      return bounds.extend(coord);
-    }, new map.constructor.LngLatBounds(coordinates[0], coordinates[0]));
+    const bounds = new mapboxgl.LngLatBounds(
+      coordinates[0] as [number, number],
+      coordinates[0] as [number, number]
+    );
+    coordinates.forEach((coord) => bounds.extend(coord as [number, number]));
 
     map.fitBounds(bounds, {
       padding: 50,
@@ -279,7 +303,7 @@ function renderTracePath(map: any, tracePath: TracePath) {
   }
 }
 
-function cleanupTracePath(map: any) {
+function cleanupTracePath(map: mapboxgl.Map) {
   ['trace-path-nodes', 'trace-path-line'].forEach(layerId => {
     if (map.getLayer(layerId)) {
       map.removeLayer(layerId);
@@ -292,17 +316,17 @@ function cleanupTracePath(map: any) {
 }
 
 // Helper functions for heatmap
-function renderHeatmap(map: any, heatmapData: HeatmapData) {
-  const geojson = {
-    type: 'FeatureCollection',
+function renderHeatmap(map: mapboxgl.Map, heatmapData: HeatmapData) {
+  const geojson: GeoJSON.FeatureCollection = {
+    type: 'FeatureCollection' as const,
     features: heatmapData.dataPoints.map(point => ({
-      type: 'Feature',
+      type: 'Feature' as const,
       properties: {
         intensity: point.intensity,
         value: point.value || 0
       },
       geometry: {
-        type: 'Point',
+        type: 'Point' as const,
         coordinates: [point.position.lng, point.position.lat]
       }
     }))
@@ -370,7 +394,7 @@ function renderHeatmap(map: any, heatmapData: HeatmapData) {
   });
 }
 
-function cleanupHeatmap(map: any) {
+function cleanupHeatmap(map: mapboxgl.Map) {
   if (map.getLayer('heatmap-layer')) {
     map.removeLayer('heatmap-layer');
   }
