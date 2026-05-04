@@ -15,11 +15,13 @@
  * @see https://atomix.design/docs/design-tokens/transitions
  */
 
+@use "./tokens" as tok;
+
 @use "../../../../node_modules/@shohojdhara/atomix/src/styles/01-settings/settings.animations"
   with (
-  $transition-duration: 0.3s,
-  $easing: cubic-bezier(0.23, 1, 0.32, 1),
-  $transition-base: all 0.3s cubic-bezier(0.23, 1, 0.32, 1),
-  $transition-fast: all 0.15s cubic-bezier(0.23, 1, 0.32, 1),
-  $transition-slow: all 0.5s cubic-bezier(0.23, 1, 0.32, 1)
+  $transition-duration: tok.$transition-duration,
+  $easing:              tok.$easing,
+  $transition-base:     tok.$transition-base,
+  $transition-fast:     tok.$transition-fast,
+  $transition-slow:     tok.$transition-slow
 );

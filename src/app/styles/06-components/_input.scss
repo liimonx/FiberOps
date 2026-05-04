@@ -2,12 +2,97 @@
  * Input Component Variable Overrides
  * =============================================================================
  *
- * Refined form inputs: crisp typography, well-proportioned padding, clear
- * border state progression (default → hover → focus → error/success),
- * and smooth transitions throughout.
+ * Premium text input: refined height, well-proportioned padding, smooth
+ * focus transition with brand ring, and accessible error/disabled states.
  *
  * @see https://atomix.design/docs/components/input
  */
+
+@use "../01-settings/tokens" as tok;
+
+// =============================================================================
+// Component Variable Definitions
+// =============================================================================
+
+  // ---------------------------------------------------------------------------
+  // Color & surface
+  // ---------------------------------------------------------------------------
+  $input-color: var(--atomix-body-color) !default;
+
+  $input-bg: var(--atomix-primary-bg-subtle) !default;
+
+  $input-bg-disabled: var(--atomix-secondary-bg-subtle) !default;
+
+  $input-placeholder-color: var(--atomix-tertiary-text-emphasis) !default;
+
+  $input-disabled-color: var(--atomix-disabled-text-emphasis) !default;
+
+  $input-disabled-bg: var(--atomix-secondary-bg-subtle) !default;
+
+  // ---------------------------------------------------------------------------
+  // Typography
+  // ---------------------------------------------------------------------------
+  $input-font-size: 0.8125rem !default;
+
+  // 13px
+  $input-font-size-sm: 0.75rem !default;
+
+  // 12px
+  $input-font-size-lg: 0.875rem !default;
+
+  // 14px
+  $input-line-height-md: 1.4 !default;
+
+  $input-line-height-sm: 1.4 !default;
+
+  $input-line-height-lg: 1.4 !default;
+
+
+  // ---------------------------------------------------------------------------
+  // Padding
+  // ---------------------------------------------------------------------------
+  $input-padding-x: 0.75rem !default;
+
+  // 12px
+  $input-padding-y: 0.4375rem !default;
+
+  // 7px — matches compact btn height
+  $input-padding-x-sm: 0.625rem !default;
+
+  $input-padding-y-sm: 0.25rem !default;
+
+  $input-padding-x-lg: 0.875rem !default;
+
+  $input-padding-y-lg: 0.625rem !default;
+
+
+  // ---------------------------------------------------------------------------
+  // Border
+  // ---------------------------------------------------------------------------
+  $input-border-width: 1px !default;
+
+  $input-border-color: var(--atomix-border-color) !default;
+
+  $input-hover-border-color: var(--atomix-primary-border-subtle) !default;
+
+  $input-focus-border-color: var(--atomix-primary) !default;
+
+  $input-invalid-border-color: var(--atomix-error) !default;
+
+  $input-success-border-color: var(--atomix-success) !default;
+
+  $input-border-radius: tok.$border-radius-xl !default;
+
+
+  // 10px — matches button
+  // ---------------------------------------------------------------------------
+  // Textarea height
+  // ---------------------------------------------------------------------------
+  $input-textarea-height: auto !default;
+
+  $input-textarea-height-sm: auto !default;
+
+  $input-textarea-height-lg: auto !default;
 
 // =============================================================================
 // Input Variable Configuration
@@ -17,55 +102,55 @@
   // ---------------------------------------------------------------------------
   // Color & surface
   // ---------------------------------------------------------------------------
-  $input-color: var(--atomix-body-color),
-  $input-bg: var(--atomix-primary-bg-subtle),
-  $input-bg-disabled: var(--atomix-secondary-bg-subtle),
-  $input-placeholder-color: var(--atomix-tertiary-text-emphasis),
-  $input-disabled-color: var(--atomix-disabled-text-emphasis),
-  $input-disabled-bg: var(--atomix-secondary-bg-subtle),
+  $input-color: $input-color,
+  $input-bg: $input-bg,
+  $input-bg-disabled: $input-bg-disabled,
+  $input-placeholder-color: $input-placeholder-color,
+  $input-disabled-color: $input-disabled-color,
+  $input-disabled-bg: $input-disabled-bg,
   // ---------------------------------------------------------------------------
   // Typography
   // ---------------------------------------------------------------------------
-  $input-font-size: 0.8125rem,
+  $input-font-size: $input-font-size,
   // 13px
-  $input-font-size-sm: 0.75rem,
+  $input-font-size-sm: $input-font-size-sm,
   // 12px
-  $input-font-size-lg: 0.875rem,
+  $input-font-size-lg: $input-font-size-lg,
   // 14px
-  $input-line-height-md: 1.4,
-  $input-line-height-sm: 1.4,
-  $input-line-height-lg: 1.4,
+  $input-line-height-md: $input-line-height-md,
+  $input-line-height-sm: $input-line-height-sm,
+  $input-line-height-lg: $input-line-height-lg,
 
   // ---------------------------------------------------------------------------
   // Padding
   // ---------------------------------------------------------------------------
-  $input-padding-x: 0.75rem,
+  $input-padding-x: $input-padding-x,
   // 12px
-  $input-padding-y: 0.4375rem,
+  $input-padding-y: $input-padding-y,
   // 7px — matches compact btn height
-  $input-padding-x-sm: 0.625rem,
-  $input-padding-y-sm: 0.25rem,
-  $input-padding-x-lg: 0.875rem,
-  $input-padding-y-lg: 0.625rem,
+  $input-padding-x-sm: $input-padding-x-sm,
+  $input-padding-y-sm: $input-padding-y-sm,
+  $input-padding-x-lg: $input-padding-x-lg,
+  $input-padding-y-lg: $input-padding-y-lg,
 
   // ---------------------------------------------------------------------------
   // Border
   // ---------------------------------------------------------------------------
-  $input-border-width: 1px,
-  $input-border-color: var(--atomix-border-color),
-  $input-hover-border-color: var(--atomix-primary-border-subtle),
-  $input-focus-border-color: var(--atomix-primary),
-  $input-invalid-border-color: var(--atomix-error),
-  $input-success-border-color: var(--atomix-success),
-  $input-border-radius: 0.625rem,
+  $input-border-width: $input-border-width,
+  $input-border-color: $input-border-color,
+  $input-hover-border-color: $input-hover-border-color,
+  $input-focus-border-color: $input-focus-border-color,
+  $input-invalid-border-color: $input-invalid-border-color,
+  $input-success-border-color: $input-success-border-color,
+  $input-border-radius: $input-border-radius,
 
   // 10px — matches button
   // ---------------------------------------------------------------------------
   // Textarea height
   // ---------------------------------------------------------------------------
-  $input-textarea-height: auto,
-  $input-textarea-height-sm: auto,
-  $input-textarea-height-lg: auto
+  $input-textarea-height: $input-textarea-height,
+  $input-textarea-height-sm: $input-textarea-height-sm,
+  $input-textarea-height-lg: $input-textarea-height-lg
 );
 
 // =============================================================================
@@ -73,8 +158,8 @@
 // =============================================================================
 .c-input {
   transition:
-    border-color 0.3s cubic-bezier(0.23, 1, 0.32, 1),
-    box-shadow 0.3s cubic-bezier(0.23, 1, 0.32, 1),
+    border-color tok.$transition-duration tok.$easing,
+    box-shadow tok.$transition-duration tok.$easing,
     background-color 0.3s cubic-bezier(0.23, 1, 0.32, 1);
 
   // Hover — gentle border lift
@@ -83,9 +168,10 @@
   }
 
   // Focus — brand ring
+  &:focus-within,
   &:focus {
     border-color: var(--atomix-primary);
-    box-shadow: 0 0 0 3px rgba(var(--atomix-primary-rgb, 6, 182, 212), 0.16);
+    box-shadow: tok.$input-focus-ring;
     outline: none;
   }
 
@@ -97,10 +183,13 @@
   }
 
   // Error state
-  &.is-invalid,
-  &[aria-invalid="true"] {
+  &:has(input.is-invalid),
+  &.is-invalid {
     border-color: var(--atomix-error);
-    box-shadow: 0 0 0 3px rgba(var(--atomix-error-rgb, 239, 68, 68), 0.14);
+
+    &:focus-within {
+      box-shadow: tok.$input-error-ring;
+    }
   }
 
   // Disabled

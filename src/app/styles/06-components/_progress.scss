@@ -7,8 +7,16 @@
  * @see https://atomix.design/docs/components/progress
  */
 
+// =============================================================================
+// Component Variable Definitions
+// =============================================================================
+
+  $progress-height: 8px !default;
+
+  $progress-border-radius: 1rem !default;
+
 @use "../../../../node_modules/@shohojdhara/atomix/src/styles/01-settings/settings.progress"
   with (
-  $progress-height: 8px,
-  $progress-border-radius: 1rem
+  $progress-height: $progress-height,
+  $progress-border-radius: $progress-border-radius
 );

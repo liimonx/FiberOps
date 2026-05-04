@@ -57,13 +57,16 @@ export const MapControls: React.FC<MapControlsProps> = ({
     const map = getMapInstance();
     if (!map) return;
 
-    const newStyle = isSatelliteView 
+    const newStyle = isSatelliteView
       ? "mapbox://styles/mapbox/dark-v11"
       : "mapbox://styles/mapbox/satellite-streets-v12";
 
     map.setStyle(newStyle);
     setIsSatelliteView(!isSatelliteView);
-    announce(isSatelliteView ? "Switched to dark map view" : "Switched to satellite view", "polite");
+    announce(
+      isSatelliteView ? "Switched to dark map view" : "Switched to satellite view",
+      "polite"
+    );
   }, [isSatelliteView, announce]);
 
   const positionClasses = {
@@ -75,7 +78,7 @@ export const MapControls: React.FC<MapControlsProps> = ({
 
   return (
     <div className={` ${positionClasses[position]} ${className}`}>
-      <Card glass={{ blurAmount: 5 }} appearance="ghost" size="sm">
+      <Card glass>
         <div
           className="u-flex u-flex-column u-gap-1"
           role="toolbar"
@@ -119,7 +122,9 @@ export const MapControls: React.FC<MapControlsProps> = ({
               iconName={isSatelliteView ? "GlobeHemisphereWest" : "Globe"}
               iconOnly
               onClick={handleToggleSatellite}
-              aria-label={isSatelliteView ? "Switch to dark map view" : "Switch to satellite view"}
+              aria-label={
+                isSatelliteView ? "Switch to dark map view" : "Switch to satellite view"
+              }
             />
           </div>
 
@@ -177,16 +182,16 @@ export const CompassControl: React.FC<{ size?: "sm" | "md" }> = ({ size = "md" }
       size={size}
       onClick={handleResetBearing}
       aria-label={`Reset map orientation, current bearing: ${Math.round(bearing)} degrees`}
-    >
-      <div
-        className="u-flex u-items-center u-justify-center u-transition-all"
-        style={{
-          transform: `rotate(${-bearing}deg)`,
-        }}
-        aria-hidden="true"
-      >
-        <Icon name="NavigationArrow" size={16} />
-      </div>
-    </Button>
+      iconOnly
+      icon={
+        <div
+          style={{
+            transform: `rotate(${-bearing}deg)`,
+          }}
+        >
+          <Icon name="NavigationArrow" size={16} />
+        </div>
+      }
+    ></Button>
   );
 };

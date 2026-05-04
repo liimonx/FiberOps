@@ -8,6 +8,82 @@
  * @see https://atomix.design/docs/components/tabs
  */
 
+@use "../01-settings/tokens" as tok;
+
+// =============================================================================
+// Component Variable Definitions
+// =============================================================================
+
+  // ---------------------------------------------------------------------------
+  // Nav button — geometry & spacing
+  // ---------------------------------------------------------------------------
+  $tabs-nav-btn-padding-x: 12px !default;
+
+  $tabs-nav-btn-padding-y: 8px !default;
+
+  $tabs-nav-btn-border-radius: 0px !default;
+
+
+  // flat underline style
+  // ---------------------------------------------------------------------------
+  // Nav button — typography
+  // ---------------------------------------------------------------------------
+  $tabs-nav-btn-font-size: 0.8125rem !default;
+
+  // 13px – tight, compact label
+  $tabs-nav-btn-font-weight: 500 !default;
+
+
+  // ---------------------------------------------------------------------------
+  // Nav button — colors (default / hover / active / disabled)
+  // ---------------------------------------------------------------------------
+  $tabs-nav-btn-color: var(--atomix-tertiary-text-emphasis) !default;
+
+  $tabs-nav-btn-active-color: var(--atomix-body-color) !default;
+
+  $tabs-nav-btn-disabled-color: var(--atomix-disabled-text-emphasis) !default;
+
+  $tabs-nav-btn-bg: transparent !default;
+
+  $tabs-nav-btn-bg-hover: var(--atomix-secondary-bg-subtle) !default;
+
+  $tabs-nav-btn-bg-active: transparent !default;
+
+  $tabs-nav-btn-bg-disabled: transparent !default;
+
+
+  // ---------------------------------------------------------------------------
+  // Nav button — border / indicator
+  // ---------------------------------------------------------------------------
+  $tabs-nav-btn-border-width: 2px !default;
+
+  $tabs-nav-btn-border-color: transparent !default;
+
+  $tabs-nav-btn-border-active-color: var(--atomix-primary) !default;
+
+  $tabs-nav-btn-border-disabled-color: var(--atomix-border-color) !default;
+
+  // ---------------------------------------------------------------------------
+  // Gap between tab buttons
+  // ---------------------------------------------------------------------------
+  $tabs-nav-btns-gap: 0px !default;
+
+  $tabs-nav-btn-inner-gap: 4px !default;
+
+
+  // ---------------------------------------------------------------------------
+  // Icon inside button
+  // ---------------------------------------------------------------------------
+  $tab-nav-btn-icon-size: 16px !default;
+
+
+  // ---------------------------------------------------------------------------
+  // Panel content padding
+  // ---------------------------------------------------------------------------
+  $tabs-panel-padding-x: 0px !default;
+
+  $tabs-panel-padding-y: 16px !default;
+
 // =============================================================================
 // Tabs Variable Configuration
 // =============================================================================
@@ -16,52 +92,52 @@
   // ---------------------------------------------------------------------------
   // Nav button — geometry & spacing
   // ---------------------------------------------------------------------------
-  $tabs-nav-btn-padding-x: 12px,
-  $tabs-nav-btn-padding-y: 8px,
-  $tabs-nav-btn-border-radius: 0px,
+  $tabs-nav-btn-padding-x: $tabs-nav-btn-padding-x,
+  $tabs-nav-btn-padding-y: $tabs-nav-btn-padding-y,
+  $tabs-nav-btn-border-radius: $tabs-nav-btn-border-radius,
 
   // flat underline style
   // ---------------------------------------------------------------------------
   // Nav button — typography
   // ---------------------------------------------------------------------------
-  $tabs-nav-btn-font-size: 0.8125rem,
+  $tabs-nav-btn-font-size: $tabs-nav-btn-font-size,
   // 13px – tight, compact label
-  $tabs-nav-btn-font-weight: 500,
+  $tabs-nav-btn-font-weight: $tabs-nav-btn-font-weight,
 
   // ---------------------------------------------------------------------------
   // Nav button — colors (default / hover / active / disabled)
   // ---------------------------------------------------------------------------
-  $tabs-nav-btn-color: var(--atomix-tertiary-text-emphasis),
-  $tabs-nav-btn-active-color: var(--atomix-body-color),
-  $tabs-nav-btn-disabled-color: var(--atomix-disabled-text-emphasis),
-  $tabs-nav-btn-bg: transparent,
-  $tabs-nav-btn-bg-hover: var(--atomix-secondary-bg-subtle),
-  $tabs-nav-btn-bg-active: transparent,
-  $tabs-nav-btn-bg-disabled: transparent,
+  $tabs-nav-btn-color: $tabs-nav-btn-color,
+  $tabs-nav-btn-active-color: $tabs-nav-btn-active-color,
+  $tabs-nav-btn-disabled-color: $tabs-nav-btn-disabled-color,
+  $tabs-nav-btn-bg: $tabs-nav-btn-bg,
+  $tabs-nav-btn-bg-hover: $tabs-nav-btn-bg-hover,
+  $tabs-nav-btn-bg-active: $tabs-nav-btn-bg-active,
+  $tabs-nav-btn-bg-disabled: $tabs-nav-btn-bg-disabled,
 
   // ---------------------------------------------------------------------------
   // Nav button — border / indicator
   // ---------------------------------------------------------------------------
-  $tabs-nav-btn-border-width: 2px,
-  $tabs-nav-btn-border-color: transparent,
-  $tabs-nav-btn-border-active-color: var(--atomix-primary),
-  $tabs-nav-btn-border-disabled-color: var(--atomix-border-color),
+  $tabs-nav-btn-border-width: $tabs-nav-btn-border-width,
+  $tabs-nav-btn-border-color: $tabs-nav-btn-border-color,
+  $tabs-nav-btn-border-active-color: $tabs-nav-btn-border-active-color,
+  $tabs-nav-btn-border-disabled-color: $tabs-nav-btn-border-disabled-color,
   // ---------------------------------------------------------------------------
   // Gap between tab buttons
   // ---------------------------------------------------------------------------
-  $tabs-nav-btns-gap: 0px,
-  $tabs-nav-btn-inner-gap: 4px,
+  $tabs-nav-btns-gap: $tabs-nav-btns-gap,
+  $tabs-nav-btn-inner-gap: $tabs-nav-btn-inner-gap,
 
   // ---------------------------------------------------------------------------
   // Icon inside button
   // ---------------------------------------------------------------------------
-  $tab-nav-btn-icon-size: 16px,
+  $tab-nav-btn-icon-size: $tab-nav-btn-icon-size,
 
   // ---------------------------------------------------------------------------
   // Panel content padding
   // ---------------------------------------------------------------------------
-  $tabs-panel-padding-x: 0px,
-  $tabs-panel-padding-y: 16px
+  $tabs-panel-padding-x: $tabs-panel-padding-x,
+  $tabs-panel-padding-y: $tabs-panel-padding-y
 );
 
 // =============================================================================
@@ -95,9 +171,9 @@
     white-space: nowrap;
     letter-spacing: 0.01em;
     transition:
-      color 0.3s cubic-bezier(0.23, 1, 0.32, 1),
-      background-color 0.3s cubic-bezier(0.23, 1, 0.32, 1),
-      border-color 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+      color tok.$transition-duration tok.$easing,
+      background-color tok.$transition-duration tok.$easing,
+      border-color tok.$transition-duration tok.$easing;
 
     // Gradient active indicator that replaces the raw border-bottom tick
     &::after {
@@ -114,7 +190,7 @@
         var(--atomix-primary-hover, var(--atomix-primary))
       );
       transform: translateX(-50%);
-      transition: width 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+      transition: width tok.$transition-duration tok.$easing;
     }
 
     // Active state — slide indicator in + strengthen label
@@ -151,8 +227,8 @@
   // --------------------------------------------------------------------------
   &__panel {
     transition:
-      opacity 0.3s cubic-bezier(0.23, 1, 0.32, 1),
-      transform 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+      opacity tok.$transition-duration tok.$easing,
+      transform tok.$transition-duration tok.$easing;
     transform: translateY(4px);
 
     &.is-active {

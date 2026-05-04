@@ -8,6 +8,48 @@
  * @see https://atomix.design/docs/components/tooltip
  */
 
+@use "../01-settings/tokens" as tok;
+
+// =============================================================================
+// Component Variable Definitions
+// =============================================================================
+
+  // ---------------------------------------------------------------------------
+  // Geometry
+  // ---------------------------------------------------------------------------
+  $tooltip-max-width: 220px !default;
+
+  $tooltip-padding-x: 10px !default;
+
+  $tooltip-padding-y: 6px !default;
+
+  $tooltip-arrow-size: 10px !default;
+
+
+  // ---------------------------------------------------------------------------
+  // Surface
+  // ---------------------------------------------------------------------------
+  $tooltip-bg: var(--atomix-invert-bg-subtle) !default;
+
+  $tooltip-border-radius: tok.$border-radius-lg !default;
+
+  $tooltip-border-width: null !default;
+
+  $tooltip-border-color: null !default;
+
+  $tooltip-box-shadow: tok.$box-shadow-md !default;
+
+
+  // ---------------------------------------------------------------------------
+  // Typography
+  // ---------------------------------------------------------------------------
+  $tooltip-font-size: 0.75rem !default;
+
+  // 12px — tight tooltip label
+  $tooltip-font-weight: 500 !default;
+
+  $tooltip-color: var(--atomix-invert-text-emphasis) !default;
+
 // =============================================================================
 // Tooltip Variable Configuration
 // =============================================================================
@@ -16,30 +58,27 @@
   // ---------------------------------------------------------------------------
   // Geometry
   // ---------------------------------------------------------------------------
-  $tooltip-max-width: 220px,
-  $tooltip-padding-x: 10px,
-  $tooltip-padding-y: 6px,
-  $tooltip-arrow-size: 10px,
+  $tooltip-max-width: $tooltip-max-width,
+  $tooltip-padding-x: $tooltip-padding-x,
+  $tooltip-padding-y: $tooltip-padding-y,
+  $tooltip-arrow-size: $tooltip-arrow-size,
 
   // ---------------------------------------------------------------------------
   // Surface
   // ---------------------------------------------------------------------------
-  $tooltip-bg: var(--atomix-invert-bg-subtle),
-  $tooltip-border-radius: 0.5rem,
-  $tooltip-border-width: null,
-  $tooltip-border-color: null,
-  $tooltip-box-shadow: (
-    0 4px 12px -2px rgba(0, 0, 0, 0.25),
-    0 2px 4px -1px rgba(0, 0, 0, 0.15)
-  ),
+  $tooltip-bg: $tooltip-bg,
+  $tooltip-border-radius: $tooltip-border-radius,
+  $tooltip-border-width: $tooltip-border-width,
+  $tooltip-border-color: $tooltip-border-color,
+  $tooltip-box-shadow: $tooltip-box-shadow,
 
   // ---------------------------------------------------------------------------
   // Typography
   // ---------------------------------------------------------------------------
-  $tooltip-font-size: 0.75rem,
+  $tooltip-font-size: $tooltip-font-size,
   // 12px — tight tooltip label
-  $tooltip-font-weight: 500,
-  $tooltip-color: var(--atomix-invert-text-emphasis)
+  $tooltip-font-weight: $tooltip-font-weight,
+  $tooltip-color: $tooltip-color
 );
 
 // =============================================================================
@@ -58,7 +97,7 @@
   // Entrance animation
   &.is-visible &__content,
   &[data-show] &__content {
-    animation: tooltip-in 0.16s cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation: tooltip-in tok.$transition-duration-fast tok.$easing-out both;
   }
 }
 

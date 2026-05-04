@@ -9,6 +9,102 @@
  * @see https://atomix.design/docs/components/data-table
  */
 
+@use "../01-settings/tokens" as tok;
+
+// =============================================================================
+// Component Variable Definitions
+// =============================================================================
+
+  // ---------------------------------------------------------------------------
+  // Table surface
+  // ---------------------------------------------------------------------------
+  $data-table-bg: var(--atomix-primary-bg-subtle) !default;
+
+  $data-table-color: var(--atomix-body-color) !default;
+
+  $data-table-border-color: var(--atomix-border-color) !default;
+
+  $data-table-border-width: 1px !default;
+
+  $data-table-border-style: solid !default;
+
+  $data-table-border-radius: 0.875rem !default;
+
+
+  // ---------------------------------------------------------------------------
+  // Header
+  // ---------------------------------------------------------------------------
+  $data-table-header-bg: var(--atomix-secondary-bg-subtle) !default;
+
+  $data-table-header-color: var(--atomix-body-color) !default;
+
+  $data-table-header-font-weight: 600 !default;
+
+
+  // ---------------------------------------------------------------------------
+  // Cell padding — base / dense
+  // ---------------------------------------------------------------------------
+  $data-table-cell-padding-y: 0.5rem !default;
+
+  $data-table-cell-padding-x: 0.75rem !default;
+
+  $data-table-cell-padding-y-sm: 0.3125rem !default;
+
+  // 5px
+  $data-table-cell-padding-x-sm: 0.5rem !default;
+
+
+  // ---------------------------------------------------------------------------
+  // Row states
+  // ---------------------------------------------------------------------------
+  $data-table-striped-bg: rgba(0, 0, 0, 0.025) !default;
+
+  $data-table-hover-bg: var(--atomix-secondary-bg-subtle) !default;
+
+  // ---------------------------------------------------------------------------
+  // Pagination zone
+  // ---------------------------------------------------------------------------
+  $data-table-pagination-padding-y: 0.5rem !default;
+
+  $data-table-pagination-padding-x: 0.75rem !default;
+
+  $data-table-pagination-bg: var(--atomix-primary-bg-subtle) !default;
+
+  $data-table-pagination-border-color: var(--atomix-border-color) !default;
+
+  $data-table-pagination-hover-bg: var(--atomix-secondary-bg-subtle) !default;
+
+  $data-table-pagination-active-bg: var(--atomix-primary) !default;
+
+  $data-table-pagination-active-color: #ffffff !default;
+
+  $data-table-pagination-disabled-color: var(--atomix-disabled-text-emphasis) !default;
+
+  // ---------------------------------------------------------------------------
+  // Search input
+  // ---------------------------------------------------------------------------
+  $data-table-search-bg: var(--atomix-primary-bg-subtle) !default;
+
+  $data-table-search-border-color: var(--atomix-border-color) !default;
+
+  $data-table-search-focus-border-color: var(--atomix-primary) !default;
+
+  $data-table-search-padding-y: 0.5rem !default;
+
+  $data-table-search-padding-x: 0.75rem !default;
+
+  $data-table-search-border-radius: 0.625rem !default;
+
+
+  // ---------------------------------------------------------------------------
+  // Sort icon
+  // ---------------------------------------------------------------------------
+  $data-table-sort-icon-size: 0.875rem !default;
+
+  $data-table-sort-icon-color: var(--atomix-tertiary-text-emphasis) !default;
+
+  $data-table-sort-icon-active-color: var(--atomix-primary) !default;
+
 // =============================================================================
 // Data Table Variable Configuration
 // =============================================================================
@@ -17,61 +113,61 @@
   // ---------------------------------------------------------------------------
   // Table surface
   // ---------------------------------------------------------------------------
-  $data-table-bg: var(--atomix-primary-bg-subtle),
-  $data-table-color: var(--atomix-body-color),
-  $data-table-border-color: var(--atomix-border-color),
-  $data-table-border-width: 1px,
-  $data-table-border-style: solid,
-  $data-table-border-radius: 0.875rem,
+  $data-table-bg: $data-table-bg,
+  $data-table-color: $data-table-color,
+  $data-table-border-color: $data-table-border-color,
+  $data-table-border-width: $data-table-border-width,
+  $data-table-border-style: $data-table-border-style,
+  $data-table-border-radius: $data-table-border-radius,
 
   // ---------------------------------------------------------------------------
   // Header
   // ---------------------------------------------------------------------------
-  $data-table-header-bg: var(--atomix-secondary-bg-subtle),
-  $data-table-header-color: var(--atomix-body-color),
-  $data-table-header-font-weight: 600,
+  $data-table-header-bg: $data-table-header-bg,
+  $data-table-header-color: $data-table-header-color,
+  $data-table-header-font-weight: $data-table-header-font-weight,
 
   // ---------------------------------------------------------------------------
   // Cell padding — base / dense
   // ---------------------------------------------------------------------------
-  $data-table-cell-padding-y: 0.5rem,
-  $data-table-cell-padding-x: 0.75rem,
-  $data-table-cell-padding-y-sm: 0.3125rem,
+  $data-table-cell-padding-y: $data-table-cell-padding-y,
+  $data-table-cell-padding-x: $data-table-cell-padding-x,
+  $data-table-cell-padding-y-sm: $data-table-cell-padding-y-sm,
   // 5px
-  $data-table-cell-padding-x-sm: 0.5rem,
+  $data-table-cell-padding-x-sm: $data-table-cell-padding-x-sm,
 
   // ---------------------------------------------------------------------------
   // Row states
   // ---------------------------------------------------------------------------
-  $data-table-striped-bg: rgba(0, 0, 0, 0.025),
-  $data-table-hover-bg: var(--atomix-secondary-bg-subtle),
+  $data-table-striped-bg: $data-table-striped-bg,
+  $data-table-hover-bg: $data-table-hover-bg,
   // ---------------------------------------------------------------------------
   // Pagination zone
   // ---------------------------------------------------------------------------
-  $data-table-pagination-padding-y: 0.5rem,
-  $data-table-pagination-padding-x: 0.75rem,
-  $data-table-pagination-bg: var(--atomix-primary-bg-subtle),
-  $data-table-pagination-border-color: var(--atomix-border-color),
-  $data-table-pagination-hover-bg: var(--atomix-secondary-bg-subtle),
-  $data-table-pagination-active-bg: var(--atomix-primary),
-  $data-table-pagination-active-color: #ffffff,
-  $data-table-pagination-disabled-color: var(--atomix-disabled-text-emphasis),
+  $data-table-pagination-padding-y: $data-table-pagination-padding-y,
+  $data-table-pagination-padding-x: $data-table-pagination-padding-x,
+  $data-table-pagination-bg: $data-table-pagination-bg,
+  $data-table-pagination-border-color: $data-table-pagination-border-color,
+  $data-table-pagination-hover-bg: $data-table-pagination-hover-bg,
+  $data-table-pagination-active-bg: $data-table-pagination-active-bg,
+  $data-table-pagination-active-color: $data-table-pagination-active-color,
+  $data-table-pagination-disabled-color: $data-table-pagination-disabled-color,
   // ---------------------------------------------------------------------------
   // Search input
   // ---------------------------------------------------------------------------
-  $data-table-search-bg: var(--atomix-primary-bg-subtle),
-  $data-table-search-border-color: var(--atomix-border-color),
-  $data-table-search-focus-border-color: var(--atomix-primary),
-  $data-table-search-padding-y: 0.5rem,
-  $data-table-search-padding-x: 0.75rem,
-  $data-table-search-border-radius: 0.625rem,
+  $data-table-search-bg: $data-table-search-bg,
+  $data-table-search-border-color: $data-table-search-border-color,
+  $data-table-search-focus-border-color: $data-table-search-focus-border-color,
+  $data-table-search-padding-y: $data-table-search-padding-y,
+  $data-table-search-padding-x: $data-table-search-padding-x,
+  $data-table-search-border-radius: $data-table-search-border-radius,
 
   // ---------------------------------------------------------------------------
   // Sort icon
   // ---------------------------------------------------------------------------
-  $data-table-sort-icon-size: 0.875rem,
-  $data-table-sort-icon-color: var(--atomix-tertiary-text-emphasis),
-  $data-table-sort-icon-active-color: var(--atomix-primary)
+  $data-table-sort-icon-size: $data-table-sort-icon-size,
+  $data-table-sort-icon-color: $data-table-sort-icon-color,
+  $data-table-sort-icon-active-color: $data-table-sort-icon-active-color
 );
 
 // =============================================================================
@@ -84,8 +180,7 @@
   border: 1px solid var(--atomix-border-color);
   overflow: hidden;
   box-shadow:
-    0 1px 3px 0 rgba(0, 0, 0, 0.06),
-    0 1px 2px -1px rgba(0, 0, 0, 0.06);
+    tok.$box-shadow-xs;
 }
 
 // Scrollable wrapper
@@ -130,7 +225,7 @@
   // Row hover + selected states
   // --------------------------------------------------------------------------
   &__row {
-    transition: background-color 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+    transition: background-color tok.$transition-duration tok.$easing;
 
     &:last-child &__cell,
     &:last-child td {
@@ -165,7 +260,7 @@
   // Sort icon — smooth transition
   // --------------------------------------------------------------------------
   &__sort-icon {
-    transition: color 0.14s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: color tok.$transition-duration-fast tok.$easing;
     margin-left: 6px;
   }
 
@@ -177,7 +272,7 @@
     font-size: 0.8125rem;
     border-color: var(--atomix-border-color);
     background-color: var(--atomix-primary-bg-subtle);
-    transition: border-color 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+    transition: border-color tok.$transition-duration tok.$easing;
 
     &:focus {
       outline: none;
@@ -211,8 +306,8 @@
   &__input {
     width: 220px;
     transition:
-      border-color 0.16s cubic-bezier(0.4, 0, 0.2, 1),
-      box-shadow 0.16s cubic-bezier(0.4, 0, 0.2, 1);
+      border-color tok.$transition-duration-fast tok.$easing,
+      box-shadow tok.$transition-duration-fast tok.$easing;
 
     &:focus {
       border-color: var(--atomix-primary);

@@ -8,6 +8,72 @@
  * @see https://atomix.design/docs/components/modal
  */
 
+@use "../01-settings/tokens" as tok;
+
+// =============================================================================
+// Component Variable Definitions
+// =============================================================================
+
+  // ---------------------------------------------------------------------------
+  // Content area
+  // ---------------------------------------------------------------------------
+  $modal-inner-padding: 1.25rem !default;
+
+  $modal-content-bg: var(--atomix-primary-bg-subtle) !default;
+
+  $modal-content-border-radius: tok.$border-radius-xxl !default;
+
+  $modal-content-box-shadow: tok.$box-shadow-lg !default;
+
+
+  // ---------------------------------------------------------------------------
+  // Header
+  // ---------------------------------------------------------------------------
+  $modal-header-padding-bottom: 0.75rem !default;
+
+  $modal-title-font-size: 1.125rem !default;
+
+
+  // ---------------------------------------------------------------------------
+  // Sub-heading
+  // ---------------------------------------------------------------------------
+  $modal-sub-margin-top: 4px !default;
+
+  $modal-sub-font-size: 0.8125rem !default;
+
+  $modal-sub-color: var(--atomix-tertiary-text-emphasis) !default;
+
+  // ---------------------------------------------------------------------------
+  // Footer
+  // ---------------------------------------------------------------------------
+  $modal-footer-items-gap: 0.5rem !default;
+
+
+  // ---------------------------------------------------------------------------
+  // Backdrop
+  // ---------------------------------------------------------------------------
+  $modal-backdrop-opacity: 0.55 !default;
+
+  $modal-backdrop-blur: 14px !default;
+
+
+  // ---------------------------------------------------------------------------
+  // Close icon
+  // ---------------------------------------------------------------------------
+  $modal-close-icon-size: 24px !default;
+
+
+  // ---------------------------------------------------------------------------
+  // Sizes
+  // ---------------------------------------------------------------------------
+  $modal-sm: 340px !default;
+
+  $modal-md: 520px !default;
+
+  $modal-lg: 800px !default;
+
+  $modal-xl: 1100px !default;
+
 // =============================================================================
 // Modal Variable Configuration
 // =============================================================================
@@ -16,49 +82,46 @@
   // ---------------------------------------------------------------------------
   // Content area
   // ---------------------------------------------------------------------------
-  $modal-inner-padding: 1.25rem,
-  $modal-content-bg: var(--atomix-primary-bg-subtle),
-  $modal-content-border-radius: 1rem,
-  $modal-content-box-shadow: (
-    0 24px 48px -8px rgba(0, 0, 0, 0.18),
-    0 8px 16px -4px rgba(0, 0, 0, 0.1)
-  ),
+  $modal-inner-padding: $modal-inner-padding,
+  $modal-content-bg: $modal-content-bg,
+  $modal-content-border-radius: $modal-content-border-radius,
+  $modal-content-box-shadow: $modal-content-box-shadow,
 
   // ---------------------------------------------------------------------------
   // Header
   // ---------------------------------------------------------------------------
-  $modal-header-padding-bottom: 0.75rem,
-  $modal-title-font-size: 1.125rem,
+  $modal-header-padding-bottom: $modal-header-padding-bottom,
+  $modal-title-font-size: $modal-title-font-size,
 
   // ---------------------------------------------------------------------------
   // Sub-heading
   // ---------------------------------------------------------------------------
-  $modal-sub-margin-top: 4px,
-  $modal-sub-font-size: 0.8125rem,
-  $modal-sub-color: var(--atomix-tertiary-text-emphasis),
+  $modal-sub-margin-top: $modal-sub-margin-top,
+  $modal-sub-font-size: $modal-sub-font-size,
+  $modal-sub-color: $modal-sub-color,
   // ---------------------------------------------------------------------------
   // Footer
   // ---------------------------------------------------------------------------
-  $modal-footer-items-gap: 0.5rem,
+  $modal-footer-items-gap: $modal-footer-items-gap,
 
   // ---------------------------------------------------------------------------
   // Backdrop
   // ---------------------------------------------------------------------------
-  $modal-backdrop-opacity: 0.55,
-  $modal-backdrop-blur: 14px,
+  $modal-backdrop-opacity: $modal-backdrop-opacity,
+  $modal-backdrop-blur: $modal-backdrop-blur,
 
   // ---------------------------------------------------------------------------
   // Close icon
   // ---------------------------------------------------------------------------
-  $modal-close-icon-size: 24px,
+  $modal-close-icon-size: $modal-close-icon-size,
 
   // ---------------------------------------------------------------------------
   // Sizes
   // ---------------------------------------------------------------------------
-  $modal-sm: 340px,
-  $modal-md: 520px,
-  $modal-lg: 800px,
-  $modal-xl: 1100px
+  $modal-sm: $modal-sm,
+  $modal-md: $modal-md,
+  $modal-lg: $modal-lg,
+  $modal-xl: $modal-xl
 );
 
 // =============================================================================
@@ -91,7 +154,7 @@
 
   // Content container — entrance animation
   &__content {
-    animation: modal-slide-in 0.3s cubic-bezier(0.23, 1, 0.32, 1) both;
+    animation: modal-slide-in tok.$transition-duration tok.$easing both;
   }
 }
 

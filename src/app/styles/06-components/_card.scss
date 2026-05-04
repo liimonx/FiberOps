@@ -9,6 +9,106 @@
  * @see https://atomix.design/docs/components/card
  */
 
+@use "../01-settings/tokens" as tok;
+
+// =============================================================================
+// Component Variable Definitions
+// =============================================================================
+
+  // ---------------------------------------------------------------------------
+  // Base padding (md default)
+  // ---------------------------------------------------------------------------
+  // $card-spacer-y: 1.25rem,
+  // // 20px
+  // $card-spacer-x: 1.25rem,
+  // 20px
+  // ---------------------------------------------------------------------------
+  // Row-layout inner spacing
+  // ---------------------------------------------------------------------------
+  $card-row-spacer-y: 0.875rem !default;
+
+  // 14px
+  $card-row-spacer-x: 0.875rem !default;
+
+
+  // 14px
+  // ---------------------------------------------------------------------------
+  // Internal vertical rhythm
+  // ---------------------------------------------------------------------------
+  $card-title-spacer-y: 0.375rem !default;
+
+  //  6px — tighter title → text gap
+  $card-action-spacer-y: 0.875rem !default;
+
+  // 14px
+  $card-header-spacer-y: 0.875rem !default;
+
+
+  // 14px
+  // ---------------------------------------------------------------------------
+  // Typography
+  // ---------------------------------------------------------------------------
+  $card-title-color: var(--atomix-body-color) !default;
+
+  $card-title-font-size: 1rem !default;
+
+  // 16px — clear heading
+  $card-text-color: var(--atomix-secondary-text-emphasis) !default;
+
+  $card-text-font-size: 0.875rem !default;
+
+
+  // 14px
+  // ---------------------------------------------------------------------------
+  // Border
+  // ---------------------------------------------------------------------------
+  $card-border-width: 1px !default;
+
+  $card-border-color: var(--atomix-border-color) !default;
+
+  $card-border-radius: tok.$border-radius-xxl !default;
+
+  // 16px — modern rounded card
+  $card-image-border-radius: tok.$border-radius-xl !default;
+
+
+  // 12px — tighter image corners
+  // ---------------------------------------------------------------------------
+  // Shadows
+  // ---------------------------------------------------------------------------
+  $card-boxshadow: tok.$box-shadow !default;
+
+  $card-hover-box-shadow: tok.$box-shadow-md !default;
+
+
+  // ---------------------------------------------------------------------------
+  // Surfaces
+  // ---------------------------------------------------------------------------
+  $card-bg: var(--atomix-primary-bg-subtle) !default;
+
+  $card-bg-hover: var(--atomix-secondary-bg-subtle) !default;
+
+  $card-height: null !default;
+
+  $card-width: 100% !default;
+
+
+  // ---------------------------------------------------------------------------
+  // Icon slot
+  // ---------------------------------------------------------------------------
+  $card-icon-size: 16px !default;
+
+  $card-icon-padding: 0.75rem !default;
+
+  $card-icon-bg: var(--atomix-brand-bg-subtle) !default;
+
+  $card-icon-color: var(--atomix-brand-text-emphasis) !default;
+
+  // ---------------------------------------------------------------------------
+  // Enable hover background swap
+  // ---------------------------------------------------------------------------
+  $card-hover: false !default; // Hover handled additively below for more control
+
 // =============================================================================
 // Card Variable Configuration
 // =============================================================================
@@ -24,72 +124,66 @@
   // ---------------------------------------------------------------------------
   // Row-layout inner spacing
   // ---------------------------------------------------------------------------
-  $card-row-spacer-y: 0.875rem,
+  $card-row-spacer-y: $card-row-spacer-y,
   // 14px
-  $card-row-spacer-x: 0.875rem,
+  $card-row-spacer-x: $card-row-spacer-x,
 
   // 14px
   // ---------------------------------------------------------------------------
   // Internal vertical rhythm
   // ---------------------------------------------------------------------------
-  $card-title-spacer-y: 0.375rem,
+  $card-title-spacer-y: $card-title-spacer-y,
   //  6px — tighter title → text gap
-  $card-action-spacer-y: 0.875rem,
+  $card-action-spacer-y: $card-action-spacer-y,
   // 14px
-  $card-header-spacer-y: 0.875rem,
+  $card-header-spacer-y: $card-header-spacer-y,
 
   // 14px
   // ---------------------------------------------------------------------------
   // Typography
   // ---------------------------------------------------------------------------
-  $card-title-color: var(--atomix-body-color),
-  $card-title-font-size: 1rem,
+  $card-title-color: $card-title-color,
+  $card-title-font-size: $card-title-font-size,
   // 16px — clear heading
-  $card-text-color: var(--atomix-secondary-text-emphasis),
-  $card-text-font-size: 0.875rem,
+  $card-text-color: $card-text-color,
+  $card-text-font-size: $card-text-font-size,
 
   // 14px
   // ---------------------------------------------------------------------------
   // Border
   // ---------------------------------------------------------------------------
-  $card-border-width: 1px,
-  $card-border-color: var(--atomix-border-color),
-  $card-border-radius: 1rem,
+  $card-border-width: $card-border-width,
+  $card-border-color: $card-border-color,
+  $card-border-radius: $card-border-radius,
   // 16px — modern rounded card
-  $card-image-border-radius: 0.75rem,
+  $card-image-border-radius: $card-image-border-radius,
 
   // 12px — tighter image corners
   // ---------------------------------------------------------------------------
   // Shadows
   // ---------------------------------------------------------------------------
-  $card-boxshadow: (
-      0 2px 8px -2px rgba(2, 6, 23, 0.1),
-      0 1px 3px -1px rgba(2, 6, 23, 0.06)
-    ),
-  $card-hover-box-shadow: (
-    0 12px 28px -6px rgba(2, 6, 23, 0.15),
-    0 4px 10px -4px rgba(2, 6, 23, 0.1)
-  ),
+  $card-boxshadow: $card-boxshadow,
+  $card-hover-box-shadow: $card-hover-box-shadow,
 
   // ---------------------------------------------------------------------------
   // Surfaces
   // ---------------------------------------------------------------------------
-  $card-bg: var(--atomix-primary-bg-subtle),
-  $card-bg-hover: var(--atomix-secondary-bg-subtle),
-  $card-height: null,
-  $card-width: 100%,
+  $card-bg: $card-bg,
+  $card-bg-hover: $card-bg-hover,
+  $card-height: $card-height,
+  $card-width: $card-width,
 
   // ---------------------------------------------------------------------------
   // Icon slot
   // ---------------------------------------------------------------------------
-  $card-icon-size: 16px,
-  $card-icon-padding: 0.75rem,
-  $card-icon-bg: var(--atomix-brand-bg-subtle),
-  $card-icon-color: var(--atomix-brand-text-emphasis),
+  $card-icon-size: $card-icon-size,
+  $card-icon-padding: $card-icon-padding,
+  $card-icon-bg: $card-icon-bg,
+  $card-icon-color: $card-icon-color,
   // ---------------------------------------------------------------------------
   // Enable hover background swap
   // ---------------------------------------------------------------------------
-  $card-hover: false // Hover handled additively below for more control
+  $card-hover: $card-hover
 );
 
 // =============================================================================
@@ -98,10 +192,10 @@
 .c-card {
   // Global transition — covers all variant interactions
   transition:
-    background-color 0.3s cubic-bezier(0.23, 1, 0.32, 1),
-    border-color 0.3s cubic-bezier(0.23, 1, 0.32, 1),
-    box-shadow 0.3s cubic-bezier(0.23, 1, 0.32, 1),
-    transform 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+    background-color tok.$transition-duration tok.$easing,
+    border-color tok.$transition-duration tok.$easing,
+    box-shadow tok.$transition-duration tok.$easing,
+    transform tok.$transition-duration tok.$easing;
 
   // --------------------------------------------------------------------------
   // Title — refined line-height and weight
@@ -130,8 +224,8 @@
   // Icon slot — round container
   // --------------------------------------------------------------------------
   &__icon {
-    border-radius: 0.75rem;
-    transition: background-color 0.15s cubic-bezier(0.23, 1, 0.32, 1);
+    border-radius: tok.$border-radius-xl;
+    transition: background-color tok.$transition-duration tok.$easing;
   }
 
   // --------------------------------------------------------------------------
@@ -143,15 +237,13 @@
 
     &:hover:not(&--disabled) {
       transform: translateY(-2px);
-      box-shadow:
-        0 12px 28px -6px rgba(2, 6, 23, 0.15),
-        0 4px 10px -4px rgba(2, 6, 23, 0.1);
+      box-shadow: tok.$box-shadow-md;
       background-color: var(--atomix-secondary-bg-subtle);
     }
 
     &:active:not(&--disabled) {
       transform: translateY(0);
-      box-shadow: 0 2px 8px -2px rgba(2, 6, 23, 0.1);
+      box-shadow: tok.$box-shadow;
     }
   }
 
@@ -159,9 +251,7 @@
   // Elevated — resting shadow (additive on top of --elevated modifier)
   // --------------------------------------------------------------------------
   &--elevated {
-    box-shadow:
-      0 12px 28px -6px rgba(2, 6, 23, 0.15),
-      0 4px 10px -4px rgba(2, 6, 23, 0.1);
+    box-shadow: tok.$box-shadow-md;
   }
 
   // --------------------------------------------------------------------------

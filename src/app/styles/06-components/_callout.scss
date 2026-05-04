@@ -8,6 +8,93 @@
  * @see https://atomix.design/docs/components/callout
  */
 
+@use "../01-settings/tokens" as tok;
+
+// =============================================================================
+// Component Variable Definitions
+// =============================================================================
+
+  // ---------------------------------------------------------------------------
+  // Container
+  // ---------------------------------------------------------------------------
+  $callout-width: 100% !default;
+
+  $callout-padding-x: 16px !default;
+
+  $callout-padding-y: 14px !default;
+
+  $callout-bg: var(--atomix-primary-bg-subtle) !default;
+
+  $callout-border-radius: 0.875rem !default;
+
+  $callout-border-color: var(--atomix-border-color) !default;
+
+  $callout-border-width: 1px !default;
+
+  $callout-box-shadow: tok.$box-shadow-sm !default;
+
+
+  // ---------------------------------------------------------------------------
+  // Title
+  // ---------------------------------------------------------------------------
+  $callout-title-font-size: 0.9375rem !default;
+
+  // 15px
+  $callout-title-font-weight: 700 !default;
+
+  $callout-title-color: var(--atomix-body-color) !default;
+
+  // ---------------------------------------------------------------------------
+  // Body text
+  // ---------------------------------------------------------------------------
+  $callout-text-font-size: 0.875rem !default;
+
+  // 14px
+  $callout-text-font-weight: 400 !default;
+
+  $callout-text-color: var(--atomix-secondary-text-emphasis) !default;
+
+  // ---------------------------------------------------------------------------
+  // Message spacer
+  // ---------------------------------------------------------------------------
+  $callout-message-spacer: 10px !default;
+
+
+  // ---------------------------------------------------------------------------
+  // Icon
+  // ---------------------------------------------------------------------------
+  $callout-icon-size: 20px !default;
+
+  $callout-icon-color: var(--atomix-primary) !default;
+
+  // ---------------------------------------------------------------------------
+  // Close button
+  // ---------------------------------------------------------------------------
+  $callout-close-btn-size: 20px !default;
+
+
+  // ---------------------------------------------------------------------------
+  // Actions
+  // ---------------------------------------------------------------------------
+  $callout-actions-spacer: 8px !default;
+
+  $callout-actions-spacer-y: 12px !default;
+
+
+  // ---------------------------------------------------------------------------
+  // Toast-specific padding
+  // ---------------------------------------------------------------------------
+  $callout-tost-padding-x: 16px !default;
+
+  $callout-tost-padding-y: 14px !default;
+
+  $callout-toast-bg: var(--atomix-primary-bg-subtle) !default;
+
+  // ---------------------------------------------------------------------------
+  // Toast z-index
+  // ---------------------------------------------------------------------------
+  $callout-toast-z-index: 1050 !default;
+
 // =============================================================================
 // Callout Variable Configuration
 // =============================================================================
@@ -16,63 +103,60 @@
   // ---------------------------------------------------------------------------
   // Container
   // ---------------------------------------------------------------------------
-  $callout-width: 100%,
-  $callout-padding-x: 16px,
-  $callout-padding-y: 14px,
-  $callout-bg: var(--atomix-primary-bg-subtle),
-  $callout-border-radius: 0.875rem,
-  $callout-border-color: var(--atomix-border-color),
-  $callout-border-width: 1px,
-  $callout-box-shadow: (
-    0 4px 12px -2px rgba(0, 0, 0, 0.08),
-    0 2px 4px -1px rgba(0, 0, 0, 0.06)
-  ),
+  $callout-width: $callout-width,
+  $callout-padding-x: $callout-padding-x,
+  $callout-padding-y: $callout-padding-y,
+  $callout-bg: $callout-bg,
+  $callout-border-radius: $callout-border-radius,
+  $callout-border-color: $callout-border-color,
+  $callout-border-width: $callout-border-width,
+  $callout-box-shadow: $callout-box-shadow,
 
   // ---------------------------------------------------------------------------
   // Title
   // ---------------------------------------------------------------------------
-  $callout-title-font-size: 0.9375rem,
+  $callout-title-font-size: $callout-title-font-size,
   // 15px
-  $callout-title-font-weight: 700,
-  $callout-title-color: var(--atomix-body-color),
+  $callout-title-font-weight: $callout-title-font-weight,
+  $callout-title-color: $callout-title-color,
   // ---------------------------------------------------------------------------
   // Body text
   // ---------------------------------------------------------------------------
-  $callout-text-font-size: 0.875rem,
+  $callout-text-font-size: $callout-text-font-size,
   // 14px
-  $callout-text-font-weight: 400,
-  $callout-text-color: var(--atomix-secondary-text-emphasis),
+  $callout-text-font-weight: $callout-text-font-weight,
+  $callout-text-color: $callout-text-color,
   // ---------------------------------------------------------------------------
   // Message spacer
   // ---------------------------------------------------------------------------
-  $callout-message-spacer: 10px,
+  $callout-message-spacer: $callout-message-spacer,
 
   // ---------------------------------------------------------------------------
   // Icon
   // ---------------------------------------------------------------------------
-  $callout-icon-size: 20px,
-  $callout-icon-color: var(--atomix-primary),
+  $callout-icon-size: $callout-icon-size,
+  $callout-icon-color: $callout-icon-color,
   // ---------------------------------------------------------------------------
   // Close button
   // ---------------------------------------------------------------------------
-  $callout-close-btn-size: 20px,
+  $callout-close-btn-size: $callout-close-btn-size,
 
   // ---------------------------------------------------------------------------
   // Actions
   // ---------------------------------------------------------------------------
-  $callout-actions-spacer: 8px,
-  $callout-actions-spacer-y: 12px,
+  $callout-actions-spacer: $callout-actions-spacer,
+  $callout-actions-spacer-y: $callout-actions-spacer-y,
 
   // ---------------------------------------------------------------------------
   // Toast-specific padding
   // ---------------------------------------------------------------------------
-  $callout-tost-padding-x: 16px,
-  $callout-tost-padding-y: 14px,
-  $callout-toast-bg: var(--atomix-primary-bg-subtle),
+  $callout-tost-padding-x: $callout-tost-padding-x,
+  $callout-tost-padding-y: $callout-tost-padding-y,
+  $callout-toast-bg: $callout-toast-bg,
   // ---------------------------------------------------------------------------
   // Toast z-index
   // ---------------------------------------------------------------------------
-  $callout-toast-z-index: 1050
+  $callout-toast-z-index: $callout-toast-z-index
 );
 
 // =============================================================================
@@ -100,7 +184,7 @@
 
   // Toast — entrance slide
   &--toast {
-    animation: callout-in 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation: callout-in tok.$transition-duration tok.$easing-out both;
   }
 }
 

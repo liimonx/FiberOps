@@ -8,37 +8,46 @@
  * @see https://atomix.design/docs/components/avatar
  */
 
+@use "../01-settings/tokens" as tok;
+
 // =============================================================================
-// Avatar Variable Configuration
+// Component Variable Definitions
 // =============================================================================
-@use "../../../../node_modules/@shohojdhara/atomix/src/styles/01-settings/settings.avatar"
-  with (
+
   // ---------------------------------------------------------------------------
   // Size map — xs / sm / md / lg / xl
   // ---------------------------------------------------------------------------
-  $avatar-size: (xs: 24px, sm: 32px, md: 40px, lg: 48px, xl: 64px),
+  $avatar-size: (xs: 24px, sm: 32px, md: 40px, lg: 48px, xl: 64px) !default;
+
 
   // ---------------------------------------------------------------------------
   // Border radius map — same keys
   // ---------------------------------------------------------------------------
-  $avatar-border-radius: (xs: 4px, sm: 6px, md: 8px, lg: 10px, xl: 12px, circle: 50%),
+  $avatar-border-radius: (xs: 4px, sm: 6px, md: 8px, lg: 10px, xl: 12px, circle: 50%) !default;
+
 
   // ---------------------------------------------------------------------------
   // Colors
   // ---------------------------------------------------------------------------
-  $avatar-color: var(--atomix-body-color),
-  $avatar-bg: var(--atomix-secondary-bg-subtle),
-  $avatar-border-width: 2px,
-  $avatar-border-color: var(--atomix-border-color),
+  $avatar-color: var(--atomix-body-color) !default;
+
+  $avatar-bg: var(--atomix-secondary-bg-subtle) !default;
+
+  $avatar-border-width: 2px !default;
+
+  $avatar-border-color: var(--atomix-border-color) !default;
+
   // ---------------------------------------------------------------------------
   // Image fit
   // ---------------------------------------------------------------------------
-  $avatar-fit: cover,
+  $avatar-fit: cover !default;
+
 
   // ---------------------------------------------------------------------------
   // Initials typography
   // ---------------------------------------------------------------------------
-  $avatar-initials-font-weight: 700,
+  $avatar-initials-font-weight: 700 !default;
+
   $avatar-initials-font-size: (
     xs: 0.625rem,
     // 10px
@@ -50,15 +59,60 @@
     // 16px
     xl: 1.25rem,
     // 20px
-  ),
+  ) !default;
+
 
   // ---------------------------------------------------------------------------
   // Interactive states
   // ---------------------------------------------------------------------------
-  $avatar-hover-opacity: 0.85,
-  $avatar-focus-ring-width: 2px,
-  $avatar-focus-ring-color: var(--atomix-primary),
-  $avatar-disabled-opacity: 0.45
+  $avatar-hover-opacity: 0.85 !default;
+
+  $avatar-focus-ring-width: 2px !default;
+
+  $avatar-focus-ring-color: var(--atomix-primary) !default;
+
+  $avatar-disabled-opacity: 0.45 !default;
+
+// =============================================================================
+// Avatar Variable Configuration
+// =============================================================================
+@use "../../../../node_modules/@shohojdhara/atomix/src/styles/01-settings/settings.avatar"
+  with (
+  // ---------------------------------------------------------------------------
+  // Size map — xs / sm / md / lg / xl
+  // ---------------------------------------------------------------------------
+  $avatar-size: $avatar-size,
+
+  // ---------------------------------------------------------------------------
+  // Border radius map — same keys
+  // ---------------------------------------------------------------------------
+  $avatar-border-radius: $avatar-border-radius,
+
+  // ---------------------------------------------------------------------------
+  // Colors
+  // ---------------------------------------------------------------------------
+  $avatar-color: $avatar-color,
+  $avatar-bg: $avatar-bg,
+  $avatar-border-width: $avatar-border-width,
+  $avatar-border-color: $avatar-border-color,
+  // ---------------------------------------------------------------------------
+  // Image fit
+  // ---------------------------------------------------------------------------
+  $avatar-fit: $avatar-fit,
+
+  // ---------------------------------------------------------------------------
+  // Initials typography
+  // ---------------------------------------------------------------------------
+  $avatar-initials-font-weight: $avatar-initials-font-weight,
+  $avatar-initials-font-size: $avatar-initials-font-size,
+
+  // ---------------------------------------------------------------------------
+  // Interactive states
+  // ---------------------------------------------------------------------------
+  $avatar-hover-opacity: $avatar-hover-opacity,
+  $avatar-focus-ring-width: $avatar-focus-ring-width,
+  $avatar-focus-ring-color: $avatar-focus-ring-color,
+  $avatar-disabled-opacity: $avatar-disabled-opacity
 );
 
 // =============================================================================
@@ -77,7 +131,7 @@
 
     &:hover {
       transform: scale(1.05);
-      box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.2);
+      box-shadow: tok.$box-shadow-sm;
     }
 
     &:active {

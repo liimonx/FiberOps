@@ -38,61 +38,62 @@
   $font-weight-black: 900,
 
   // ── Base Font Size ────────────────────────────────────────────────────────
-  // 14px base for high-density, compact UI
+  // 14px base for high-density, compact UI (matches body-md)
   $font-size-base: 0.875rem,
 
   // ── Fluid Type Scale (rem) ────────────────────────────────────────────────
-  $font-size-xs: 0.625rem,
-  // 10px — micro-labels, timestamps
-  $font-size-sm: 0.75rem,
-  // 12px — secondary labels, metadata
+  $font-size-xs: 0.6875rem,
+  // 11px (matches label-caps)
+  $font-size-sm: 0.8125rem,
+  // 13px (matches body-sm)
   $font-size-md: 0.875rem,
-  // 14px — standard UI text
+  // 14px (matches body-md)
   $font-size-lg: 1rem,
-  // 16px — comfortable sub-headings
-  $font-size-xl: 1.125rem,
-  // 18px — prominent UI titles
-  // ── Heading Sizes ─────────────────────────────────────────────────────────
-  // Adjusted for a tighter, compact ramp
-  $h1-font-size: 2rem,
-  // 32px
-  $h2-font-size: 1.75rem,
-  // 28px
-  $h3-font-size: 1.5rem,
-  // 24px
-  $h4-font-size: 1.25rem,
-  // 20px
-  $h5-font-size: 1rem,
   // 16px
-  $h6-font-size: 0.875rem,
-  // 14px
-  // ── Display Sizes ─────────────────────────────────────────────────────────
-  $display-1: 3.25rem,
+  $font-size-xl: 1.125rem,
 
-  // 52px — hero headlines
+  // 18px (matches title-sm)
+  // ── Heading Sizes ─────────────────────────────────────────────────────────
+  $h1-font-size: 2.25rem,
+  // 36px (matches display-lg)
+  $h2-font-size: 1.5rem,
+  // 24px (matches headline-md)
+  $h3-font-size: 1.125rem,
+  // 18px (matches title-sm)
+  $h4-font-size: 0.875rem,
+  // 14px (matches body-md)
+  $h5-font-size: 0.8125rem,
+  // 13px (matches body-sm)
+  $h6-font-size: 0.6875rem,
+  // 11px (matches label-caps)
+  // ── Display Sizes ─────────────────────────────────────────────────────────
+  $display-1: 2.25rem,
+
+  // 36px (matches display-lg)
   // ── Line Heights ──────────────────────────────────────────────────────────
-  $line-height-base: 1.5,
-  // optimal for compact body copy
-  $line-height-sm: 1.4,
-  // tight for labels/metadata
+  $line-height-base: 1.4285,
+  // 20/14 (matches body-md)
+  $line-height-sm: 1.3846,
+  // 18/13 (matches body-sm)
   $line-height-lg: 1.6,
 
-  // airy for long-form content
   // ── Heading Defaults ──────────────────────────────────────────────────────
   $headings-font-weight: 700,
-  $headings-line-height: 1.2,
-  // tight for large display text
+  $headings-line-height: 1.22,
+  // 44/36 (matches display-lg)
   $headings-margin-bottom: 0,
 
   // ── Letter Spacing (via heading-specific vars) ────────────────────────────
-  $h1-letter-spaceing: -0.04em,
-  // ultra-tight for display
-  $h2-letter-spaceing: -0.03em,
-  $h3-letter-spaceing: -0.02em,
-  $h4-letter-spaceing: -0.01em,
-  $h5-letter-spaceing: -0.005em,
-  $h6-letter-spaceing: 0em,
+  $h1-letter-spaceing: -0.02em,
+  // matches display-lg
+  $h2-letter-spaceing: -0.01em,
+  // matches headline-md
+  $h3-letter-spaceing: 0em,
+  $h4-letter-spaceing: 0em,
+  $h5-letter-spaceing: 0em,
+  $h6-letter-spaceing: 0.05em,
 
+  // matches label-caps
   // ── Paragraph ─────────────────────────────────────────────────────────────
   $paragraph-margin-bottom: 0
 );

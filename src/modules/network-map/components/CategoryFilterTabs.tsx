@@ -55,7 +55,11 @@ export const CategoryFilterTabs: React.FC<CategoryFilterTabsProps> = ({
             }}
           >
             <span className="u-text-capitalize">{config.label}</span>
-            <Badge label={`${count}`} variant={isActive ? "primary" : "secondary"} size="sm" className="u-ms-2" />
+            <Badge
+              label={`${count}`}
+              variant={isActive ? "primary" : "secondary"}
+              size="sm"
+            />
           </Button>
         );
       })}

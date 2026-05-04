@@ -326,8 +326,10 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({ onMapLoad, onMapError }) =
         }
       };
     } catch (error) {
-      setMapError(error instanceof Error ? error.message : "Failed to init map");
-      setMapLoading(false);
+      setTimeout(() => {
+        setMapError(error instanceof Error ? error.message : "Failed to init map");
+        setMapLoading(false);
+      }, 0);
     }
   }, []);
 

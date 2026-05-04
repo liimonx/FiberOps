@@ -1,0 +1,51 @@
+/**
+ * Design Tokens — Re-usable Sass Variables
+ * =============================================================================
+ *
+ * Pure Sass variable definitions that can be @used across any component SCSS
+ * file via `@use "../01-settings/tokens" as tok;`.
+ *
+ * These mirror the values configured in the individual settings partials
+ * (_shadows, _borders, _transitions) so that component files have a single,
+ * authoritative source for all design primitives.
+ *
+ * @see _shadows.scss, _borders.scss, _transitions.scss
+ */
+
+// ── Transitions ────────────────────────────────────────────────────────────
+$transition-duration:      0.3s                            !default;
+$transition-duration-fast: 0.15s                           !default;
+$transition-duration-slow: 0.5s                            !default;
+$easing:                   cubic-bezier(0.23, 1, 0.32, 1) !default;
+$easing-out:               cubic-bezier(0.16, 1, 0.3, 1)  !default;
+$transition-base:          all 0.3s cubic-bezier(0.23, 1, 0.32, 1) !default;
+$transition-fast:          all 0.15s cubic-bezier(0.23, 1, 0.32, 1) !default;
+$transition-slow:          all 0.5s cubic-bezier(0.23, 1, 0.32, 1) !default;
+
+// ── Box Shadows ────────────────────────────────────────────────────────────
+$box-shadow:       (0 2px 8px -2px rgba(2, 6, 23, 0.1), 0 1px 3px -1px rgba(2, 6, 23, 0.06)) !default;
+$box-shadow-xs:    (0 1px 2px 0 rgba(2, 6, 23, 0.05))                                          !default;
+$box-shadow-sm:    (0 3px 8px -2px rgba(2, 6, 23, 0.12), 0 1px 4px -1px rgba(2, 6, 23, 0.08)) !default;
+$box-shadow-md:    (0 12px 28px -6px rgba(2, 6, 23, 0.15), 0 4px 10px -4px rgba(2, 6, 23, 0.1)) !default;
+$box-shadow-lg:    (0 24px 54px -10px rgba(2, 6, 23, 0.2), 0 10px 20px -8px rgba(2, 6, 23, 0.12), 0 0px 0px 1px rgba(2, 6, 23, 0.04)) !default;
+$box-shadow-xl:    (0 40px 80px -16px rgba(2, 6, 23, 0.3), 0 16px 40px -12px rgba(2, 6, 23, 0.16)) !default;
+$box-shadow-inset: (inset 0 2px 6px 0 rgba(2, 6, 23, 0.08), inset 0 1px 3px 0 rgba(2, 6, 23, 0.05)) !default;
+
+// ── Focus / Error Rings ────────────────────────────────────────────────────
+$input-focus-ring: 0 0 0 3px rgba(6, 182, 212, 0.18)  !default; // primary cyan
+$input-error-ring: 0 0 0 3px rgba(225, 29, 72, 0.16)  !default; // red-6
+
+// ── Border Radii ───────────────────────────────────────────────────────────
+$border-radius:      0.25rem  !default;
+$border-radius-sm:   0.125rem !default;
+$border-radius-md:   0.375rem !default;
+$border-radius-lg:   0.5rem   !default;
+$border-radius-xl:   0.75rem  !default;
+$border-radius-xxl:  1.25rem  !default;
+$border-radius-3xl:  1.75rem  !default;
+$border-radius-4xl:  2.25rem  !default;
+$border-radius-pill: 9999px   !default;
+
+// ── Colors ──────────────────────────────────────────────────────────────────
+$white: #ffffff !default;
+$black: #000000 !default;

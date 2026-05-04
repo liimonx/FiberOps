@@ -8,6 +8,64 @@
  * @see https://atomix.design/docs/components/checkbox
  */
 
+@use "../01-settings/tokens" as tok;
+
+// =============================================================================
+// Component Variable Definitions
+// =============================================================================
+
+  // ---------------------------------------------------------------------------
+  // Geometry
+  // ---------------------------------------------------------------------------
+  $checkbox-width: 16px !default;
+
+  $checkbox-height: 16px !default;
+
+  $checkbox-spacer: 6px !default;
+
+
+  // ---------------------------------------------------------------------------
+  // Typography
+  // ---------------------------------------------------------------------------
+  $checkbox-font-size: 0.8125rem !default;
+
+
+  // 13px
+  // ---------------------------------------------------------------------------
+  // Text colors
+  // ---------------------------------------------------------------------------
+  $checkbox-text-color: var(--atomix-body-color) !default;
+
+  $checkbox-checked-text-color: var(--atomix-body-color) !default;
+
+  $checkbox-text-color-disabled: var(--atomix-tertiary-text-emphasis) !default;
+
+  $checkbox-checked-text-color-disabled: var(--atomix-disabled-text-emphasis) !default;
+
+  // ---------------------------------------------------------------------------
+  // Box colours
+  // ---------------------------------------------------------------------------
+  $checkbox-bg: var(--atomix-primary-bg-subtle) !default;
+
+  $checkbox-checked-bg: var(--atomix-primary) !default;
+
+  $checkbox-checked-bg-hover: var(--atomix-primary-hover, var(--atomix-primary)) !default;
+
+  $checkbox-checked-bg-disabled: var(--atomix-disabled-text-emphasis) !default;
+
+  // ---------------------------------------------------------------------------
+  // Border
+  // ---------------------------------------------------------------------------
+  $checkbox-border-width: 1px !default;
+
+  $checkbox-border-color: var(--atomix-border-color) !default;
+
+  $checkbox-border-color-hover: var(--atomix-primary) !default;
+
+  $checkbox-border-color-disabled: var(--atomix-disabled-text-emphasis) !default;
+
+  $checkbox-border-color-error: var(--atomix-error) !default;
+
 // =============================================================================
 // Checkbox Variable Configuration
 // =============================================================================
@@ -16,38 +74,38 @@
   // ---------------------------------------------------------------------------
   // Geometry
   // ---------------------------------------------------------------------------
-  $checkbox-width: 16px,
-  $checkbox-height: 16px,
-  $checkbox-spacer: 6px,
+  $checkbox-width: $checkbox-width,
+  $checkbox-height: $checkbox-height,
+  $checkbox-spacer: $checkbox-spacer,
 
   // ---------------------------------------------------------------------------
   // Typography
   // ---------------------------------------------------------------------------
-  $checkbox-font-size: 0.8125rem,
+  $checkbox-font-size: $checkbox-font-size,
 
   // 13px
   // ---------------------------------------------------------------------------
   // Text colors
   // ---------------------------------------------------------------------------
-  $checkbox-text-color: var(--atomix-body-color),
-  $checkbox-checked-text-color: var(--atomix-body-color),
-  $checkbox-text-color-disabled: var(--atomix-tertiary-text-emphasis),
-  $checkbox-checked-text-color-disabled: var(--atomix-disabled-text-emphasis),
+  $checkbox-text-color: $checkbox-text-color,
+  $checkbox-checked-text-color: $checkbox-checked-text-color,
+  $checkbox-text-color-disabled: $checkbox-text-color-disabled,
+  $checkbox-checked-text-color-disabled: $checkbox-checked-text-color-disabled,
   // ---------------------------------------------------------------------------
   // Box colours
   // ---------------------------------------------------------------------------
-  $checkbox-bg: var(--atomix-primary-bg-subtle),
-  $checkbox-checked-bg: var(--atomix-primary),
-  $checkbox-checked-bg-hover: var(--atomix-primary-hover, var(--atomix-primary)),
-  $checkbox-checked-bg-disabled: var(--atomix-disabled-text-emphasis),
+  $checkbox-bg: $checkbox-bg,
+  $checkbox-checked-bg: $checkbox-checked-bg,
+  $checkbox-checked-bg-hover: $checkbox-checked-bg-hover,
+  $checkbox-checked-bg-disabled: $checkbox-checked-bg-disabled,
   // ---------------------------------------------------------------------------
   // Border
   // ---------------------------------------------------------------------------
-  $checkbox-border-width: 1px,
-  $checkbox-border-color: var(--atomix-border-color),
-  $checkbox-border-color-hover: var(--atomix-primary),
-  $checkbox-border-color-disabled: var(--atomix-disabled-text-emphasis),
-  $checkbox-border-color-error: var(--atomix-error)
+  $checkbox-border-width: $checkbox-border-width,
+  $checkbox-border-color: $checkbox-border-color,
+  $checkbox-border-color-hover: $checkbox-border-color-hover,
+  $checkbox-border-color-disabled: $checkbox-border-color-disabled,
+  $checkbox-border-color-error: $checkbox-border-color-error
 );
 
 // =============================================================================
@@ -74,7 +132,7 @@
   &__input:focus-visible {
     outline: 2px solid var(--atomix-primary);
     outline-offset: 2px;
-    box-shadow: 0 0 0 3px rgba(var(--atomix-primary-rgb, 6, 182, 212), 0.16);
+    box-shadow: tok.$input-focus-ring;
   }
 
   // Hover — border lift
@@ -86,14 +144,14 @@
   // Checked — bounce tick
   &.is-checked &__box,
   &__input:checked + &__box {
-    box-shadow: 0 0 0 3px rgba(var(--atomix-primary-rgb, 6, 182, 212), 0.14);
+    box-shadow: tok.$input-focus-ring;
   }
 
   // Error state
   &.is-invalid &__box,
   &__input[aria-invalid="true"] + &__box {
     border-color: var(--atomix-error);
-    box-shadow: 0 0 0 3px rgba(var(--atomix-error-rgb, 239, 68, 68), 0.14);
+    box-shadow: tok.$input-error-ring;
   }
 
   // Label

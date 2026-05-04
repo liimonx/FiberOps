@@ -14,25 +14,18 @@
  * @see https://atomix.design/docs/design-tokens/borders
  */
 
+@use "./tokens" as tok;
+
 @use "../../../../node_modules/@shohojdhara/atomix/src/styles/01-settings/settings.border-radius"
   with (
-  $border-radius: 0.375rem,
-  //  6px — inputs, tags, small buttons
-  $border-radius-sm: 0.1875rem,
-  //  3px — tight chips, code blocks
-  $border-radius-md: 0.5rem,
-  //  8px — standard cards, dropdowns
-  $border-radius-lg: 0.75rem,
-  // 12px — floating panels, tooltips
-  $border-radius-xl: 1rem,
-  // 16px — modals, side drawers
-  $border-radius-xxl: 1.25rem,
-  // 20px — large feature cards
-  $border-radius-3xl: 1.75rem,
-  // 28px — display / hero sections
-  $border-radius-4xl: 2.25rem,
-  // 36px — decorative blobs, sheets
-  $border-radius-pill: 9999px,
-  // ∞px  — pills, avatar rings, badges
-  $enable-rounded: true
+  $border-radius:      tok.$border-radius,
+  $border-radius-sm:   tok.$border-radius-sm,
+  $border-radius-md:   tok.$border-radius-md,
+  $border-radius-lg:   tok.$border-radius-lg,
+  $border-radius-xl:   tok.$border-radius-xl,
+  $border-radius-xxl:  tok.$border-radius-xxl,
+  $border-radius-3xl:  tok.$border-radius-3xl,
+  $border-radius-4xl:  tok.$border-radius-4xl,
+  $border-radius-pill: tok.$border-radius-pill,
+  $enable-rounded:     true
 );

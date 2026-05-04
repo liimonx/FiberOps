@@ -8,6 +8,76 @@
  * @see https://atomix.design/docs/components/pagination
  */
 
+@use "../01-settings/tokens" as tok;
+
+// =============================================================================
+// Component Variable Definitions
+// =============================================================================
+
+  // ---------------------------------------------------------------------------
+  // Sizes
+  // ---------------------------------------------------------------------------
+  $pagination-size: 34px !default;
+
+  $pagination-size-sm: 26px !default;
+
+  $pagination-size-lg: 42px !default;
+
+
+  // ---------------------------------------------------------------------------
+  // Spacing
+  // ---------------------------------------------------------------------------
+  $pagination-padding-x: 8px !default;
+
+  $pagination-padding-y: 8px !default;
+
+
+  // ---------------------------------------------------------------------------
+  // Typography
+  // ---------------------------------------------------------------------------
+  $pagination-font-size: 0.875rem !default;
+
+
+  // 14px
+  // ---------------------------------------------------------------------------
+  // Colors — default
+  // ---------------------------------------------------------------------------
+  $pagination-color: var(--atomix-secondary-text-emphasis) !default;
+
+  $pagination-bg: transparent !default;
+
+  $pagination-border-radius: 9999px !default;
+
+
+  // pill
+  // ---------------------------------------------------------------------------
+  // Focus
+  // ---------------------------------------------------------------------------
+  $pagination-focus-border-width: 2px !default;
+
+  $pagination-focus-border-color: var(--atomix-primary) !default;
+
+  // ---------------------------------------------------------------------------
+  // Hover
+  // ---------------------------------------------------------------------------
+  $pagination-hover-color: var(--atomix-body-color) !default;
+
+  $pagination-hover-bg: var(--atomix-secondary-bg-subtle) !default;
+
+  // ---------------------------------------------------------------------------
+  // Active
+  // ---------------------------------------------------------------------------
+  $pagination-active-color: #ffffff !default;
+
+  $pagination-active-bg: var(--atomix-primary) !default;
+
+  // ---------------------------------------------------------------------------
+  // Disabled
+  // ---------------------------------------------------------------------------
+  $pagination-disabled-color: var(--atomix-disabled-text-emphasis) !default;
+
+  $pagination-disabled-bg: transparent !default;
+
 // =============================================================================
 // Pagination Variable Configuration
 // =============================================================================
@@ -16,50 +86,50 @@
   // ---------------------------------------------------------------------------
   // Sizes
   // ---------------------------------------------------------------------------
-  $pagination-size: 34px,
-  $pagination-size-sm: 26px,
-  $pagination-size-lg: 42px,
+  $pagination-size: $pagination-size,
+  $pagination-size-sm: $pagination-size-sm,
+  $pagination-size-lg: $pagination-size-lg,
 
   // ---------------------------------------------------------------------------
   // Spacing
   // ---------------------------------------------------------------------------
-  $pagination-padding-x: 8px,
-  $pagination-padding-y: 8px,
+  $pagination-padding-x: $pagination-padding-x,
+  $pagination-padding-y: $pagination-padding-y,
 
   // ---------------------------------------------------------------------------
   // Typography
   // ---------------------------------------------------------------------------
-  $pagination-font-size: 0.875rem,
+  $pagination-font-size: $pagination-font-size,
 
   // 14px
   // ---------------------------------------------------------------------------
   // Colors — default
   // ---------------------------------------------------------------------------
-  $pagination-color: var(--atomix-secondary-text-emphasis),
-  $pagination-bg: transparent,
-  $pagination-border-radius: 9999px,
+  $pagination-color: $pagination-color,
+  $pagination-bg: $pagination-bg,
+  $pagination-border-radius: $pagination-border-radius,
 
   // pill
   // ---------------------------------------------------------------------------
   // Focus
   // ---------------------------------------------------------------------------
-  $pagination-focus-border-width: 2px,
-  $pagination-focus-border-color: var(--atomix-primary),
+  $pagination-focus-border-width: $pagination-focus-border-width,
+  $pagination-focus-border-color: $pagination-focus-border-color,
   // ---------------------------------------------------------------------------
   // Hover
   // ---------------------------------------------------------------------------
-  $pagination-hover-color: var(--atomix-body-color),
-  $pagination-hover-bg: var(--atomix-secondary-bg-subtle),
+  $pagination-hover-color: $pagination-hover-color,
+  $pagination-hover-bg: $pagination-hover-bg,
   // ---------------------------------------------------------------------------
   // Active
   // ---------------------------------------------------------------------------
-  $pagination-active-color: #ffffff,
-  $pagination-active-bg: var(--atomix-primary),
+  $pagination-active-color: $pagination-active-color,
+  $pagination-active-bg: $pagination-active-bg,
   // ---------------------------------------------------------------------------
   // Disabled
   // ---------------------------------------------------------------------------
-  $pagination-disabled-color: var(--atomix-disabled-text-emphasis),
-  $pagination-disabled-bg: transparent
+  $pagination-disabled-color: $pagination-disabled-color,
+  $pagination-disabled-bg: $pagination-disabled-bg
 );
 
 // =============================================================================
@@ -69,14 +139,14 @@
   // Page item
   &__item {
     transition:
-      background-color 0.16s cubic-bezier(0.4, 0, 0.2, 1),
-      color 0.16s cubic-bezier(0.4, 0, 0.2, 1),
-      transform 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+      background-color tok.$transition-duration-fast tok.$easing,
+      color tok.$transition-duration-fast tok.$easing,
+      transform 0.1s tok.$easing;
 
     // Active — brand filled
     &.is-active {
       font-weight: 700;
-      box-shadow: 0 2px 8px -1px rgba(var(--atomix-primary-rgb, 6, 182, 212), 0.4);
+      box-shadow: tok.$box-shadow-sm;
     }
 
     // Press feedback

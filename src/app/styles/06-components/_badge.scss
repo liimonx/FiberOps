@@ -9,6 +9,44 @@
  */
 
 // =============================================================================
+// Component Variable Definitions
+// =============================================================================
+
+  // ---------------------------------------------------------------------------
+  // Typography
+  // ---------------------------------------------------------------------------
+  $badge-font-size: 0.625rem !default;
+
+  // 10px — micro label
+  $badge-font-weight: 600 !default;
+
+
+  // ---------------------------------------------------------------------------
+  // Padding — base / sm / lg
+  // ---------------------------------------------------------------------------
+  $badge-padding-x: 6px !default;
+
+  $badge-padding-y: 2px !default;
+
+  $badge-padding-y-sm: 1px !default;
+
+  $badge-padding-y-lg: 4px !default;
+
+
+  // ---------------------------------------------------------------------------
+  // Border radius — pill by default
+  // ---------------------------------------------------------------------------
+  $badge-border-radius: 9999px !default;
+
+
+  // ---------------------------------------------------------------------------
+  // Icon
+  // ---------------------------------------------------------------------------
+  $badge-icon-size: 12px !default;
+
+  $badge-inner-items-gap: 3px !default;
+
+// =============================================================================
 // Badge Variable Configuration
 // =============================================================================
 @use "../../../../node_modules/@shohojdhara/atomix/src/styles/01-settings/settings.badge"
@@ -16,28 +54,28 @@
   // ---------------------------------------------------------------------------
   // Typography
   // ---------------------------------------------------------------------------
-  $badge-font-size: 0.625rem,
+  $badge-font-size: $badge-font-size,
   // 10px — micro label
-  $badge-font-weight: 600,
+  $badge-font-weight: $badge-font-weight,
 
   // ---------------------------------------------------------------------------
   // Padding — base / sm / lg
   // ---------------------------------------------------------------------------
-  $badge-padding-x: 6px,
-  $badge-padding-y: 2px,
-  $badge-padding-y-sm: 1px,
-  $badge-padding-y-lg: 4px,
+  $badge-padding-x: $badge-padding-x,
+  $badge-padding-y: $badge-padding-y,
+  $badge-padding-y-sm: $badge-padding-y-sm,
+  $badge-padding-y-lg: $badge-padding-y-lg,
 
   // ---------------------------------------------------------------------------
   // Border radius — pill by default
   // ---------------------------------------------------------------------------
-  $badge-border-radius: 9999px,
+  $badge-border-radius: $badge-border-radius,
 
   // ---------------------------------------------------------------------------
   // Icon
   // ---------------------------------------------------------------------------
-  $badge-icon-size: 12px,
-  $badge-inner-items-gap: 3px
+  $badge-icon-size: $badge-icon-size,
+  $badge-inner-items-gap: $badge-inner-items-gap
 );
 
 // =============================================================================

@@ -10,6 +10,7 @@
  */
 
 @use "sass:map";
+@use "../01-settings/tokens" as tok;
 
 // =============================================================================
 // Button Variable Configuration
@@ -69,22 +70,19 @@
   // ---------------------------------------------------------------------------
   // Border Radius — harmonised with global scale
   // ---------------------------------------------------------------------------
-  $btn-border-radius: 0.625rem,
+  $btn-border-radius: tok.$border-radius-xl,
   // 10px – mid-weight rounded, not pill
-  $btn-border-radius-sm: 0.5rem,
+  $btn-border-radius-sm: tok.$border-radius-lg,
   //  8px
-  $btn-border-radius-lg: 0.75rem,
+  $btn-border-radius-lg: tok.$border-radius-xl,
 
   // 12px
   // ---------------------------------------------------------------------------
   // Shadows — elevation tokens
   // ---------------------------------------------------------------------------
-  $btn-box-shadow: (0 1px 2px 0 rgba(0, 0, 0, 0.05)),
-  $btn-hover-shadow: (
-    0 4px 8px -2px rgba(0, 0, 0, 0.12),
-    0 2px 4px -2px rgba(0, 0, 0, 0.08)
-  ),
-  $btn-active-shadow: (0 1px 2px 0 rgba(0, 0, 0, 0.06)),
+  $btn-box-shadow: tok.$box-shadow-xs,
+  $btn-hover-shadow: tok.$box-shadow-sm,
+  $btn-active-shadow: tok.$box-shadow-xs,
 
   // ---------------------------------------------------------------------------
   // Hover & active micro-transforms
@@ -130,12 +128,12 @@
   // Transition — smooth cubic-bezier across all properties
   // ---------------------------------------------------------------------------
   $btn-transition: (
-      color 0.3s cubic-bezier(0.23, 1, 0.32, 1),
-      background-color 0.3s cubic-bezier(0.23, 1, 0.32, 1),
-      border-color 0.3s cubic-bezier(0.23, 1, 0.32, 1),
-      box-shadow 0.3s cubic-bezier(0.23, 1, 0.32, 1),
-      transform 0.3s cubic-bezier(0.23, 1, 0.32, 1),
-      opacity 0.3s cubic-bezier(0.23, 1, 0.32, 1)
+      color tok.$transition-duration tok.$easing,
+      background-color tok.$transition-duration tok.$easing,
+      border-color tok.$transition-duration tok.$easing,
+      box-shadow tok.$transition-duration tok.$easing,
+      transform tok.$transition-duration tok.$easing,
+      opacity tok.$transition-duration tok.$easing
     ),
 
   // ---------------------------------------------------------------------------
@@ -151,6 +149,31 @@
 // are modified; only additive overrides that extend the component.
 // =============================================================================
 
+// --------------------------------------------------------------------------
+// Secondary button — fix text/bg colour collision
+//
+// Atomix's btn-variant mixin hardcodes `dark-text-emphasis` for the secondary
+// text colour. In light mode the secondary bg is $gray-2 (#f1f5f9) so a dark
+// text works fine, but in dark mode the secondary bg flips to $gray-8
+// (#334155) and `dark-text-emphasis` is still dark — invisible against it.
+//
+// Fix: use explicit light text in dark mode so contrast is always maintained.
+// --------------------------------------------------------------------------
+.c-btn--secondary {
+  // Light mode: dark text on light-gray bg — as expected
+  --atomix-btn-color: var(--atomix-dark-text-emphasis, #1e293b);
+  --atomix-btn-hover-color: var(--atomix-dark-text-emphasis, #1e293b);
+  --atomix-btn-active-color: var(--atomix-dark-text-emphasis, #1e293b);
+}
+
+// Dark mode override — flip to light text so it contrasts against $gray-8 bg
+// Atomix uses `[data-atomix-color-mode='dark']` as the dark-mode attribute
+[data-atomix-color-mode="dark"] .c-btn--secondary {
+  --atomix-btn-color: var(--atomix-primary-text-emphasis, #f1f5f9);
+  --atomix-btn-hover-color: var(--atomix-primary-text-emphasis, #f1f5f9);
+  --atomix-btn-active-color: var(--atomix-primary-text-emphasis, #f1f5f9);
+}
+
 .c-btn {
   // --------------------------------------------------------------------------
   // Lift + shadow interaction layer
@@ -159,14 +182,12 @@
   // --------------------------------------------------------------------------
   &:not(:disabled):not(.c-btn--disabled) {
     &:hover {
-      box-shadow:
-        0 4px 8px -2px rgba(0, 0, 0, 0.12),
-        0 2px 4px -2px rgba(0, 0, 0, 0.08);
+      box-shadow: tok.$box-shadow-sm;
       transform: translateY(-1px);
     }
 
     &:active {
-      box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+      box-shadow: tok.$box-shadow-xs;
       transform: translateY(0);
     }
   }
@@ -184,7 +205,7 @@
   // Loading overlay — glass tint instead of hard white
   // --------------------------------------------------------------------------
   &--loading::before {
-    background-color: rgba(255, 255, 255, 0.35) !important;
+    background-color: rgba(tok.$white, 0.35) !important;
     backdrop-filter: blur(2px);
   }
 

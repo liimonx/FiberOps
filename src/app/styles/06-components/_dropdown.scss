@@ -2,11 +2,94 @@
  * Dropdown Component Variable Overrides
  * =============================================================================
  *
- * Premium dropdown surface: floating glass-tinted background, elevated shadow,
- * brand-tinted hover/active states, and a smooth spring-eased open animation.
+ * Premium dropdown menu: glass-tinted surface, refined item geometry,
+ * subtle shadow depth, and smooth open/close animation.
  *
  * @see https://atomix.design/docs/components/dropdown
  */
+
+@use "../01-settings/tokens" as tok;
+
+// =============================================================================
+// Component Variable Definitions
+// =============================================================================
+
+  // ---------------------------------------------------------------------------
+  // Container
+  // ---------------------------------------------------------------------------
+  $dropdown-min-width: 200px !default;
+
+  $dropdown-font-size: 0.875rem !default;
+
+  // 14px
+  $dropdown-color: var(--atomix-body-color) !default;
+
+  $dropdown-bg: var(--atomix-primary-bg-subtle) !default;
+
+  $dropdown-border-color: var(--atomix-border-color) !default;
+
+  $dropdown-border-radius: tok.$border-radius-xxl !default;
+
+  // 14px — rounder than buttons
+  $dropdown-border-width: 1px !default;
+
+  $dropdown-padding-x: 6px !default;
+
+  $dropdown-padding-y: 6px !default;
+
+  $dropdown-spacer: 4px !default;
+
+  $dropdown-box-shadow: tok.$box-shadow-md !default;
+
+
+  // ---------------------------------------------------------------------------
+  // Items
+  // ---------------------------------------------------------------------------
+  $dropdown-item-padding-x: 10px !default;
+
+  $dropdown-item-padding-y: 8px !default;
+
+  $dropdown-item-hover-color: var(--atomix-body-color) !default;
+
+  $dropdown-item-hover-bg: var(--atomix-secondary-bg-subtle) !default;
+
+  // ---------------------------------------------------------------------------
+  // Link states
+  // ---------------------------------------------------------------------------
+  $dropdown-link-color: var(--atomix-body-color) !default;
+
+  $dropdown-link-hover-color: var(--atomix-brand-text-emphasis) !default;
+
+  $dropdown-link-hover-bg: var(--atomix-brand-bg-subtle) !default;
+
+  $dropdown-link-active-color: var(--atomix-brand-text-emphasis) !default;
+
+  $dropdown-link-active-bg: var(--atomix-brand-bg-subtle) !default;
+
+  $dropdown-link-border-radius: 0.5rem !default;
+
+
+  // ---------------------------------------------------------------------------
+  // Header
+  // ---------------------------------------------------------------------------
+  $dropdown-header-color: var(--atomix-tertiary-text-emphasis) !default;
+
+  $dropdown-header-padding: 6px 10px !default;
+
+
+  // ---------------------------------------------------------------------------
+  // Divider
+  // ---------------------------------------------------------------------------
+  $dropdown-divider-margin-y: 6px !default;
+
+  $dropdown-divider-bg: var(--atomix-border-color) !default;
+
+  // ---------------------------------------------------------------------------
+  // Animation
+  // ---------------------------------------------------------------------------
+  $dropdown-animation-duration: 0.22s !default;
+
+  $dropdown-animation-timing: cubic-bezier(0.16, 1, 0.3, 1) !default;
 
 // =============================================================================
 // Dropdown Variable Configuration
@@ -16,56 +99,53 @@
   // ---------------------------------------------------------------------------
   // Container
   // ---------------------------------------------------------------------------
-  $dropdown-min-width: 200px,
-  $dropdown-font-size: 0.875rem,
+  $dropdown-min-width: $dropdown-min-width,
+  $dropdown-font-size: $dropdown-font-size,
   // 14px
-  $dropdown-color: var(--atomix-body-color),
-  $dropdown-bg: var(--atomix-primary-bg-subtle),
-  $dropdown-border-color: var(--atomix-border-color),
-  $dropdown-border-radius: 0.875rem,
+  $dropdown-color: $dropdown-color,
+  $dropdown-bg: $dropdown-bg,
+  $dropdown-border-color: $dropdown-border-color,
+  $dropdown-border-radius: $dropdown-border-radius,
   // 14px — rounder than buttons
-  $dropdown-border-width: 1px,
-  $dropdown-padding-x: 6px,
-  $dropdown-padding-y: 6px,
-  $dropdown-spacer: 4px,
-  $dropdown-box-shadow: (
-    0 16px 32px -4px rgba(0, 0, 0, 0.14),
-    0 4px 8px -2px rgba(0, 0, 0, 0.08)
-  ),
+  $dropdown-border-width: $dropdown-border-width,
+  $dropdown-padding-x: $dropdown-padding-x,
+  $dropdown-padding-y: $dropdown-padding-y,
+  $dropdown-spacer: $dropdown-spacer,
+  $dropdown-box-shadow: $dropdown-box-shadow,
 
   // ---------------------------------------------------------------------------
   // Items
   // ---------------------------------------------------------------------------
-  $dropdown-item-padding-x: 10px,
-  $dropdown-item-padding-y: 8px,
-  $dropdown-item-hover-color: var(--atomix-body-color),
-  $dropdown-item-hover-bg: var(--atomix-secondary-bg-subtle),
+  $dropdown-item-padding-x: $dropdown-item-padding-x,
+  $dropdown-item-padding-y: $dropdown-item-padding-y,
+  $dropdown-item-hover-color: $dropdown-item-hover-color,
+  $dropdown-item-hover-bg: $dropdown-item-hover-bg,
   // ---------------------------------------------------------------------------
   // Link states
   // ---------------------------------------------------------------------------
-  $dropdown-link-color: var(--atomix-body-color),
-  $dropdown-link-hover-color: var(--atomix-brand-text-emphasis),
-  $dropdown-link-hover-bg: var(--atomix-brand-bg-subtle),
-  $dropdown-link-active-color: var(--atomix-brand-text-emphasis),
-  $dropdown-link-active-bg: var(--atomix-brand-bg-subtle),
-  $dropdown-link-border-radius: 0.5rem,
+  $dropdown-link-color: $dropdown-link-color,
+  $dropdown-link-hover-color: $dropdown-link-hover-color,
+  $dropdown-link-hover-bg: $dropdown-link-hover-bg,
+  $dropdown-link-active-color: $dropdown-link-active-color,
+  $dropdown-link-active-bg: $dropdown-link-active-bg,
+  $dropdown-link-border-radius: $dropdown-link-border-radius,
 
   // ---------------------------------------------------------------------------
   // Header
   // ---------------------------------------------------------------------------
-  $dropdown-header-color: var(--atomix-tertiary-text-emphasis),
-  $dropdown-header-padding: 6px 10px,
+  $dropdown-header-color: $dropdown-header-color,
+  $dropdown-header-padding: $dropdown-header-padding,
 
   // ---------------------------------------------------------------------------
   // Divider
   // ---------------------------------------------------------------------------
-  $dropdown-divider-margin-y: 6px,
-  $dropdown-divider-bg: var(--atomix-border-color),
+  $dropdown-divider-margin-y: $dropdown-divider-margin-y,
+  $dropdown-divider-bg: $dropdown-divider-bg,
   // ---------------------------------------------------------------------------
   // Animation
   // ---------------------------------------------------------------------------
-  $dropdown-animation-duration: 0.22s,
-  $dropdown-animation-timing: cubic-bezier(0.16, 1, 0.3, 1)
+  $dropdown-animation-duration: $dropdown-animation-duration,
+  $dropdown-animation-timing: $dropdown-animation-timing
 );
 
 // =============================================================================
@@ -75,16 +155,16 @@
   // Menu surface — entry animation
   &__menu {
     transform-origin: top center;
-    animation: dropdown-open 0.22s cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation: dropdown-in tok.$transition-duration-fast tok.$easing-out both;
   }
 
   // Individual link item
   &__link,
   &__item {
-    border-radius: 0.5rem;
+    border-radius: tok.$border-radius-lg;
     transition:
-      background-color 0.14s cubic-bezier(0.4, 0, 0.2, 1),
-      color 0.14s cubic-bezier(0.4, 0, 0.2, 1);
+      background-color tok.$transition-duration tok.$easing,
+      color tok.$transition-duration tok.$easing;
     font-weight: 450;
   }
 

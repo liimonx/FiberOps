@@ -9,6 +9,66 @@
  */
 
 // =============================================================================
+// Component Variable Definitions
+// =============================================================================
+
+  // ---------------------------------------------------------------------------
+  // Typography
+  // ---------------------------------------------------------------------------
+  $breadcrumb-font-size: 0.75rem !default;
+
+
+  // 12px — compact trail label
+  // ---------------------------------------------------------------------------
+  // Link geometry
+  // ---------------------------------------------------------------------------
+  $breadcrumb-link-padding-y: 2px !default;
+
+  $breadcrumb-link-padding-x: 0px !default;
+
+  $breadcrumb-link-border-width: 0px !default;
+
+
+  // no underline until hover
+  // ---------------------------------------------------------------------------
+  // Spacing
+  // ---------------------------------------------------------------------------
+  $breadcrumb-items-gap: 6px !default;
+
+  $breadcrumb-margin-bottom: 0px !default;
+
+
+  // ---------------------------------------------------------------------------
+  // Surface
+  // ---------------------------------------------------------------------------
+  $breadcrumb-bg: null !default;
+
+
+  // transparent — inherits container
+  // ---------------------------------------------------------------------------
+  // Colors
+  // ---------------------------------------------------------------------------
+  $breadcrumb-color: var(--atomix-tertiary-text-emphasis) !default;
+
+  $breadcrumb-hover-color: var(--atomix-body-color) !default;
+
+  $breadcrumb-active-color: var(--atomix-body-color) !default;
+
+  // ---------------------------------------------------------------------------
+  // Divider
+  // ---------------------------------------------------------------------------
+  $breadcrumb-divider: "\203A" !default;
+
+  // ›
+  $breadcrumb-divider-size: 12px !default;
+
+  $breadcrumb-divider-gap: 3px !default;
+
+  $breadcrumb-divider-color: var(--atomix-tertiary-text-emphasis) !default;
+
+  $breadcrumb-divider-active-color: var(--atomix-tertiary-text-emphasis) !default;
+
+// =============================================================================
 // Breadcrumb Variable Configuration
 // =============================================================================
 @use "../../../../node_modules/@shohojdhara/atomix/src/styles/01-settings/settings.breadcrumb"
@@ -16,44 +76,44 @@
   // ---------------------------------------------------------------------------
   // Typography
   // ---------------------------------------------------------------------------
-  $breadcrumb-font-size: 0.75rem,
+  $breadcrumb-font-size: $breadcrumb-font-size,
 
   // 12px — compact trail label
   // ---------------------------------------------------------------------------
   // Link geometry
   // ---------------------------------------------------------------------------
-  $breadcrumb-link-padding-y: 2px,
-  $breadcrumb-link-padding-x: 0px,
-  $breadcrumb-link-border-width: 0px,
+  $breadcrumb-link-padding-y: $breadcrumb-link-padding-y,
+  $breadcrumb-link-padding-x: $breadcrumb-link-padding-x,
+  $breadcrumb-link-border-width: $breadcrumb-link-border-width,
 
   // no underline until hover
   // ---------------------------------------------------------------------------
   // Spacing
   // ---------------------------------------------------------------------------
-  $breadcrumb-items-gap: 6px,
-  $breadcrumb-margin-bottom: 0px,
+  $breadcrumb-items-gap: $breadcrumb-items-gap,
+  $breadcrumb-margin-bottom: $breadcrumb-margin-bottom,
 
   // ---------------------------------------------------------------------------
   // Surface
   // ---------------------------------------------------------------------------
-  $breadcrumb-bg: null,
+  $breadcrumb-bg: $breadcrumb-bg,
 
   // transparent — inherits container
   // ---------------------------------------------------------------------------
   // Colors
   // ---------------------------------------------------------------------------
-  $breadcrumb-color: var(--atomix-tertiary-text-emphasis),
-  $breadcrumb-hover-color: var(--atomix-body-color),
-  $breadcrumb-active-color: var(--atomix-body-color),
+  $breadcrumb-color: $breadcrumb-color,
+  $breadcrumb-hover-color: $breadcrumb-hover-color,
+  $breadcrumb-active-color: $breadcrumb-active-color,
   // ---------------------------------------------------------------------------
   // Divider
   // ---------------------------------------------------------------------------
-  $breadcrumb-divider: "\203A",
+  $breadcrumb-divider: $breadcrumb-divider,
   // ›
-  $breadcrumb-divider-size: 12px,
-  $breadcrumb-divider-gap: 3px,
-  $breadcrumb-divider-color: var(--atomix-tertiary-text-emphasis),
-  $breadcrumb-divider-active-color: var(--atomix-tertiary-text-emphasis)
+  $breadcrumb-divider-size: $breadcrumb-divider-size,
+  $breadcrumb-divider-gap: $breadcrumb-divider-gap,
+  $breadcrumb-divider-color: $breadcrumb-divider-color,
+  $breadcrumb-divider-active-color: $breadcrumb-divider-active-color
 );
 
 // =============================================================================

@@ -2,11 +2,98 @@
  * Select Component Variable Overrides
  * =============================================================================
  *
- * Premium custom select: consistent sizing with inputs, glass-tinted panel,
- * refined item states, smooth chevron animation, and brand-tinted focus ring.
+ * Premium select / combobox: consistent with input height, refined dropdown
+ * panel, smooth open animation, and clear option state colours.
  *
  * @see https://atomix.design/docs/components/select
  */
+
+@use "../01-settings/tokens" as tok;
+
+// =============================================================================
+// Component Variable Definitions
+// =============================================================================
+
+  // ---------------------------------------------------------------------------
+  // Trigger / container
+  // ---------------------------------------------------------------------------
+  $select-width: 100% !default;
+
+  $select-padding-x: 0.75rem !default;
+
+  $select-padding-y: 0.4375rem !default;
+
+  // 7px — matches compact input/button
+  $select-color: var(--atomix-body-color) !default;
+
+  $select-font-size: 0.8125rem !default;
+
+  // 13px
+  $select-font-size-lg: 0.875rem !default;
+
+  $select-bg: var(--atomix-primary-bg-subtle) !default;
+
+  $select-expanded-bg: var(--atomix-secondary-bg-subtle) !default;
+
+  $select-border-color: var(--atomix-border-color) !default;
+
+  $select-border-color-hover: var(--atomix-primary-border-subtle) !default;
+
+  $select-border-radius: tok.$border-radius-xl !default;
+
+
+  // 10px — matches input
+  // ---------------------------------------------------------------------------
+  // Chevron/toggle icon
+  // ---------------------------------------------------------------------------
+  $select-icon-toggle-size: 18px !default;
+
+  $select-icon-toggle-color: var(--atomix-tertiary-text-emphasis) !default;
+
+  $select-dropdown-icon-size: 20px !default;
+
+
+  // ---------------------------------------------------------------------------
+  // Placeholder
+  // ---------------------------------------------------------------------------
+  $select-placeholder-color: var(--atomix-tertiary-text-emphasis) !default;
+
+  // ---------------------------------------------------------------------------
+  // Inner spacing
+  // ---------------------------------------------------------------------------
+  $select-inner-spacer: 6px !default;
+
+
+  // ---------------------------------------------------------------------------
+  // Panel (dropdown list)
+  // ---------------------------------------------------------------------------
+  $select-panel-padding-x: 6px !default;
+
+  $select-panel-padding-y: 6px !default;
+
+  $select-panel-spacer-y: 6px !default;
+
+  $select-panel-bg: var(--atomix-primary-bg-subtle) !default;
+
+  $select-dropdown-border-radius: tok.$border-radius-xxl !default;
+
+  $select-dropdown-box-shadow: tok.$box-shadow-md !default;
+
+
+  // ---------------------------------------------------------------------------
+  // Panel items
+  // ---------------------------------------------------------------------------
+  $select-item-padding-x: 10px !default;
+
+  $select-item-padding-y: 6px !default;
+
+  $select-item-color: var(--atomix-body-color) !default;
+
+  $select-item-bg: transparent !default;
+
+  $select-item-border-radius: 0.5rem !default;
+
+  $select-item-bg-hover: var(--atomix-secondary-bg-subtle) !default;
 
 // =============================================================================
 // Select Variable Configuration
@@ -16,59 +103,56 @@
   // ---------------------------------------------------------------------------
   // Trigger / container
   // ---------------------------------------------------------------------------
-  $select-width: 100%,
-  $select-padding-x: 0.75rem,
-  $select-padding-y: 0.4375rem,
+  $select-width: $select-width,
+  $select-padding-x: $select-padding-x,
+  $select-padding-y: $select-padding-y,
   // 7px — matches compact input/button
-  $select-color: var(--atomix-body-color),
-  $select-font-size: 0.8125rem,
+  $select-color: $select-color,
+  $select-font-size: $select-font-size,
   // 13px
-  $select-font-size-lg: 0.875rem,
-  $select-bg: var(--atomix-primary-bg-subtle),
-  $select-expanded-bg: var(--atomix-secondary-bg-subtle),
-  $select-border-color: var(--atomix-border-color),
-  $select-border-color-hover: var(--atomix-primary-border-subtle),
-  $select-border-radius: 0.625rem,
+  $select-font-size-lg: $select-font-size-lg,
+  $select-bg: $select-bg,
+  $select-expanded-bg: $select-expanded-bg,
+  $select-border-color: $select-border-color,
+  $select-border-color-hover: $select-border-color-hover,
+  $select-border-radius: $select-border-radius,
 
   // 10px — matches input
   // ---------------------------------------------------------------------------
   // Chevron/toggle icon
   // ---------------------------------------------------------------------------
-  $select-icon-toggle-size: 18px,
-  $select-icon-toggle-color: var(--atomix-tertiary-text-emphasis),
-  $select-dropdown-icon-size: 20px,
+  $select-icon-toggle-size: $select-icon-toggle-size,
+  $select-icon-toggle-color: $select-icon-toggle-color,
+  $select-dropdown-icon-size: $select-dropdown-icon-size,
 
   // ---------------------------------------------------------------------------
   // Placeholder
   // ---------------------------------------------------------------------------
-  $select-placeholder-color: var(--atomix-tertiary-text-emphasis),
+  $select-placeholder-color: $select-placeholder-color,
   // ---------------------------------------------------------------------------
   // Inner spacing
   // ---------------------------------------------------------------------------
-  $select-inner-spacer: 6px,
+  $select-inner-spacer: $select-inner-spacer,
 
   // ---------------------------------------------------------------------------
   // Panel (dropdown list)
   // ---------------------------------------------------------------------------
-  $select-panel-padding-x: 6px,
-  $select-panel-padding-y: 6px,
-  $select-panel-spacer-y: 6px,
-  $select-panel-bg: var(--atomix-primary-bg-subtle),
-  $select-panel-border-radius: 0.875rem,
-  $select-panel-box-shadow: (
-    0 16px 32px -4px rgba(0, 0, 0, 0.14),
-    0 4px 8px -2px rgba(0, 0, 0, 0.08)
-  ),
+  $select-panel-padding-x: $select-panel-padding-x,
+  $select-panel-padding-y: $select-panel-padding-y,
+  $select-panel-spacer-y: $select-panel-spacer-y,
+  $select-panel-bg: $select-panel-bg,
+  $select-panel-border-radius: $select-dropdown-border-radius,
+  $select-panel-box-shadow: $select-dropdown-box-shadow,
 
   // ---------------------------------------------------------------------------
   // Panel items
   // ---------------------------------------------------------------------------
-  $select-item-padding-x: 10px,
-  $select-item-padding-y: 6px,
-  $select-item-color: var(--atomix-body-color),
-  $select-item-bg: transparent,
-  $select-item-border-radius: 0.5rem,
-  $select-item-bg-hover: var(--atomix-secondary-bg-subtle)
+  $select-item-padding-x: $select-item-padding-x,
+  $select-item-padding-y: $select-item-padding-y,
+  $select-item-color: $select-item-color,
+  $select-item-bg: $select-item-bg,
+  $select-item-border-radius: $select-item-border-radius,
+  $select-item-bg-hover: $select-item-bg-hover
 );
 
 // =============================================================================
@@ -79,15 +163,15 @@
   &__trigger,
   &__control {
     transition:
-      border-color 0.3s cubic-bezier(0.23, 1, 0.32, 1),
-      box-shadow 0.3s cubic-bezier(0.23, 1, 0.32, 1),
+      border-color tok.$transition-duration tok.$easing,
+      box-shadow tok.$transition-duration tok.$easing,
       background-color 0.3s cubic-bezier(0.23, 1, 0.32, 1);
 
     &:focus,
+    &.is-open,
     &:focus-within {
-      outline: none;
       border-color: var(--atomix-primary);
-      box-shadow: 0 0 0 3px rgba(var(--atomix-primary-rgb, 6, 182, 212), 0.16);
+      box-shadow: tok.$input-focus-ring;
     }
   }
 

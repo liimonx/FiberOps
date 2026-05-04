@@ -13,44 +13,15 @@
  * @see https://atomix.design/docs/design-tokens/shadows
  */
 
+@use "./tokens" as tok;
+
 @use "../../../../node_modules/@shohojdhara/atomix/src/styles/01-settings/settings.box-shadow"
   with (
-  // ── Light Mode Shadows ────────────────────────────────────────────────────
-  // Default — card / surface elevation (using slate-950 base for richness)
-  $box-shadow:
-    (0 2px 8px -2px rgba(2, 6, 23, 0.1), 0 1px 3px -1px rgba(2, 6, 23, 0.06)),
-
-  // xs — hairline lift (chip, tag, focused input)
-  $box-shadow-xs: (0 1px 2px 0 rgba(2, 6, 23, 0.05)),
-
-  // sm — subtle raise (button, pill badge)
-  $box-shadow-sm: (
-      0 3px 8px -2px rgba(2, 6, 23, 0.12),
-      0 1px 4px -1px rgba(2, 6, 23, 0.08)
-    ),
-
-  // md — medium elevation (dropdown, tooltip)
-  $box-shadow-md: (
-      0 12px 28px -6px rgba(2, 6, 23, 0.15),
-      0 4px 10px -4px rgba(2, 6, 23, 0.1)
-    ),
-
-  // lg — prominent float (modal, side panel)
-  $box-shadow-lg: (
-      0 24px 54px -10px rgba(2, 6, 23, 0.2),
-      0 10px 20px -8px rgba(2, 6, 23, 0.12),
-      0 0px 0px 1px rgba(2, 6, 23, 0.04)
-    ),
-
-  // xl — maximum depth (command palette, overlay drawer)
-  $box-shadow-xl: (
-      0 40px 80px -16px rgba(2, 6, 23, 0.3),
-      0 16px 40px -12px rgba(2, 6, 23, 0.16)
-    ),
-
-  // inset — pressed / recessed UI states
-  $box-shadow-inset: (
-      inset 0 2px 6px 0 rgba(2, 6, 23, 0.08),
-      inset 0 1px 3px 0 rgba(2, 6, 23, 0.05)
-    )
+  $box-shadow:       tok.$box-shadow,
+  $box-shadow-xs:    tok.$box-shadow-xs,
+  $box-shadow-sm:    tok.$box-shadow-sm,
+  $box-shadow-md:    tok.$box-shadow-md,
+  $box-shadow-lg:    tok.$box-shadow-lg,
+  $box-shadow-xl:    tok.$box-shadow-xl,
+  $box-shadow-inset: tok.$box-shadow-inset
 );

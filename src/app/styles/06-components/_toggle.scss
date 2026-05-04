@@ -8,6 +8,94 @@
  * @see https://atomix.design/docs/components/toggle
  */
 
+@use "../01-settings/tokens" as tok;
+
+// =============================================================================
+// Component Variable Definitions
+// =============================================================================
+
+  // ---------------------------------------------------------------------------
+  // Label gap
+  // ---------------------------------------------------------------------------
+  $toggle-gap: 8px !default;
+
+
+  // ---------------------------------------------------------------------------
+  // Track colours
+  // ---------------------------------------------------------------------------
+  $toggle-switch-on-bg: var(--atomix-primary) !default;
+
+  $toggle-switch-off-bg: var(--atomix-tertiary-bg-subtle) !default;
+
+  $toggle-switch-disabled-bg: var(--atomix-secondary-bg-subtle) !default;
+
+  $toggle-switch-border-radius: 9999px !default;
+
+
+  // pill track
+  // ---------------------------------------------------------------------------
+  // Track box-shadow (subtle depth)
+  // ---------------------------------------------------------------------------
+  $toggle-switch-box-shadow: tok.$box-shadow-inset !default;
+
+  // ---------------------------------------------------------------------------
+  // Track sizes — sm
+  // ---------------------------------------------------------------------------
+  $toggle-switch-width-sm: 44px !default;
+
+  $toggle-switch-height-sm: 24px !default;
+
+
+  // ---------------------------------------------------------------------------
+  // Track sizes — md (default)
+  // ---------------------------------------------------------------------------
+  $toggle-switch-width-md: 32px !default;
+
+  $toggle-switch-height-md: 18px !default;
+
+  $toggle-switch-width: 32px !default;
+
+  $toggle-switch-height: 18px !default;
+
+
+  // ---------------------------------------------------------------------------
+  // Handle
+  // ---------------------------------------------------------------------------
+  $toggle-switch-handle-bg: #ffffff !default;
+
+  $toggle-switch-handle-border-radius: 9999px !default;
+
+  $toggle-switch-handle-margin: 2px !default;
+
+
+  // ---------------------------------------------------------------------------
+  // Handle sizes — sm
+  // ---------------------------------------------------------------------------
+  $toggle-switch-handle-width-sm: 20px !default;
+
+  $toggle-switch-handle-height-sm: 20px !default;
+
+
+  // ---------------------------------------------------------------------------
+  // Handle sizes — md (default)
+  // ---------------------------------------------------------------------------
+  $toggle-switch-handle-width-md: 14px !default;
+
+  $toggle-switch-handle-height-md: 14px !default;
+
+  $toggle-switch-handle-width: 14px !default;
+
+  $toggle-switch-handle-height: 14px !default;
+
+
+  // ---------------------------------------------------------------------------
+  // Label
+  // ---------------------------------------------------------------------------
+  $toggle-label-font-size: 0.8125rem !default;
+
+  // 13px
+  $toggle-label-color: var(--atomix-body-color) !default;
+
 // =============================================================================
 // Toggle Variable Configuration
 // =============================================================================
@@ -16,62 +104,62 @@
   // ---------------------------------------------------------------------------
   // Label gap
   // ---------------------------------------------------------------------------
-  $toggle-gap: 8px,
+  $toggle-gap: $toggle-gap,
 
   // ---------------------------------------------------------------------------
   // Track colours
   // ---------------------------------------------------------------------------
-  $toggle-switch-on-bg: var(--atomix-primary),
-  $toggle-switch-off-bg: var(--atomix-tertiary-bg-subtle),
-  $toggle-switch-disabled-bg: var(--atomix-secondary-bg-subtle),
-  $toggle-switch-border-radius: 9999px,
+  $toggle-switch-on-bg: $toggle-switch-on-bg,
+  $toggle-switch-off-bg: $toggle-switch-off-bg,
+  $toggle-switch-disabled-bg: $toggle-switch-disabled-bg,
+  $toggle-switch-border-radius: $toggle-switch-border-radius,
 
   // pill track
   // ---------------------------------------------------------------------------
   // Track box-shadow (subtle depth)
   // ---------------------------------------------------------------------------
-  $toggle-switch-box-shadow: (inset 0 1px 3px rgba(0, 0, 0, 0.15)),
+  $toggle-switch-box-shadow: $toggle-switch-box-shadow,
   // ---------------------------------------------------------------------------
   // Track sizes — sm
   // ---------------------------------------------------------------------------
-  $toggle-switch-width-sm: 44px,
-  $toggle-switch-height-sm: 24px,
+  $toggle-switch-width-sm: $toggle-switch-width-sm,
+  $toggle-switch-height-sm: $toggle-switch-height-sm,
 
   // ---------------------------------------------------------------------------
   // Track sizes — md (default)
   // ---------------------------------------------------------------------------
-  $toggle-switch-width-md: 32px,
-  $toggle-switch-height-md: 18px,
-  $toggle-switch-width: 32px,
-  $toggle-switch-height: 18px,
+  $toggle-switch-width-md: $toggle-switch-width-md,
+  $toggle-switch-height-md: $toggle-switch-height-md,
+  $toggle-switch-width: $toggle-switch-width,
+  $toggle-switch-height: $toggle-switch-height,
 
   // ---------------------------------------------------------------------------
   // Handle
   // ---------------------------------------------------------------------------
-  $toggle-switch-handle-bg: #ffffff,
-  $toggle-switch-handle-border-radius: 9999px,
-  $toggle-switch-handle-margin: 2px,
+  $toggle-switch-handle-bg: $toggle-switch-handle-bg,
+  $toggle-switch-handle-border-radius: $toggle-switch-handle-border-radius,
+  $toggle-switch-handle-margin: $toggle-switch-handle-margin,
 
   // ---------------------------------------------------------------------------
   // Handle sizes — sm
   // ---------------------------------------------------------------------------
-  $toggle-switch-handle-width-sm: 20px,
-  $toggle-switch-handle-height-sm: 20px,
+  $toggle-switch-handle-width-sm: $toggle-switch-handle-width-sm,
+  $toggle-switch-handle-height-sm: $toggle-switch-handle-height-sm,
 
   // ---------------------------------------------------------------------------
   // Handle sizes — md (default)
   // ---------------------------------------------------------------------------
-  $toggle-switch-handle-width-md: 14px,
-  $toggle-switch-handle-height-md: 14px,
-  $toggle-switch-handle-width: 14px,
-  $toggle-switch-handle-height: 14px,
+  $toggle-switch-handle-width-md: $toggle-switch-handle-width-md,
+  $toggle-switch-handle-height-md: $toggle-switch-handle-height-md,
+  $toggle-switch-handle-width: $toggle-switch-handle-width,
+  $toggle-switch-handle-height: $toggle-switch-handle-height,
 
   // ---------------------------------------------------------------------------
   // Label
   // ---------------------------------------------------------------------------
-  $toggle-label-font-size: 0.8125rem,
+  $toggle-label-font-size: $toggle-label-font-size,
   // 13px
-  $toggle-label-color: var(--atomix-body-color)
+  $toggle-label-color: $toggle-label-color
 );
 
 // =============================================================================
@@ -92,7 +180,7 @@
   &__handle,
   &__thumb {
     transition: transform 0.3s cubic-bezier(0.23, 1, 0.32, 1);
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+    box-shadow: tok.$box-shadow-xs;
   }
 
   // Focus ring on track
@@ -107,7 +195,7 @@
   &.is-checked &__switch,
   input:checked + &__track {
     box-shadow:
-      inset 0 1px 3px rgba(0, 0, 0, 0.15),
+      tok.$box-shadow-inset,
       0 0 0 3px rgba(var(--atomix-primary-rgb, 6, 182, 212), 0.18);
   }
 
