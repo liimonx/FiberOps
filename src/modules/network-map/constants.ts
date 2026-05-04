@@ -4,10 +4,12 @@ import { NetworkStatus, NetworkNodeType, NetworkMapLayer } from "./types";
 
 export const MAPBOX_CONFIG = {
   ACCESS_TOKEN: process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN || "",
-  STYLE: "mapbox://styles/mapbox/dark-v10",
+  STYLE: "mapbox://styles/mapbox/dark-v11",
   DEFAULT_CENTER: [90.4125, 23.8103] as [number, number], // Dhaka, Bangladesh [lng, lat]
-  DEFAULT_ZOOM: 12,
-  MIN_ZOOM: 5,
+  DEFAULT_ZOOM: 15,
+  DEFAULT_PITCH: 60,
+  DEFAULT_BEARING: -20,
+  MIN_ZOOM: 2,
   MAX_ZOOM: 18,
 } as const;
 

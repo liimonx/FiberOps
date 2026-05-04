@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useEffect, useState, useCallback } from "react";
-import { Icon, Button, Card } from "@shohojdhara/atomix";
+import React, { useEffect, useState } from "react";
+import { Icon, Button, Card, PhosphorIconsType } from "@shohojdhara/atomix";
 import {
   ErrorType,
   AppError,
@@ -11,7 +11,7 @@ import {
 } from "../utils/errorHandler";
 
 interface UserFriendlyErrorProps {
-  error?: any;
+  error?: unknown;
   title?: string;
   message?: string;
   onRetry?: () => void;
@@ -89,16 +89,14 @@ export function UserFriendlyError({
           className={`u-inline-flex u-items-center u-justify-center u-w-20 u-h-20 u-rounded-circle u-bg-white-opacity-5 u-border u-border-solid u-shadow-lg ${isOffline ? "u-border-error" : "u-border-warning"}`}
         >
           <Icon
-            name={getIcon() as any}
+            name={getIcon() as PhosphorIconsType}
             size={40}
             className={isOffline ? "u-text-error" : "u-text-warning"}
           />
         </div>
       </div>
 
-      <h2
-        className="u-m-0 u-text-xl u-font-bold u-text-uppercase u-mb-2"
-      >
+      <h2 className="u-m-0 u-text-xl u-font-bold u-text-uppercase u-mb-2">
         {title || errorConfig.title}
       </h2>
 
@@ -193,7 +191,7 @@ export function InlineErrorMessage({
   compact = false,
   className = "",
 }: {
-  error?: any;
+  error?: unknown;
   message?: string;
   onRetry?: () => void;
   compact?: boolean;
@@ -234,7 +232,7 @@ export function ErrorToast({
   onClose,
   duration = 5000,
 }: {
-  error: any;
+  error: unknown;
   onClose: () => void;
   duration?: number;
 }) {
@@ -270,10 +268,10 @@ export function ErrorToast({
         <div
           className="u-absolute u-bottom-0 u-start-0 u-h-1 u-bg-error u-w-100"
           style={{
-            animationName: 'shrinkWidth',
+            animationName: "shrinkWidth",
             animationDuration: `${duration}ms`,
-            animationTimingFunction: 'linear',
-            animationFillMode: 'forwards',
+            animationTimingFunction: "linear",
+            animationFillMode: "forwards",
           }}
         />
       </Card>

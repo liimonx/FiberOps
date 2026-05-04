@@ -1,7 +1,14 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { Icon, Card, Button, Tabs, Badge } from "@shohojdhara/atomix";
+import {
+  Icon,
+  Card,
+  Button,
+  Tabs,
+  CardProps,
+  PhosphorIconsType,
+} from "@shohojdhara/atomix";
 import { NetworkNode, NetworkConnection, NetworkNodeType, NetworkStatus } from "../types";
 import { StatusIndicator } from "./StatusIndicator";
 import { NODE_TYPE_ICONS, NETWORK_STATUS_COLORS } from "../constants";
@@ -92,7 +99,11 @@ export const InspectorPanel: React.FC<InspectorPanelProps> = ({
       <Card
         glass={{ blurAmount: 5, mode: "shader" }}
         className={`u-overflow-hidden ${isCollapsed ? "u-h-auto u-w-auto" : "u-h-100 u-w-100"} ${className}`}
-        variant={selectedNode?.status == "active" ? "success" : `${selectedNode?.status}`}
+        variant={
+          selectedNode?.status == "active"
+            ? "success"
+            : (`${selectedNode?.status}` as CardProps["variant"])
+        }
       >
         {/* Header */}
         <Card.Header className="u-flex u-items-center u-gap-3">
@@ -104,7 +115,9 @@ export const InspectorPanel: React.FC<InspectorPanelProps> = ({
           >
             <Icon
               name={
-                (selectedNode ? NODE_TYPE_ICONS[selectedNode.type] : "GitBranch") as any
+                (selectedNode
+                  ? NODE_TYPE_ICONS[selectedNode.type]
+                  : "GitBranch") as PhosphorIconsType
               }
             />
           </div>

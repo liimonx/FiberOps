@@ -170,13 +170,13 @@ export function useRealTimeUpdates(options: UseRealTimeUpdatesOptions = {}) {
 }
 
 // Hook for optimistic updates with rollback
-export function useOptimisticUpdate<T extends { id: string }>(
+export function useOptimisticUpdate<T extends { id: string }, TVariables>(
   queryKey: string[],
-  updateMutation: any
+  updateMutation: { mutateAsync: (variables: TVariables) => Promise<unknown> }
 ) {
   const queryClient = useQueryClient();
 
-  return useCallback(async (itemId: string, updates: Partial<T>) => {
+  return useCallback(async (itemId: string, updates: Partial<T>, variables: TVariables) => {
     const previousData = queryClient.getQueryData<T[]>(queryKey);
     
     // Optimistically update

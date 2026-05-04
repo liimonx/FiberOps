@@ -75,15 +75,21 @@ export interface NetworkMapLayer {
 
 export type ToolType = 'select' | 'trace' | 'measure' | 'heatmap';
 
-/**
- * Base search result interface
- * Extended by CategorizedResult to include category field for filtering
- */
 export interface SearchResult {
   id: string;
   name: string;
   type: 'node' | 'connection' | 'customer';
   matchScore: number;
+}
+
+export type AssetCategory = 'all' | 'nodes' | 'connections' | 'customers';
+
+/**
+ * Extended search result with category information for filtering
+ * Inherits all properties from SearchResult plus category field
+ */
+export interface CategorizedResult extends SearchResult {
+  category: AssetCategory;
 }
 
 // Measurement and tracing types

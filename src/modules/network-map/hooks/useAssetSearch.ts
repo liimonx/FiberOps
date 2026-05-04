@@ -1,17 +1,14 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { NetworkNode, NetworkConnection, SearchResult, NetworkNodeType } from "../types";
-
-export type AssetCategory = "all" | "nodes" | "connections" | "customers";
-
-/**
- * Extended search result with category information for filtering
- * Inherits all properties from SearchResult plus category field
- */
-export interface CategorizedResult extends SearchResult {
-  category: AssetCategory;
-}
+import { 
+  NetworkNode, 
+  NetworkConnection, 
+  SearchResult, 
+  NetworkNodeType,
+  AssetCategory,
+  CategorizedResult
+} from "../types";
 
 interface UseAssetSearchProps {
   nodes: NetworkNode[];

@@ -10,7 +10,7 @@ interface CacheEntry<T> {
 }
 
 class DataCache {
-  private cache: Map<string, CacheEntry<any>> = new Map();
+  private cache: Map<string, CacheEntry<unknown>> = new Map();
   private maxSize: number;
 
   constructor(maxSize: number = 100) {
@@ -110,13 +110,13 @@ export const cacheKeys = {
 };
 
 // Debounce utility for expensive operations
-export function debounce<T extends (...args: any[]) => any>(
-  func: T,
+export function debounce<TArgs extends unknown[]>(
+  func: (...args: TArgs) => void,
   wait: number
-): (...args: Parameters<T>) => void {
+): (...args: TArgs) => void {
   let timeout: NodeJS.Timeout | null = null;
-
-  return (...args: Parameters<T>) => {
+  
+  return (...args: TArgs) => {
     if (timeout) {
       clearTimeout(timeout);
     }
@@ -129,13 +129,13 @@ export function debounce<T extends (...args: any[]) => any>(
 }
 
 // Throttle utility for rate-limiting
-export function throttle<T extends (...args: any[]) => any>(
-  func: T,
+export function throttle<TArgs extends unknown[]>(
+  func: (...args: TArgs) => void,
   limit: number
-): (...args: Parameters<T>) => void {
+): (...args: TArgs) => void {
   let inThrottle: boolean = false;
-
-  return (...args: Parameters<T>) => {
+  
+  return (...args: TArgs) => {
     if (!inThrottle) {
       func(...args);
       inThrottle = true;
@@ -148,23 +148,23 @@ export function throttle<T extends (...args: any[]) => any>(
 }
 
 // Memoize function with custom key generator
-export function memoize<T extends (...args: any[]) => any>(
-  func: T,
-  keyGenerator?: (...args: Parameters<T>) => string
-): T {
-  const cache = new Map<string, ReturnType<T>>();
-
-  return ((...args: Parameters<T>) => {
+export function memoize<TArgs extends unknown[], TResult>(
+  func: (...args: TArgs) => TResult,
+  keyGenerator?: (...args: TArgs) => string
+): (...args: TArgs) => TResult {
+  const cache = new Map<string, TResult>();
+  
+  return (...args: TArgs) => {
     const key = keyGenerator ? keyGenerator(...args) : JSON.stringify(args);
     
     if (cache.has(key)) {
       return cache.get(key)!;
     }
-
+    
     const result = func(...args);
     cache.set(key, result);
     return result;
-  }) as T;
+  };
 }
 
 // Batch updates for better performance

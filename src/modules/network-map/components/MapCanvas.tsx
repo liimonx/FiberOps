@@ -17,6 +17,7 @@ import {
   updateLayerVisibility,
   createNodeFeature,
   createConnectionFeature,
+  create3DNodeFeatures,
 } from "../utils/mapStyling";
 import {
   visibleConnectionTypesFromLayers,
@@ -116,6 +117,13 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({ onMapLoad, onMapError }) =
         if (nodesSource)
           nodesSource.setData({ type: "FeatureCollection", features: nodeFeatures });
 
+        const node3DFeatures = filteredNodes.flatMap(create3DNodeFeatures);
+        const nodes3DSource = map.getSource("network-nodes-3d") as
+          | mapboxgl.GeoJSONSource
+          | undefined;
+        if (nodes3DSource)
+          nodes3DSource.setData({ type: "FeatureCollection", features: node3DFeatures });
+
         const connectionFeatures = filteredConnections
           .map((conn) => createConnectionFeature(conn, allNodes))
           .filter((f): f is GeoJSON.Feature => f != null);
@@ -170,8 +178,7 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({ onMapLoad, onMapError }) =
 
         // Avoid stale Mapbox filters (previously hid all features in GL JS 3)
         const clearFilterIds = [
-          "network-nodes-layer",
-          "network-nodes-glow",
+          "network-nodes-3d-layer",
           "network-connections-layer",
           "network-connections-casing",
         ];
@@ -180,7 +187,7 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({ onMapLoad, onMapError }) =
         });
 
         const nodesVis = nodeTypes.length === 0 ? "none" : "visible";
-        ["network-nodes-layer", "network-nodes-glow"].forEach((id) => {
+        ["network-nodes-3d-layer"].forEach((id) => {
           if (map.getLayer(id)) {
             map.setLayoutProperty(id, "visibility", nodesVis);
           }

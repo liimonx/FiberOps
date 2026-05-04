@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Icon } from "@shohojdhara/atomix";
-import { CategorizedResult } from "../hooks/useAssetSearch";
+import { CategorizedResult } from "../types";
 import { NODE_TYPE_ICONS } from "../constants";
 import { NetworkNodeType } from "../types";
 

@@ -5,7 +5,7 @@ import { NetworkNode, NetworkConnection } from '../types';
 export type WebSocketMessage = 
   | { type: 'node_update'; data: Partial<NetworkNode> & { id: string } }
   | { type: 'connection_update'; data: Partial<NetworkConnection> & { id: string } }
-  | { type: 'incident_alert'; data: any }
+  | { type: 'incident_alert'; data: Record<string, unknown> }
   | { type: 'status_broadcast'; data: { nodeId: string; status: string; timestamp: string } }
   | { type: 'heartbeat'; data: { serverTime: string; connectedClients: number } };
 

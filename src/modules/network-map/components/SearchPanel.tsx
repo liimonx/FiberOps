@@ -2,12 +2,8 @@
 
 import React, { useState } from "react";
 import { Card, Icon } from "@shohojdhara/atomix";
-import { NetworkNode, NetworkConnection } from "../types";
-import {
-  useAssetSearch,
-  AssetCategory,
-  CategorizedResult,
-} from "../hooks/useAssetSearch";
+import { NetworkNode, NetworkConnection, AssetCategory, CategorizedResult } from "../types";
+import { useAssetSearch } from "../hooks/useAssetSearch";
 import { SearchInput } from "./SearchInput";
 import { CategoryFilterTabs } from "./CategoryFilterTabs";
 import { SearchResultsList } from "./SearchResultsList";

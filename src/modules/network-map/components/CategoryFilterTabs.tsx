@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Icon, Button, Badge } from "@shohojdhara/atomix";
-import { AssetCategory } from "../hooks/useAssetSearch";
+import { AssetCategory } from "../types";
 
 interface CategoryFilterTabsProps {
   selectedCategory: AssetCategory;

@@ -1,7 +1,15 @@
 "use client";
 
 import React, { useEffect, useState, useMemo } from "react";
-import { Icon, Card, Toggle, Button, Badge, Accordion } from "@shohojdhara/atomix";
+import {
+  Icon,
+  Card,
+  Toggle,
+  Button,
+  Badge,
+  Accordion,
+  PhosphorIconsType,
+} from "@shohojdhara/atomix";
 import { useNetworkMapStore, useLayers } from "../stores/useNetworkMapStore";
 import { NetworkMapLayer, NetworkStatus } from "../types";
 
@@ -11,7 +19,7 @@ interface LayerControlsProps {
 }
 
 interface LayerConfig extends NetworkMapLayer {
-  icon: string;
+  icon: PhosphorIconsType;
   description: string;
   color: string;
   stats?: {

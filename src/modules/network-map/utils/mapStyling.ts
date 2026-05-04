@@ -1,6 +1,7 @@
 // Map styling utilities for Mapbox GL JS
 
 import type { ExpressionSpecification, LayerSpecification } from "mapbox-gl";
+import { NetworkNodeType } from "../types";
 import type { NetworkNode, NetworkConnection } from "../types";
 
 /* ─────────────────────────────────────────────────────────────────────────────
@@ -14,30 +15,30 @@ import type { NetworkNode, NetworkConnection } from "../types";
  */
 export const MAP_COLORS = {
   // Nodes
-  core: "#1e3a8a", // Deep Indigo
-  pop: "#3730a3", // Violet 800
-  distribution: "#0f766e", // Teal 700
-  access: "#047857", // Emerald 700
-  splitter: "#b45309", // Amber 700
-  junction: "#57534e", // Stone 600
-  pole: "#92400e", // Brown 800
-  onu: "#0369a1", // Sky 700
-  customer: "#6d28d9", // Violet 700
+  core: "#00ff00", // Neon Green
+  pop: "#00ffff", // Cyan
+  distribution: "#00cc00", // Darker Neon Green
+  access: "#33ff33", // Light Neon Green
+  splitter: "#ff00ff", // Magenta
+  junction: "#a3a3a3", // Light Gray
+  pole: "#525252", // Dark Gray
+  onu: "#0088ff", // Bright Blue
+  customer: "#ff0055", // Neon Pink
 
   // Connections
-  fiber_route: "#ee8952", // Orange 600
-  customer_connection: "#38bdf8", // Sky 400
+  fiber_route: "#14b8a6", // Muted Teal
+  customer_connection: "#3b82f6", // Muted Blue
 
   // Status
-  inactive: "#64748b", // Slate 500
-  error: "#b91c1c", // Red 700
-  warning: "#d97706", // Amber 600
-  selected: "#fefce8", // Warm White
-  hovered: "#fde68a", // Soft Gold
+  inactive: "#333333", // Very Dark Gray
+  error: "#ff0000", // Pure Red
+  warning: "#ffff00", // Pure Yellow
+  selected: "#ffffff", // Pure White
+  hovered: "#ccff00", // Neon Yellow-Green
 
   // Backgrounds
-  casing: "#0f172a", // Slate 900
-  coverage: "#14b8a6", // Teal 500
+  casing: "#000000", // Pure Black
+  coverage: "#002200", // Very Dark Green
 } as const;
 
 /** Sizing hierarchy for different zoom levels */
@@ -83,8 +84,8 @@ const NODE_SIZES = {
 
 /** Helper to build a node type-based match expression */
 const matchNodeType = (
-  values: Record<string, any>,
-  defaultValue: any
+  values: Record<string, string | number>,
+  defaultValue: string | number
 ): ExpressionSpecification => [
   "match",
   ["get", "type"],
@@ -154,6 +155,12 @@ const LINE_COLOR: ExpressionSpecification = [
  * ───────────────────────────────────────────────────────────────────────────── */
 
 export const AVAILABLE_STYLES = [
+  {
+    id: "cyber",
+    name: "Cyber Security",
+    url: "mapbox://styles/mapbox/cj3kbeqzo00022smj7akz3o1e",
+    isDark: true,
+  },
   { id: "dark", name: "Dark", url: "mapbox://styles/mapbox/dark-v11", isDark: true },
   { id: "light", name: "Light", url: "mapbox://styles/mapbox/light-v11", isDark: false },
   {
@@ -171,116 +178,6 @@ export const AVAILABLE_STYLES = [
 ];
 
 export const CUSTOM_LAYERS: Record<string, LayerSpecification> = {
-  /** Soft halo behind every node for better visibility and status feedback */
-  nodeGlow: {
-    id: "network-nodes-glow",
-    type: "circle",
-    source: "network-nodes",
-    paint: {
-      "circle-radius": [
-        "interpolate",
-        ["exponential", 1.5],
-        ["zoom"],
-        5,
-        matchNodeType(
-          {
-            core: 12,
-            pop: 12,
-            distribution: 8,
-            access: 6,
-            onu: 5,
-            splitter: 5,
-            junction: 4,
-            customer: 4,
-            pole: 4,
-          },
-          5
-        ),
-        12,
-        matchNodeType(
-          {
-            core: 24,
-            pop: 24,
-            distribution: 16,
-            access: 14,
-            onu: 12,
-            splitter: 10,
-            junction: 9,
-            customer: 8,
-            pole: 8,
-          },
-          12
-        ),
-        18,
-        matchNodeType(
-          {
-            core: 40,
-            pop: 40,
-            distribution: 30,
-            access: 24,
-            onu: 20,
-            splitter: 16,
-            junction: 14,
-            customer: 12,
-            pole: 12,
-          },
-          20
-        ),
-      ],
-      "circle-color": NODE_FILL,
-      "circle-opacity": [
-        "case",
-        ["==", ["get", "status"], "error"],
-        0.35,
-        ["==", ["get", "status"], "warning"],
-        0.25,
-        ["==", ["get", "status"], "inactive"],
-        0.05,
-        0.15,
-      ],
-      "circle-blur": 1,
-    },
-  },
-
-  /** Primary node visualization */
-  nodes: {
-    id: "network-nodes-layer",
-    type: "circle",
-    source: "network-nodes",
-    paint: {
-      "circle-radius": [
-        "interpolate",
-        ["exponential", 1.5],
-        ["zoom"],
-        5,
-        matchNodeType(NODE_SIZES.min, 3),
-        12,
-        matchNodeType(NODE_SIZES.mid, 8),
-        18,
-        matchNodeType(NODE_SIZES.max, 14),
-      ],
-      "circle-color": NODE_FILL,
-      "circle-stroke-width": [
-        "case",
-        ["boolean", ["feature-state", "selected"], false],
-        3,
-        ["boolean", ["feature-state", "hovered"], false],
-        2.5,
-        ["match", ["get", "type"], "core_node", 2, "pop", 2, "customer", 1, 1.5],
-      ],
-      "circle-stroke-color": [
-        "case",
-        ["boolean", ["feature-state", "selected"], false],
-        MAP_COLORS.selected,
-        ["boolean", ["feature-state", "hovered"], false],
-        MAP_COLORS.hovered,
-        "rgba(255, 255, 255, 0.8)",
-      ],
-      "circle-opacity": 0.98,
-      "circle-stroke-opacity": 0.9,
-    },
-  },
-
   /** Dark casing under connections for visual depth */
   connectionCasing: {
     id: "network-connections-casing",
@@ -295,24 +192,24 @@ export const CUSTOM_LAYERS: Record<string, LayerSpecification> = {
         5,
         [
           "+",
-          ["match", ["get", "type"], "fiber_route", 2, "customer_connection", 1, 1.5],
-          1.5,
+          ["match", ["get", "type"], "fiber_route", 1.5, "customer_connection", 0.8, 1],
+          1,
         ],
         10,
         [
           "+",
-          ["match", ["get", "type"], "fiber_route", 4, "customer_connection", 2, 3],
-          2.5,
+          ["match", ["get", "type"], "fiber_route", 2.5, "customer_connection", 1.2, 1.8],
+          1.5,
         ],
         15,
         [
           "+",
-          ["match", ["get", "type"], "fiber_route", 7, "customer_connection", 3.5, 5],
-          3,
+          ["match", ["get", "type"], "fiber_route", 4, "customer_connection", 2, 3],
+          2,
         ],
       ],
       "line-color": MAP_COLORS.casing,
-      "line-opacity": 0.4,
+      "line-opacity": 0.3,
     },
   },
 
@@ -328,14 +225,14 @@ export const CUSTOM_LAYERS: Record<string, LayerSpecification> = {
         ["exponential", 1.5],
         ["zoom"],
         5,
-        ["match", ["get", "type"], "fiber_route", 1.25, "customer_connection", 0.65, 0.9],
+        ["match", ["get", "type"], "fiber_route", 0.75, "customer_connection", 0.4, 0.5],
         12,
-        ["match", ["get", "type"], "fiber_route", 3, "customer_connection", 1.5, 2.2],
+        ["match", ["get", "type"], "fiber_route", 1.8, "customer_connection", 0.9, 1.2],
         18,
-        ["match", ["get", "type"], "fiber_route", 5, "customer_connection", 2.2, 3.5],
+        ["match", ["get", "type"], "fiber_route", 3, "customer_connection", 1.5, 2],
       ],
       "line-color": LINE_COLOR,
-      "line-opacity": 0.9,
+      "line-opacity": 0.75,
       "line-dasharray": [
         "case",
         ["==", ["get", "status"], "inactive"],
@@ -388,6 +285,19 @@ export const CUSTOM_LAYERS: Record<string, LayerSpecification> = {
       "fill-outline-color": "rgba(94, 234, 212, 0.35)",
     },
   },
+
+  /** 3D Extruded Blocks for Nodes */
+  nodes3D: {
+    id: "network-nodes-3d-layer",
+    type: "fill-extrusion",
+    source: "network-nodes-3d",
+    paint: {
+      "fill-extrusion-color": NODE_FILL,
+      "fill-extrusion-height": ["get", "height"],
+      "fill-extrusion-base": ["get", "min_height"],
+      "fill-extrusion-opacity": 0.95,
+    },
+  },
 };
 
 /* ─────────────────────────────────────────────────────────────────────────────
@@ -401,7 +311,59 @@ export const addCustomLayers = (map: mapboxgl.Map) => {
     { id: "network-connections", type: "geojson" },
     { id: "network-outages", type: "geojson" },
     { id: "network-coverage", type: "geojson" },
+    { id: "network-nodes-3d", type: "geojson" },
   ];
+
+  // Set the map background to pure black to enhance the cyberpunk look
+  if (map.getLayer("background")) {
+    map.setPaintProperty("background", "background-color", "#000000");
+  }
+
+  // Find a label layer to insert the 3D buildings beneath it
+  const styleLayers = map.getStyle()?.layers || [];
+  let labelLayerId;
+  for (let i = 0; i < styleLayers.length; i++) {
+    if (styleLayers[i].type === "symbol" && styleLayers[i].layout) {
+      labelLayerId = styleLayers[i].id;
+      break;
+    }
+  }
+
+  if (!map.getLayer("3d-buildings")) {
+    map.addLayer(
+      {
+        id: "3d-buildings",
+        source: "composite",
+        "source-layer": "building",
+        filter: ["==", "extrude", "true"],
+        type: "fill-extrusion",
+        minzoom: 14,
+        paint: {
+          "fill-extrusion-color": "#0a0a0a", // Almost pitch black 3D buildings
+          "fill-extrusion-height": [
+            "interpolate",
+            ["linear"],
+            ["zoom"],
+            14,
+            0,
+            14.05,
+            ["get", "height"],
+          ],
+          "fill-extrusion-base": [
+            "interpolate",
+            ["linear"],
+            ["zoom"],
+            14,
+            0,
+            14.05,
+            ["get", "min_height"],
+          ],
+          "fill-extrusion-opacity": 0.8,
+        },
+      },
+      labelLayerId
+    );
+  }
 
   // Add sources
   sources.forEach((src) => {
@@ -420,8 +382,7 @@ export const addCustomLayers = (map: mapboxgl.Map) => {
     CUSTOM_LAYERS.connections,
     CUSTOM_LAYERS.outagesGlow,
     CUSTOM_LAYERS.outages,
-    CUSTOM_LAYERS.nodeGlow,
-    CUSTOM_LAYERS.nodes,
+    CUSTOM_LAYERS.nodes3D,
   ];
 
   layers.forEach((layer) => {
@@ -441,7 +402,7 @@ export const updateLayerVisibility = (
 
   // Map primary layers to their auxiliary layers
   const auxiliaryMap: Record<string, string[]> = {
-    "network-nodes-layer": ["network-nodes-glow"],
+    "network-nodes-3d-layer": [],
     "network-connections-layer": ["network-connections-casing"],
     "network-outages-layer": ["network-outages-glow"],
   };
@@ -460,7 +421,7 @@ export const setFeatureState = (
   map: mapboxgl.Map,
   source: string,
   id: string | number,
-  state: Record<string, any>
+  state: Record<string, unknown>
 ) => {
   map.setFeatureState({ source, id }, state);
 };
@@ -506,6 +467,591 @@ export const createNodeFeature = (node: NetworkNode): GeoJSON.Feature => ({
     status: String(node.status),
   },
 });
+
+export const create3DNodeFeatures = (node: NetworkNode): GeoJSON.Feature[] => {
+  let radius = 0.0001; // ~10m
+  let height = 15;
+
+  if (node.type === NetworkNodeType.CORE_NODE) {
+    radius = 0.0004;
+    height = 50;
+  } else if (node.type === NetworkNodeType.POP) {
+    radius = 0.0003;
+    height = 40;
+  } else if (node.type === NetworkNodeType.DISTRIBUTION_NODE) {
+    radius = 0.0002;
+    height = 30;
+  } else if (node.type === NetworkNodeType.ACCESS_NODE) {
+    radius = 0.00015;
+    height = 20;
+  }
+
+  const baseFeature: GeoJSON.Feature = {
+    type: "Feature",
+    geometry: {
+      type: "Polygon",
+      coordinates: [
+        [
+          [node.position.lng - radius, node.position.lat - radius],
+          [node.position.lng + radius, node.position.lat - radius],
+          [node.position.lng + radius, node.position.lat + radius],
+          [node.position.lng - radius, node.position.lat + radius],
+          [node.position.lng - radius, node.position.lat - radius],
+        ],
+      ],
+    },
+    properties: {
+      ...node,
+      type: String(node.type),
+      status: String(node.status),
+      height,
+      min_height: 0,
+    },
+  };
+
+  if (node.type === NetworkNodeType.POP) {
+    // Large Data Center / POP building
+    const w = 0.0003; // width
+    const l = 0.00025; // length
+    const h = 40;
+
+    baseFeature.geometry = {
+      type: "Polygon",
+      coordinates: [
+        [
+          [node.position.lng - w, node.position.lat - l],
+          [node.position.lng + w, node.position.lat - l],
+          [node.position.lng + w, node.position.lat + l],
+          [node.position.lng - w, node.position.lat + l],
+          [node.position.lng - w, node.position.lat - l],
+        ],
+      ],
+    };
+    if (baseFeature.properties) {
+      baseFeature.properties.height = h;
+    }
+
+    // Cooling units on roof
+    const unitSize = 0.00006;
+    const unitH = h + 4;
+    const units: GeoJSON.Feature[] = [];
+
+    const unitPositions = [
+      { dlng: -w * 0.5, dlat: -l * 0.4 },
+      { dlng: w * 0.5, dlat: -l * 0.4 },
+      { dlng: -w * 0.5, dlat: l * 0.4 },
+      { dlng: w * 0.5, dlat: l * 0.4 },
+    ];
+
+    unitPositions.forEach((pos, i) => {
+      units.push({
+        type: "Feature",
+        geometry: {
+          type: "Polygon",
+          coordinates: [
+            [
+              [
+                node.position.lng + pos.dlng - unitSize,
+                node.position.lat + pos.dlat - unitSize,
+              ],
+              [
+                node.position.lng + pos.dlng + unitSize,
+                node.position.lat + pos.dlat - unitSize,
+              ],
+              [
+                node.position.lng + pos.dlng + unitSize,
+                node.position.lat + pos.dlat + unitSize,
+              ],
+              [
+                node.position.lng + pos.dlng - unitSize,
+                node.position.lat + pos.dlat + unitSize,
+              ],
+              [
+                node.position.lng + pos.dlng - unitSize,
+                node.position.lat + pos.dlat - unitSize,
+              ],
+            ],
+          ],
+        },
+        properties: {
+          ...node,
+          id: `${node.id}-hvac-${i}`,
+          type: String(node.type),
+          status: String(node.status),
+          height: unitH,
+          min_height: h,
+        },
+      });
+    });
+
+    // Front entrance / loading dock area
+    const dockW = w * 0.4;
+    const dockL = 0.00005;
+    const dockH = 6;
+    const entrance: GeoJSON.Feature = {
+      type: "Feature",
+      geometry: {
+        type: "Polygon",
+        coordinates: [
+          [
+            [node.position.lng - dockW, node.position.lat - l - dockL],
+            [node.position.lng + dockW, node.position.lat - l - dockL],
+            [node.position.lng + dockW, node.position.lat - l],
+            [node.position.lng - dockW, node.position.lat - l],
+            [node.position.lng - dockW, node.position.lat - l - dockL],
+          ],
+        ],
+      },
+      properties: {
+        ...node,
+        id: `${node.id}-entrance`,
+        type: String(node.type),
+        status: String(node.status),
+        height: dockH,
+        min_height: 0,
+      },
+    };
+
+    return [baseFeature, ...units, entrance];
+  }
+
+  if (node.type === NetworkNodeType.ACCESS_NODE) {
+    // Street Cabinet (DSLAM / ODF)
+    const w = 0.00008; // width
+    const l = 0.00005; // depth
+    const h = 4; // height (scaled for visibility)
+
+    // Main Cabinet
+    baseFeature.geometry = {
+      type: "Polygon",
+      coordinates: [
+        [
+          [node.position.lng - w, node.position.lat - l],
+          [node.position.lng + w, node.position.lat - l],
+          [node.position.lng + w, node.position.lat + l],
+          [node.position.lng - w, node.position.lat + l],
+          [node.position.lng - w, node.position.lat - l],
+        ],
+      ],
+    };
+    if (baseFeature.properties) {
+      baseFeature.properties.height = h;
+    }
+
+    // Top Cap (slightly wider and slanted-look)
+    const capW = w * 1.1;
+    const capL = l * 1.1;
+    const capH = h + 0.4;
+    const capMin = h - 0.2;
+
+    const cap: GeoJSON.Feature = {
+      type: "Feature",
+      geometry: {
+        type: "Polygon",
+        coordinates: [
+          [
+            [node.position.lng - capW, node.position.lat - capL],
+            [node.position.lng + capW, node.position.lat - capL],
+            [node.position.lng + capW, node.position.lat + capL],
+            [node.position.lng - capW, node.position.lat + capL],
+            [node.position.lng - capW, node.position.lat - capL],
+          ],
+        ],
+      },
+      properties: {
+        ...node,
+        id: `${node.id}-cap`,
+        type: String(node.type),
+        status: String(node.status),
+        height: capH,
+        min_height: capMin,
+      },
+    };
+
+    // Base Plinth
+    const plinthW = w * 1.2;
+    const plinthL = l * 1.2;
+    const plinthH = 0.6;
+
+    const plinth: GeoJSON.Feature = {
+      type: "Feature",
+      geometry: {
+        type: "Polygon",
+        coordinates: [
+          [
+            [node.position.lng - plinthW, node.position.lat - plinthL],
+            [node.position.lng + plinthW, node.position.lat - plinthL],
+            [node.position.lng + plinthW, node.position.lat + plinthL],
+            [node.position.lng - plinthW, node.position.lat + plinthL],
+            [node.position.lng - plinthW, node.position.lat - plinthL],
+          ],
+        ],
+      },
+      properties: {
+        ...node,
+        id: `${node.id}-plinth`,
+        type: String(node.type),
+        status: String(node.status),
+        height: plinthH,
+        min_height: 0,
+      },
+    };
+
+    return [baseFeature, cap, plinth];
+  }
+
+  if (node.type === NetworkNodeType.SPLITTER) {
+    // Splitter: Compact rugged box
+    const w = 0.00005;
+    const l = 0.00005;
+    const h = 2;
+
+    baseFeature.geometry = {
+      type: "Polygon",
+      coordinates: [
+        [
+          [node.position.lng - w, node.position.lat - l],
+          [node.position.lng + w, node.position.lat - l],
+          [node.position.lng + w, node.position.lat + l],
+          [node.position.lng - w, node.position.lat + l],
+          [node.position.lng - w, node.position.lat - l],
+        ],
+      ],
+    };
+    if (baseFeature.properties) {
+      baseFeature.properties.height = h;
+    }
+
+    // Splitter Cap
+    const capH = h + 0.3;
+    const capMin = h - 0.2;
+    const capFeature: GeoJSON.Feature = {
+      type: "Feature",
+      geometry: {
+        type: "Polygon",
+        coordinates: [
+          [
+            [node.position.lng - w * 1.1, node.position.lat - l * 1.1],
+            [node.position.lng + w * 1.1, node.position.lat - l * 1.1],
+            [node.position.lng + w * 1.1, node.position.lat + l * 1.1],
+            [node.position.lng - w * 1.1, node.position.lat + l * 1.1],
+            [node.position.lng - w * 1.1, node.position.lat - l * 1.1],
+          ],
+        ],
+      },
+      properties: {
+        ...node,
+        id: `${node.id}-cap`,
+        type: String(node.type),
+        status: String(node.status),
+        height: capH,
+        min_height: capMin,
+      },
+    };
+
+    // Ports / Connections side detail
+    const portW = 0.00001;
+    const portL = 0.00002;
+    const portH = h * 0.6;
+    const portMin = h * 0.2;
+
+    const port: GeoJSON.Feature = {
+      type: "Feature",
+      geometry: {
+        type: "Polygon",
+        coordinates: [
+          [
+            [node.position.lng + w, node.position.lat - l * 0.5],
+            [node.position.lng + w + portL, node.position.lat - l * 0.5],
+            [node.position.lng + w + portL, node.position.lat + l * 0.5],
+            [node.position.lng + w, node.position.lat + l * 0.5],
+            [node.position.lng + w, node.position.lat - l * 0.5],
+          ],
+        ],
+      },
+      properties: {
+        ...node,
+        id: `${node.id}-ports`,
+        type: String(node.type),
+        status: String(node.status),
+        height: portH,
+        min_height: portMin,
+      },
+    };
+
+    return [baseFeature, capFeature, port];
+  }
+
+  if (node.type === NetworkNodeType.JUNCTION_BOX) {
+    // Ground-mounted telecom pedestal / junction box
+    const w = 0.00004; // width
+    const l = 0.00002; // length (depth)
+    const h = 1.5; // 1.5 meters tall
+
+    baseFeature.geometry = {
+      type: "Polygon",
+      coordinates: [
+        [
+          [node.position.lng - w, node.position.lat - l],
+          [node.position.lng + w, node.position.lat - l],
+          [node.position.lng + w, node.position.lat + l],
+          [node.position.lng - w, node.position.lat + l],
+          [node.position.lng - w, node.position.lat - l],
+        ],
+      ],
+    };
+    if (baseFeature.properties) {
+      baseFeature.properties.height = h;
+    }
+
+    // Small raised "lid" or cap on top
+    const capW = 0.000045; // slightly wider cap
+    const capL = 0.000025;
+    const capH = 1.6;
+    const capMin = 1.4;
+
+    const capFeature: GeoJSON.Feature = {
+      type: "Feature",
+      geometry: {
+        type: "Polygon",
+        coordinates: [
+          [
+            [node.position.lng - capW, node.position.lat - capL],
+            [node.position.lng + capW, node.position.lat - capL],
+            [node.position.lng + capW, node.position.lat + capL],
+            [node.position.lng - capW, node.position.lat + capL],
+            [node.position.lng - capW, node.position.lat - capL],
+          ],
+        ],
+      },
+      properties: {
+        ...node,
+        id: `${node.id}-cap`,
+        type: String(node.type),
+        status: String(node.status),
+        height: capH,
+        min_height: capMin,
+      },
+    };
+
+    return [baseFeature, capFeature];
+  }
+
+  if (node.type === NetworkNodeType.ONU) {
+    // ONU: Small wall-mounted or side-mounted box, floating slightly off the ground
+    const w = 0.000015; // very small width
+    const l = 0.00001; // very small depth
+    const h = 2.0; // top at 2 meters
+    const minH = 1.2; // bottom at 1.2 meters (floating)
+
+    baseFeature.geometry = {
+      type: "Polygon",
+      coordinates: [
+        [
+          [node.position.lng - w, node.position.lat - l],
+          [node.position.lng + w, node.position.lat - l],
+          [node.position.lng + w, node.position.lat + l],
+          [node.position.lng - w, node.position.lat + l],
+          [node.position.lng - w, node.position.lat - l],
+        ],
+      ],
+    };
+    if (baseFeature.properties) {
+      baseFeature.properties.height = h;
+      baseFeature.properties.min_height = minH;
+    }
+
+    // Conduit / wire going from the ONU down to the ground
+    const wireRadius = 0.000003;
+    const wireFeature: GeoJSON.Feature = {
+      type: "Feature",
+      geometry: {
+        type: "Polygon",
+        coordinates: [
+          [
+            [node.position.lng - wireRadius, node.position.lat - wireRadius],
+            [node.position.lng + wireRadius, node.position.lat - wireRadius],
+            [node.position.lng + wireRadius, node.position.lat + wireRadius],
+            [node.position.lng - wireRadius, node.position.lat + wireRadius],
+            [node.position.lng - wireRadius, node.position.lat - wireRadius],
+          ],
+        ],
+      },
+      properties: {
+        ...node,
+        id: `${node.id}-wire`,
+        type: String(node.type),
+        status: String(node.status),
+        height: minH,
+        min_height: 0,
+      },
+    };
+
+    return [baseFeature, wireFeature];
+  }
+
+  if (node.type === NetworkNodeType.POLE) {
+    // Utility pole: make the main pole thinner
+    const poleRadius = 0.00003; // ~3m
+    baseFeature.geometry = {
+      type: "Polygon",
+      coordinates: [
+        [
+          [node.position.lng - poleRadius, node.position.lat - poleRadius],
+          [node.position.lng + poleRadius, node.position.lat - poleRadius],
+          [node.position.lng + poleRadius, node.position.lat + poleRadius],
+          [node.position.lng - poleRadius, node.position.lat + poleRadius],
+          [node.position.lng - poleRadius, node.position.lat - poleRadius],
+        ],
+      ],
+    };
+
+    // Add a crossarm near the top
+    const crossarmLength = 0.00012; // ~12m
+    const crossarmWidth = 0.00002; // ~2m
+    const crossarmHeight = height; // 15m
+    const crossarmMinHeight = height - 0.5; // 14.5m
+
+    const crossarmFeature: GeoJSON.Feature = {
+      type: "Feature",
+      geometry: {
+        type: "Polygon",
+        coordinates: [
+          [
+            [node.position.lng - crossarmLength, node.position.lat - crossarmWidth],
+            [node.position.lng + crossarmLength, node.position.lat - crossarmWidth],
+            [node.position.lng + crossarmLength, node.position.lat + crossarmWidth],
+            [node.position.lng - crossarmLength, node.position.lat + crossarmWidth],
+            [node.position.lng - crossarmLength, node.position.lat - crossarmWidth],
+          ],
+        ],
+      },
+      properties: {
+        ...node,
+        id: `${node.id}-crossarm`, // distinct ID
+        type: String(node.type),
+        status: String(node.status),
+        height: crossarmHeight,
+        min_height: crossarmMinHeight,
+      },
+    };
+
+    return [baseFeature, crossarmFeature];
+  }
+
+  if (node.type === NetworkNodeType.CUSTOMER) {
+    // WiFi Router: flat box base with two small antennas
+    const w = 0.00003; // width
+    const l = 0.00002; // length (depth)
+    const h = 0.5; // height (thin box)
+    const minH = 0; // on ground
+
+    baseFeature.geometry = {
+      type: "Polygon",
+      coordinates: [
+        [
+          [node.position.lng - w, node.position.lat - l],
+          [node.position.lng + w, node.position.lat - l],
+          [node.position.lng + w, node.position.lat + l],
+          [node.position.lng - w, node.position.lat + l],
+          [node.position.lng - w, node.position.lat - l],
+        ],
+      ],
+    };
+    if (baseFeature.properties) {
+      baseFeature.properties.height = h;
+      baseFeature.properties.min_height = minH;
+    }
+
+    // Antennas
+    const antRadius = 0.000002;
+    const antH = 1.5; // stick up 1.5m
+    const antLeftOffset = w * 0.7; // near the left edge
+    const antDepthOffset = l * 0.7; // near the back edge
+
+    const antenna1: GeoJSON.Feature = {
+      type: "Feature",
+      geometry: {
+        type: "Polygon",
+        coordinates: [
+          [
+            [
+              node.position.lng - antLeftOffset - antRadius,
+              node.position.lat - antDepthOffset - antRadius,
+            ],
+            [
+              node.position.lng - antLeftOffset + antRadius,
+              node.position.lat - antDepthOffset - antRadius,
+            ],
+            [
+              node.position.lng - antLeftOffset + antRadius,
+              node.position.lat - antDepthOffset + antRadius,
+            ],
+            [
+              node.position.lng - antLeftOffset - antRadius,
+              node.position.lat - antDepthOffset + antRadius,
+            ],
+            [
+              node.position.lng - antLeftOffset - antRadius,
+              node.position.lat - antDepthOffset - antRadius,
+            ],
+          ],
+        ],
+      },
+      properties: {
+        ...node,
+        id: `${node.id}-ant1`,
+        type: String(node.type),
+        status: String(node.status),
+        height: antH,
+        min_height: h,
+      },
+    };
+
+    const antenna2: GeoJSON.Feature = {
+      type: "Feature",
+      geometry: {
+        type: "Polygon",
+        coordinates: [
+          [
+            [
+              node.position.lng + antLeftOffset - antRadius,
+              node.position.lat - antDepthOffset - antRadius,
+            ],
+            [
+              node.position.lng + antLeftOffset + antRadius,
+              node.position.lat - antDepthOffset - antRadius,
+            ],
+            [
+              node.position.lng + antLeftOffset + antRadius,
+              node.position.lat - antDepthOffset + antRadius,
+            ],
+            [
+              node.position.lng + antLeftOffset - antRadius,
+              node.position.lat - antDepthOffset + antRadius,
+            ],
+            [
+              node.position.lng + antLeftOffset - antRadius,
+              node.position.lat - antDepthOffset - antRadius,
+            ],
+          ],
+        ],
+      },
+      properties: {
+        ...node,
+        id: `${node.id}-ant2`,
+        type: String(node.type),
+        status: String(node.status),
+        height: antH,
+        min_height: h,
+      },
+    };
+
+    return [baseFeature, antenna1, antenna2];
+  }
+
+  return [baseFeature];
+};
 
 export const createConnectionFeature = (
   connection: NetworkConnection,

@@ -1,7 +1,14 @@
 "use client";
 
-import { NetworkNode, NetworkConnection, LatLng, MeasurementPoint, TracePath, NetworkStatus } from '../types';
-import { useNetworkMapStore } from '../stores/useNetworkMapStore';
+import {
+  NetworkNode,
+  NetworkConnection,
+  LatLng,
+  MeasurementPoint,
+  TracePath,
+  NetworkStatus,
+} from "../types";
+import { useNetworkMapStore } from "../stores/useNetworkMapStore";
 
 // Tool interface defining common methods
 export interface MapTool {
@@ -9,11 +16,11 @@ export interface MapTool {
   name: string;
   icon: string;
   description: string;
-  
+
   // Lifecycle methods
   activate: () => void;
   deactivate: () => void;
-  
+
   // Event handlers
   onClick?: (event: MapMouseEvent) => void;
   onDoubleClick?: (event: MapMouseEvent) => void;
@@ -22,7 +29,7 @@ export interface MapTool {
   onMouseUp?: (event: MapMouseEvent) => void;
   onKeyDown?: (event: KeyboardEvent) => void;
   onKeyUp?: (event: KeyboardEvent) => void;
-  
+
   // Cursor style
   cursor?: string;
 }
@@ -34,8 +41,11 @@ export interface MapMouseEvent {
   originalEvent: MouseEvent;
   features?: Array<{
     layer?: { id: string };
-    properties?: Record<string, any>;
-    geometry?: { type: string; coordinates: any };
+    properties?: Record<string, any> | null;
+    geometry?: {
+      type: string;
+      coordinates: number;
+    } | null;
   }>;
 }
 
@@ -45,7 +55,7 @@ abstract class BaseTool implements MapTool {
   public abstract readonly name: string;
   public abstract readonly icon: string;
   public abstract readonly description: string;
-  public cursor: string = 'default';
+  public cursor: string = "default";
 
   activate(): void {
     console.log(`[Tool] ${this.name} activated`);
@@ -58,20 +68,20 @@ abstract class BaseTool implements MapTool {
 
 // Select Tool - Default selection and inspection
 export class SelectTool extends BaseTool {
-  public readonly id = 'select';
-  public readonly name = 'Select';
-  public readonly icon = 'CursorClick';
-  public readonly description = 'Select and inspect network elements';
-  public cursor = 'pointer';
+  public readonly id = "select";
+  public readonly name = "Select";
+  public readonly icon = "CursorClick";
+  public readonly description = "Select and inspect network elements";
+  public cursor = "pointer";
 
   onClick(event: MapMouseEvent): void {
     const store = useNetworkMapStore.getState();
-    
+
     // Find clicked feature
     if (event.features && event.features.length > 0) {
       const feature = event.features[0];
       const elementId = feature.properties?.id;
-      
+
       if (elementId) {
         store.setSelectedElement(elementId);
         store.addToSelectionHistory(elementId);
@@ -85,12 +95,12 @@ export class SelectTool extends BaseTool {
 
 // Trace Tool - Connection path tracing
 export class TraceTool extends BaseTool {
-  public readonly id = 'trace';
-  public readonly name = 'Trace';
-  public readonly icon = 'GitCommit';
-  public readonly description = 'Trace connections between nodes';
-  public cursor = 'crosshair';
-  
+  public readonly id = "trace";
+  public readonly name = "Trace";
+  public readonly icon = "GitCommit";
+  public readonly description = "Trace connections between nodes";
+  public cursor = "crosshair";
+
   private sourceNode: string | null = null;
 
   activate(): void {
@@ -106,19 +116,19 @@ export class TraceTool extends BaseTool {
 
   onClick(event: MapMouseEvent): void {
     const store = useNetworkMapStore.getState();
-    
+
     if (!event.features || event.features.length === 0) return;
-    
+
     const feature = event.features[0];
     const nodeId = feature.properties?.id;
-    
+
     if (!nodeId) return;
 
     // If no source node selected, set it
     if (!this.sourceNode) {
       this.sourceNode = nodeId;
       store.setSelectedElement(nodeId);
-      console.log('[Trace] Source node selected:', nodeId);
+      console.log("[Trace] Source node selected:", nodeId);
       return;
     }
 
@@ -134,11 +144,11 @@ export class TraceTool extends BaseTool {
     const nodes = store.nodes;
     const connections = store.connections;
 
-    console.log('[Trace] Tracing path from', sourceId, 'to', targetId);
+    console.log("[Trace] Tracing path from", sourceId, "to", targetId);
 
     // BFS to find path
     const path = this.findPathBFS(sourceId, targetId, nodes, connections);
-    
+
     if (path) {
       const tracePath: TracePath = {
         id: `trace_${Date.now()}`,
@@ -147,13 +157,13 @@ export class TraceTool extends BaseTool {
         path: path.nodes,
         connections: path.connections,
         totalDistance: this.calculatePathDistance(path.nodes),
-        calculatedAt: new Date()
+        calculatedAt: new Date(),
       };
-      
+
       store.setTracePath(tracePath);
-      console.log('[Trace] Path found:', tracePath);
+      console.log("[Trace] Path found:", tracePath);
     } else {
-      console.warn('[Trace] No path found between', sourceId, 'and', targetId);
+      console.warn("[Trace] No path found between", sourceId, "and", targetId);
       store.setTracePath(null);
     }
   }
@@ -164,39 +174,46 @@ export class TraceTool extends BaseTool {
     nodes: NetworkNode[],
     connections: NetworkConnection[]
   ): { nodes: NetworkNode[]; connections: NetworkConnection[] } | null {
-    const nodeMap = new Map(nodes.map(n => [n.id, n]));
-    const adjacencyList = new Map<string, Array<{ nodeId: string; connection: NetworkConnection }>>();
+    const nodeMap = new Map(nodes.map((n) => [n.id, n]));
+    const adjacencyList = new Map<
+      string,
+      Array<{ nodeId: string; connection: NetworkConnection }>
+    >();
 
     // Build adjacency list
-    connections.forEach(conn => {
+    connections.forEach((conn) => {
       if (!adjacencyList.has(conn.sourceNodeId)) {
         adjacencyList.set(conn.sourceNodeId, []);
       }
       if (!adjacencyList.has(conn.targetNodeId)) {
         adjacencyList.set(conn.targetNodeId, []);
       }
-      
+
       adjacencyList.get(conn.sourceNodeId)!.push({
         nodeId: conn.targetNodeId,
-        connection: conn
+        connection: conn,
       });
       adjacencyList.get(conn.targetNodeId)!.push({
         nodeId: conn.sourceNodeId,
-        connection: conn
+        connection: conn,
       });
     });
 
     // BFS
-    const queue: Array<{ nodeId: string; path: string[]; connections: NetworkConnection[] }> = [
-      { nodeId: sourceId, path: [sourceId], connections: [] }
-    ];
+    const queue: Array<{
+      nodeId: string;
+      path: string[];
+      connections: NetworkConnection[];
+    }> = [{ nodeId: sourceId, path: [sourceId], connections: [] }];
     const visited = new Set<string>([sourceId]);
 
     while (queue.length > 0) {
       const current = queue.shift()!;
-      
+
       if (current.nodeId === targetId) {
-        const pathNodes = current.path.map(id => nodeMap.get(id)).filter(Boolean) as NetworkNode[];
+        const pathNodes = current.path
+          .map((id) => nodeMap.get(id))
+          .filter(Boolean) as NetworkNode[];
         return { nodes: pathNodes, connections: current.connections };
       }
 
@@ -207,7 +224,7 @@ export class TraceTool extends BaseTool {
           queue.push({
             nodeId: neighbor.nodeId,
             path: [...current.path, neighbor.nodeId],
-            connections: [...current.connections, neighbor.connection]
+            connections: [...current.connections, neighbor.connection],
           });
         }
       }
@@ -218,29 +235,26 @@ export class TraceTool extends BaseTool {
 
   private calculatePathDistance(nodes: NetworkNode[]): number {
     let totalDistance = 0;
-    
+
     for (let i = 0; i < nodes.length - 1; i++) {
-      const dist = this.haversineDistance(
-        nodes[i].position,
-        nodes[i + 1].position
-      );
+      const dist = this.haversineDistance(nodes[i].position, nodes[i + 1].position);
       totalDistance += dist;
     }
-    
+
     return totalDistance;
   }
 
   private haversineDistance(p1: LatLng, p2: LatLng): number {
     const R = 6371e3; // Earth's radius in meters
-    const φ1 = p1.lat * Math.PI / 180;
-    const φ2 = p2.lat * Math.PI / 180;
-    const Δφ = (p2.lat - p1.lat) * Math.PI / 180;
-    const Δλ = (p2.lng - p1.lng) * Math.PI / 180;
+    const φ1 = (p1.lat * Math.PI) / 180;
+    const φ2 = (p2.lat * Math.PI) / 180;
+    const Δφ = ((p2.lat - p1.lat) * Math.PI) / 180;
+    const Δλ = ((p2.lng - p1.lng) * Math.PI) / 180;
 
-    const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
-              Math.cos(φ1) * Math.cos(φ2) *
-              Math.sin(Δλ/2) * Math.sin(Δλ/2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    const a =
+      Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+      Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
     return R * c;
   }
@@ -248,11 +262,11 @@ export class TraceTool extends BaseTool {
 
 // Measure Tool - Distance and area measurement
 export class MeasureTool extends BaseTool {
-  public readonly id = 'measure';
-  public readonly name = 'Measure';
-  public readonly icon = 'Ruler';
-  public readonly description = 'Measure distances and areas on the map';
-  public cursor = 'crosshair';
+  public readonly id = "measure";
+  public readonly name = "Measure";
+  public readonly icon = "Ruler";
+  public readonly description = "Measure distances and areas on the map";
+  public cursor = "crosshair";
 
   activate(): void {
     super.activate();
@@ -272,42 +286,46 @@ export class MeasureTool extends BaseTool {
       id: `measure_${Date.now()}_${measurements.length}`,
       position: event.lngLat,
       timestamp: new Date(),
-      distance: measurements.length > 0 
-        ? this.calculateDistance(measurements[measurements.length - 1].position, event.lngLat)
-        : 0
+      distance:
+        measurements.length > 0
+          ? this.calculateDistance(
+              measurements[measurements.length - 1].position,
+              event.lngLat
+            )
+          : 0,
     };
 
     store.addMeasurement(newPoint);
-    console.log('[Measure] Added point:', newPoint);
+    console.log("[Measure] Added point:", newPoint);
   }
 
   onKeyDown(event: KeyboardEvent): void {
     // Press Escape or Backspace to remove last point
-    if (event.key === 'Escape' || event.key === 'Backspace') {
+    if (event.key === "Escape" || event.key === "Backspace") {
       const store = useNetworkMapStore.getState();
       const measurements = store.measurements;
-      
+
       if (measurements.length > 0) {
         // Remove last measurement (need to implement remove in store)
         const updated = measurements.slice(0, -1);
         // For now, just clear all
         store.clearMeasurements();
-        console.log('[Measure] Cleared measurements');
+        console.log("[Measure] Cleared measurements");
       }
     }
   }
 
   private calculateDistance(p1: LatLng, p2: LatLng): number {
     const R = 6371e3; // Earth's radius in meters
-    const φ1 = p1.lat * Math.PI / 180;
-    const φ2 = p2.lat * Math.PI / 180;
-    const Δφ = (p2.lat - p1.lat) * Math.PI / 180;
-    const Δλ = (p2.lng - p1.lng) * Math.PI / 180;
+    const φ1 = (p1.lat * Math.PI) / 180;
+    const φ2 = (p2.lat * Math.PI) / 180;
+    const Δφ = ((p2.lat - p1.lat) * Math.PI) / 180;
+    const Δλ = ((p2.lng - p1.lng) * Math.PI) / 180;
 
-    const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
-              Math.cos(φ1) * Math.cos(φ2) *
-              Math.sin(Δλ/2) * Math.sin(Δλ/2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    const a =
+      Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+      Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
     return R * c;
   }
@@ -320,13 +338,13 @@ export class MeasureTool extends BaseTool {
 
 // Heatmap Tool - Network density visualization
 export class HeatmapTool extends BaseTool {
-  public readonly id = 'heatmap';
-  public readonly name = 'Heatmap';
-  public readonly icon = 'Fire';
-  public readonly description = 'Visualize network density and utilization';
-  public cursor = 'default';
+  public readonly id = "heatmap";
+  public readonly name = "Heatmap";
+  public readonly icon = "Fire";
+  public readonly description = "Visualize network density and utilization";
+  public cursor = "default";
 
-  private heatmapType: 'density' | 'utilization' | 'incidents' = 'density';
+  private heatmapType: "density" | "utilization" | "incidents" = "density";
 
   activate(): void {
     super.activate();
@@ -338,7 +356,7 @@ export class HeatmapTool extends BaseTool {
     useNetworkMapStore.getState().setHeatmapData(null);
   }
 
-  setHeatmapType(type: 'density' | 'utilization' | 'incidents'): void {
+  setHeatmapType(type: "density" | "utilization" | "incidents"): void {
     this.heatmapType = type;
     this.generateHeatmap();
   }
@@ -348,31 +366,31 @@ export class HeatmapTool extends BaseTool {
     const nodes = store.nodes;
     const connections = store.connections;
 
-    console.log('[Heatmap] Generating heatmap:', this.heatmapType);
+    console.log("[Heatmap] Generating heatmap:", this.heatmapType);
 
     let dataPoints: Array<{ position: LatLng; intensity: number; value?: number }> = [];
 
     switch (this.heatmapType) {
-      case 'density':
+      case "density":
         // Node density heatmap
-        dataPoints = nodes.map(node => ({
+        dataPoints = nodes.map((node) => ({
           position: node.position,
           intensity: this.calculateNodeDensity(node, nodes),
-          value: 1
+          value: 1,
         }));
         break;
 
-      case 'utilization':
+      case "utilization":
         // Bandwidth utilization heatmap
         dataPoints = connections
-          .filter(conn => conn.utilization !== undefined)
-          .map(conn => {
-            const sourceNode = nodes.find(n => n.id === conn.sourceNodeId);
+          .filter((conn) => conn.utilization !== undefined)
+          .map((conn) => {
+            const sourceNode = nodes.find((n) => n.id === conn.sourceNodeId);
             if (sourceNode) {
               return {
                 position: sourceNode.position,
                 intensity: (conn.utilization || 0) / 100,
-                value: conn.utilization
+                value: conn.utilization,
               };
             }
             return null;
@@ -380,41 +398,44 @@ export class HeatmapTool extends BaseTool {
           .filter(Boolean) as typeof dataPoints;
         break;
 
-      case 'incidents':
+      case "incidents":
         // Incident concentration heatmap
         // This would use incident data from the store
         dataPoints = nodes
-          .filter(node => node.status === NetworkStatus.ERROR || node.status === NetworkStatus.WARNING)
-          .map(node => ({
+          .filter(
+            (node) =>
+              node.status === NetworkStatus.ERROR || node.status === NetworkStatus.WARNING
+          )
+          .map((node) => ({
             position: node.position,
             intensity: node.status === NetworkStatus.ERROR ? 1 : 0.5,
-            value: 1
+            value: 1,
           }));
         break;
     }
 
     const heatmapData = {
       dataPoints,
-      maxIntensity: Math.max(...dataPoints.map(d => d.intensity), 1),
+      maxIntensity: Math.max(...dataPoints.map((d) => d.intensity), 1),
       radius: 30,
       blur: 15,
       gradient: {
-        '0.0': 'blue',
-        '0.25': 'cyan',
-        '0.5': 'lime',
-        '0.75': 'yellow',
-        '1.0': 'red'
-      }
+        "0.0": "blue",
+        "0.25": "cyan",
+        "0.5": "lime",
+        "0.75": "yellow",
+        "1.0": "red",
+      },
     };
 
     store.setHeatmapData(heatmapData);
-    console.log('[Heatmap] Generated with', dataPoints.length, 'data points');
+    console.log("[Heatmap] Generated with", dataPoints.length, "data points");
   }
 
   private calculateNodeDensity(node: NetworkNode, allNodes: NetworkNode[]): number {
     // Count nodes within 1km radius
     const radius = 0.01; // ~1km in degrees (rough approximation)
-    const nearbyCount = allNodes.filter(other => {
+    const nearbyCount = allNodes.filter((other) => {
       if (other.id === node.id) return false;
       const dx = other.position.lat - node.position.lat;
       const dy = other.position.lng - node.position.lng;
@@ -441,7 +462,7 @@ export class ToolManager {
 
   registerTool(tool: MapTool): void {
     this.tools.set(tool.id, tool);
-    console.log('[ToolManager] Registered tool:', tool.name);
+    console.log("[ToolManager] Registered tool:", tool.name);
   }
 
   getTool(toolId: string): MapTool | undefined {
@@ -463,12 +484,12 @@ export class ToolManager {
     if (newTool) {
       this.activeTool = newTool;
       newTool.activate();
-      
+
       // Update store
       useNetworkMapStore.getState().setActiveTool(toolId as any);
-      console.log('[ToolManager] Active tool changed to:', newTool.name);
+      console.log("[ToolManager] Active tool changed to:", newTool.name);
     } else {
-      console.warn('[ToolManager] Tool not found:', toolId);
+      console.warn("[ToolManager] Tool not found:", toolId);
     }
   }
 
@@ -476,11 +497,11 @@ export class ToolManager {
     return this.activeTool;
   }
 
-  handleEvent(eventName: string, event: any): void {
+  handleEvent(eventName: string, event: MapMouseEvent | KeyboardEvent): void {
     if (!this.activeTool) return;
 
     const handler = (this.activeTool as any)[eventName];
-    if (typeof handler === 'function') {
+    if (typeof handler === "function") {
       handler.call(this.activeTool, event);
     }
   }

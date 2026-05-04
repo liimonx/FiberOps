@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo } from "react";
 import { Icon, Button, Card, Badge } from "@shohojdhara/atomix";
+import { Customer } from "@/types/domain";
 import {
   useNetworkData,
   useRealTimeUpdates,
@@ -48,7 +49,7 @@ function NetworkMapDataSync({ children }: NetworkMapDataProps) {
   useEffect(() => {
     const assetNodes = nodes.data ?? [];
     const customerNodes =
-      customers.data?.map((customer: any) => ({
+      customers.data?.map((customer: Customer) => ({
         id: customer.id,
         name: customer.name,
         type: NetworkNodeType.CUSTOMER,

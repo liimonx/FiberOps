@@ -1,10 +1,10 @@
 "use client";
 
-import React, { useEffect, useRef } from 'react';
-import { getMapInstance } from './MapCanvas';
-import { useNetworkMapStore } from '../stores/useNetworkMapStore';
-import { useAccessibilityAnnounce } from './AccessibilityAnnouncer';
-import { getToolManager } from '../tools/toolManager';
+import React, { useEffect, useRef } from "react";
+import { getMapInstance } from "./MapCanvas";
+import { useNetworkMapStore } from "../stores/useNetworkMapStore";
+import { useAccessibilityAnnounce } from "./AccessibilityAnnouncer";
+import { getToolManager } from "../tools/toolManager";
 
 interface MapEventHandlerProps {
   onNodeClick?: (nodeId: string, event: mapboxgl.MapMouseEvent) => void;
@@ -19,7 +19,7 @@ export const MapEventHandler: React.FC<MapEventHandlerProps> = ({
   onNodeHover,
   onConnectionClick,
   onMapClick,
-  onMapMove
+  onMapMove,
 }) => {
   const setSelectedElement = useNetworkMapStore((state) => state.setSelectedElement);
   const setHoveredElement = useNetworkMapStore((state) => state.setHoveredElement);
@@ -45,28 +45,31 @@ export const MapEventHandler: React.FC<MapEventHandlerProps> = ({
     const handleMapClick = (event: mapboxgl.MapMouseEvent) => {
       // Check if layers exist before querying
       let features: mapboxgl.MapboxGeoJSONFeature[] = [];
-      if (map.getLayer('network-nodes-layer') && map.getLayer('network-connections-layer')) {
+      if (
+        map.getLayer("network-nodes-3d-layer") &&
+        map.getLayer("network-connections-layer")
+      ) {
         features = map.queryRenderedFeatures(event.point, {
-          layers: ['network-nodes-layer', 'network-connections-layer']
+          layers: ["network-nodes-3d-layer", "network-connections-layer"],
         });
       }
 
       // Delegate to ToolManager
-      toolManager.handleEvent('onClick', {
+      toolManager.handleEvent("onClick", {
         lngLat: event.lngLat,
         point: event.point,
         originalEvent: event.originalEvent,
-        features: features
+        features: features,
       });
 
       // Still fire callbacks for external components if needed
       if (features.length > 0) {
         const feature = features[0];
         const elementId = feature.properties?.id;
-        
-        if (feature.layer && feature.layer.id === 'network-nodes-layer') {
+
+        if (feature.layer && feature.layer.id === "network-nodes-3d-layer") {
           onNodeClick?.(elementId, event);
-        } else if (feature.layer && feature.layer.id === 'network-connections-layer') {
+        } else if (feature.layer && feature.layer.id === "network-connections-layer") {
           onConnectionClick?.(elementId, event);
         }
       } else {
@@ -77,19 +80,22 @@ export const MapEventHandler: React.FC<MapEventHandlerProps> = ({
     // Handle mouse move for hover effects
     const handleMouseMove = (event: mapboxgl.MapMouseEvent) => {
       // Check if layers exist before querying
-      if (!map.getLayer('network-nodes-layer') || !map.getLayer('network-connections-layer')) {
+      if (
+        !map.getLayer("network-nodes-layer") ||
+        !map.getLayer("network-connections-layer")
+      ) {
         return;
       }
 
       const features = map.queryRenderedFeatures(event.point, {
-        layers: ['network-nodes-layer', 'network-connections-layer']
+        layers: ["network-nodes-layer", "network-connections-layer"],
       });
 
       if (features.length > 0) {
         const feature = features[0];
         const elementId = feature.properties?.id;
-        
-        if (feature.layer && feature.layer.id === 'network-nodes-layer') {
+
+        if (feature.layer && feature.layer.id === "network-nodes-3d-layer") {
           setHoveredElement(elementId);
           onNodeHover?.(elementId, event);
         } else {
@@ -109,9 +115,9 @@ export const MapEventHandler: React.FC<MapEventHandlerProps> = ({
     };
 
     // Add event listeners
-    map.on('click', handleMapClick);
-    map.on('mousemove', handleMouseMove);
-    map.on('mouseleave', handleMouseLeave);
+    map.on("click", handleMapClick);
+    map.on("mousemove", handleMouseMove);
+    map.on("mouseleave", handleMouseLeave);
 
     // Add keyboard navigation support
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -122,97 +128,108 @@ export const MapEventHandler: React.FC<MapEventHandlerProps> = ({
 
       // Don't intercept if typing in an input
       const target = event.target as HTMLElement;
-      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) {
+      if (
+        target.tagName === "INPUT" ||
+        target.tagName === "TEXTAREA" ||
+        target.isContentEditable
+      ) {
         return;
       }
 
       switch (event.key) {
-        case 'ArrowLeft':
+        case "ArrowLeft":
           event.preventDefault();
           map.panBy([-moveStep, 0], { duration: 100 });
           break;
-        case 'ArrowRight':
+        case "ArrowRight":
           event.preventDefault();
           map.panBy([moveStep, 0], { duration: 100 });
           break;
-        case 'ArrowUp':
+        case "ArrowUp":
           event.preventDefault();
           map.panBy([0, -moveStep], { duration: 100 });
           break;
-        case 'ArrowDown':
+        case "ArrowDown":
           event.preventDefault();
           map.panBy([0, moveStep], { duration: 100 });
           break;
-        case '+':
-        case '=':
+        case "+":
+        case "=":
           event.preventDefault();
           map.zoomIn({ duration: 100 });
-          announce('Zoomed in', 'polite');
+          announce("Zoomed in", "polite");
           break;
-        case '-':
-        case '_':
+        case "-":
+        case "_":
           event.preventDefault();
           map.zoomOut({ duration: 100 });
-          announce('Zoomed out', 'polite');
+          announce("Zoomed out", "polite");
           break;
-        case 'v':
-        case 'V':
+        case "v":
+        case "V":
           if (!event.ctrlKey && !event.metaKey) {
             event.preventDefault();
-            setActiveTool('select');
-            announce('Select tool activated', 'polite');
+            setActiveTool("select");
+            announce("Select tool activated", "polite");
           }
           break;
-        case 't':
-        case 'T':
+        case "t":
+        case "T":
           if (!event.ctrlKey && !event.metaKey) {
             event.preventDefault();
-            setActiveTool('trace');
-            announce('Trace path tool activated', 'polite');
+            setActiveTool("trace");
+            announce("Trace path tool activated", "polite");
           }
           break;
-        case 'm':
-        case 'M':
+        case "m":
+        case "M":
           if (!event.ctrlKey && !event.metaKey) {
             event.preventDefault();
-            setActiveTool('measure');
-            announce('Measure tool activated', 'polite');
+            setActiveTool("measure");
+            announce("Measure tool activated", "polite");
           }
           break;
-        case 'h':
-        case 'H':
+        case "h":
+        case "H":
           if (!event.ctrlKey && !event.metaKey) {
             event.preventDefault();
-            setActiveTool('heatmap');
-            announce('Heatmap tool activated', 'polite');
+            setActiveTool("heatmap");
+            announce("Heatmap tool activated", "polite");
           }
           break;
-        case 'Escape':
+        case "Escape":
           setSelectedElement(null);
           setHoveredElement(null);
-          announce('Selection cleared', 'polite');
+          announce("Selection cleared", "polite");
           break;
       }
     };
 
     // Add keyboard event listener to the map container
     const mapContainer = map.getContainer();
-    mapContainer.addEventListener('keydown', handleKeyDown);
+    mapContainer.addEventListener("keydown", handleKeyDown);
     mapContainer.tabIndex = 0; // Make map focusable for keyboard navigation
 
     // Cleanup function
     return () => {
       if (map) {
-        map.off('click', handleMapClick);
-        map.off('mousemove', handleMouseMove);
-        map.off('mouseleave', handleMouseLeave);
+        map.off("click", handleMapClick);
+        map.off("mousemove", handleMouseMove);
+        map.off("mouseleave", handleMouseLeave);
       }
-      
+
       if (mapContainer) {
-        mapContainer.removeEventListener('keydown', handleKeyDown);
+        mapContainer.removeEventListener("keydown", handleKeyDown);
       }
     };
-  }, [setSelectedElement, setHoveredElement, onNodeClick, onNodeHover, onConnectionClick, onMapClick]);
+  }, [
+    setSelectedElement,
+    setHoveredElement,
+    onNodeClick,
+    onNodeHover,
+    onConnectionClick,
+    onMapClick,
+  ]);
 
   // This component doesn't render anything visible
   return null;
@@ -227,28 +244,28 @@ export const useToolHandlers = (activeTool: string) => {
 
     // Set cursor based on active tool
     const mapContainer = map.getContainer();
-    
+
     switch (activeTool) {
-      case 'select':
-        mapContainer.style.cursor = 'pointer';
+      case "select":
+        mapContainer.style.cursor = "pointer";
         break;
-      case 'trace':
-        mapContainer.style.cursor = 'crosshair';
+      case "trace":
+        mapContainer.style.cursor = "crosshair";
         break;
-      case 'measure':
-        mapContainer.style.cursor = 'cell';
+      case "measure":
+        mapContainer.style.cursor = "cell";
         break;
-      case 'heatmap':
-        mapContainer.style.cursor = 'help';
+      case "heatmap":
+        mapContainer.style.cursor = "help";
         break;
       default:
-        mapContainer.style.cursor = 'grab';
+        mapContainer.style.cursor = "grab";
     }
 
     // Cleanup cursor on unmount
     return () => {
       if (mapContainer) {
-        mapContainer.style.cursor = 'grab';
+        mapContainer.style.cursor = "grab";
       }
     };
   }, [activeTool, map]);
@@ -263,17 +280,17 @@ export const useToolHandlers = (activeTool: string) => {
 export const getFeaturesAtPoint = (point: mapboxgl.Point, layerIds?: string[]) => {
   const map = getMapInstance();
   if (!map) return [];
-  
+
   // Check if layers exist before querying
-  const layersToQuery = layerIds || ['network-nodes-layer', 'network-connections-layer'];
-  const layersExist = layersToQuery.every(layerId => map.getLayer(layerId));
-  
+  const layersToQuery = layerIds || ["network-nodes-3d-layer", "network-connections-layer"];
+  const layersExist = layersToQuery.every((layerId) => map.getLayer(layerId));
+
   if (!layersExist) {
     return [];
   }
-  
+
   return map.queryRenderedFeatures(point, {
-    layers: layersToQuery
+    layers: layersToQuery,
   });
 };
 
@@ -281,11 +298,11 @@ export const getFeaturesAtPoint = (point: mapboxgl.Point, layerIds?: string[]) =
 export const fitMapBounds = (bounds: mapboxgl.LngLatBoundsLike, padding?: number) => {
   const map = getMapInstance();
   if (!map) return;
-  
+
   map.fitBounds(bounds, {
     padding: padding || 50,
     duration: 1000,
-    essential: true
+    essential: true,
   });
 };
 
@@ -298,13 +315,13 @@ export const flyToLocation = (
 ) => {
   const map = getMapInstance();
   if (!map) return;
-  
+
   map.flyTo({
     center,
     zoom: zoom || map.getZoom(),
     bearing: bearing || map.getBearing(),
     pitch: pitch || map.getPitch(),
     duration: 1500,
-    essential: true
+    essential: true,
   });
 };

@@ -79,26 +79,26 @@ export class PerformanceOptimizer {
   }
 
   // Debounce function for performance
-  static debounce<T extends (...args: any[]) => any>(
-    fn: T,
+  static debounce<TArgs extends unknown[]>(
+    fn: (...args: TArgs) => void,
     wait: number
-  ): (...args: Parameters<T>) => void {
+  ): (...args: TArgs) => void {
     let timeout: NodeJS.Timeout | null = null;
     
-    return (...args: Parameters<T>) => {
+    return (...args: TArgs) => {
       if (timeout) clearTimeout(timeout);
       timeout = setTimeout(() => fn(...args), wait);
     };
   }
 
   // Throttle function for performance
-  static throttle<T extends (...args: any[]) => any>(
-    fn: T,
+  static throttle<TArgs extends unknown[]>(
+    fn: (...args: TArgs) => void,
     limit: number
-  ): (...args: Parameters<T>) => void {
+  ): (...args: TArgs) => void {
     let inThrottle = false;
     
-    return (...args: Parameters<T>) => {
+    return (...args: TArgs) => {
       if (!inThrottle) {
         fn(...args);
         inThrottle = true;
@@ -249,14 +249,15 @@ export class LazyImageLoader {
 // Memory management utilities
 export class MemoryManager {
   // Clear large objects from memory
-  static releaseLargeObjects(objects: any[]): void {
+  static releaseLargeObjects(objects: Array<Record<string, unknown>>): void {
     objects.forEach(obj => {
       if (obj && typeof obj === 'object') {
         // Nullify properties to help GC
         Object.keys(obj).forEach(key => {
-          if (obj[key] instanceof ArrayBuffer || 
-              obj[key] instanceof Float32Array ||
-              Array.isArray(obj[key]) && obj[key].length > 1000) {
+          const val = obj[key];
+          if (val instanceof ArrayBuffer || 
+              val instanceof Float32Array ||
+              (Array.isArray(val) && val.length > 1000)) {
             obj[key] = null;
           }
         });

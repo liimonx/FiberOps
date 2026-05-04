@@ -12,7 +12,8 @@ import {
   NetworkConnection,
   MeasurementPoint,
   HeatmapData,
-  TracePath
+  TracePath,
+  CategorizedResult
 } from '../types';
 import { DEFAULT_LAYERS, MAPBOX_CONFIG } from '../constants';
 
@@ -58,8 +59,8 @@ interface NetworkMapStore {
   // Search state
   searchQuery: string;
   setSearchQuery: (query: string) => void;
-  searchResults: any[];
-  setSearchResults: (results: any[]) => void;
+  searchResults: CategorizedResult[];
+  setSearchResults: (results: CategorizedResult[]) => void;
   
   // Tool-specific state
   measurements: MeasurementPoint[];
@@ -96,8 +97,8 @@ interface NetworkMapStore {
 const initialViewport: ViewportState = {
   center: { lat: MAPBOX_CONFIG.DEFAULT_CENTER[1], lng: MAPBOX_CONFIG.DEFAULT_CENTER[0] }, // Mapbox uses [lng, lat] format
   zoom: MAPBOX_CONFIG.DEFAULT_ZOOM,
-  bearing: 0,
-  pitch: 0
+  bearing: MAPBOX_CONFIG.DEFAULT_BEARING,
+  pitch: MAPBOX_CONFIG.DEFAULT_PITCH
 };
 
 const initialInteraction: MapInteractionState = {
