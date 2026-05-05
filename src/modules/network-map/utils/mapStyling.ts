@@ -891,8 +891,11 @@ export const create3DNodeFeatures = (node: NetworkNode): GeoJSON.Feature[] => {
   }
 
   if (node.type === NetworkNodeType.POLE) {
-    // Utility pole: make the main pole thinner
-    const poleRadius = 0.00003; // ~3m
+    // Utility pole: realistic proportions
+    const poleRadius = 0.00001; // Thinner pole, still visible
+    const poleHeight = 12; // 12m tall
+    
+    // Main Pole Body
     baseFeature.geometry = {
       type: "Polygon",
       coordinates: [
@@ -905,38 +908,150 @@ export const create3DNodeFeatures = (node: NetworkNode): GeoJSON.Feature[] => {
         ],
       ],
     };
+    if (baseFeature.properties) {
+      baseFeature.properties.height = poleHeight;
+      baseFeature.properties.min_height = 0;
+    }
 
-    // Add a crossarm near the top
-    const crossarmLength = 0.00012; // ~12m
-    const crossarmWidth = 0.00002; // ~2m
-    const crossarmHeight = height; // 15m
-    const crossarmMinHeight = height - 0.5; // 14.5m
-
-    const crossarmFeature: GeoJSON.Feature = {
+    // Top Crossarm (larger, primary wires)
+    const ca1W = 0.00006; // Length
+    const ca1L = 0.000008; // Width
+    const ca1H = poleHeight - 0.5;
+    const ca1Min = ca1H - 0.3;
+    
+    const crossarm1: GeoJSON.Feature = {
       type: "Feature",
       geometry: {
         type: "Polygon",
-        coordinates: [
-          [
-            [node.position.lng - crossarmLength, node.position.lat - crossarmWidth],
-            [node.position.lng + crossarmLength, node.position.lat - crossarmWidth],
-            [node.position.lng + crossarmLength, node.position.lat + crossarmWidth],
-            [node.position.lng - crossarmLength, node.position.lat + crossarmWidth],
-            [node.position.lng - crossarmLength, node.position.lat - crossarmWidth],
-          ],
-        ],
+        coordinates: [[
+          [node.position.lng - ca1W, node.position.lat - ca1L],
+          [node.position.lng + ca1W, node.position.lat - ca1L],
+          [node.position.lng + ca1W, node.position.lat + ca1L],
+          [node.position.lng - ca1W, node.position.lat + ca1L],
+          [node.position.lng - ca1W, node.position.lat - ca1L],
+        ]],
       },
       properties: {
         ...node,
-        id: `${node.id}-crossarm`, // distinct ID
+        id: `${node.id}-ca1`,
         type: String(node.type),
         status: String(node.status),
-        height: crossarmHeight,
-        min_height: crossarmMinHeight,
+        height: ca1H,
+        min_height: ca1Min,
       },
     };
 
-    return [baseFeature, crossarmFeature];
+    // Secondary Crossarm (lower, secondary/fiber)
+    const ca2W = 0.000045;
+    const ca2L = ca1L;
+    const ca2H = poleHeight - 2.5;
+    const ca2Min = ca2H - 0.3;
+    
+    const crossarm2: GeoJSON.Feature = {
+      type: "Feature",
+      geometry: {
+        type: "Polygon",
+        coordinates: [[
+          [node.position.lng - ca2W, node.position.lat - ca2L],
+          [node.position.lng + ca2W, node.position.lat - ca2L],
+          [node.position.lng + ca2W, node.position.lat + ca2L],
+          [node.position.lng - ca2W, node.position.lat + ca2L],
+          [node.position.lng - ca2W, node.position.lat - ca2L],
+        ]],
+      },
+      properties: {
+        ...node,
+        id: `${node.id}-ca2`,
+        type: String(node.type),
+        status: String(node.status),
+        height: ca2H,
+        min_height: ca2Min,
+      },
+    };
+
+    // Insulators on crossarms
+    const insulators: GeoJSON.Feature[] = [];
+    const insRadius = 0.000003;
+    
+    // Insulators on Top Crossarm
+    [-0.8, -0.3, 0.3, 0.8].forEach((offset, i) => {
+      insulators.push({
+        type: "Feature",
+        geometry: {
+          type: "Polygon",
+          coordinates: [[
+            [node.position.lng + ca1W * offset - insRadius, node.position.lat - insRadius],
+            [node.position.lng + ca1W * offset + insRadius, node.position.lat - insRadius],
+            [node.position.lng + ca1W * offset + insRadius, node.position.lat + insRadius],
+            [node.position.lng + ca1W * offset - insRadius, node.position.lat + insRadius],
+            [node.position.lng + ca1W * offset - insRadius, node.position.lat - insRadius],
+          ]],
+        },
+        properties: {
+          ...node,
+          id: `${node.id}-ins1-${i}`,
+          type: String(node.type),
+          status: String(node.status),
+          height: ca1H + 0.4,
+          min_height: ca1H,
+        },
+      });
+    });
+
+    // Insulators on Second Crossarm
+    [-0.7, 0.7].forEach((offset, i) => {
+      insulators.push({
+        type: "Feature",
+        geometry: {
+          type: "Polygon",
+          coordinates: [[
+            [node.position.lng + ca2W * offset - insRadius, node.position.lat - insRadius],
+            [node.position.lng + ca2W * offset + insRadius, node.position.lat - insRadius],
+            [node.position.lng + ca2W * offset + insRadius, node.position.lat + insRadius],
+            [node.position.lng + ca2W * offset - insRadius, node.position.lat + insRadius],
+            [node.position.lng + ca2W * offset - insRadius, node.position.lat - insRadius],
+          ]],
+        },
+        properties: {
+          ...node,
+          id: `${node.id}-ins2-${i}`,
+          type: String(node.type),
+          status: String(node.status),
+          height: ca2H + 0.3,
+          min_height: ca2H,
+        },
+      });
+    });
+
+    // Transformer (Side-mounted cylinder/box)
+    const transW = 0.000015;
+    const transL = 0.000015;
+    const transH = 8.5;
+    const transMin = 6.5;
+    
+    const transformer: GeoJSON.Feature = {
+      type: "Feature",
+      geometry: {
+        type: "Polygon",
+        coordinates: [[
+          [node.position.lng + poleRadius, node.position.lat - transL],
+          [node.position.lng + poleRadius + transW, node.position.lat - transL],
+          [node.position.lng + poleRadius + transW, node.position.lat + transL],
+          [node.position.lng + poleRadius, node.position.lat + transL],
+          [node.position.lng + poleRadius, node.position.lat - transL],
+        ]],
+      },
+      properties: {
+        ...node,
+        id: `${node.id}-trans`,
+        type: String(node.type),
+        status: String(node.status),
+        height: transH,
+        min_height: transMin,
+      },
+    };
+
+    return [baseFeature, crossarm1, crossarm2, ...insulators, transformer];
   }
 
   if (node.type === NetworkNodeType.CUSTOMER) {

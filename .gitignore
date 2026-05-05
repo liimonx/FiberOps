@@ -39,6 +39,7 @@ next-env.d.ts
 # IDE
 
 /.lingma
+/.comate
 
 
 /masala

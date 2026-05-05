@@ -282,7 +282,10 @@ export const getFeaturesAtPoint = (point: mapboxgl.Point, layerIds?: string[]) =
   if (!map) return [];
 
   // Check if layers exist before querying
-  const layersToQuery = layerIds || ["network-nodes-3d-layer", "network-connections-layer"];
+  const layersToQuery = layerIds || [
+    "network-nodes-3d-layer",
+    "network-connections-layer",
+  ];
   const layersExist = layersToQuery.every((layerId) => map.getLayer(layerId));
 
   if (!layersExist) {

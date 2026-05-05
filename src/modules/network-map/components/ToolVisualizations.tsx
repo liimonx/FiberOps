@@ -14,7 +14,7 @@ export function MeasurementVisualization({ mapInstance }: ToolVisualizationsProp
   const measurements = useNetworkMapStore((state) => state.measurements);
 
   useEffect(() => {
-    if (!mapInstance) return;
+    if (!mapInstance || !mapInstance.isStyleLoaded()) return;
 
     // Always sync the source (even when empty, so layers show nothing)
     if (mapInstance.getSource("measurements")) {
@@ -23,11 +23,6 @@ export function MeasurementVisualization({ mapInstance }: ToolVisualizationsProp
       // Only add layers when we have the first point
       addMeasurementLayers(mapInstance, measurements);
     }
-
-    // Only clean up on true unmount, not on every measurements change
-    return () => {
-      // noop - cleanup happens in the dedicated unmount effect below
-    };
   }, [mapInstance, measurements]);
 
   // Separate effect for unmount cleanup only
@@ -45,17 +40,13 @@ export function TracePathVisualization({ mapInstance }: ToolVisualizationsProps)
   const tracePath = useNetworkMapStore((state) => state.tracePath);
 
   useEffect(() => {
-    if (!mapInstance) return;
+    if (!mapInstance || !mapInstance.isStyleLoaded()) return;
 
     if (tracePath) {
       renderTracePath(mapInstance, tracePath);
     } else {
       cleanupTracePath(mapInstance);
     }
-
-    return () => {
-      // noop - cleanup on unmount handled below
-    };
   }, [mapInstance, tracePath]);
 
   // Separate unmount cleanup
@@ -73,17 +64,13 @@ export function HeatmapVisualization({ mapInstance }: ToolVisualizationsProps) {
   const heatmapData = useNetworkMapStore((state) => state.heatmapData);
 
   useEffect(() => {
-    if (!mapInstance) return;
+    if (!mapInstance || !mapInstance.isStyleLoaded()) return;
 
     if (heatmapData) {
       renderHeatmap(mapInstance, heatmapData);
     } else {
       cleanupHeatmap(mapInstance);
     }
-
-    return () => {
-      // noop
-    };
   }, [mapInstance, heatmapData]);
 
   useEffect(() => {
@@ -195,6 +182,8 @@ function createMeasurementGeoJSON(
 }
 
 function cleanupMeasurementLayers(map: mapboxgl.Map) {
+  if (!map || !map.getStyle()) return;
+
   ["measurements-labels", "measurements-points", "measurements-line"].forEach(
     (layerId) => {
       if (map.getLayer(layerId)) {
@@ -305,6 +294,8 @@ function renderTracePath(map: mapboxgl.Map, tracePath: TracePath) {
 }
 
 function cleanupTracePath(map: mapboxgl.Map) {
+  if (!map || !map.getStyle()) return;
+
   ["trace-path-nodes", "trace-path-line"].forEach((layerId) => {
     if (map.getLayer(layerId)) {
       map.removeLayer(layerId);
@@ -356,14 +347,16 @@ function renderHeatmap(map: mapboxgl.Map, heatmapData: HeatmapData) {
         ["heatmap-density"],
         0,
         "rgba(0, 0, 255, 0)",
-        0.25,
-        "rgba(0, 255, 255, 1)",
-        0.5,
-        "rgba(0, 255, 0, 1)",
-        0.75,
-        "rgba(255, 255, 0, 1)",
+        0.2,
+        "rgba(65, 105, 225, 0.5)",
+        0.4,
+        "rgba(0, 255, 255, 0.8)",
+        0.6,
+        "rgba(0, 255, 127, 0.9)",
+        0.8,
+        "rgba(255, 215, 0, 1)",
         1,
-        "rgba(255, 0, 0, 1)",
+        "rgba(255, 69, 0, 1)",
       ],
       "heatmap-radius": [
         "interpolate",
@@ -380,6 +373,8 @@ function renderHeatmap(map: mapboxgl.Map, heatmapData: HeatmapData) {
 }
 
 function cleanupHeatmap(map: mapboxgl.Map) {
+  if (!map || !map.getStyle()) return;
+
   if (map.getLayer("heatmap-layer")) {
     map.removeLayer("heatmap-layer");
   }
