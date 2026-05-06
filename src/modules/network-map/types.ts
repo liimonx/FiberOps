@@ -20,27 +20,28 @@ export interface ViewportState {
 }
 
 export enum NetworkNodeType {
-  CORE_NODE = 'core_node',
-  DISTRIBUTION_NODE = 'distribution_node',
-  ACCESS_NODE = 'access_node',
-  SPLITTER = 'splitter',
-  CUSTOMER = 'customer',
-  POLE = 'pole',
-  JUNCTION_BOX = 'junction_box',
-  ONU = 'onu',
-  POP = 'pop'
+  CORE_NODE = "core_node",
+  DISTRIBUTION_NODE = "distribution_node",
+  ACCESS_NODE = "access_node",
+  SPLITTER = "splitter",
+  CUSTOMER = "customer",
+  POLE = "pole",
+  JUNCTION_BOX = "junction_box",
+  ONU = "onu",
+  POP = "pop",
 }
 
 export enum ConnectionType {
-  FIBER_ROUTE = 'fiber_route',
-  CUSTOMER_CONNECTION = 'customer_connection'
+  FIBER_ROUTE = "fiber_route",
+  CUSTOMER_CONNECTION = "customer_connection",
 }
 
 export enum NetworkStatus {
-  ACTIVE = 'active',
-  INACTIVE = 'inactive',
-  WARNING = 'warning',
-  ERROR = 'error'
+  ACTIVE = "active",
+  INACTIVE = "inactive",
+  WARNING = "warning",
+  DEGRADED = "degraded",
+  ERROR = "error",
 }
 
 export interface NetworkNode {
@@ -52,7 +53,7 @@ export interface NetworkNode {
   capacity?: number;
   utilization?: number;
   connectedNodes?: string[];
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface NetworkConnection {
@@ -70,19 +71,19 @@ export interface NetworkMapLayer {
   id: string;
   name: string;
   visible: boolean;
-  type: 'nodes' | 'connections' | 'outages' | 'coverage' | 'customers';
+  type: "nodes" | "connections" | "outages" | "coverage" | "customers";
 }
 
-export type ToolType = 'select' | 'trace' | 'measure' | 'heatmap';
+export type ToolType = "select" | "trace" | "measure" | "heatmap";
 
 export interface SearchResult {
   id: string;
   name: string;
-  type: 'node' | 'connection' | 'customer';
+  type: "node" | "connection" | "customer";
   matchScore: number;
 }
 
-export type AssetCategory = 'all' | 'nodes' | 'connections' | 'customers';
+export type AssetCategory = "all" | "nodes" | "connections" | "customers";
 
 /**
  * Extended search result with category information for filtering

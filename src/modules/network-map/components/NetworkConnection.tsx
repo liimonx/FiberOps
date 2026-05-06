@@ -52,6 +52,7 @@ export const NetworkConnection: React.FC<NetworkConnectionProps> = ({
       case NetworkStatus.ACTIVE:
         return "Activity";
       case NetworkStatus.WARNING:
+      case NetworkStatus.DEGRADED:
         return "Warning";
       case NetworkStatus.ERROR:
         return "WarningCircle";

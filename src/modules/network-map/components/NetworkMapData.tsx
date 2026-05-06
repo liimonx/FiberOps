@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useCallback } from "react";
 import { Icon, Button, Card, Badge } from "@shohojdhara/atomix";
 import { Customer } from "@/types/domain";
 import {
@@ -13,6 +13,7 @@ import { useNetworkMapStore } from "../stores/useNetworkMapStore";
 import { ErrorBoundary } from "./ErrorBoundary";
 import { LoadingState } from "./LoadingState";
 import { NetworkNodeType, NetworkStatus } from "../types";
+import { sanitizeSearchQuery, sanitizeMetadata } from "../utils/sanitization";
 
 interface NetworkMapDataProps {
   children: React.ReactNode;
@@ -22,14 +23,16 @@ interface NetworkMapDataProps {
 function NetworkMapDataSync({ children }: NetworkMapDataProps) {
   const { customers, nodes, connections, isLoading, error } = useNetworkData();
 
+  const handleConnectionChange = useCallback((connected: boolean) => {
+    console.log(
+      "[NetworkMap] WebSocket connection:",
+      connected ? "connected" : "disconnected"
+    );
+  }, []);
+
   const { isConnected, connectionQuality } = useRealTimeUpdates({
-    enabled: false,
-    onConnectionChange: (connected) => {
-      console.log(
-        "[NetworkMap] WebSocket connection:",
-        connected ? "connected" : "disconnected"
-      );
-    },
+    enabled: true,
+    onConnectionChange: handleConnectionChange,
   });
 
   const { data: activeIncidents } = useActiveIncidents();
@@ -40,49 +43,12 @@ function NetworkMapDataSync({ children }: NetworkMapDataProps) {
   const setConnections = useNetworkMapStore((state) => state.setConnections);
   const setLoading = useNetworkMapStore((state) => state.setLoading);
   const setError = useNetworkMapStore((state) => state.setError);
-  const setWebSocketConnected = useNetworkMapStore(
-    (state) => state.setWebSocketConnected
-  );
+  const setWebSocketConnected = useNetworkMapStore((state) => state.setWebSocketConnected);
   const setConnectionQuality = useNetworkMapStore((state) => state.setConnectionQuality);
 
-  // Single merge: avoids asset-only effect overwriting customer nodes when queries resolve out of order.
-  useEffect(() => {
-    const assetNodes = nodes.data ?? [];
-    const customerNodes =
-      customers.data?.map((customer: Customer) => ({
-        id: customer.id,
-        name: customer.name,
-        type: NetworkNodeType.CUSTOMER,
-        position: customer.location || { lat: 23.8103, lng: 90.4125 },
-        status:
-          customer.status === "online"
-            ? NetworkStatus.ACTIVE
-            : customer.status === "offline"
-              ? NetworkStatus.ERROR
-              : NetworkStatus.WARNING,
-        metadata: {
-          kind: "customer",
-          plan: customer.plan,
-          originalStatus: customer.status,
-        },
-      })) ?? [];
-
-    if (assetNodes.length === 0 && customerNodes.length === 0) return;
-
-    setNodes([...assetNodes, ...customerNodes]);
-  }, [nodes.data, customers.data, setNodes]);
-
-  useEffect(() => {
-    if (connections.data !== undefined) {
-      setConnections(connections.data);
-    }
-  }, [connections.data, setConnections]);
-
+  // Sync basic states
   useEffect(() => {
     setLoading(isLoading);
-  }, [isLoading, setLoading]);
-
-  useEffect(() => {
     setError(
       error instanceof Error
         ? error.message
@@ -90,12 +56,39 @@ function NetworkMapDataSync({ children }: NetworkMapDataProps) {
           ? "Failed to load network data"
           : null
     );
-  }, [error, setError]);
-
-  useEffect(() => {
     setWebSocketConnected(isConnected);
     setConnectionQuality(connectionQuality);
-  }, [isConnected, connectionQuality, setWebSocketConnected, setConnectionQuality]);
+  }, [isLoading, error, isConnected, connectionQuality, setLoading, setError, setWebSocketConnected, setConnectionQuality]);
+
+  // Sync data with sanitization and optimization
+  useEffect(() => {
+    const assetNodes = nodes.data ?? [];
+    const customerNodes = customers.data?.map((customer: Customer) => ({
+      id: customer.id,
+      name: sanitizeSearchQuery(customer.name),
+      type: NetworkNodeType.CUSTOMER,
+      position: customer.location || { lat: 23.8103, lng: 90.4125 },
+      status:
+        customer.status === "online"
+          ? NetworkStatus.ACTIVE
+          : customer.status === "offline"
+            ? NetworkStatus.ERROR
+            : NetworkStatus.WARNING,
+      metadata: sanitizeMetadata({
+        kind: "customer",
+        plan: customer.plan,
+        originalStatus: customer.status,
+      }),
+    })) ?? [];
+
+    if (assetNodes.length > 0 || customerNodes.length > 0) {
+      setNodes([...assetNodes, ...customerNodes]);
+    }
+
+    if (connections.data) {
+      setConnections(connections.data);
+    }
+  }, [nodes.data, customers.data, connections.data, setNodes, setConnections]);
 
   if (isLoading && !nodes.data) {
     return (
@@ -110,10 +103,11 @@ function NetworkMapDataSync({ children }: NetworkMapDataProps) {
       <div className="u-w-100 u-h-100 u-flex u-items-center u-justify-center u-p-8 u-bg-dark">
         <Card
           glass={true}
-          className="u-p-8 u-text-center u-max-w-md u-bg-white-opacity-5"
+          appearance="ghost"
+          className="u-p-8 u-text-center u-max-w-md u-border-solid u-border-secondary-subtle"
         >
           <Icon name="Warning" size={48} className="u-text-warning u-mb-4" />
-          <h2 className="u-m-0 u-text-xl u-font-bold  u-text-uppercase u-mb-2">
+          <h2 className="u-m-0 u-text-xl u-font-bold u-text-uppercase u-mb-2">
             Data Synchronization Error
           </h2>
           <p className="u-text-sm u-text-secondary-emphasis u-mb-8">
@@ -125,6 +119,7 @@ function NetworkMapDataSync({ children }: NetworkMapDataProps) {
             variant="primary"
             onClick={() => window.location.reload()}
             iconName="ArrowsCounterClockwise"
+            fullWidth
           >
             Retry Sync
           </Button>
@@ -162,55 +157,52 @@ function NetworkStatusIndicators({
   downNodes: number;
 }) {
   return (
-    <div className="u-absolute u-mt-4 u-start-50 u-flex u-items-center  u-gap-2">
-      {/* WebSocket Connection Status */}
+    <div 
+      className="u-absolute u-mt-4 u-start-50 u-flex u-items-center u-gap-2"
+      role="status"
+      aria-live="polite"
+    >
       <Badge
-        glass={{
-          blurAmount: 10,
-        }}
+        glass={{ blurAmount: 10 }}
         variant={
           isConnected ? (connectionQuality === "good" ? "success" : "warning") : "error"
         }
         icon={<Icon name={isConnected ? "WifiHigh" : "WifiSlash"} size={"sm"} />}
         label={isConnected ? "Live Feed" : "Static Map"}
         size="sm"
+        aria-label={isConnected ? `Live connection active, quality: ${connectionQuality}` : "Connection lost, showing cached data"}
       />
 
-      {/* Active Incidents Badge */}
       {activeIncidents > 0 && (
         <Badge
-          glass={{
-            blurAmount: 10,
-          }}
+          glass={{ blurAmount: 10 }}
           variant="error"
           icon={<Icon name="Warning" size={"sm"} />}
           label={`${activeIncidents} Active Incidents`}
           size="sm"
+          aria-label={`${activeIncidents} critical incidents reported`}
         />
       )}
 
-      {/* Node Status Summary - Degraded */}
       {degradedNodes > 0 && (
         <Badge
-          glass={{
-            blurAmount: 10,
-          }}
+          glass={{ blurAmount: 10 }}
           variant="warning"
           icon={<Icon name="Warning" size={"sm"} />}
           label={`${degradedNodes} Degraded`}
           size="sm"
+          aria-label={`${degradedNodes} nodes experiencing performance issues`}
         />
       )}
 
-      {/* Node Status Summary - Down */}
       {downNodes > 0 && (
         <Badge
-          glass={{
-            blurAmount: 10,
-          }}
+          glass={{ blurAmount: 10 }}
           variant="error"
           icon={<Icon name="Warning" size={"sm"} />}
           label={`${downNodes} Down`}
+          size="sm"
+          aria-label={`${downNodes} nodes currently offline`}
         />
       )}
     </div>

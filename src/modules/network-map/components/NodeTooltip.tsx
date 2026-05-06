@@ -27,8 +27,8 @@ export const NodeTooltip: React.FC<NodeTooltipProps> = ({
 
   const { id, name, status, type, capacity, utilization, metadata } = node;
 
-  const address = metadata?.address || metadata?.location?.address;
-  const lastSeen = metadata?.lastSeen;
+  const address = (metadata as any)?.address || (metadata as any)?.location?.address;
+  const lastSeen = (metadata as any)?.lastSeen;
 
   const formatLastSeen = (timestamp?: string) => {
     if (!timestamp) return "Unknown";

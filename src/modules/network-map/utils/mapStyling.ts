@@ -26,19 +26,19 @@ export const MAP_COLORS = {
   customer: "#ff0055", // Neon Pink
 
   // Connections
-  fiber_route: "#14b8a6", // Muted Teal
-  customer_connection: "#3b82f6", // Muted Blue
+  fiber_route: "#22d3ee", // Bright Cyan (was muted teal)
+  customer_connection: "#60a5fa", // Bright Sky Blue (was muted blue)
 
   // Status
-  inactive: "#333333", // Very Dark Gray
-  error: "#ff0000", // Pure Red
-  warning: "#ffff00", // Pure Yellow
-  selected: "#ffffff", // Pure White
-  hovered: "#ccff00", // Neon Yellow-Green
+  inactive: "#4b5563", // Medium Gray
+  error: "#ff3333", // Brighter Red
+  warning: "#fbbf24", // Brighter Amber
+  selected: "#ffffff", // White
+  hovered: "#a3e635", // Lime Green
 
   // Backgrounds
-  casing: "#000000", // Pure Black
-  coverage: "#002200", // Very Dark Green
+  casing: "#000000",
+  coverage: "#064e3b", // Deep Emerald
 } as const;
 
 /** Sizing hierarchy for different zoom levels */
@@ -222,17 +222,27 @@ export const CUSTOM_LAYERS: Record<string, LayerSpecification> = {
     paint: {
       "line-width": [
         "interpolate",
-        ["exponential", 1.5],
+        ["linear"],
         ["zoom"],
-        5,
-        ["match", ["get", "type"], "fiber_route", 0.75, "customer_connection", 0.4, 0.5],
-        12,
-        ["match", ["get", "type"], "fiber_route", 1.8, "customer_connection", 0.9, 1.2],
+        10,
+        ["case", ["boolean", ["feature-state", "hover"], false], 3, 1.5],
+        15,
+        ["case", ["boolean", ["feature-state", "hover"], false], 6, 3],
         18,
-        ["match", ["get", "type"], "fiber_route", 3, "customer_connection", 1.5, 2],
+        ["case", ["boolean", ["feature-state", "hover"], false], 10, 5]
       ],
-      "line-color": LINE_COLOR,
-      "line-opacity": 0.75,
+      "line-color": [
+        "case",
+        ["boolean", ["feature-state", "hover"], false],
+        MAP_COLORS.hovered,
+        LINE_COLOR,
+      ],
+      "line-opacity": [
+        "case",
+        ["boolean", ["feature-state", "hover"], false],
+        1,
+        0.75,
+      ],
       "line-dasharray": [
         "case",
         ["==", ["get", "status"], "inactive"],
@@ -292,10 +302,66 @@ export const CUSTOM_LAYERS: Record<string, LayerSpecification> = {
     type: "fill-extrusion",
     source: "network-nodes-3d",
     paint: {
-      "fill-extrusion-color": NODE_FILL,
+      "fill-extrusion-color": [
+        "case",
+        ["boolean", ["feature-state", "hover"], false],
+        MAP_COLORS.hovered,
+        NODE_FILL,
+      ],
       "fill-extrusion-height": ["get", "height"],
       "fill-extrusion-base": ["get", "min_height"],
       "fill-extrusion-opacity": 0.95,
+    },
+  },
+
+  /** 2D Node Circles for fallback and low-zoom visibility */
+  nodes2D: {
+    id: "network-nodes-layer",
+    type: "circle",
+    source: "network-nodes",
+    paint: {
+      "circle-radius": [
+        "interpolate",
+        ["linear"],
+        ["zoom"],
+        10,
+        2,
+        15,
+        [
+          "match",
+          ["get", "type"],
+          "core_node", 8,
+          "pop", 8,
+          "distribution_node", 6,
+          4
+        ],
+        18,
+        [
+          "match",
+          ["get", "type"],
+          "core_node", 12,
+          "pop", 12,
+          "distribution_node", 10,
+          8
+        ]
+      ],
+      "circle-color": [
+        "case",
+        ["boolean", ["feature-state", "hover"], false],
+        MAP_COLORS.hovered,
+        NODE_FILL,
+      ],
+      "circle-stroke-width": 1,
+      "circle-stroke-color": "#000000",
+      "circle-opacity": [
+        "interpolate",
+        ["linear"],
+        ["zoom"],
+        13,
+        1,
+        14,
+        0.5 // Fade out as 3D kicks in
+      ],
     },
   },
 };
@@ -320,6 +386,7 @@ export const addCustomLayers = (map: mapboxgl.Map) => {
   }
 
   // Find a label layer to insert the 3D buildings beneath it
+  if (!map.isStyleLoaded()) return;
   const styleLayers = map.getStyle()?.layers || [];
   let labelLayerId;
   for (let i = 0; i < styleLayers.length; i++) {
@@ -375,13 +442,13 @@ export const addCustomLayers = (map: mapboxgl.Map) => {
     }
   });
 
-  // Add layers in specific order for correct stacking
   const layers = [
     CUSTOM_LAYERS.coverage,
     CUSTOM_LAYERS.connectionCasing,
     CUSTOM_LAYERS.connections,
     CUSTOM_LAYERS.outagesGlow,
     CUSTOM_LAYERS.outages,
+    CUSTOM_LAYERS.nodes2D,
     CUSTOM_LAYERS.nodes3D,
   ];
 

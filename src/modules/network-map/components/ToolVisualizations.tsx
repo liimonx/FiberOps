@@ -182,7 +182,7 @@ function createMeasurementGeoJSON(
 }
 
 function cleanupMeasurementLayers(map: mapboxgl.Map) {
-  if (!map || !map.getStyle()) return;
+  if (!map || !map.isStyleLoaded()) return;
 
   ["measurements-labels", "measurements-points", "measurements-line"].forEach(
     (layerId) => {
@@ -294,7 +294,7 @@ function renderTracePath(map: mapboxgl.Map, tracePath: TracePath) {
 }
 
 function cleanupTracePath(map: mapboxgl.Map) {
-  if (!map || !map.getStyle()) return;
+  if (!map || !map.isStyleLoaded()) return;
 
   ["trace-path-nodes", "trace-path-line"].forEach((layerId) => {
     if (map.getLayer(layerId)) {
@@ -373,7 +373,7 @@ function renderHeatmap(map: mapboxgl.Map, heatmapData: HeatmapData) {
 }
 
 function cleanupHeatmap(map: mapboxgl.Map) {
-  if (!map || !map.getStyle()) return;
+  if (!map || !map.isStyleLoaded()) return;
 
   if (map.getLayer("heatmap-layer")) {
     map.removeLayer("heatmap-layer");

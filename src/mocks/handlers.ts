@@ -1,7 +1,50 @@
-import { delay, http, HttpResponse } from "msw";
+import { delay, http, HttpResponse, ws } from "msw";
 import { assets, customers, incidents } from "@/mocks/data";
 
+const chat = ws.link("ws://localhost:8080/ws");
+
 export const handlers = [
+  // WebSocket Mocking
+  chat.addEventListener("connection", ({ client }) => {
+    console.log("[MSW] WebSocket connected:", client.id);
+
+    // Send initial heartbeat
+    client.send(
+      JSON.stringify({
+        type: "heartbeat",
+        data: {
+          serverTime: new Date().toISOString(),
+          connectedClients: 1,
+        },
+      })
+    );
+
+    // Simulate random node updates every 10 seconds
+    const interval = setInterval(() => {
+      const randomNode = assets[Math.floor(Math.random() * assets.length)];
+      if (!randomNode) return;
+
+      const statuses = ["active", "degraded", "down", "maintenance"];
+      const newStatus = statuses[Math.floor(Math.random() * statuses.length)];
+
+      client.send(
+        JSON.stringify({
+          type: "status_broadcast",
+          data: {
+            nodeId: randomNode.id,
+            status: newStatus,
+            timestamp: new Date().toISOString(),
+          },
+        })
+      );
+    }, 10000);
+
+    client.addEventListener("close", () => {
+      clearInterval(interval);
+      console.log("[MSW] WebSocket disconnected:", client.id);
+    });
+  }),
+
   // Bypass Mapbox telemetry requests to avoid console errors
   http.post("https://events.mapbox.com/events/v2", () => {
     return new HttpResponse(null, { status: 204 });

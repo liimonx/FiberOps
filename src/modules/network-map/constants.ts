@@ -23,6 +23,7 @@ export const NETWORK_STATUS_COLORS = {
   [NetworkStatus.ACTIVE]: "#10b981", // Green
   [NetworkStatus.INACTIVE]: "#6b7280", // Gray
   [NetworkStatus.WARNING]: "#f59e0b", // Orange
+  [NetworkStatus.DEGRADED]: "#fb923c", // Light Orange/Amber
   [NetworkStatus.ERROR]: "#ef4444", // Red
 } as const;
 
@@ -30,6 +31,7 @@ export const NETWORK_STATUS_LABELS = {
   [NetworkStatus.ACTIVE]: "Active",
   [NetworkStatus.INACTIVE]: "Inactive",
   [NetworkStatus.WARNING]: "Warning",
+  [NetworkStatus.DEGRADED]: "Degraded",
   [NetworkStatus.ERROR]: "Error",
 } as const;
 
@@ -46,22 +48,17 @@ export const NODE_TYPE_ICONS = {
 } as const;
 
 export const DEFAULT_LAYERS: NetworkMapLayer[] = [
-  { id: "infrastructure", name: "Core Infrastructure", visible: true, type: "nodes" },
-  { id: "pops", name: "POPs", visible: true, type: "nodes" },
   { id: "fiber-routes", name: "Fiber Routes", visible: true, type: "connections" },
-  { id: "poles", name: "Poles", visible: true, type: "nodes" },
-  { id: "junction-boxes", name: "Junction Boxes", visible: true, type: "nodes" },
+  { id: "infrastructure", name: "Core Nodes", visible: true, type: "nodes" },
+  { id: "pops", name: "Points of Presence", visible: true, type: "nodes" },
   { id: "splitters", name: "Splitters", visible: true, type: "nodes" },
-  { id: "onus", name: "ONUs", visible: true, type: "nodes" },
-  { id: "customers", name: "Customers", visible: true, type: "nodes" },
-  {
-    id: "customer-connections",
-    name: "Customer Connections",
-    visible: true,
-    type: "connections",
-  },
-  { id: "outages", name: "Outages", visible: true, type: "outages" },
-  { id: "coverage", name: "Coverage Area", visible: true, type: "coverage" },
+  { id: "junction-boxes", name: "Junction Boxes", visible: true, type: "nodes" },
+  { id: "poles", name: "Utility Poles", visible: true, type: "nodes" },
+  { id: "onus", name: "ONU Units", visible: true, type: "nodes" },
+  { id: "customers", name: "Client Endpoints", visible: true, type: "nodes" },
+  { id: "customer-connections", name: "Drop Cables", visible: true, type: "connections" },
+  { id: "outages", name: "Active Outages", visible: true, type: "outages" },
+  { id: "coverage", name: "Service Coverage", visible: true, type: "coverage" },
 ];
 
 // Animation constants

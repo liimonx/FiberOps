@@ -187,15 +187,60 @@
   }
 }
 
-/* Reduce motion support */
-@media (prefers-reduced-motion: reduce) {
-  .network-node,
-  .network-connection {
-    transition: none;
-  }
-
-  .network-loading--spinner {
-    animation: none;
-    border-top-color: transparent;
-  }
+/* Futuristic Map Aesthetics */
+.u-animate-scanline {
+  top: -100%;
+  animation: scanline 8s linear infinite;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    rgba(var(--atomix-primary-rgb), 0.15) 50%,
+    transparent
+  );
+  filter: blur(2px);
 }
+
+@keyframes scanline {
+  0% { top: -100%; }
+  100% { top: 200%; }
+}
+
+.u-animate-pulse-subtle {
+  animation: pulse-subtle 4s ease-in-out infinite;
+}
+
+@keyframes pulse-subtle {
+  0%, 100% { opacity: 0.05; }
+  50% { opacity: 0.15; }
+}
+
+.u-map-vignette {
+  background: radial-gradient(
+    circle,
+    transparent 40%,
+    rgba(0, 0, 0, 0.4) 100%
+  );
+  pointer-events: none;
+}
+
+.u-grid-overlay {
+  background-image: 
+    linear-gradient(rgba(var(--atomix-primary-rgb), 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(var(--atomix-primary-rgb), 0.05) 1px, transparent 1px);
+  background-size: 50px 50px;
+  background-position: center center;
+}
+
+.u-corner-bracket {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border-color: rgba(var(--atomix-primary-rgb), 0.3);
+  border-style: solid;
+  pointer-events: none;
+}
+
+.u-corner-tl { top: 20px; left: 20px; border-width: 2px 0 0 2px; }
+.u-corner-tr { top: 20px; right: 20px; border-width: 2px 2px 0 0; }
+.u-corner-bl { bottom: 20px; left: 20px; border-width: 0 0 2px 2px; }
+.u-corner-br { bottom: 20px; right: 20px; border-width: 0 2px 2px 0; }

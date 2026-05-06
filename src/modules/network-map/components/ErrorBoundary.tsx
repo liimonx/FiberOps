@@ -94,14 +94,15 @@ export class ErrorBoundary extends Component<Props, State> {
         <div className="u-flex u-flex-column u-items-center u-justify-center u-h-100 u-w-100 u-p-10">
           <Card
             glass={true}
-            className="u-max-w-md u-w-100 u-p-8 u-text-center u-bg-white-opacity-5"
+            appearance="ghost"
+            className="u-max-w-md u-w-100 u-p-8 u-text-center u-border-solid u-border-error"
           >
             <div className="u-inline-flex u-items-center u-justify-center u-w-16 u-h-16 u-rounded-circle u-bg-error-subtle u-border u-border-solid u-border-error u-mb-6">
               <Icon name="Warning" size={32} className="u-text-error" />
             </div>
 
             <h2
-              className="u-m-0 u-text-xl u-font-bold  u-text-uppercase u-mb-2"
+              className="u-m-0 u-text-xl u-font-bold u-text-uppercase u-mb-2"
               style={{ letterSpacing: "1px" }}
             >
               System Exception
@@ -114,7 +115,7 @@ export class ErrorBoundary extends Component<Props, State> {
 
             {process.env.NODE_ENV === "development" && this.state.error && (
               <div className="u-text-start u-mb-8">
-                <details className="u-bg-black-opacity-20 u-rounded u-p-4 u-border u-border-solid u-border-secondary-subtle">
+                <details className="u-bg-dark u-rounded u-p-4 u-border u-border-solid u-border-secondary-subtle">
                   <summary className="u-text-xs u-font-bold u-text-secondary-emphasis u-cursor-pointer">
                     Error Trace
                   </summary>

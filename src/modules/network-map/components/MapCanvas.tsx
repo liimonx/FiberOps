@@ -187,7 +187,7 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({ onMapLoad, onMapError }) =
         });
 
         const nodesVis = nodeTypes.length === 0 ? "none" : "visible";
-        ["network-nodes-3d-layer"].forEach((id) => {
+        ["network-nodes-layer", "network-nodes-3d-layer"].forEach((id) => {
           if (map.getLayer(id)) {
             map.setLayoutProperty(id, "visibility", nodesVis);
           }

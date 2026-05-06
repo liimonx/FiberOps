@@ -231,6 +231,7 @@ export function AnimatedStatusBadge({
     {
       [NetworkStatus.ACTIVE]: "success",
       [NetworkStatus.WARNING]: "warning",
+      [NetworkStatus.DEGRADED]: "warning",
       [NetworkStatus.ERROR]: "error",
       [NetworkStatus.INACTIVE]: "secondary",
     };

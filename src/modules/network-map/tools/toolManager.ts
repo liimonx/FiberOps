@@ -44,7 +44,7 @@ export interface MapMouseEvent {
     properties?: Record<string, any> | null;
     geometry?: {
       type: string;
-      coordinates: number;
+      coordinates?: any;
     } | null;
   }>;
 }

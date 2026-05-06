@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useCallback, useState, useRef, useEffect } from "react";
-import { Card, Icon, Button } from "@shohojdhara/atomix";
+import { useCallback, useState, useEffect } from "react";
+import { Icon } from "@shohojdhara/atomix";
 import {
   NetworkMapDataProvider,
   MapCanvas,
@@ -15,7 +15,6 @@ import {
   createNodeTooltipContent,
   createConnectionTooltipContent,
 } from "@/modules/network-map/components";
-import type { TooltipContent } from "@/modules/network-map/components";
 import {
   useNetworkMapStore,
   useNodes,
@@ -23,12 +22,7 @@ import {
   useSelectedNode,
   useConnectionById,
 } from "@/modules/network-map/stores/useNetworkMapStore";
-import {
-  SearchResult,
-  NetworkNode,
-  NetworkConnection,
-} from "@/modules/network-map/types";
-import { CategorizedResult } from "@/modules/network-map/hooks/useAssetSearch";
+import { CategorizedResult } from "@/modules/network-map/types";
 import { flyToLocation } from "@/modules/network-map/components/MapEventHandler";
 import { getMapInstance } from "@/modules/network-map/components/MapCanvas";
 import {
@@ -37,6 +31,7 @@ import {
   HeatmapLegend,
 } from "@/modules/network-map/components/MeasurementOverlay";
 import { ToolVisualizations } from "@/modules/network-map/components/ToolVisualizations";
+import { useTooltipHover } from "@/modules/network-map/hooks/useTooltipHover";
 
 // Wrapper component to access store hooks
 function NetworkMapContent() {
@@ -49,7 +44,6 @@ function NetworkMapContent() {
     (state) => state.interaction.selectedElementId
   );
   const setSelectedElement = useNetworkMapStore((state) => state.setSelectedElement);
-  const setActiveTool = useNetworkMapStore((state) => state.setActiveTool);
   const addToSelectionHistory = useNetworkMapStore(
     (state) => state.addToSelectionHistory
   );
@@ -71,13 +65,14 @@ function NetworkMapContent() {
   // Resolve selected connection from store
   const selectedConnection = useConnectionById(selectedNode ? null : selectedElementId);
 
-  // Tooltip state
-  const [tooltip, setTooltip] = useState<{
-    content: TooltipContent;
-    x: number;
-    y: number;
-  } | null>(null);
-  const tooltipTimeoutRef = useRef<NodeJS.Timeout>(undefined);
+  // Use the custom hook for tooltip hover logic
+  const {
+    tooltip,
+    showTooltip,
+    hideTooltip,
+    handleMouseEnter: handleTooltipMouseEnter,
+    handleMouseLeave: handleTooltipMouseLeave,
+  } = useTooltipHover({ delayLeave: 150 });
 
   // Handle search result selection — fly to actual node coordinates
   const handleSelectResult = useCallback(
@@ -98,49 +93,37 @@ function NetworkMapContent() {
     setSelectedElement(null);
   }, [setSelectedElement]);
 
-  const handleNavigate = useCallback(
-    (elementId: string, type: "node" | "connection") => {
-      setSelectedElement(elementId);
-      addToSelectionHistory(elementId);
-
-      const node = nodes.find((n) => n.id === elementId);
-      if (node) {
-        flyToLocation([node.position.lng, node.position.lat], 15);
-      }
-    },
-    [nodes, setSelectedElement, addToSelectionHistory]
-  );
-
-  const handleTracePath = useCallback(
-    (elementId: string) => {
-      console.log("Tracing path for:", elementId);
-      setActiveTool("trace");
-    },
-    [setActiveTool]
-  );
-
-  // Tooltip handlers wired to MapEventHandler
+  // Tooltip handlers wired to MapEventHandler - stable implementation
   const handleNodeHover = useCallback(
     (nodeId: string | null, event: mapboxgl.MapMouseEvent) => {
-      if (tooltipTimeoutRef.current) {
-        clearTimeout(tooltipTimeoutRef.current);
-      }
-
       if (!nodeId) {
-        tooltipTimeoutRef.current = setTimeout(() => setTooltip(null), 150);
+        hideTooltip(); // The hook handles the delay internally
         return;
       }
 
       const node = nodes.find((n) => n.id === nodeId);
       if (node && event.point) {
-        setTooltip({
-          content: createNodeTooltipContent(node),
-          x: event.point.x,
-          y: event.point.y,
-        });
+        const content = createNodeTooltipContent(node);
+        showTooltip(content, event.point.x, event.point.y);
       }
     },
-    [nodes]
+    [nodes, showTooltip, hideTooltip]
+  );
+
+  const handleConnectionHover = useCallback(
+    (connectionId: string | null, event: mapboxgl.MapMouseEvent) => {
+      if (!connectionId) {
+        hideTooltip(); // The hook handles the delay internally
+        return;
+      }
+
+      const connection = connections.find((c) => c.id === connectionId);
+      if (connection && event.point) {
+        const content = createConnectionTooltipContent(connection);
+        showTooltip(content, event.point.x, event.point.y);
+      }
+    },
+    [connections, showTooltip, hideTooltip]
   );
 
   // Node click → behaviour depends on active tool
@@ -170,15 +153,6 @@ function NetworkMapContent() {
     [setSelectedElement, addToSelectionHistory]
   );
 
-  // Clean up tooltip timeout on unmount
-  useEffect(() => {
-    return () => {
-      if (tooltipTimeoutRef.current) {
-        clearTimeout(tooltipTimeoutRef.current);
-      }
-    };
-  }, []);
-
   return (
     <div className="network-map-page">
       {/* Map Canvas - Full Screen Background */}
@@ -189,6 +163,7 @@ function NetworkMapContent() {
         onNodeClick={handleNodeClick}
         onNodeHover={handleNodeHover}
         onConnectionClick={handleConnectionClick}
+        onConnectionHover={handleConnectionHover}
       />
 
       {/* Floating UI Panels */}
@@ -224,8 +199,6 @@ function NetworkMapContent() {
               selectedNode={selectedNode || null}
               selectedConnection={selectedConnection || null}
               onClose={handleCloseInspector}
-              onNavigate={handleNavigate}
-              onTracePath={handleTracePath}
             />
           </div>
         )}
@@ -244,35 +217,14 @@ function NetworkMapContent() {
       {mapInstance && <ToolVisualizations mapInstance={mapInstance} />}
 
       {/* Interactive Tooltip — follows mouse on hover */}
-      {tooltip && !selectedNode && !selectedConnection && (
-        <div
-          className="map-tooltip-anchor"
-          style={{
-            position: "absolute",
-            left: tooltip.x + 12,
-            top: tooltip.y - 12,
-            pointerEvents: "none",
-          }}
-        >
-          <Card glass={{ blurAmount: 6, mode: "shader" }} className="tooltip-card">
-            <div className="tooltip-body">
-              <strong className="tooltip-title">{tooltip.content.title}</strong>
-              {tooltip.content.subtitle && (
-                <span className="tooltip-subtitle">{tooltip.content.subtitle}</span>
-              )}
-              {tooltip.content.details && tooltip.content.details.length > 0 && (
-                <div className="tooltip-details">
-                  {tooltip.content.details.map((detail, i) => (
-                    <div key={i} className="tooltip-detail-row">
-                      <span className="tooltip-detail-label">{detail.label}</span>
-                      <span className="tooltip-detail-value">{detail.value}</span>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </Card>
-        </div>
+      {!selectedNode && !selectedConnection && tooltip.content && (
+        <InteractiveTooltip
+          content={tooltip.content}
+          visible={tooltip.visible}
+          position={{ x: tooltip.x, y: tooltip.y }}
+          onMouseEnter={handleTooltipMouseEnter}
+          onMouseLeave={handleTooltipMouseLeave}
+        />
       )}
 
       <style jsx>{`
@@ -335,55 +287,6 @@ function NetworkMapContent() {
           right: 16px;
           overflow-y: auto;
           pointer-events: auto;
-        }
-
-        .tooltip-card {
-          max-width: 280px;
-          padding: 0;
-          overflow: hidden;
-        }
-
-        .tooltip-body {
-          padding: 10px 14px;
-          display: flex;
-          flex-direction: column;
-          gap: 4px;
-        }
-
-        .tooltip-title {
-          font-size: 13px;
-          font-weight: 600;
-          color: var(--color-gray-100);
-        }
-
-        .tooltip-subtitle {
-          font-size: 11px;
-          color: var(--color-gray-400);
-        }
-
-        .tooltip-details {
-          display: flex;
-          flex-direction: column;
-          gap: 3px;
-          margin-top: 4px;
-          padding-top: 6px;
-          border-top: 1px solid var(--color-gray-700);
-        }
-
-        .tooltip-detail-row {
-          display: flex;
-          justify-content: space-between;
-          gap: 12px;
-          font-size: 11px;
-        }
-
-        .tooltip-detail-label {
-          color: var(--color-gray-500);
-        }
-
-        .tooltip-detail-value {
-          color: var(--color-gray-200);
-          font-weight: 500;
         }
 
         @media (max-width: 768px) {

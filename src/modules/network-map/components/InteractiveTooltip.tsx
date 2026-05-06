@@ -1,23 +1,26 @@
 "use client";
 
-import React, { useState, useCallback, useRef, useEffect } from "react";
-import { Icon, Card, Button } from "@shohojdhara/atomix";
+import React, { useState, useCallback, useRef } from "react";
+import { Icon, Card, Button, PhosphorIconsType } from "@shohojdhara/atomix";
+import { gsap } from "gsap";
+import { useGSAP } from "@gsap/react";
 import { NetworkNode, NetworkConnection, NetworkStatus } from "../types";
 import { StatusIndicator } from "./StatusIndicator";
 import { NETWORK_STATUS_COLORS, NODE_TYPE_ICONS } from "../constants";
+import { sanitizeSearchQuery, sanitizeMetadata } from "../utils/sanitization";
 
 export interface TooltipContent {
   title: string;
   subtitle?: string;
   status: NetworkStatus;
-  details: Array<{ label: string; value: string | number; icon?: string }>;
+  details: Array<{ label: string; value: string | number; icon?: PhosphorIconsType }>;
   actions?: Array<{
     label: string;
-    icon: string;
+    icon: PhosphorIconsType;
     onClick: () => void;
     variant?: "primary" | "secondary";
   }>;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 interface InteractiveTooltipProps {
@@ -33,6 +36,8 @@ interface InteractiveTooltipProps {
   className?: string;
   maxWidth?: number;
   interactive?: boolean;
+  onMouseEnter?: () => void;
+  onMouseLeave?: () => void;
 }
 
 export const InteractiveTooltip: React.FC<InteractiveTooltipProps> = ({
@@ -48,38 +53,75 @@ export const InteractiveTooltip: React.FC<InteractiveTooltipProps> = ({
   className = "",
   maxWidth = 300,
   interactive = true,
+  onMouseEnter,
+  onMouseLeave,
 }) => {
   const tooltipRef = useRef<HTMLDivElement>(null);
   const [adjustedPosition, setAdjustedPosition] = useState(position);
   const [isExpanded, setIsExpanded] = useState(false);
 
-  // Adjust position to keep tooltip within viewport
-  useEffect(() => {
-    if (!visible || !tooltipRef.current) return;
+  // Adjust position and handle animations using GSAP React best practices
+  useGSAP(
+    () => {
+      if (!visible) {
+        if (tooltipRef.current) {
+          gsap.to(tooltipRef.current, {
+            opacity: 0,
+            scale: 0.95,
+            y: -10,
+            duration: 0.2,
+            ease: "power2.in",
+            onComplete: () => {
+              if (tooltipRef.current) tooltipRef.current.style.display = "none";
+            },
+          });
+        }
+        return;
+      }
 
-    const tooltip = tooltipRef.current;
-    const rect = tooltip.getBoundingClientRect();
-    const viewport = {
-      width: window.innerWidth,
-      height: window.innerHeight,
-    };
+      if (tooltipRef.current) {
+        tooltipRef.current.style.display = "block";
 
-    let adjusted = { ...position };
+        const tooltip = tooltipRef.current;
+        const rect = tooltip.getBoundingClientRect();
+        const viewport = {
+          width: window.innerWidth,
+          height: window.innerHeight,
+        };
 
-    if (rect.right > viewport.width) {
-      adjusted.x = position.x - rect.width - offset;
-    } else if (rect.left < 0) {
-      adjusted.x = offset;
-    }
+        const adjusted = { ...position };
 
-    if (rect.bottom > viewport.height) {
-      adjusted.y = position.y - rect.height - offset;
-    } else if (rect.top < 0) {
-      adjusted.y = offset;
-    }
+        if (rect.right > viewport.width) {
+          adjusted.x = position.x - rect.width - offset;
+        } else if (rect.left < 0) {
+          adjusted.x = offset;
+        }
 
-    setAdjustedPosition(adjusted);
-  }, [position, visible, offset]);
+        if (rect.bottom > viewport.height) {
+          adjusted.y = position.y - rect.height - offset;
+        } else if (rect.top < 0) {
+          adjusted.y = offset;
+        }
+
+        setAdjustedPosition(adjusted);
+
+        // Entrance animation
+        gsap.fromTo(
+          tooltip,
+          { opacity: 0, scale: 0.9, y: 10 },
+          {
+            opacity: 1,
+            scale: 1,
+            y: 0,
+            duration: 0.3,
+            ease: "back.out(1.7)",
+            clearProps: "transform",
+          }
+        );
+      }
+    },
+    { dependencies: [position, visible, offset], scope: tooltipRef }
+  );
 
   const getAnchorStyles = useCallback(() => {
     const base: React.CSSProperties = {
@@ -131,17 +173,21 @@ export const InteractiveTooltip: React.FC<InteractiveTooltipProps> = ({
       .join(" ");
   };
 
-  if (!visible) return null;
+  if (!visible || !content) return null;
 
   return (
     <div
       ref={tooltipRef}
       className={`u-transition-all ${className}`}
-      style={getAnchorStyles()}
+      style={{ ...getAnchorStyles(), display: visible ? "block" : "none" }}
       role="dialog"
-      aria-label={`${content.title} details`}
+      aria-label={`${content?.title || "Tooltip"} details`}
+      aria-hidden={!visible}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
     >
-      <Card
+      {content && (
+        <Card
         glass={{ blurAmount: 5 }}
         appearance="ghost"
         className="u-p-0 u-overflow-hidden u-bg-white-opacity-5"
@@ -158,12 +204,12 @@ export const InteractiveTooltip: React.FC<InteractiveTooltipProps> = ({
           </div>
 
           <div className="u-flex-1 u-min-w-0">
-            <h4 className="u-m-0 u-text-sm u-font-bold  u-text-truncate">
-              {content.title}
+            <h4 className="u-m-0 u-text-sm u-font-bold u-text-truncate">
+              {sanitizeSearchQuery(content.title)}
             </h4>
             {content.subtitle && (
               <span className="u-block u-text-xs u-text-secondary-emphasis u-mt-1">
-                {content.subtitle}
+                {sanitizeSearchQuery(content.subtitle)}
               </span>
             )}
             {node && (
@@ -193,22 +239,43 @@ export const InteractiveTooltip: React.FC<InteractiveTooltipProps> = ({
         </div>
 
         {/* Details Section */}
-        <div className="u-p-4 u-flex u-flex-column u-gap-2">
-          {content.details.map((detail, index) => (
-            <div key={index} className="u-flex u-items-center u-gap-2 u-text-xs">
-              {detail.icon && (
-                <Icon
-                  name={detail.icon}
-                  size={14}
-                  className="u-text-secondary-emphasis u-opacity-50"
-                />
-              )}
-              <span className="u-text-secondary-emphasis u-font-bold u-text-uppercase">
-                {detail.label}:
-              </span>
-              <span className="u-ms-auto u-font-bold ">{detail.value}</span>
-            </div>
-          ))}
+        <div className="u-p-4 u-flex u-flex-column u-gap-3">
+          {content.details.map((detail, index) => {
+            const isUtilization = detail.label.toLowerCase().includes("utilization") || 
+                                detail.label.toLowerCase().includes("usage");
+            const val = typeof detail.value === "string" ? parseFloat(detail.value) : detail.value;
+            
+            return (
+              <div key={index} className="u-flex u-flex-column u-gap-1.5">
+                <div className="u-flex u-items-center u-gap-2 u-text-xs">
+                  {detail.icon && (
+                    <Icon
+                      name={detail.icon}
+                      size={14}
+                      className="u-text-secondary-emphasis u-opacity-50"
+                    />
+                  )}
+                  <span className="u-text-secondary-emphasis u-font-bold u-text-uppercase u-tracking-wider">
+                    {detail.label}
+                  </span>
+                  <span className="u-ms-auto u-font-bold u-text-primary">
+                    {detail.value}
+                  </span>
+                </div>
+                
+                {isUtilization && !isNaN(val as number) && (
+                  <div className="u-w-100 u-h-1 u-bg-secondary-subtle u-rounded-full u-overflow-hidden">
+                    <div 
+                      className={`u-h-100 u-transition-all ${
+                        (val as number) > 90 ? "u-bg-error" : (val as number) > 70 ? "u-bg-warning" : "u-bg-success"
+                      }`}
+                      style={{ width: `${Math.min(val as number, 100)}%` }}
+                    />
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
 
         {/* Expandable Metadata */}
@@ -224,11 +291,11 @@ export const InteractiveTooltip: React.FC<InteractiveTooltipProps> = ({
 
             {isExpanded && (
               <div className="u-px-4 u-pb-3 u-flex u-flex-column u-gap-1">
-                {Object.entries(content.metadata).map(([key, value]) => (
+                {(content.metadata ? Object.entries(sanitizeMetadata(content.metadata)) : []).map(([key, value]) => (
                   <div key={key} className="u-flex u-justify-between u-gap-2 u-text-xs">
-                    <span className="u-text-secondary-emphasis u-opacity-60">{key}:</span>
-                    <span className="u-font-mono  u-opacity-80 u-text-truncate u-max-w-60">
-                      {typeof value === "object" ? JSON.stringify(value) : String(value)}
+                    <span className="u-text-secondary-emphasis u-opacity-60">{sanitizeSearchQuery(key)}:</span>
+                    <span className="u-font-mono u-opacity-80 u-text-truncate u-max-w-60">
+                      {typeof value === "object" ? JSON.stringify(value) : sanitizeSearchQuery(String(value))}
                     </span>
                   </div>
                 ))}
@@ -255,6 +322,7 @@ export const InteractiveTooltip: React.FC<InteractiveTooltipProps> = ({
           </div>
         )}
       </Card>
+      )}
     </div>
   );
 };
@@ -296,23 +364,23 @@ export const createNodeTooltipContent = (node: NetworkNode): TooltipContent => (
   title: node.name,
   status: node.status,
   details: [
-    { label: "Type", value: node.type, icon: "Tag" },
-    { label: "ID", value: node.id, icon: "Fingerprint" },
+    { label: "Type", value: node.type, icon: "Tag" as PhosphorIconsType },
+    { label: "ID", value: node.id, icon: "Fingerprint" as PhosphorIconsType },
     ...(node.capacity
-      ? [{ label: "Capacity", value: `${node.capacity} ports`, icon: "HardDrives" }]
+      ? [{ label: "Capacity", value: `${node.capacity} ports`, icon: "HardDrives" as PhosphorIconsType }]
       : []),
     ...(node.utilization !== undefined
-      ? [{ label: "Utilization", value: `${node.utilization}%`, icon: "Gauge" }]
+      ? [{ label: "Utilization", value: `${node.utilization}%`, icon: "Gauge" as PhosphorIconsType }]
       : []),
     {
       label: "Location",
       value: `${node.position.lat.toFixed(4)}, ${node.position.lng.toFixed(4)}`,
-      icon: "MapPin",
+      icon: "MapPin" as PhosphorIconsType,
     },
   ],
   actions: [
-    { label: "View Details", icon: "Eye", onClick: () => {}, variant: "primary" },
-    { label: "Trace Path", icon: "GitBranch", onClick: () => {}, variant: "secondary" },
+    { label: "View Details", icon: "Eye" as PhosphorIconsType, onClick: () => {}, variant: "primary" },
+    { label: "Trace Path", icon: "GitBranch" as PhosphorIconsType, onClick: () => {}, variant: "secondary" },
   ],
   metadata: node.metadata,
 });
@@ -320,21 +388,36 @@ export const createNodeTooltipContent = (node: NetworkNode): TooltipContent => (
 // Utility to create tooltip content from connection
 export const createConnectionTooltipContent = (
   connection: NetworkConnection
-): TooltipContent => ({
-  title: `Connection ${connection.id}`,
-  status: connection.status,
-  details: [
-    { label: "From", value: connection.sourceNodeId, icon: "ArrowRight" },
-    { label: "To", value: connection.targetNodeId, icon: "ArrowLeft" },
-    ...(connection.bandwidth
-      ? [{ label: "Bandwidth", value: `${connection.bandwidth} Mbps`, icon: "Speed" }]
-      : []),
-    ...(connection.utilization !== undefined
-      ? [{ label: "Utilization", value: `${connection.utilization}%`, icon: "Gauge" }]
-      : []),
-  ],
-  actions: [
-    { label: "View Route", icon: "MapTrifold", onClick: () => {}, variant: "primary" },
-    { label: "Check Health", icon: "Heartbeat", onClick: () => {}, variant: "secondary" },
-  ],
-});
+): TooltipContent => {
+  const { bandwidth, utilization } = connection;
+  const currentSpeed =
+    bandwidth && utilization !== undefined ? (bandwidth * utilization) / 100 : null;
+
+  return {
+    title: `Connection ${connection.id}`,
+    status: connection.status,
+    details: [
+      { label: "From", value: connection.sourceNodeId, icon: "ArrowRight" as PhosphorIconsType },
+      { label: "To", value: connection.targetNodeId, icon: "ArrowLeft" as PhosphorIconsType },
+      ...(bandwidth
+        ? [{ label: "Bandwidth", value: `${bandwidth} Mbps`, icon: "Speed" as PhosphorIconsType }]
+        : []),
+      ...(currentSpeed !== null
+        ? [
+            {
+              label: "Current Speed",
+              value: `${currentSpeed.toFixed(2)} Mbps`,
+              icon: "TrendUp" as PhosphorIconsType,
+            },
+          ]
+        : []),
+      ...(utilization !== undefined
+        ? [{ label: "Utilization", value: `${utilization}%`, icon: "Gauge" as PhosphorIconsType }]
+        : []),
+    ],
+    actions: [
+      { label: "View Route", icon: "MapTrifold" as PhosphorIconsType, onClick: () => {}, variant: "primary" },
+      { label: "Check Health", icon: "Heartbeat" as PhosphorIconsType, onClick: () => {}, variant: "secondary" },
+    ],
+  };
+};

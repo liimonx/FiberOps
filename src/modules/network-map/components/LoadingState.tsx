@@ -77,7 +77,7 @@ export const SkeletonLoader: React.FC<{
 
   return (
     <div
-      className={`u-bg-white-opacity-5 u-animate-pulse ${variantClasses[variant]} ${className}`}
+      className={`u-bg-secondary-subtle u-opacity-50 u-animate-pulse ${variantClasses[variant]} ${className}`}
       style={{ width, height }}
       aria-hidden="true"
     />

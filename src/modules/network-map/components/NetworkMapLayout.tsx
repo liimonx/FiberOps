@@ -2,6 +2,7 @@
 
 import React from "react";
 import { Card } from "@shohojdhara/atomix";
+import { MapOverlayAesthetics } from "./MapOverlayAesthetics";
 
 interface NetworkMapLayoutProps {
   mapComponent: React.ReactNode;
@@ -42,6 +43,7 @@ export const NetworkMapLayout: React.FC<NetworkMapLayoutProps> = ({
         aria-label="Interactive network map"
       >
         {mapComponent}
+        <MapOverlayAesthetics />
       </main>
 
       {/* Desktop layout */}

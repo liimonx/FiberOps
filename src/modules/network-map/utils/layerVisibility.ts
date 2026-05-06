@@ -8,19 +8,15 @@ export function visibleNodeTypesFromLayers(layers: NetworkMapLayer[]): NetworkNo
     .flatMap((l) => {
       switch (l.id) {
         case "infrastructure":
-          return [
-            NetworkNodeType.CORE_NODE,
-            NetworkNodeType.DISTRIBUTION_NODE,
-            NetworkNodeType.ACCESS_NODE,
-          ];
+          return [NetworkNodeType.CORE_NODE, NetworkNodeType.DISTRIBUTION_NODE, NetworkNodeType.ACCESS_NODE];
         case "pops":
           return [NetworkNodeType.POP];
-        case "poles":
-          return [NetworkNodeType.POLE];
         case "junction-boxes":
           return [NetworkNodeType.JUNCTION_BOX];
         case "splitters":
           return [NetworkNodeType.SPLITTER];
+        case "poles":
+          return [NetworkNodeType.POLE];
         case "onus":
           return [NetworkNodeType.ONU];
         case "customers":
@@ -36,9 +32,14 @@ export function visibleConnectionTypesFromLayers(layers: NetworkMapLayer[]): Con
   const types = layers
     .filter((l) => l.visible && l.type === "connections")
     .flatMap((l) => {
-      if (l.id === "fiber-routes") return [ConnectionType.FIBER_ROUTE];
-      if (l.id === "customer-connections") return [ConnectionType.CUSTOMER_CONNECTION];
-      return [];
+      switch (l.id) {
+        case "fiber-routes":
+          return [ConnectionType.FIBER_ROUTE];
+        case "customer-connections":
+          return [ConnectionType.CUSTOMER_CONNECTION];
+        default:
+          return [];
+      }
     });
   return Array.from(new Set(types));
 }

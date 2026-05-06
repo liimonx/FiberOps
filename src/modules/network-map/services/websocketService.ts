@@ -1,14 +1,13 @@
 "use client";
 
-import { NetworkNode, NetworkConnection } from '../types';
+import { NetworkNode, NetworkConnection } from "../types";
+import { safeValidateData } from "../utils/validation";
+import {
+  webSocketMessageSchema,
+  WebSocketMessageSchema,
+} from "../schemas/webSocketMessage.schema";
 
-export type WebSocketMessage = 
-  | { type: 'node_update'; data: Partial<NetworkNode> & { id: string } }
-  | { type: 'connection_update'; data: Partial<NetworkConnection> & { id: string } }
-  | { type: 'incident_alert'; data: Record<string, unknown> }
-  | { type: 'status_broadcast'; data: { nodeId: string; status: string; timestamp: string } }
-  | { type: 'heartbeat'; data: { serverTime: string; connectedClients: number } };
-
+export type WebSocketMessage = WebSocketMessageSchema;
 export type WebSocketEventHandler = (message: WebSocketMessage) => void;
 
 export interface WebSocketServiceConfig {
@@ -16,9 +15,11 @@ export interface WebSocketServiceConfig {
   reconnectInterval?: number;
   maxReconnectAttempts?: number;
   heartbeatInterval?: number;
+  maxBufferSize?: number;
 }
 
 export class WebSocketService {
+  private static instance: WebSocketService | null = null;
   private ws: WebSocket | null = null;
   private config: Required<WebSocketServiceConfig>;
   private eventHandlers: Map<string, Set<WebSocketEventHandler>> = new Map();
@@ -27,17 +28,25 @@ export class WebSocketService {
   private heartbeatTimer: NodeJS.Timeout | null = null;
   private isManualClose: boolean = false;
   private messageBuffer: WebSocketMessage[] = [];
-  
-  constructor(config: WebSocketServiceConfig = {}) {
+
+  private constructor(config: WebSocketServiceConfig = {}) {
     this.config = {
-      url: config.url || process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:8080/ws',
+      url: config.url || process.env.NEXT_PUBLIC_WS_URL || "ws://localhost:8080/ws",
       reconnectInterval: config.reconnectInterval || 3000,
       maxReconnectAttempts: config.maxReconnectAttempts || 10,
       heartbeatInterval: config.heartbeatInterval || 30000,
+      maxBufferSize: config.maxBufferSize || 100,
     };
   }
 
-  connect(): Promise<void> {
+  public static getInstance(config?: WebSocketServiceConfig): WebSocketService {
+    if (!WebSocketService.instance) {
+      WebSocketService.instance = new WebSocketService(config);
+    }
+    return WebSocketService.instance;
+  }
+
+  public connect(): Promise<void> {
     return new Promise((resolve, reject) => {
       if (this.ws?.readyState === WebSocket.OPEN) {
         resolve();
@@ -49,18 +58,18 @@ export class WebSocketService {
       // Set connection timeout
       const connectionTimeout = setTimeout(() => {
         if (this.ws?.readyState !== WebSocket.OPEN) {
-          console.error('[WebSocket] Connection timeout');
+          console.error("[WebSocket] Connection timeout");
           this.ws?.close();
-          reject(new Error('WebSocket connection timed out'));
+          reject(new Error("WebSocket connection timed out"));
         }
-      }, 5000); // 5 second timeout
+      }, 5000);
 
       try {
         this.ws = new WebSocket(this.config.url);
 
         this.ws.onopen = () => {
           clearTimeout(connectionTimeout);
-          console.log('[WebSocket] Connected successfully');
+          console.log("[WebSocket] Connected successfully");
           this.reconnectAttempts = 0;
           this.startHeartbeat();
           this.flushMessageBuffer();
@@ -69,148 +78,158 @@ export class WebSocketService {
 
         this.ws.onmessage = (event) => {
           try {
-            const message: WebSocketMessage = JSON.parse(event.data);
-            this.handleMessage(message);
+            const rawData = JSON.parse(event.data);
+            const validationResult = safeValidateData(webSocketMessageSchema, rawData);
+
+            if (validationResult.success) {
+              this.handleMessage(validationResult.data);
+            } else {
+              console.warn(
+                "[WebSocket] Received malformed message:",
+                validationResult.error,
+                rawData
+              );
+            }
           } catch (error) {
-            console.error('[WebSocket] Failed to parse message:', error);
+            console.error("[WebSocket] Failed to parse message:", error);
           }
         };
 
-        this.ws.onerror = (error) => {
-          const errorMessage = this.ws?.url 
-            ? `Failed to connect to WebSocket at ${this.ws.url}. Ensure the server is running and accessible.`
-            : 'WebSocket connection failed';
-          console.error('[WebSocket] Connection error:', errorMessage);
-          // Don't reject here - let onclose handle reconnection logic
-          // This prevents unhandled promise rejections for transient errors
+        this.ws.onerror = (event) => {
+          // WebSocket errors are often opaque in browsers for security reasons.
+          const isConnecting = this.ws?.readyState === WebSocket.CONNECTING;
+          
+          if (isConnecting) {
+            console.warn(
+              `[WebSocket] Connection failed for ${this.config.url}. (Check if backend is running)`
+            );
+          } else if (this.ws?.readyState === WebSocket.OPEN) {
+            console.error("[WebSocket] Live connection error:", event);
+          }
         };
 
         this.ws.onclose = (event) => {
           clearTimeout(connectionTimeout);
-          const closeMessage = event.code === 1006 
-            ? 'Connection failed - server may be unreachable' 
-            : `Connection closed (code: ${event.code})`;
-          
-          if (event.reason) {
-            console.warn(`[WebSocket] ${closeMessage}: ${event.reason}`);
-          } else {
-            console.log(`[WebSocket] ${closeMessage}`);
-          }
-          
           this.stopHeartbeat();
-          
+
+          // If we haven't connected yet, reject the promise early
+          if (this.reconnectAttempts === 0 && !this.isConnected()) {
+            reject(
+              new Error(
+                `WebSocket connection failed: ${this.config.url} (Code: ${event.code})`
+              )
+            );
+          }
+
           if (!this.isManualClose && event.code !== 1000) {
             this.attemptReconnect();
           }
         };
       } catch (error) {
-        console.error('[WebSocket] Failed to connect:', error);
+        console.error("[WebSocket] Failed to connect:", error);
         reject(error);
       }
     });
   }
 
-  disconnect(): void {
+  public disconnect(): void {
     this.isManualClose = true;
     this.stopHeartbeat();
-    
+
     if (this.reconnectTimer) {
       clearTimeout(this.reconnectTimer);
       this.reconnectTimer = null;
     }
 
     if (this.ws) {
-      this.ws.close(1000, 'Client disconnecting');
+      this.ws.close(1000, "Client disconnecting");
       this.ws = null;
     }
   }
 
-  send(message: WebSocketMessage): void {
+  public send(message: WebSocketMessage): void {
     if (this.ws?.readyState === WebSocket.OPEN) {
       this.ws.send(JSON.stringify(message));
     } else {
-      // Buffer message for when connection is established
-      this.messageBuffer.push(message);
-      console.warn('[WebSocket] Message buffered - connection not ready');
+      if (this.messageBuffer.length < this.config.maxBufferSize) {
+        this.messageBuffer.push(message);
+        console.warn("[WebSocket] Message buffered - connection not ready");
+      } else {
+        console.error("[WebSocket] Message buffer full - dropping message");
+      }
     }
   }
 
-  subscribe(eventType: string, handler: WebSocketEventHandler): () => void {
+  public subscribe(eventType: string, handler: WebSocketEventHandler): () => void {
     if (!this.eventHandlers.has(eventType)) {
       this.eventHandlers.set(eventType, new Set());
     }
-    
-    this.eventHandlers.get(eventType)!.add(handler);
 
-    // Return unsubscribe function
-    return () => {
-      this.eventHandlers.get(eventType)?.delete(handler);
-    };
+    this.eventHandlers.get(eventType)!.add(handler);
+    return () => this.eventHandlers.get(eventType)?.delete(handler);
   }
 
-  getConnectionState(): 'connecting' | 'open' | 'closing' | 'closed' {
-    if (!this.ws) return 'closed';
-    
+  public getConnectionState(): "connecting" | "open" | "closing" | "closed" {
+    if (!this.ws) return "closed";
     switch (this.ws.readyState) {
       case WebSocket.CONNECTING:
-        return 'connecting';
+        return "connecting";
       case WebSocket.OPEN:
-        return 'open';
+        return "open";
       case WebSocket.CLOSING:
-        return 'closing';
+        return "closing";
       case WebSocket.CLOSED:
-        return 'closed';
+        return "closed";
       default:
-        return 'closed';
+        return "closed";
     }
   }
 
-  isConnected(): boolean {
+  public isConnected(): boolean {
     return this.ws?.readyState === WebSocket.OPEN;
   }
 
   private handleMessage(message: WebSocketMessage): void {
-    // Call all handlers for this message type
     const handlers = this.eventHandlers.get(message.type);
-    if (handlers) {
-      handlers.forEach(handler => {
-        try {
-          handler(message);
-        } catch (error) {
-          console.error(`[WebSocket] Error in ${message.type} handler:`, error);
-        }
-      });
-    }
+    handlers?.forEach((handler) => {
+      try {
+        handler(message);
+      } catch (e) {
+        console.error(`[WebSocket] Error in ${message.type} handler:`, e);
+      }
+    });
 
-    // Call generic 'message' handlers
-    const genericHandlers = this.eventHandlers.get('message');
-    if (genericHandlers) {
-      genericHandlers.forEach(handler => {
-        try {
-          handler(message);
-        } catch (error) {
-          console.error('[WebSocket] Error in generic message handler:', error);
-        }
-      });
-    }
+    const genericHandlers = this.eventHandlers.get("message");
+    genericHandlers?.forEach((handler) => {
+      try {
+        handler(message);
+      } catch (e) {
+        console.error("[WebSocket] Error in generic message handler:", e);
+      }
+    });
   }
 
   private attemptReconnect(): void {
     if (this.reconnectAttempts >= this.config.maxReconnectAttempts) {
-      console.error('[WebSocket] Max reconnection attempts reached');
+      console.error("[WebSocket] Max reconnection attempts reached");
       this.notifyConnectionFailure();
       return;
     }
 
     this.reconnectAttempts++;
-    const delay = this.config.reconnectInterval * Math.pow(2, this.reconnectAttempts - 1);
-    
-    console.log(`[WebSocket] Reconnecting in ${delay}ms (attempt ${this.reconnectAttempts})`);
-    
+    const delay = Math.min(
+      this.config.reconnectInterval * Math.pow(2, this.reconnectAttempts - 1),
+      30000 // Cap delay at 30 seconds
+    );
+
+    console.log(
+      `[WebSocket] Reconnecting in ${delay}ms (attempt ${this.reconnectAttempts})`
+    );
+
     this.reconnectTimer = setTimeout(() => {
-      this.connect().catch(err => {
-        console.error('[WebSocket] Reconnection failed:', err);
-      });
+      this.connect().catch((err) =>
+        console.error("[WebSocket] Reconnection failed:", err)
+      );
     }, delay);
   }
 
@@ -218,11 +237,11 @@ export class WebSocketService {
     this.heartbeatTimer = setInterval(() => {
       if (this.isConnected()) {
         this.send({
-          type: 'heartbeat',
+          type: "heartbeat",
           data: {
             serverTime: new Date().toISOString(),
-            connectedClients: 0 // This would come from server
-          }
+            connectedClients: 0,
+          },
         });
       }
     }, this.config.heartbeatInterval);
@@ -238,46 +257,29 @@ export class WebSocketService {
   private flushMessageBuffer(): void {
     while (this.messageBuffer.length > 0 && this.isConnected()) {
       const message = this.messageBuffer.shift();
-      if (message) {
-        this.send(message);
-      }
+      if (message) this.send(message);
     }
   }
 
   private notifyConnectionFailure(): void {
-    const handlers = this.eventHandlers.get('connection_error');
-    if (handlers) {
-      handlers.forEach(handler => {
-        try {
-          handler({
-            type: 'status_broadcast',
-            data: {
-              nodeId: 'system',
-              status: 'disconnected',
-              timestamp: new Date().toISOString()
-            }
-          });
-        } catch (error) {
-          console.error('[WebSocket] Error in connection_error handler:', error);
-        }
-      });
-    }
+    const handlers = this.eventHandlers.get("connection_error");
+    handlers?.forEach((handler) => {
+      try {
+        handler({
+          type: "status_broadcast",
+          data: {
+            nodeId: "system",
+            status: "disconnected" as any,
+            timestamp: new Date().toISOString(),
+          },
+        });
+      } catch (e) {
+        console.error("[WebSocket] Error in connection_error handler:", e);
+      }
+    });
   }
 }
 
-// Singleton instance
-let webSocketServiceInstance: WebSocketService | null = null;
-
-export function getWebSocketService(config?: WebSocketServiceConfig): WebSocketService {
-  if (!webSocketServiceInstance) {
-    webSocketServiceInstance = new WebSocketService(config);
-  }
-  return webSocketServiceInstance;
-}
-
-export function resetWebSocketService(): void {
-  if (webSocketServiceInstance) {
-    webSocketServiceInstance.disconnect();
-    webSocketServiceInstance = null;
-  }
-}
+export const getWebSocketService = (config?: WebSocketServiceConfig) =>
+  WebSocketService.getInstance(config);
+export const resetWebSocketService = () => WebSocketService.getInstance().disconnect();

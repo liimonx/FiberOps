@@ -36,6 +36,14 @@ export const statusColors: Record<NetworkStatus, StatusColorConfig> = {
     icon: '#F59E0B',
     glow: 'rgba(245, 158, 11, 0.5)'
   },
+  [NetworkStatus.DEGRADED]: {
+    primary: '#FB923C', // Orange 400
+    secondary: '#F97316', // Orange 500
+    background: 'rgba(251, 146, 60, 0.1)',
+    border: 'rgba(251, 146, 60, 0.3)',
+    icon: '#FB923C',
+    glow: 'rgba(251, 146, 60, 0.5)'
+  },
   [NetworkStatus.ERROR]: {
     primary: '#EF4444', // Red 500
     secondary: '#DC2626', // Red 600
@@ -57,6 +65,7 @@ export const statusClasses: Record<NetworkStatus, string> = {
   [NetworkStatus.ACTIVE]: 'status-active',
   [NetworkStatus.INACTIVE]: 'status-inactive',
   [NetworkStatus.WARNING]: 'status-warning',
+  [NetworkStatus.DEGRADED]: 'status-degraded',
   [NetworkStatus.ERROR]: 'status-error'
 };
 
@@ -65,6 +74,7 @@ export const statusIcons: Record<NetworkStatus, string> = {
   [NetworkStatus.ACTIVE]: 'CheckCircle',
   [NetworkStatus.INACTIVE]: 'MinusCircle',
   [NetworkStatus.WARNING]: 'Warning',
+  [NetworkStatus.DEGRADED]: 'Warning',
   [NetworkStatus.ERROR]: 'XCircle'
 };
 
@@ -72,7 +82,8 @@ export const statusIcons: Record<NetworkStatus, string> = {
 export const statusLabels: Record<NetworkStatus, string> = {
   [NetworkStatus.ACTIVE]: 'Active',
   [NetworkStatus.INACTIVE]: 'Inactive',
-  [NetworkStatus.WARNING]: 'Degraded',
+  [NetworkStatus.WARNING]: 'Warning',
+  [NetworkStatus.DEGRADED]: 'Degraded',
   [NetworkStatus.ERROR]: 'Down'
 };
 
