@@ -98,7 +98,7 @@ export default function IncidentsPage() {
     {
       key: "actions",
       title: "",
-      render: () => <Button variant="secondary" size="sm" iconName="arrow-right" />,
+      render: () => <Button variant="secondary" size="sm" iconName="ArrowRight" />,
     },
   ];
 

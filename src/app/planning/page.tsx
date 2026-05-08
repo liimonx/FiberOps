@@ -12,7 +12,7 @@ export default function PlanningPage() {
             Future network expansion, capacity forecasting, and budget modeling.
           </p>
         </div>
-        <Button variant="primary" iconName="plus">
+        <Button variant="primary" iconName="Plus">
           Create Proposal
         </Button>
       </div>
