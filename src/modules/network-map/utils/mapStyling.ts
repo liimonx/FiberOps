@@ -285,7 +285,7 @@ export const addCustomLayers = (map: mapboxgl.Map) => {
   // Find a label layer to insert the 3D buildings beneath it
   if (!map.isStyleLoaded()) return;
   const styleLayers = map.getStyle()?.layers || [];
-  let labelLayerId;
+  let labelLayerId: string | undefined;
   for (let i = 0; i < styleLayers.length; i++) {
     if (styleLayers[i].type === "symbol" && styleLayers[i].layout) {
       labelLayerId = styleLayers[i].id;
@@ -342,16 +342,17 @@ export const addCustomLayers = (map: mapboxgl.Map) => {
 
   const layers = [
     CUSTOM_LAYERS.coverage,
+    CUSTOM_LAYERS.outagesGlow,
     CUSTOM_LAYERS.connectionCasing,
     CUSTOM_LAYERS.connections,
-    CUSTOM_LAYERS.outagesGlow,
     CUSTOM_LAYERS.outages,
     CUSTOM_LAYERS.nodes3D,
   ];
 
   layers.forEach((layer) => {
     if (!map.getLayer(layer.id)) {
-      map.addLayer(layer);
+      // Insert all network layers beneath labels for better legibility
+      map.addLayer(layer, labelLayerId);
     }
   });
 };
@@ -1028,8 +1029,8 @@ export const create3DNodeFeatures = (node: NetworkNode): GeoJSON.Feature[] => {
     // Transformer (Side-mounted cylinder/box)
     const transW = 0.000015;
     const transL = 0.000015;
-    const transH = 8.5;
-    const transMin = 6.5;
+    const transH = 15.5;
+    const transMin = 13.5;
 
     const transformer: GeoJSON.Feature = {
       type: "Feature",
