@@ -11,7 +11,7 @@ import {
   useConnections,
 } from "../stores/useNetworkMapStore";
 import { MAPBOX_CONFIG } from "../constants";
-import { LoadingState } from "./LoadingState";
+import { EnhancedLoadingState } from "./EnhancedLoadingState";
 import {
   addCustomLayers,
   updateLayerVisibility,
@@ -407,7 +407,7 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({ onMapLoad, onMapError }) =
         tabIndex={0}
       />
       {mapLoading && (
-        <LoadingState message="Initializing Neural Map..." variant="overlay" />
+        <EnhancedLoadingState message="Initializing Neural Map..." variant="overlay" />
       )}
     </div>
   );

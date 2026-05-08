@@ -30,32 +30,11 @@ describe('useTooltipHover', () => {
     });
   });
 
-  it('should show tooltip immediately when delayEnter is 0', () => {
-    const { result } = renderHook(() => useTooltipHover({ delayEnter: 0 }));
+  it('should show tooltip immediately', () => {
+    const { result } = renderHook(() => useTooltipHover());
     
     act(() => {
       result.current.showTooltip(mockContent, 100, 200);
-    });
-
-    expect(result.current.tooltip).toEqual({
-      content: mockContent,
-      x: 100,
-      y: 200,
-      visible: true
-    });
-  });
-
-  it('should show tooltip after delayEnter when delayEnter > 0', () => {
-    const { result } = renderHook(() => useTooltipHover({ delayEnter: 100 }));
-    
-    act(() => {
-      result.current.showTooltip(mockContent, 100, 200);
-    });
-
-    expect(result.current.tooltip.visible).toBe(false);
-
-    act(() => {
-      vi.advanceTimersByTime(100);
     });
 
     expect(result.current.tooltip).toEqual({
@@ -80,49 +59,8 @@ describe('useTooltipHover', () => {
     expect(result.current.tooltip.visible).toBe(false);
   });
 
-  it('should hide tooltip after delayLeave when immediate is false', () => {
-    const { result } = renderHook(() => useTooltipHover({ delayLeave: 150 }));
-    
-    act(() => {
-      result.current.showTooltip(mockContent, 100, 200);
-    });
-    
-    act(() => {
-      result.current.hideTooltip(false);
-    });
-    expect(result.current.tooltip.visible).toBe(true);
-
-    act(() => {
-      vi.advanceTimersByTime(150);
-    });
-    expect(result.current.tooltip.visible).toBe(false);
-  });
-
-  it('should prevent hiding tooltip when mouse enters', () => {
-    const { result } = renderHook(() => useTooltipHover({ delayLeave: 150 }));
-    
-    act(() => {
-      result.current.showTooltip(mockContent, 100, 200);
-    });
-    
-    act(() => {
-      result.current.handleMouseEnter();
-    });
-
-    act(() => {
-      result.current.hideTooltip(false);
-    });
-
-    act(() => {
-      vi.advanceTimersByTime(150);
-    });
-    
-    // Should still be visible because mouse is hovering over the tooltip
-    expect(result.current.tooltip.visible).toBe(true);
-  });
-
-  it('should hide tooltip when mouse leaves', () => {
-    const { result } = renderHook(() => useTooltipHover({ delayLeave: 150 }));
+  it('should hide tooltip after delay when mouse leaves', () => {
+    const { result } = renderHook(() => useTooltipHover());
     
     act(() => {
       result.current.showTooltip(mockContent, 100, 200);
@@ -136,105 +74,134 @@ describe('useTooltipHover', () => {
       result.current.handleMouseLeave();
     });
 
+    // Should still be visible immediately after leaving (due to delay)
     expect(result.current.tooltip.visible).toBe(true);
 
     act(() => {
-      vi.advanceTimersByTime(150);
+      vi.advanceTimersByTime(300);
     });
     
     expect(result.current.tooltip.visible).toBe(false);
   });
 
-  it('should clear pending timeouts on unmount', () => {
-    const { result, unmount } = renderHook(() => useTooltipHover({ delayLeave: 150 }));
+  it('should hide tooltip after delay when hideTooltip is called without immediate flag if not hovered', () => {
+    const { result } = renderHook(() => useTooltipHover());
     
     act(() => {
       result.current.showTooltip(mockContent, 100, 200);
     });
     
     act(() => {
-      result.current.hideTooltip(false);
+      result.current.hideTooltip();
     });
 
-    unmount();
+    expect(result.current.tooltip.visible).toBe(true);
 
     act(() => {
-      vi.advanceTimersByTime(150);
+      vi.advanceTimersByTime(300);
     });
+
+    expect(result.current.tooltip.visible).toBe(false);
   });
 
-  describe('Race Condition Fix', () => {
-    it('should handle rapid consecutive showTooltip calls with delay', () => {
-      const { result } = renderHook(() => useTooltipHover({ delayEnter: 50 }));
-
-      act(() => {
-        result.current.showTooltip(mockContent, 100, 200);
-      });
-
-      act(() => {
-        result.current.showTooltip({ ...mockContent, title: 'Second' }, 150, 250);
-      });
-
-      act(() => {
-        vi.advanceTimersByTime(50);
-      });
-
-      expect(result.current.tooltip.content?.title).toBe('Second');
+  it('should NOT hide tooltip when hideTooltip is called if hovered', () => {
+    const { result } = renderHook(() => useTooltipHover());
+    
+    act(() => {
+      result.current.showTooltip(mockContent, 100, 200);
+    });
+    
+    act(() => {
+      result.current.handleMouseEnter();
+    });
+    
+    act(() => {
+      result.current.hideTooltip();
     });
 
-    it('should prevent tooltip from showing when hover leaves during delay', () => {
-      const { result } = renderHook(() => useTooltipHover({ delayEnter: 100, delayLeave: 50 }));
-
-      act(() => {
-        result.current.showTooltip(mockContent, 100, 200);
-      });
-
-      act(() => {
-        result.current.handleMouseLeave();
-      });
-
-      act(() => {
-        vi.advanceTimersByTime(100);
-      });
-
-      expect(result.current.tooltip.visible).toBe(false);
+    act(() => {
+      vi.advanceTimersByTime(300);
     });
 
-    it('should clear pending timeout when showTooltip is called during delay', () => {
-      const { result } = renderHook(() => useTooltipHover({ delayEnter: 100 }));
+    expect(result.current.tooltip.visible).toBe(true);
+  });
 
-      act(() => {
-        result.current.showTooltip(mockContent, 100, 200);
-      });
-
-      act(() => {
-        vi.advanceTimersByTime(50);
-      });
-
-      act(() => {
-        result.current.showTooltip({ ...mockContent, title: 'Updated' }, 300, 400);
-      });
-
-      act(() => {
-        vi.advanceTimersByTime(100);
-      });
-
-      expect(result.current.tooltip.content?.title).toBe('Updated');
+  it('should NOT reset hover state when showTooltip is called', () => {
+    const { result } = renderHook(() => useTooltipHover());
+    
+    act(() => {
+      result.current.showTooltip(mockContent, 100, 200);
+    });
+    
+    act(() => {
+      result.current.handleMouseEnter();
+    });
+    
+    expect(result.current.tooltip.visible).toBe(true);
+    
+    act(() => {
+      result.current.showTooltip(mockContent, 110, 210);
     });
 
-    it('should show tooltip immediately when delayEnter is 0 regardless of hover state', () => {
-      const { result } = renderHook(() => useTooltipHover({ delayEnter: 0 }));
-
-      act(() => {
-        result.current.handleMouseEnter();
-      });
-
-      act(() => {
-        result.current.showTooltip(mockContent, 100, 200);
-      });
-
-      expect(result.current.tooltip.visible).toBe(true);
-      expect(result.current.tooltip.content).toEqual(mockContent);
+    act(() => {
+      result.current.hideTooltip();
     });
+
+    act(() => {
+      vi.advanceTimersByTime(300);
+    });
+
+    // Should still be visible because we are still "hovered" and showTooltip didn't reset it
+    expect(result.current.tooltip.visible).toBe(true);
+  });
+
+  it('should use custom delay when provided', () => {
+    const { result } = renderHook(() => useTooltipHover({ delay: 500 }));
+    
+    act(() => {
+      result.current.showTooltip(mockContent, 100, 200);
+    });
+    
+    act(() => {
+      result.current.hideTooltip();
+    });
+
+    // At 300ms it should still be visible (unlike default)
+    act(() => {
+      vi.advanceTimersByTime(300);
+    });
+    expect(result.current.tooltip.visible).toBe(true);
+
+    // At 500ms it should hide
+    act(() => {
+      vi.advanceTimersByTime(200);
+    });
+    expect(result.current.tooltip.visible).toBe(false);
+  });
+
+  it('should NOT hide automatically when autoHide is false', () => {
+    const { result } = renderHook(() => useTooltipHover({ autoHide: false }));
+    
+    act(() => {
+      result.current.showTooltip(mockContent, 100, 200);
+    });
+    
+    act(() => {
+      result.current.hideTooltip();
+    });
+
+    act(() => {
+      vi.advanceTimersByTime(1000);
+    });
+
+    // Should still be visible even after long delay
+    expect(result.current.tooltip.visible).toBe(true);
+
+    // Should still hide if immediate is forced
+    act(() => {
+      result.current.hideTooltip(true);
+    });
+    expect(result.current.tooltip.visible).toBe(false);
   });
 });
+

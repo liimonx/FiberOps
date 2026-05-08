@@ -2,18 +2,15 @@
 
 import { useEffect, useMemo, useCallback } from "react";
 import { Icon, Button, Card, Badge } from "@shohojdhara/atomix";
-import { Customer } from "@/types/domain";
 import {
   useNetworkData,
   useRealTimeUpdates,
   useActiveIncidents,
-  useNodesByStatus,
 } from "../hooks";
 import { useNetworkMapStore } from "../stores/useNetworkMapStore";
 import { ErrorBoundary } from "./ErrorBoundary";
-import { LoadingState } from "./LoadingState";
-import { NetworkNodeType, NetworkStatus } from "../types";
-import { sanitizeSearchQuery, sanitizeMetadata } from "../utils/sanitization";
+import { EnhancedLoadingState } from "./EnhancedLoadingState";
+import { NetworkStatus } from "../types";
 
 interface NetworkMapDataProps {
   children: React.ReactNode;
@@ -21,7 +18,7 @@ interface NetworkMapDataProps {
 
 // Component that fetches and syncs network data with the store
 function NetworkMapDataSync({ children }: NetworkMapDataProps) {
-  const { customers, nodes, connections, isLoading, error } = useNetworkData();
+  const { nodes, connections, isLoading, error, isFetching } = useNetworkData();
 
   const handleConnectionChange = useCallback((connected: boolean) => {
     console.log(
@@ -36,8 +33,15 @@ function NetworkMapDataSync({ children }: NetworkMapDataProps) {
   });
 
   const { data: activeIncidents } = useActiveIncidents();
-  const { data: degradedNodes } = useNodesByStatus("degraded");
-  const { data: downNodes } = useNodesByStatus("down");
+  
+  // Memoize counts to avoid re-renders of status indicators
+  const stats = useMemo(() => {
+    return {
+      degraded: nodes.filter(n => n.status === NetworkStatus.WARNING).length,
+      down: nodes.filter(n => n.status === NetworkStatus.ERROR).length,
+      incidents: activeIncidents?.length || 0
+    };
+  }, [nodes, activeIncidents]);
 
   const setNodes = useNetworkMapStore((state) => state.setNodes);
   const setConnections = useNetworkMapStore((state) => state.setConnections);
@@ -46,59 +50,49 @@ function NetworkMapDataSync({ children }: NetworkMapDataProps) {
   const setWebSocketConnected = useNetworkMapStore((state) => state.setWebSocketConnected);
   const setConnectionQuality = useNetworkMapStore((state) => state.setConnectionQuality);
 
-  // Sync basic states
+  // Consolidated sync effect
   useEffect(() => {
     setLoading(isLoading);
-    setError(
-      error instanceof Error
-        ? error.message
-        : error
-          ? "Failed to load network data"
-          : null
-    );
     setWebSocketConnected(isConnected);
     setConnectionQuality(connectionQuality);
-  }, [isLoading, error, isConnected, connectionQuality, setLoading, setError, setWebSocketConnected, setConnectionQuality]);
-
-  // Sync data with sanitization and optimization
-  useEffect(() => {
-    const assetNodes = nodes.data ?? [];
-    const customerNodes = customers.data?.map((customer: Customer) => ({
-      id: customer.id,
-      name: sanitizeSearchQuery(customer.name),
-      type: NetworkNodeType.CUSTOMER,
-      position: customer.location || { lat: 23.8103, lng: 90.4125 },
-      status:
-        customer.status === "online"
-          ? NetworkStatus.ACTIVE
-          : customer.status === "offline"
-            ? NetworkStatus.ERROR
-            : NetworkStatus.WARNING,
-      metadata: sanitizeMetadata({
-        kind: "customer",
-        plan: customer.plan,
-        originalStatus: customer.status,
-      }),
-    })) ?? [];
-
-    if (assetNodes.length > 0 || customerNodes.length > 0) {
-      setNodes([...assetNodes, ...customerNodes]);
+    
+    if (error) {
+      setError(error instanceof Error ? error.message : "Failed to load network data");
+    } else {
+      setError(null);
     }
 
-    if (connections.data) {
-      setConnections(connections.data);
+    if (nodes.length > 0) {
+      setNodes(nodes);
     }
-  }, [nodes.data, customers.data, connections.data, setNodes, setConnections]);
+    
+    if (connections.length > 0) {
+      setConnections(connections);
+    }
+  }, [
+    nodes, 
+    connections, 
+    isLoading, 
+    error, 
+    isConnected, 
+    connectionQuality, 
+    setNodes, 
+    setConnections, 
+    setLoading, 
+    setError, 
+    setWebSocketConnected, 
+    setConnectionQuality
+  ]);
 
-  if (isLoading && !nodes.data) {
+  if (isLoading && nodes.length === 0) {
     return (
       <div className="u-w-100 u-h-100 u-flex u-items-center u-justify-center u-bg-dark">
-        <LoadingState message="Connecting to Fiber Mesh..." />
+        <EnhancedLoadingState message="Connecting to Fiber Mesh..." />
       </div>
     );
   }
 
-  if (error && !nodes.data) {
+  if (error && nodes.length === 0) {
     return (
       <div className="u-w-100 u-h-100 u-flex u-items-center u-justify-center u-p-8 u-bg-dark">
         <Card
@@ -133,9 +127,10 @@ function NetworkMapDataSync({ children }: NetworkMapDataProps) {
       <NetworkStatusIndicators
         isConnected={isConnected}
         connectionQuality={connectionQuality}
-        activeIncidents={activeIncidents?.length || 0}
-        degradedNodes={degradedNodes?.length || 0}
-        downNodes={downNodes?.length || 0}
+        activeIncidents={stats.incidents}
+        degradedNodes={stats.degraded}
+        downNodes={stats.down}
+        isFetching={isFetching}
       />
       {children}
     </>
@@ -149,12 +144,14 @@ function NetworkStatusIndicators({
   activeIncidents,
   degradedNodes,
   downNodes,
+  isFetching,
 }: {
   isConnected: boolean;
   connectionQuality: string;
   activeIncidents: number;
   degradedNodes: number;
   downNodes: number;
+  isFetching: boolean;
 }) {
   return (
     <div 
@@ -172,6 +169,16 @@ function NetworkStatusIndicators({
         size="sm"
         aria-label={isConnected ? `Live connection active, quality: ${connectionQuality}` : "Connection lost, showing cached data"}
       />
+
+      {isFetching && (
+        <Badge
+          glass={{ blurAmount: 10 }}
+          variant="primary"
+          icon={<Icon name="ArrowsCounterClockwise" size={"sm"} className="u-animate-spin" />}
+          label="Syncing..."
+          size="sm"
+        />
+      )}
 
       {activeIncidents > 0 && (
         <Badge

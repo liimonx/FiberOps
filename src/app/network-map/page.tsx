@@ -23,7 +23,7 @@ import {
   useConnectionById,
 } from "@/modules/network-map/stores/useNetworkMapStore";
 import { CategorizedResult } from "@/modules/network-map/types";
-import { flyToLocation } from "@/modules/network-map/components/MapEventHandler";
+import { flyToLocation } from "@/modules/network-map/utils/mapUtils";
 import { getMapInstance } from "@/modules/network-map/components/MapCanvas";
 import {
   MeasurementOverlay,
@@ -72,7 +72,7 @@ function NetworkMapContent() {
     hideTooltip,
     handleMouseEnter: handleTooltipMouseEnter,
     handleMouseLeave: handleTooltipMouseLeave,
-  } = useTooltipHover({ delayLeave: 150 });
+  } = useTooltipHover();
 
   // Handle search result selection — fly to actual node coordinates
   const handleSelectResult = useCallback(
@@ -83,10 +83,10 @@ function NetworkMapContent() {
       // Look up the actual node position
       const node = nodes.find((n) => n.id === result.id);
       if (node) {
-        flyToLocation([node.position.lng, node.position.lat], 15);
+        flyToLocation(mapInstance, [node.position.lng, node.position.lat], 15);
       }
     },
-    [nodes, setSelectedElement, addToSelectionHistory]
+    [nodes, setSelectedElement, addToSelectionHistory, mapInstance]
   );
 
   const handleCloseInspector = useCallback(() => {
@@ -138,10 +138,10 @@ function NetworkMapContent() {
 
       const node = nodes.find((n) => n.id === nodeId);
       if (node) {
-        flyToLocation([node.position.lng, node.position.lat], 15);
+        flyToLocation(mapInstance, [node.position.lng, node.position.lat], 15);
       }
     },
-    [activeTool, nodes, setSelectedElement, addToSelectionHistory]
+    [activeTool, nodes, setSelectedElement, addToSelectionHistory, mapInstance]
   );
 
   // Connection click → select

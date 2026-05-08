@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { Icon, Badge } from "@shohojdhara/atomix";
 import { OfflineDetector } from "../utils/errorHandler";
+import { useVisibility } from "../../../hooks/useVisibility";
 
 interface OfflineIndicatorProps {
   className?: string;
@@ -10,7 +11,7 @@ interface OfflineIndicatorProps {
 
 export function OfflineIndicator({ className = "" }: OfflineIndicatorProps) {
   const [isOffline, setIsOffline] = useState(!OfflineDetector.isCurrentlyOnline());
-  const [showBanner, setShowBanner] = useState(false);
+  const { visible: showBanner, setVisible: setShowBanner } = useVisibility();
   const bannerRef = React.useRef<HTMLDivElement>(null);
 
   useEffect(() => {

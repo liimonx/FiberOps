@@ -2,7 +2,6 @@
 
 import React from "react";
 import { Card } from "@shohojdhara/atomix";
-import { MapOverlayAesthetics } from "./MapOverlayAesthetics";
 
 interface NetworkMapLayoutProps {
   mapComponent: React.ReactNode;
@@ -35,7 +34,6 @@ export const NetworkMapLayout: React.FC<NetworkMapLayoutProps> = ({
         Skip to map content
       </a>
 
-      {/* Map canvas - always full screen */}
       <main
         id="map-main-content"
         className="u-absolute u-inset-0 u-w-100 u-h-100"
@@ -43,7 +41,6 @@ export const NetworkMapLayout: React.FC<NetworkMapLayoutProps> = ({
         aria-label="Interactive network map"
       >
         {mapComponent}
-        <MapOverlayAesthetics />
       </main>
 
       {/* Desktop layout */}

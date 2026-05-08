@@ -6,6 +6,7 @@ import { getMapInstance } from "./MapCanvas";
 import { useNetworkMapStore } from "../stores/useNetworkMapStore";
 import { useAccessibilityAnnounce } from "./AccessibilityAnnouncer";
 import { getToolManager } from "../tools/toolManager";
+import { safeHasLayer, fitMapBounds, flyToLocation } from "../utils/mapUtils";
 
 interface MapEventHandlerProps {
   onNodeClick?: (nodeId: string, event: mapboxgl.MapMouseEvent) => void;
@@ -44,13 +45,15 @@ export const MapEventHandler: React.FC<MapEventHandlerProps> = ({
     if (!map) return;
     const toolManager = getToolManager();
 
+
+
     // Handle map click events
     const handleMapClick = (event: mapboxgl.MapMouseEvent) => {
       // Check if layers exist before querying
       let features: mapboxgl.MapboxGeoJSONFeature[] = [];
       if (
-        map.getLayer("network-nodes-3d-layer") &&
-        map.getLayer("network-connections-layer")
+        safeHasLayer(map, "network-nodes-3d-layer") &&
+        safeHasLayer(map, "network-connections-layer")
       ) {
         features = map.queryRenderedFeatures(event.point, {
           layers: ["network-nodes-3d-layer", "network-connections-layer"],
@@ -86,8 +89,8 @@ export const MapEventHandler: React.FC<MapEventHandlerProps> = ({
     // Handle mouse move for hover effects
     const handleMouseMove = (event: mapboxgl.MapMouseEvent) => {
       // Check if layers exist before querying
-      const nodeLayerExists = map.getLayer("network-nodes-3d-layer");
-      const connectionLayerExists = map.getLayer("network-connections-layer");
+      const nodeLayerExists = safeHasLayer(map, "network-nodes-3d-layer");
+      const connectionLayerExists = safeHasLayer(map, "network-connections-layer");
 
       if (!nodeLayerExists && !connectionLayerExists) return;
 
@@ -275,20 +278,30 @@ export const MapEventHandler: React.FC<MapEventHandlerProps> = ({
     const startTime = Date.now();
 
     const animateMap = () => {
-      if (!map) return;
+      // 1. Critical exit: Map instance doesn't exist or has been removed from DOM
+      if (!map || !map.getContainer()) return;
+      
+      // 2. Skip frame if style is still loading or in transition
+      if (!map.isStyleLoaded()) {
+        animationFrame = requestAnimationFrame(animateMap);
+        return;
+      }
       
       const elapsed = Date.now() - startTime;
       
-      // 1. Data Flow Animation (Dashed lines movement)
-      // Note: Mapbox GL JS does not natively support 'line-dasharray-offset'.
-      // For now, we omit this to prevent the runtime crash.
-      // If needed, flow can be achieved via line-gradient or line-pattern.
+      // Data flow animation placeholder (currently omitted to prevent property errors)
       
-      // 2. Alert Pulse Animation
-      // We can animate the opacity of the glow layers
-      const pulse = 0.4 + Math.sin(elapsed / 400) * 0.2; // Pulse between 0.2 and 0.6
-      if (map.getLayer("network-outages-glow")) {
-        map.setPaintProperty("network-outages-glow", "line-opacity", pulse);
+      try {
+        // 3. Alert Pulse Animation: Safely update opacity of the glow layer
+        const outageLayerId = "network-outages-glow";
+        if (safeHasLayer(map, outageLayerId)) {
+          const pulse = 0.4 + Math.sin(elapsed / 400) * 0.2; // Pulse between 0.2 and 0.6
+          map.setPaintProperty(outageLayerId, "line-opacity", pulse);
+        }
+      } catch (error) {
+        // Silently catch errors if style becomes unavailable during execution
+        // This is common during rapid theme switching or hot reloads
+        console.debug("[MapEventHandler] Animation frame skipped:", error);
       }
 
       animationFrame = requestAnimationFrame(animateMap);
@@ -323,102 +336,11 @@ export const MapEventHandler: React.FC<MapEventHandlerProps> = ({
     onConnectionHover,
     onMapClick,
     onMapMove,
+    announce,
+    setActiveTool,
   ]);
 
   // This component doesn't render anything visible
   return null;
 };
 
-// Tool-specific event handlers
-export const useToolHandlers = (activeTool: string) => {
-  const map = getMapInstance();
-
-  useEffect(() => {
-    if (!map) return;
-
-    // Set cursor based on active tool
-    const mapContainer = map.getContainer();
-
-    switch (activeTool) {
-      case "select":
-        mapContainer.style.cursor = "pointer";
-        break;
-      case "trace":
-        mapContainer.style.cursor = "crosshair";
-        break;
-      case "measure":
-        mapContainer.style.cursor = "cell";
-        break;
-      case "heatmap":
-        mapContainer.style.cursor = "help";
-        break;
-      default:
-        mapContainer.style.cursor = "grab";
-    }
-
-    // Cleanup cursor on unmount
-    return () => {
-      if (mapContainer) {
-        mapContainer.style.cursor = "grab";
-      }
-    };
-  }, [activeTool, map]);
-
-  // Tool-specific functionality can be implemented here
-  return {
-    // Tool-specific methods will be added in later tasks
-  };
-};
-
-// Utility function to get features at a point
-export const getFeaturesAtPoint = (point: mapboxgl.Point, layerIds?: string[]) => {
-  const map = getMapInstance();
-  if (!map) return [];
-
-  // Check if layers exist before querying
-  const layersToQuery = layerIds || [
-    "network-nodes-3d-layer",
-    "network-connections-layer",
-  ];
-  const layersExist = layersToQuery.every((layerId) => map.getLayer(layerId));
-
-  if (!layersExist) {
-    return [];
-  }
-
-  return map.queryRenderedFeatures(point, {
-    layers: layersToQuery,
-  });
-};
-
-// Utility function to fit bounds
-export const fitMapBounds = (bounds: mapboxgl.LngLatBoundsLike, padding?: number) => {
-  const map = getMapInstance();
-  if (!map) return;
-
-  map.fitBounds(bounds, {
-    padding: padding || 50,
-    duration: 1000,
-    essential: true,
-  });
-};
-
-// Utility function to fly to a location
-export const flyToLocation = (
-  center: mapboxgl.LngLatLike,
-  zoom?: number,
-  bearing?: number,
-  pitch?: number
-) => {
-  const map = getMapInstance();
-  if (!map) return;
-
-  map.flyTo({
-    center,
-    zoom: zoom || map.getZoom(),
-    bearing: bearing || map.getBearing(),
-    pitch: pitch || map.getPitch(),
-    duration: 1500,
-    essential: true,
-  });
-};

@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
 import { ColorModeToggle, Icon } from "@shohojdhara/atomix";
+import { useVisibility } from "../hooks/useVisibility";
 
 export function SidebarFooter() {
-  const [showShortcuts, setShowShortcuts] = useState(false);
+  const { visible: showShortcuts, toggle: toggleShortcuts } = useVisibility();
 
   return (
     <div className="u-flex u-flex-column u-gap-3 u-pt-3 u-border-top">
@@ -13,7 +13,7 @@ export function SidebarFooter() {
       <div className="u-flex u-flex-column u-gap-2">
         <button
           className="u-w-100 u-px-3 u-py-2 u-bg-transparent u-border-none u-cursor-pointer u-text-left u-flex u-items-center u-gap-2 u-rounded u-transition-all hover:u-bg-secondary-subtle"
-          onClick={() => setShowShortcuts(!showShortcuts)}
+          onClick={toggleShortcuts}
           aria-expanded={showShortcuts}
           aria-label="Toggle keyboard shortcuts"
         >

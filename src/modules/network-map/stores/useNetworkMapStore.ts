@@ -38,7 +38,9 @@ interface NetworkMapStore {
   
   // Data state
   nodes: NetworkNode[];
+  nodeMap: Record<string, NetworkNode>;
   connections: NetworkConnection[];
+  connectionMap: Record<string, NetworkConnection>;
   isLoading: boolean;
   loadingProgress: number;
   error: string | null;
@@ -118,7 +120,9 @@ export const useNetworkMapStore = create<NetworkMapStore>()(
         layers: DEFAULT_LAYERS,
         interaction: initialInteraction,
         nodes: [],
+        nodeMap: {},
         connections: [],
+        connectionMap: {},
         isLoading: false,
         loadingProgress: 0,
         error: null,
@@ -204,54 +208,98 @@ export const useNetworkMapStore = create<NetworkMapStore>()(
           }), false, 'setZooming'),
 
         // Data actions - Optimistic updates
-        setNodes: (nodes) => 
-          set({ nodes, lastUpdated: new Date() }, false, 'setNodes'),
+        setNodes: (nodes) => {
+          const nodeMap: Record<string, NetworkNode> = {};
+          for (const node of nodes) {
+            nodeMap[node.id] = node;
+          }
+          set({ nodes, nodeMap, lastUpdated: new Date() }, false, 'setNodes');
+        },
         
-        setConnections: (connections) => 
-          set({ connections, lastUpdated: new Date() }, false, 'setConnections'),
+        setConnections: (connections) => {
+          const connectionMap: Record<string, NetworkConnection> = {};
+          for (const conn of connections) {
+            connectionMap[conn.id] = conn;
+          }
+          set({ connections, connectionMap, lastUpdated: new Date() }, false, 'setConnections');
+        },
         
         addNode: (node) =>
-          set((state) => ({ 
-            nodes: [...state.nodes, node],
-            lastUpdated: new Date()
-          }), false, 'addNode'),
+          set((state) => {
+            const nodes = [...state.nodes, node];
+            return { 
+              nodes,
+              nodeMap: { ...state.nodeMap, [node.id]: node },
+              lastUpdated: new Date()
+            };
+          }, false, 'addNode'),
         
         updateNode: (nodeId, updates) =>
-          set((state) => ({
-            nodes: state.nodes.map(node =>
+          set((state) => {
+            const nodes = state.nodes.map(node =>
               node.id === nodeId ? { ...node, ...updates } : node
-            ),
-            lastUpdated: new Date()
-          }), false, 'updateNode'),
+            );
+            const updatedNode = nodes.find(n => n.id === nodeId);
+            return {
+              nodes,
+              nodeMap: updatedNode ? { ...state.nodeMap, [nodeId]: updatedNode } : state.nodeMap,
+              lastUpdated: new Date()
+            };
+          }, false, 'updateNode'),
         
         removeNode: (nodeId) =>
-          set((state) => ({
-            nodes: state.nodes.filter(node => node.id !== nodeId),
-            connections: state.connections.filter(
-              conn => conn.sourceNodeId !== nodeId && conn.targetNodeId !== nodeId
-            ),
-            lastUpdated: new Date()
-          }), false, 'removeNode'),
+          set((state) => {
+            const newNodeMap = { ...state.nodeMap };
+            delete newNodeMap[nodeId];
+            return {
+              nodes: state.nodes.filter(node => node.id !== nodeId),
+              nodeMap: newNodeMap,
+              connections: state.connections.filter(
+                conn => conn.sourceNodeId !== nodeId && conn.targetNodeId !== nodeId
+              ),
+              // We should also update connectionMap here, but for simplicity let's just filter it in the next sync or do it now
+              connectionMap: Object.fromEntries(
+                Object.entries(state.connectionMap).filter(([_, c]) => 
+                  c.sourceNodeId !== nodeId && c.targetNodeId !== nodeId
+                )
+              ),
+              lastUpdated: new Date()
+            };
+          }, false, 'removeNode'),
         
         addConnection: (connection) =>
-          set((state) => ({ 
-            connections: [...state.connections, connection],
-            lastUpdated: new Date()
-          }), false, 'addConnection'),
+          set((state) => {
+            const connections = [...state.connections, connection];
+            return { 
+              connections,
+              connectionMap: { ...state.connectionMap, [connection.id]: connection },
+              lastUpdated: new Date()
+            };
+          }, false, 'addConnection'),
         
         updateConnection: (connectionId, updates) =>
-          set((state) => ({
-            connections: state.connections.map(conn =>
+          set((state) => {
+            const connections = state.connections.map(conn =>
               conn.id === connectionId ? { ...conn, ...updates } : conn
-            ),
-            lastUpdated: new Date()
-          }), false, 'updateConnection'),
+            );
+            const updatedConn = connections.find(c => c.id === connectionId);
+            return {
+              connections,
+              connectionMap: updatedConn ? { ...state.connectionMap, [connectionId]: updatedConn } : state.connectionMap,
+              lastUpdated: new Date()
+            };
+          }, false, 'updateConnection'),
         
         removeConnection: (connectionId) =>
-          set((state) => ({
-            connections: state.connections.filter(conn => conn.id !== connectionId),
-            lastUpdated: new Date()
-          }), false, 'removeConnection'),
+          set((state) => {
+            const newConnMap = { ...state.connectionMap };
+            delete newConnMap[connectionId];
+            return {
+              connections: state.connections.filter(conn => conn.id !== connectionId),
+              connectionMap: newConnMap,
+              lastUpdated: new Date()
+            };
+          }, false, 'removeConnection'),
         
         setLoading: (isLoading) => 
           set({ isLoading }, false, 'setLoading'),
@@ -397,12 +445,12 @@ export const useVisibleLayers = () =>
 
 export const useNodeById = (nodeId: string | null) =>
   useNetworkMapStore((state) => 
-    nodeId ? state.nodes.find(n => n.id === nodeId) : undefined
+    nodeId ? state.nodeMap[nodeId] : undefined
   );
 
 export const useConnectionById = (connectionId: string | null) =>
   useNetworkMapStore((state) => 
-    connectionId ? state.connections.find(c => c.id === connectionId) : undefined
+    connectionId ? state.connectionMap[connectionId] : undefined
   );
 
 export const useSelectedNode = () => {

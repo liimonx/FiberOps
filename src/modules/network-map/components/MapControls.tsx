@@ -37,13 +37,6 @@ export const MapControls: React.FC<MapControlsProps> = ({
     }
   }, [announce]);
 
-  const handleResetBearing = useCallback(() => {
-    const map = getMapInstance();
-    if (map) {
-      map.resetNorth();
-      announce("Map orientation reset to north", "polite");
-    }
-  }, [announce]);
 
   const handleResetPitch = useCallback(() => {
     const map = getMapInstance();
