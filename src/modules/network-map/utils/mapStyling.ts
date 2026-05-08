@@ -15,67 +15,30 @@ import type { NetworkNode, NetworkConnection } from "../types";
  */
 export const MAP_COLORS = {
   // Nodes
-  core: "#00ff00", // Neon Green
-  pop: "#00ffff", // Cyan
-  distribution: "#00cc00", // Darker Neon Green
-  access: "#33ff33", // Light Neon Green
-  splitter: "#ff00ff", // Magenta
-  junction: "#a3a3a3", // Light Gray
-  pole: "#525252", // Dark Gray
-  onu: "#0088ff", // Bright Blue
-  customer: "#ff0055", // Neon Pink
+  core: "#10b981", // Emerald
+  pop: "#0ea5e9", // Sky Blue
+  distribution: "#34d399", // Soft Emerald
+  access: "#6ee7b7", // Mint
+  splitter: "#a855f7", // Purple
+  junction: "#94a3b8", // Slate
+  pole: "#64748b", // Dark Slate
+  onu: "#3b82f6", // Blue
+  customer: "#fffff0", // Rose
 
   // Connections
-  fiber_route: "#22d3ee", // Bright Cyan (was muted teal)
-  customer_connection: "#60a5fa", // Bright Sky Blue (was muted blue)
+  fiber_route: "#22d3ee", // Cyan
+  customer_connection: "#60a5fa", // Sky
 
   // Status
-  inactive: "#4b5563", // Medium Gray
-  error: "#ff3333", // Brighter Red
-  warning: "#fbbf24", // Brighter Amber
+  inactive: "#4b5563", // Gray
+  error: "#ef4444", // Red
+  warning: "#f59e0b", // Amber
   selected: "#ffffff", // White
-  hovered: "#a3e635", // Lime Green
+  hovered: "#facc15", // Amber/Yellow for high-contrast feedback
 
   // Backgrounds
-  casing: "#000000",
+  casing: "#020617", // Deep Navy
   coverage: "#064e3b", // Deep Emerald
-} as const;
-
-/** Sizing hierarchy for different zoom levels */
-const NODE_SIZES = {
-  min: {
-    core: 6,
-    pop: 6,
-    distribution: 4,
-    access: 3,
-    onu: 3,
-    splitter: 2.5,
-    junction: 2.5,
-    customer: 2,
-    pole: 2,
-  },
-  mid: {
-    core: 14,
-    pop: 14,
-    distribution: 10,
-    access: 8,
-    onu: 8,
-    splitter: 6,
-    junction: 6,
-    customer: 5,
-    pole: 5,
-  },
-  max: {
-    core: 24,
-    pop: 24,
-    distribution: 18,
-    access: 14,
-    onu: 14,
-    splitter: 10,
-    junction: 10,
-    customer: 8,
-    pole: 8,
-  },
 } as const;
 
 /* ─────────────────────────────────────────────────────────────────────────────
@@ -185,31 +148,12 @@ export const CUSTOM_LAYERS: Record<string, LayerSpecification> = {
     source: "network-connections",
     layout: { "line-cap": "round", "line-join": "round" },
     paint: {
-      "line-width": [
-        "interpolate",
-        ["linear"],
-        ["zoom"],
-        5,
-        [
-          "+",
-          ["match", ["get", "type"], "fiber_route", 1.5, "customer_connection", 0.8, 1],
-          1,
-        ],
-        10,
-        [
-          "+",
-          ["match", ["get", "type"], "fiber_route", 2.5, "customer_connection", 1.2, 1.8],
-          1.5,
-        ],
-        15,
-        [
-          "+",
-          ["match", ["get", "type"], "fiber_route", 4, "customer_connection", 2, 3],
-          2,
-        ],
-      ],
+      "line-width": ["interpolate", ["linear"], ["zoom"], 5, 1.2, 10, 1.6, 15, 2.2],
       "line-color": MAP_COLORS.casing,
-      "line-opacity": 0.3,
+      "line-opacity": 0.4,
+      "line-blur": 0.5,
+      "line-opacity-transition": { duration: 300 },
+      "line-width-transition": { duration: 300 },
     },
   },
 
@@ -225,11 +169,11 @@ export const CUSTOM_LAYERS: Record<string, LayerSpecification> = {
         ["linear"],
         ["zoom"],
         10,
-        ["case", ["boolean", ["feature-state", "hover"], false], 3, 1.5],
+        ["case", ["boolean", ["feature-state", "hover"], false], 1.5, 0.8],
         15,
-        ["case", ["boolean", ["feature-state", "hover"], false], 6, 3],
+        ["case", ["boolean", ["feature-state", "hover"], false], 2, 1],
         18,
-        ["case", ["boolean", ["feature-state", "hover"], false], 10, 5]
+        ["case", ["boolean", ["feature-state", "hover"], false], 3, 1.5],
       ],
       "line-color": [
         "case",
@@ -237,12 +181,7 @@ export const CUSTOM_LAYERS: Record<string, LayerSpecification> = {
         MAP_COLORS.hovered,
         LINE_COLOR,
       ],
-      "line-opacity": [
-        "case",
-        ["boolean", ["feature-state", "hover"], false],
-        1,
-        0.75,
-      ],
+      "line-opacity": ["case", ["boolean", ["feature-state", "hover"], false], 1, 0.8],
       "line-dasharray": [
         "case",
         ["==", ["get", "status"], "inactive"],
@@ -253,6 +192,9 @@ export const CUSTOM_LAYERS: Record<string, LayerSpecification> = {
         [6, 2.5],
         [1, 0],
       ],
+      "line-color-transition": { duration: 300 },
+      "line-width-transition": { duration: 300 },
+      "line-opacity-transition": { duration: 300 },
     },
   },
 
@@ -263,10 +205,11 @@ export const CUSTOM_LAYERS: Record<string, LayerSpecification> = {
     source: "network-outages",
     layout: { "line-cap": "round", "line-join": "round" },
     paint: {
-      "line-width": ["interpolate", ["linear"], ["zoom"], 5, 8, 10, 14, 15, 22],
+      "line-width": ["interpolate", ["linear"], ["zoom"], 5, 4, 10, 6, 15, 10],
       "line-color": MAP_COLORS.error,
-      "line-opacity": 0.3,
-      "line-blur": 3,
+      "line-opacity": 0.35,
+      "line-blur": 5,
+      "line-opacity-transition": { duration: 500 },
     },
   },
 
@@ -277,10 +220,11 @@ export const CUSTOM_LAYERS: Record<string, LayerSpecification> = {
     source: "network-outages",
     layout: { "line-cap": "round", "line-join": "round" },
     paint: {
-      "line-width": ["interpolate", ["linear"], ["zoom"], 5, 2, 10, 3.5, 15, 5],
-      "line-color": "#fca5a5",
-      "line-opacity": 0.95,
+      "line-width": ["interpolate", ["linear"], ["zoom"], 10, 0.8, 15, 1.0, 18, 1.5],
+      "line-color": "#f87171",
+      "line-opacity": 1,
       "line-dasharray": [3, 2],
+      "line-width-transition": { duration: 300 },
     },
   },
 
@@ -291,8 +235,9 @@ export const CUSTOM_LAYERS: Record<string, LayerSpecification> = {
     source: "network-coverage",
     paint: {
       "fill-color": MAP_COLORS.coverage,
-      "fill-opacity": ["interpolate", ["linear"], ["zoom"], 5, 0.06, 12, 0.1, 16, 0.14],
-      "fill-outline-color": "rgba(94, 234, 212, 0.35)",
+      "fill-opacity": ["interpolate", ["linear"], ["zoom"], 5, 0.08, 12, 0.12, 16, 0.18],
+      "fill-outline-color": "rgba(110, 231, 183, 0.4)",
+      "fill-opacity-transition": { duration: 500 },
     },
   },
 
@@ -310,58 +255,10 @@ export const CUSTOM_LAYERS: Record<string, LayerSpecification> = {
       ],
       "fill-extrusion-height": ["get", "height"],
       "fill-extrusion-base": ["get", "min_height"],
-      "fill-extrusion-opacity": 0.95,
-    },
-  },
-
-  /** 2D Node Circles for fallback and low-zoom visibility */
-  nodes2D: {
-    id: "network-nodes-layer",
-    type: "circle",
-    source: "network-nodes",
-    paint: {
-      "circle-radius": [
-        "interpolate",
-        ["linear"],
-        ["zoom"],
-        10,
-        2,
-        15,
-        [
-          "match",
-          ["get", "type"],
-          "core_node", 8,
-          "pop", 8,
-          "distribution_node", 6,
-          4
-        ],
-        18,
-        [
-          "match",
-          ["get", "type"],
-          "core_node", 12,
-          "pop", 12,
-          "distribution_node", 10,
-          8
-        ]
-      ],
-      "circle-color": [
-        "case",
-        ["boolean", ["feature-state", "hover"], false],
-        MAP_COLORS.hovered,
-        NODE_FILL,
-      ],
-      "circle-stroke-width": 1,
-      "circle-stroke-color": "#000000",
-      "circle-opacity": [
-        "interpolate",
-        ["linear"],
-        ["zoom"],
-        13,
-        1,
-        14,
-        0.5 // Fade out as 3D kicks in
-      ],
+      "fill-extrusion-opacity": 0.9,
+      "fill-extrusion-color-transition": { duration: 300 },
+      "fill-extrusion-height-transition": { duration: 300 },
+      "fill-extrusion-base-transition": { duration: 300 },
     },
   },
 };
@@ -380,9 +277,9 @@ export const addCustomLayers = (map: mapboxgl.Map) => {
     { id: "network-nodes-3d", type: "geojson" },
   ];
 
-  // Set the map background to pure black to enhance the cyberpunk look
+  // Set the map background to a deep premium navy to enhance the "wow" factor
   if (map.getLayer("background")) {
-    map.setPaintProperty("background", "background-color", "#000000");
+    map.setPaintProperty("background", "background-color", "#020617");
   }
 
   // Find a label layer to insert the 3D buildings beneath it
@@ -406,7 +303,7 @@ export const addCustomLayers = (map: mapboxgl.Map) => {
         type: "fill-extrusion",
         minzoom: 14,
         paint: {
-          "fill-extrusion-color": "#0a0a0a", // Almost pitch black 3D buildings
+          "fill-extrusion-color": "#0f172a", // Deep slate 3D buildings
           "fill-extrusion-height": [
             "interpolate",
             ["linear"],
@@ -425,7 +322,8 @@ export const addCustomLayers = (map: mapboxgl.Map) => {
             14.05,
             ["get", "min_height"],
           ],
-          "fill-extrusion-opacity": 0.8,
+          "fill-extrusion-opacity": 0.6,
+          "fill-extrusion-color-transition": { duration: 500 },
         },
       },
       labelLayerId
@@ -448,7 +346,6 @@ export const addCustomLayers = (map: mapboxgl.Map) => {
     CUSTOM_LAYERS.connections,
     CUSTOM_LAYERS.outagesGlow,
     CUSTOM_LAYERS.outages,
-    CUSTOM_LAYERS.nodes2D,
     CUSTOM_LAYERS.nodes3D,
   ];
 
@@ -906,10 +803,10 @@ export const create3DNodeFeatures = (node: NetworkNode): GeoJSON.Feature[] => {
 
   if (node.type === NetworkNodeType.ONU) {
     // ONU: Small wall-mounted or side-mounted box, floating slightly off the ground
-    const w = 0.000015; // very small width
-    const l = 0.00001; // very small depth
-    const h = 2.0; // top at 2 meters
-    const minH = 1.2; // bottom at 1.2 meters (floating)
+    const w = 0.00003; // increased width
+    const l = 0.00002; // increased depth
+    const h = 3.0; // taller
+    const minH = 1.8; // higher base
 
     baseFeature.geometry = {
       type: "Polygon",
@@ -960,8 +857,8 @@ export const create3DNodeFeatures = (node: NetworkNode): GeoJSON.Feature[] => {
   if (node.type === NetworkNodeType.POLE) {
     // Utility pole: realistic proportions
     const poleRadius = 0.00001; // Thinner pole, still visible
-    const poleHeight = 12; // 12m tall
-    
+    const poleHeight = 20; // 20m tall
+
     // Main Pole Body
     baseFeature.geometry = {
       type: "Polygon",
@@ -985,18 +882,20 @@ export const create3DNodeFeatures = (node: NetworkNode): GeoJSON.Feature[] => {
     const ca1L = 0.000008; // Width
     const ca1H = poleHeight - 0.5;
     const ca1Min = ca1H - 0.3;
-    
+
     const crossarm1: GeoJSON.Feature = {
       type: "Feature",
       geometry: {
         type: "Polygon",
-        coordinates: [[
-          [node.position.lng - ca1W, node.position.lat - ca1L],
-          [node.position.lng + ca1W, node.position.lat - ca1L],
-          [node.position.lng + ca1W, node.position.lat + ca1L],
-          [node.position.lng - ca1W, node.position.lat + ca1L],
-          [node.position.lng - ca1W, node.position.lat - ca1L],
-        ]],
+        coordinates: [
+          [
+            [node.position.lng - ca1W, node.position.lat - ca1L],
+            [node.position.lng + ca1W, node.position.lat - ca1L],
+            [node.position.lng + ca1W, node.position.lat + ca1L],
+            [node.position.lng - ca1W, node.position.lat + ca1L],
+            [node.position.lng - ca1W, node.position.lat - ca1L],
+          ],
+        ],
       },
       properties: {
         ...node,
@@ -1013,18 +912,20 @@ export const create3DNodeFeatures = (node: NetworkNode): GeoJSON.Feature[] => {
     const ca2L = ca1L;
     const ca2H = poleHeight - 2.5;
     const ca2Min = ca2H - 0.3;
-    
+
     const crossarm2: GeoJSON.Feature = {
       type: "Feature",
       geometry: {
         type: "Polygon",
-        coordinates: [[
-          [node.position.lng - ca2W, node.position.lat - ca2L],
-          [node.position.lng + ca2W, node.position.lat - ca2L],
-          [node.position.lng + ca2W, node.position.lat + ca2L],
-          [node.position.lng - ca2W, node.position.lat + ca2L],
-          [node.position.lng - ca2W, node.position.lat - ca2L],
-        ]],
+        coordinates: [
+          [
+            [node.position.lng - ca2W, node.position.lat - ca2L],
+            [node.position.lng + ca2W, node.position.lat - ca2L],
+            [node.position.lng + ca2W, node.position.lat + ca2L],
+            [node.position.lng - ca2W, node.position.lat + ca2L],
+            [node.position.lng - ca2W, node.position.lat - ca2L],
+          ],
+        ],
       },
       properties: {
         ...node,
@@ -1039,20 +940,37 @@ export const create3DNodeFeatures = (node: NetworkNode): GeoJSON.Feature[] => {
     // Insulators on crossarms
     const insulators: GeoJSON.Feature[] = [];
     const insRadius = 0.000003;
-    
+
     // Insulators on Top Crossarm
     [-0.8, -0.3, 0.3, 0.8].forEach((offset, i) => {
       insulators.push({
         type: "Feature",
         geometry: {
           type: "Polygon",
-          coordinates: [[
-            [node.position.lng + ca1W * offset - insRadius, node.position.lat - insRadius],
-            [node.position.lng + ca1W * offset + insRadius, node.position.lat - insRadius],
-            [node.position.lng + ca1W * offset + insRadius, node.position.lat + insRadius],
-            [node.position.lng + ca1W * offset - insRadius, node.position.lat + insRadius],
-            [node.position.lng + ca1W * offset - insRadius, node.position.lat - insRadius],
-          ]],
+          coordinates: [
+            [
+              [
+                node.position.lng + ca1W * offset - insRadius,
+                node.position.lat - insRadius,
+              ],
+              [
+                node.position.lng + ca1W * offset + insRadius,
+                node.position.lat - insRadius,
+              ],
+              [
+                node.position.lng + ca1W * offset + insRadius,
+                node.position.lat + insRadius,
+              ],
+              [
+                node.position.lng + ca1W * offset - insRadius,
+                node.position.lat + insRadius,
+              ],
+              [
+                node.position.lng + ca1W * offset - insRadius,
+                node.position.lat - insRadius,
+              ],
+            ],
+          ],
         },
         properties: {
           ...node,
@@ -1071,13 +989,30 @@ export const create3DNodeFeatures = (node: NetworkNode): GeoJSON.Feature[] => {
         type: "Feature",
         geometry: {
           type: "Polygon",
-          coordinates: [[
-            [node.position.lng + ca2W * offset - insRadius, node.position.lat - insRadius],
-            [node.position.lng + ca2W * offset + insRadius, node.position.lat - insRadius],
-            [node.position.lng + ca2W * offset + insRadius, node.position.lat + insRadius],
-            [node.position.lng + ca2W * offset - insRadius, node.position.lat + insRadius],
-            [node.position.lng + ca2W * offset - insRadius, node.position.lat - insRadius],
-          ]],
+          coordinates: [
+            [
+              [
+                node.position.lng + ca2W * offset - insRadius,
+                node.position.lat - insRadius,
+              ],
+              [
+                node.position.lng + ca2W * offset + insRadius,
+                node.position.lat - insRadius,
+              ],
+              [
+                node.position.lng + ca2W * offset + insRadius,
+                node.position.lat + insRadius,
+              ],
+              [
+                node.position.lng + ca2W * offset - insRadius,
+                node.position.lat + insRadius,
+              ],
+              [
+                node.position.lng + ca2W * offset - insRadius,
+                node.position.lat - insRadius,
+              ],
+            ],
+          ],
         },
         properties: {
           ...node,
@@ -1095,18 +1030,20 @@ export const create3DNodeFeatures = (node: NetworkNode): GeoJSON.Feature[] => {
     const transL = 0.000015;
     const transH = 8.5;
     const transMin = 6.5;
-    
+
     const transformer: GeoJSON.Feature = {
       type: "Feature",
       geometry: {
         type: "Polygon",
-        coordinates: [[
-          [node.position.lng + poleRadius, node.position.lat - transL],
-          [node.position.lng + poleRadius + transW, node.position.lat - transL],
-          [node.position.lng + poleRadius + transW, node.position.lat + transL],
-          [node.position.lng + poleRadius, node.position.lat + transL],
-          [node.position.lng + poleRadius, node.position.lat - transL],
-        ]],
+        coordinates: [
+          [
+            [node.position.lng + poleRadius, node.position.lat - transL],
+            [node.position.lng + poleRadius + transW, node.position.lat - transL],
+            [node.position.lng + poleRadius + transW, node.position.lat + transL],
+            [node.position.lng + poleRadius, node.position.lat + transL],
+            [node.position.lng + poleRadius, node.position.lat - transL],
+          ],
+        ],
       },
       properties: {
         ...node,
@@ -1123,9 +1060,9 @@ export const create3DNodeFeatures = (node: NetworkNode): GeoJSON.Feature[] => {
 
   if (node.type === NetworkNodeType.CUSTOMER) {
     // WiFi Router: flat box base with two small antennas
-    const w = 0.00003; // width
-    const l = 0.00002; // length (depth)
-    const h = 0.5; // height (thin box)
+    const w = 0.00006; // increased width
+    const l = 0.00004; // increased length
+    const h = 0.8; // increased height
     const minH = 0; // on ground
 
     baseFeature.geometry = {
@@ -1147,7 +1084,7 @@ export const create3DNodeFeatures = (node: NetworkNode): GeoJSON.Feature[] => {
 
     // Antennas
     const antRadius = 0.000002;
-    const antH = 1.5; // stick up 1.5m
+    const antH = 6.0; // taller antennas for better visibility
     const antLeftOffset = w * 0.7; // near the left edge
     const antDepthOffset = l * 0.7; // near the back edge
 
