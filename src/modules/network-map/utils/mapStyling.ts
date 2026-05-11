@@ -41,6 +41,37 @@ export const MAP_COLORS = {
   coverage: "#064e3b", // Deep Emerald
 } as const;
 
+/**
+ * Standard heights for 3D infrastructure (meters)
+ */
+export const NODE_HEIGHTS = {
+  [NetworkNodeType.CORE_NODE]: 50,
+  [NetworkNodeType.POP]: 40,
+  [NetworkNodeType.DISTRIBUTION_NODE]: 30,
+  [NetworkNodeType.ACCESS_NODE]: 4,
+  [NetworkNodeType.POLE]: 20,
+  [NetworkNodeType.SPLITTER]: 2,
+  [NetworkNodeType.JUNCTION_BOX]: 1.5,
+  [NetworkNodeType.ONU]: 3,
+  [NetworkNodeType.CUSTOMER]: 0.8,
+} as const;
+
+/**
+ * Vertical anchor points for cable connections (meters)
+ * This ensures cables attach correctly to poles or ground boxes.
+ */
+export const CONNECTION_ANCHORS = {
+  [NetworkNodeType.CORE_NODE]: 20,
+  [NetworkNodeType.POP]: 20,
+  [NetworkNodeType.DISTRIBUTION_NODE]: 15,
+  [NetworkNodeType.ACCESS_NODE]: 3.5,
+  [NetworkNodeType.POLE]: 19.5,
+  [NetworkNodeType.SPLITTER]: 1.8,
+  [NetworkNodeType.JUNCTION_BOX]: 1.2,
+  [NetworkNodeType.ONU]: 2.5,
+  [NetworkNodeType.CUSTOMER]: 4.0, // Reduced from 6m to look better on houses
+} as const;
+
 /* ─────────────────────────────────────────────────────────────────────────────
  * EXPRESSION BUILDERS
  * ───────────────────────────────────────────────────────────────────────────── */
@@ -261,6 +292,21 @@ export const CUSTOM_LAYERS: Record<string, LayerSpecification> = {
       "fill-extrusion-base-transition": { duration: 300 },
     },
   },
+
+  /** 3D Extruded Fiber Lines (Ribbons) */
+  connections3D: {
+    id: "network-connections-3d-layer",
+    type: "fill-extrusion",
+    source: "network-connections-3d",
+    minzoom: 15,
+    paint: {
+      "fill-extrusion-color": MAP_COLORS.fiber_route,
+      "fill-extrusion-height": ["get", "height"],
+      "fill-extrusion-base": ["get", "min_height"],
+      "fill-extrusion-opacity": 0.9,
+      "fill-extrusion-opacity-transition": { duration: 500 },
+    },
+  },
 };
 
 /* ─────────────────────────────────────────────────────────────────────────────
@@ -272,6 +318,7 @@ export const addCustomLayers = (map: mapboxgl.Map) => {
   const sources = [
     { id: "network-nodes", type: "geojson" },
     { id: "network-connections", type: "geojson" },
+    { id: "network-connections-3d", type: "geojson" },
     { id: "network-outages", type: "geojson" },
     { id: "network-coverage", type: "geojson" },
     { id: "network-nodes-3d", type: "geojson" },
@@ -342,11 +389,12 @@ export const addCustomLayers = (map: mapboxgl.Map) => {
 
   const layers = [
     CUSTOM_LAYERS.coverage,
-    CUSTOM_LAYERS.outagesGlow,
     CUSTOM_LAYERS.connectionCasing,
     CUSTOM_LAYERS.connections,
-    CUSTOM_LAYERS.outages,
+    CUSTOM_LAYERS.outagesGlow,
     CUSTOM_LAYERS.nodes3D,
+    CUSTOM_LAYERS.connections3D,
+    CUSTOM_LAYERS.outages,
   ];
 
   layers.forEach((layer) => {
@@ -435,20 +483,16 @@ export const createNodeFeature = (node: NetworkNode): GeoJSON.Feature => ({
 
 export const create3DNodeFeatures = (node: NetworkNode): GeoJSON.Feature[] => {
   let radius = 0.0001; // ~10m
-  let height = 15;
+  const height = NODE_HEIGHTS[node.type] || 15;
 
   if (node.type === NetworkNodeType.CORE_NODE) {
     radius = 0.0004;
-    height = 50;
   } else if (node.type === NetworkNodeType.POP) {
     radius = 0.0003;
-    height = 40;
   } else if (node.type === NetworkNodeType.DISTRIBUTION_NODE) {
     radius = 0.0002;
-    height = 30;
   } else if (node.type === NetworkNodeType.ACCESS_NODE) {
     radius = 0.00015;
-    height = 20;
   }
 
   const baseFeature: GeoJSON.Feature = {
@@ -1202,4 +1246,76 @@ export const createConnectionFeature = (
       status: String(connection.status),
     },
   };
+};
+
+/**
+ * Creates 3D "ribbon" features for connections to give them physical depth.
+ * These are thin fill-extrusions that sit at the height of the poles.
+ */
+export const create3DConnectionFeatures = (
+  connection: NetworkConnection,
+  nodes: NetworkNode[]
+): GeoJSON.Feature[] => {
+  const sourceNode = nodes.find((n) => n.id === connection.sourceNodeId);
+  const targetNode = nodes.find((n) => n.id === connection.targetNodeId);
+
+  if (!sourceNode || !targetNode) return [];
+
+  // Determine height based on equipment types
+  // Standard anchor is derived from both ends to handle drops
+  const sourceAnchor = CONNECTION_ANCHORS[sourceNode.type] || 19.5;
+  const targetAnchor = CONNECTION_ANCHORS[targetNode.type] || 19.5;
+  
+  // For simplicity in a flat ribbon, we use the average or the dominant anchor
+  // Overhead (poles) usually stays high, but if it goes to a ground box, it should drop
+  let height = Math.min(sourceAnchor, targetAnchor);
+
+  const coords: [number, number][] = connection.route?.length
+    ? connection.route.map((p) => [p.lng, p.lat])
+    : [
+        [sourceNode.position.lng, sourceNode.position.lat],
+        [targetNode.position.lng, targetNode.position.lat],
+      ];
+
+  if (coords.length < 2) return [];
+
+  const features: GeoJSON.Feature[] = [];
+  const width = 0.000005; // ~0.5 meters wide ribbon for visibility
+
+  for (let i = 0; i < coords.length - 1; i++) {
+    const p1 = coords[i];
+    const p2 = coords[i + 1];
+
+    const dx = p2[0] - p1[0];
+    const dy = p2[1] - p1[1];
+    const len = Math.sqrt(dx * dx + dy * dy);
+    if (len === 0) continue;
+
+    const nx = (-dy / len) * width;
+    const ny = (dx / len) * width;
+
+    features.push({
+      type: "Feature",
+      geometry: {
+        type: "Polygon",
+        coordinates: [
+          [
+            [p1[0] + nx, p1[1] + ny],
+            [p2[0] + nx, p2[1] + ny],
+            [p2[0] - nx, p2[1] - ny],
+            [p1[0] - nx, p1[1] - ny],
+            [p1[0] + nx, p1[1] + ny],
+          ],
+        ],
+      },
+      properties: {
+        ...connection,
+        id: `${connection.id}-3d-${i}`,
+        height: height,
+        min_height: height - 0.1, // thin ribbon
+      },
+    });
+  }
+
+  return features;
 };

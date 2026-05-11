@@ -18,6 +18,7 @@ import {
   createNodeFeature,
   createConnectionFeature,
   create3DNodeFeatures,
+  create3DConnectionFeatures,
 } from "../utils/mapStyling";
 import {
   visibleConnectionTypesFromLayers,
@@ -136,6 +137,18 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({ onMapLoad, onMapError }) =
             features: connectionFeatures,
           });
 
+        const connection3DFeatures = filteredConnections.flatMap((conn) =>
+          create3DConnectionFeatures(conn, allNodes)
+        );
+        const connections3DSource = map.getSource("network-connections-3d") as
+          | mapboxgl.GeoJSONSource
+          | undefined;
+        if (connections3DSource)
+          connections3DSource.setData({
+            type: "FeatureCollection",
+            features: connection3DFeatures,
+          });
+
         const outageConnections = isOutagesLayerVisible(layerState)
           ? allConnections.filter((c) => c.status === NetworkStatus.ERROR)
           : [];
@@ -192,7 +205,11 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({ onMapLoad, onMapError }) =
             map.setLayoutProperty(id, "visibility", nodesVis);
           }
         });
-        ["network-connections-layer", "network-connections-casing"].forEach((id) => {
+        [
+          "network-connections-layer",
+          "network-connections-casing",
+          "network-connections-3d-layer",
+        ].forEach((id) => {
           if (map.getLayer(id)) {
             map.setLayoutProperty(
               id,
