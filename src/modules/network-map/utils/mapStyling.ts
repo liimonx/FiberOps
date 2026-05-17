@@ -1408,15 +1408,24 @@ export const create3DNodeFeatures = (node: NetworkNode): GeoJSON.Feature[] => {
 
 export const createConnectionFeature = (
   connection: NetworkConnection,
-  nodes?: NetworkNode[]
+  nodes?: NetworkNode[] | Map<string, NetworkNode>
 ): GeoJSON.Feature | null => {
   let coords: [number, number][] = [];
 
   if (connection.route?.length) {
     coords = connection.route.map((p) => [p.lng, p.lat]);
   } else if (nodes) {
-    const s = nodes.find((n) => n.id === connection.sourceNodeId);
-    const t = nodes.find((n) => n.id === connection.targetNodeId);
+    let s: NetworkNode | undefined;
+    let t: NetworkNode | undefined;
+
+    if (nodes instanceof Map) {
+      s = nodes.get(connection.sourceNodeId);
+      t = nodes.get(connection.targetNodeId);
+    } else {
+      s = nodes.find((n) => n.id === connection.sourceNodeId);
+      t = nodes.find((n) => n.id === connection.targetNodeId);
+    }
+
     if (s && t)
       coords = [
         [s.position.lng, s.position.lat],
@@ -1443,10 +1452,18 @@ export const createConnectionFeature = (
  */
 export const create3DConnectionFeatures = (
   connection: NetworkConnection,
-  nodes: NetworkNode[]
+  nodes: NetworkNode[] | Map<string, NetworkNode>
 ): GeoJSON.Feature[] => {
-  const sourceNode = nodes.find((n) => n.id === connection.sourceNodeId);
-  const targetNode = nodes.find((n) => n.id === connection.targetNodeId);
+  let sourceNode: NetworkNode | undefined;
+  let targetNode: NetworkNode | undefined;
+
+  if (nodes instanceof Map) {
+    sourceNode = nodes.get(connection.sourceNodeId);
+    targetNode = nodes.get(connection.targetNodeId);
+  } else {
+    sourceNode = nodes.find((n) => n.id === connection.sourceNodeId);
+    targetNode = nodes.find((n) => n.id === connection.targetNodeId);
+  }
 
   if (!sourceNode || !targetNode) return [];
 
