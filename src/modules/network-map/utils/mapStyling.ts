@@ -15,26 +15,26 @@ import type { NetworkNode, NetworkConnection } from "../types";
  */
 export const MAP_COLORS = {
   // Nodes
-  core: "#10b981", // Emerald
-  pop: "#0ea5e9", // Sky Blue
-  distribution: "#34d399", // Soft Emerald
-  access: "#6ee7b7", // Mint
-  splitter: "#a855f7", // Purple
-  junction: "#94a3b8", // Slate
-  pole: "#64748b", // Dark Slate
-  onu: "#3b82f6", // Blue
-  customer: "#f43f5e", // Rose
+  core: "#00ffcc", // Emerald
+  pop: "#00e5ff", // Sky Blue
+  distribution: "#7e22ce", // Soft Emerald
+  access: "#a855f7", // Mint
+  splitter: "#f472b6", // Purple
+  junction: "#fb7185", // Slate
+  pole: "#475569", // Dark Slate
+  onu: "#38bdf8", // Blue
+  customer: "#6ee7b7", // Rose
 
   // Connections
-  fiber_route: "#22d3ee", // Cyan
-  customer_connection: "#818cf8", // Sky
+  fiber_route: "#00ffcc", // Cyan
+  customer_connection: "#c084fc", // Sky
 
   // Status
-  inactive: "#4b5563", // Gray
-  error: "#ef4444", // Red
-  warning: "#f59e0b", // Amber
+  inactive: "#334155", // Gray
+  error: "#ff0055", // Red
+  warning: "#ffaa00", // Amber
   selected: "#ffffff", // White
-  hovered: "#facc15", // Amber/Yellow for high-contrast feedback
+  hovered: "#00ffcc", // Amber/Yellow for high-contrast feedback
 
   // Backgrounds
   casing: "#020617", // Deep Navy
@@ -207,9 +207,9 @@ export const CUSTOM_LAYERS: Record<string, LayerSpecification> = {
         0.6,
         ["==", ["get", "status"], "warning"],
         0.4,
-        0,
+        0.4,
       ],
-      "circle-blur": 0.8,
+      "circle-blur": 1.5,
       "circle-opacity-transition": { duration: 300 },
       "circle-color-transition": { duration: 300 },
     },
@@ -268,6 +268,32 @@ export const CUSTOM_LAYERS: Record<string, LayerSpecification> = {
       "line-blur": ["case", ["boolean", ["feature-state", "hover"], false], 2.0, 1.0],
       "line-opacity-transition": { duration: 300 },
       "line-width-transition": { duration: 300 },
+    },
+  },
+
+  /** Neon glow for connections */
+  connectionsGlow: {
+    id: "network-connections-glow",
+    type: "line",
+    source: "network-connections",
+    layout: { "line-cap": "round", "line-join": "round" },
+    paint: {
+      "line-width": [
+        "interpolate",
+        ["linear"],
+        ["zoom"],
+        5,
+        ["case", ["boolean", ["feature-state", "hover"], false], 4.5, 2.5],
+        10,
+        ["case", ["boolean", ["feature-state", "hover"], false], 6.5, 4.0],
+        15,
+        ["case", ["boolean", ["feature-state", "hover"], false], 8.5, 5.5],
+      ],
+      "line-color": MAP_COLORS.fiber_route,
+      "line-opacity": 0.6,
+      "line-blur": 4,
+      "line-width-transition": { duration: 300 },
+      "line-opacity-transition": { duration: 300 },
     },
   },
 
@@ -369,7 +395,7 @@ export const CUSTOM_LAYERS: Record<string, LayerSpecification> = {
       ],
       "fill-extrusion-height": ["get", "height"],
       "fill-extrusion-base": ["get", "min_height"],
-      "fill-extrusion-opacity": 0.9,
+      "fill-extrusion-opacity": 0.95,
       "fill-extrusion-color-transition": { duration: 300 },
       "fill-extrusion-height-transition": { duration: 300 },
       "fill-extrusion-base-transition": { duration: 300 },
@@ -473,6 +499,7 @@ export const addCustomLayers = (map: mapboxgl.Map) => {
   const layers = [
     CUSTOM_LAYERS.coverage,
     CUSTOM_LAYERS.connectionCasing,
+    CUSTOM_LAYERS.connectionsGlow,
     CUSTOM_LAYERS.connections,
     CUSTOM_LAYERS.outagesGlow,
     CUSTOM_LAYERS.nodesGlow,
@@ -502,7 +529,7 @@ export const updateLayerVisibility = (
   const auxiliaryMap: Record<string, string[]> = {
     "network-nodes-layer": ["network-nodes-glow"],
     "network-nodes-3d-layer": [],
-    "network-connections-layer": ["network-connections-casing"],
+    "network-connections-layer": ["network-connections-casing", "network-connections-glow"],
     "network-outages-layer": ["network-outages-glow"],
   };
 
