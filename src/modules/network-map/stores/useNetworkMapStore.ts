@@ -253,7 +253,7 @@ export const useNetworkMapStore = create<NetworkMapStore>()(
 
             const updatedNode = { ...existingNode, ...updates };
             const nodes = [...state.nodes];
-            const idx = nodes.findIndex(n => n.id === nodeId);
+            const idx = nodes.findIndex((n) => n.id === nodeId);
             if (idx !== -1) nodes[idx] = updatedNode;
 
             return {
@@ -300,7 +300,7 @@ export const useNetworkMapStore = create<NetworkMapStore>()(
 
             const updatedConn = { ...existingConn, ...updates };
             const connections = [...state.connections];
-            const idx = connections.findIndex(c => c.id === connectionId);
+            const idx = connections.findIndex((c) => c.id === connectionId);
             if (idx !== -1) connections[idx] = updatedConn;
 
             return {

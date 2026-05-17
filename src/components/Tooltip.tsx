@@ -1,4 +1,4 @@
-import React, { useRef, ReactNode } from 'react';
+import React, { useId, ReactNode } from 'react';
 import { Card } from '@shohojdhara/atomix';
 import { useVisibility } from '../hooks/useVisibility';
 
@@ -22,7 +22,8 @@ export const Tooltip: React.FC<TooltipProps> = ({
   className = '',
   id,
 }) => {
-  const tooltipId = useRef(id || `tooltip-${Math.random().toString(36).substr(2, 9)}`);
+  const generatedId = useId();
+  const tooltipId = id || `tooltip-${generatedId}`;
   const { visible, show, hide } = useVisibility();
 
   const getPositionStyles = (): React.CSSProperties => {
@@ -48,14 +49,14 @@ export const Tooltip: React.FC<TooltipProps> = ({
         onMouseLeave={hide}
         onFocus={show}
         onBlur={hide}
-        aria-describedby={visible ? tooltipId.current : undefined}
+        aria-describedby={visible ? tooltipId : undefined}
       >
         {children}
       </div>
       
       {visible && (
         <div
-          id={tooltipId.current}
+          id={tooltipId}
           role="tooltip"
           className={`u-absolute u-z-tooltip ${className}`}
           style={getPositionStyles()}
