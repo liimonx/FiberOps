@@ -258,6 +258,14 @@ export const MapEventHandler: React.FC<MapEventHandlerProps> = ({
             announce("Heatmap tool activated", "polite");
           }
           break;
+        case "i":
+        case "I":
+          if (!event.ctrlKey && !event.metaKey) {
+            event.preventDefault();
+            setActiveTool("impairment");
+            announce("Impairment tool activated", "polite");
+          }
+          break;
         case "Escape":
           setSelectedElement(null);
           setHoveredElement(null);

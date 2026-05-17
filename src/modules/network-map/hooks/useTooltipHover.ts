@@ -8,18 +8,20 @@ export interface TooltipState {
   visible: boolean;
 }
 
-export interface TooltipState {
-  content: TooltipContent | null;
-  x: number;
-  y: number;
-  visible: boolean;
+/**
+ * Options for useTooltipHover
+ */
+export interface UseTooltipHoverOptions {
+  delay?: number;
+  autoHide?: boolean;
 }
 
 /**
  * Custom hook to handle tooltip hover logic.
  * Fixed 300ms delay and hover-aware hide logic.
  */
-export function useTooltipHover() {
+export function useTooltipHover(options: UseTooltipHoverOptions = {}) {
+  const { delay = 300, autoHide = true } = options;
   const [tooltip, setTooltip] = useState<TooltipState>({
     content: null,
     x: 0,
@@ -54,16 +56,16 @@ export function useTooltipHover() {
         return;
       }
 
-      if (!hoverRef.current) {
+      if (!hoverRef.current && autoHide) {
         clearPendingTimeout();
         timeoutRef.current = setTimeout(() => {
           if (!hoverRef.current) {
             setTooltip((prev) => ({ ...prev, visible: false }));
           }
-        }, 300);
+        }, delay);
       }
     },
-    [clearPendingTimeout]
+    [clearPendingTimeout, autoHide, delay]
   );
 
   const handleMouseEnter = useCallback(() => {
@@ -74,12 +76,14 @@ export function useTooltipHover() {
   const handleMouseLeave = useCallback(() => {
     hoverRef.current = false;
     clearPendingTimeout();
-    timeoutRef.current = setTimeout(() => {
-      if (!hoverRef.current) {
-        setTooltip((prev) => ({ ...prev, visible: false }));
-      }
-    }, 300);
-  }, [clearPendingTimeout]);
+    if (autoHide) {
+      timeoutRef.current = setTimeout(() => {
+        if (!hoverRef.current) {
+          setTooltip((prev) => ({ ...prev, visible: false }));
+        }
+      }, delay);
+    }
+  }, [clearPendingTimeout, autoHide, delay]);
 
   useEffect(() => {
     return () => {

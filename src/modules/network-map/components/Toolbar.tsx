@@ -48,6 +48,13 @@ const TOOLS: ToolConfig[] = [
     description: "Show network density heatmap",
     shortcut: "H",
   },
+  {
+    id: "impairment",
+    icon: "Warning",
+    label: "Impairment Area",
+    description: "Define a blast radius to simulate outages and perform impact analysis.",
+    shortcut: "I",
+  },
 ];
 
 export const Toolbar: React.FC<ToolbarProps> = ({
