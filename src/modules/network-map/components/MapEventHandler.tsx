@@ -52,11 +52,15 @@ export const MapEventHandler: React.FC<MapEventHandlerProps> = ({
       // Check if layers exist before querying
       let features: mapboxgl.MapboxGeoJSONFeature[] = [];
       if (
-        safeHasLayer(map, "network-nodes-3d-layer") &&
+        (safeHasLayer(map, "network-nodes-3d-layer") || safeHasLayer(map, "network-nodes-layer")) &&
         safeHasLayer(map, "network-connections-layer")
       ) {
+        const queryLayers = ["network-connections-layer"];
+        if (safeHasLayer(map, "network-nodes-3d-layer")) queryLayers.push("network-nodes-3d-layer");
+        if (safeHasLayer(map, "network-nodes-layer")) queryLayers.push("network-nodes-layer");
+
         features = map.queryRenderedFeatures(event.point, {
-          layers: ["network-nodes-3d-layer", "network-connections-layer"],
+          layers: queryLayers,
         });
       }
 
@@ -73,7 +77,7 @@ export const MapEventHandler: React.FC<MapEventHandlerProps> = ({
         const feature = features[0];
         const elementId = feature.properties?.id;
 
-        if (feature.layer && feature.layer.id === "network-nodes-3d-layer") {
+        if (feature.layer && (feature.layer.id === "network-nodes-3d-layer" || feature.layer.id === "network-nodes-layer")) {
           onNodeClick?.(elementId as string, event);
         } else if (feature.layer && feature.layer.id === "network-connections-layer") {
           onConnectionClick?.(elementId as string, event);
@@ -89,13 +93,15 @@ export const MapEventHandler: React.FC<MapEventHandlerProps> = ({
     // Handle mouse move for hover effects
     const handleMouseMove = (event: mapboxgl.MapMouseEvent) => {
       // Check if layers exist before querying
-      const nodeLayerExists = safeHasLayer(map, "network-nodes-3d-layer");
+      const node3DLayerExists = safeHasLayer(map, "network-nodes-3d-layer");
+      const node2DLayerExists = safeHasLayer(map, "network-nodes-layer");
       const connectionLayerExists = safeHasLayer(map, "network-connections-layer");
 
-      if (!nodeLayerExists && !connectionLayerExists) return;
+      if (!node3DLayerExists && !node2DLayerExists && !connectionLayerExists) return;
 
       const layersToQuery = [];
-      if (nodeLayerExists) layersToQuery.push("network-nodes-3d-layer");
+      if (node3DLayerExists) layersToQuery.push("network-nodes-3d-layer");
+      if (node2DLayerExists) layersToQuery.push("network-nodes-layer");
       if (connectionLayerExists) layersToQuery.push("network-connections-layer");
 
       const features = map.queryRenderedFeatures(event.point, {
@@ -123,7 +129,7 @@ export const MapEventHandler: React.FC<MapEventHandlerProps> = ({
           return;
         }
 
-        const source = feature.source || "network-nodes-3d";
+        const source = feature.source || "network-nodes";
         hoveredFeature = { id: elementId, source };
 
         // Set new hover state
@@ -133,7 +139,7 @@ export const MapEventHandler: React.FC<MapEventHandlerProps> = ({
         );
         map.getCanvas().style.cursor = "pointer";
 
-        if (feature.layer?.id === "network-nodes-3d-layer") {
+        if (feature.layer?.id === "network-nodes-3d-layer" || feature.layer?.id === "network-nodes-layer") {
           setHoveredElement(elementId as string);
           onNodeHover?.(elementId as string, event);
           onConnectionHover?.(null, event);
@@ -305,6 +311,25 @@ export const MapEventHandler: React.FC<MapEventHandlerProps> = ({
         if (safeHasLayer(map, outageLayerId)) {
           const pulse = 0.4 + Math.sin(elapsed / 400) * 0.2; // Pulse between 0.2 and 0.6
           map.setPaintProperty(outageLayerId, "line-opacity", pulse);
+        }
+
+        const nodesGlowId = "network-nodes-glow";
+        if (safeHasLayer(map, nodesGlowId)) {
+          // Dynamic pulsing for active outages/warnings on 2D nodes
+          const baseOpacity = 0.5;
+          const pulseRange = 0.25;
+          const pulseNodes = baseOpacity + Math.sin(elapsed / 300) * pulseRange;
+
+          map.setPaintProperty(nodesGlowId, "circle-opacity", [
+            "case",
+            ["boolean", ["feature-state", "hover"], false],
+            0.8,
+            ["==", ["get", "status"], "error"],
+            pulseNodes,
+            ["==", ["get", "status"], "warning"],
+            pulseNodes * 0.7,
+            0,
+          ]);
         }
       } catch (error) {
         // Silently catch errors if style becomes unavailable during execution
