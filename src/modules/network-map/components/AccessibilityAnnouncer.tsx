@@ -22,7 +22,7 @@ export const AccessibilityProvider: React.FC<{ children: React.ReactNode }> = ({
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
 
   const announce = useCallback((message: string, priority: 'polite' | 'assertive' = 'polite') => {
-    const id = `${Date.now()}-${Math.random()}`;
+    const id = crypto.randomUUID();
     setAnnouncements(prev => [...prev, { id, message, priority }]);
 
     // Remove announcement after screen reader has had time to read it
