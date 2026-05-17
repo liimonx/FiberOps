@@ -22,17 +22,50 @@ export interface AppError {
   timestamp: Date;
 }
 
+export interface ErrorWithResponse {
+  response: {
+    status: number;
+    data?: {
+      errors?: unknown;
+    };
+  };
+}
+
+function isErrorWithResponse(error: unknown): error is ErrorWithResponse {
+  if (typeof error !== "object" || error === null) return false;
+
+  const err = error as Record<string, unknown>;
+  if (typeof err.response !== "object" || err.response === null) return false;
+
+  const response = err.response as Record<string, unknown>;
+  return typeof response.status === "number";
+}
+
 // Error classification utility
 export function classifyError(error: unknown): AppError {
   const timestamp = new Date();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const err = error as any; // Cast to access potential properties safely in this context
+
+  let name: string | undefined;
+  let message: string | undefined;
+
+  if (error instanceof Error) {
+    name = error.name;
+    message = error.message;
+  } else if (typeof error === "object" && error !== null) {
+    const err = error as Record<string, unknown>;
+    if (typeof err.name === "string") name = err.name;
+    if (typeof err.message === "string") message = err.message;
+  } else if (typeof error === "string") {
+    message = error;
+  }
+
+  const safeMessage = message || "An unexpected error occurred";
 
   // Network errors
-  if (err?.name === "TypeError" && err?.message?.includes("fetch")) {
+  if (name === "TypeError" && safeMessage.includes("fetch")) {
     return {
       type: ErrorType.NETWORK,
-      message: err.message,
+      message: safeMessage,
       userMessage:
         "Unable to connect to the network. Please check your internet connection.",
       retryable: true,
@@ -41,10 +74,10 @@ export function classifyError(error: unknown): AppError {
   }
 
   // Timeout errors
-  if (err?.name === "AbortError" || err?.message?.includes("timeout")) {
+  if (name === "AbortError" || safeMessage.includes("timeout")) {
     return {
       type: ErrorType.TIMEOUT,
-      message: err.message,
+      message: safeMessage,
       userMessage: "The request timed out. Please try again.",
       retryable: true,
       timestamp,
@@ -52,14 +85,14 @@ export function classifyError(error: unknown): AppError {
   }
 
   // HTTP errors
-  if (err?.response) {
-    const status = err.response.status;
+  if (isErrorWithResponse(error)) {
+    const status = error.response.status;
 
     switch (status) {
       case 401:
         return {
           type: ErrorType.AUTHENTICATION,
-          message: err.message,
+          message: safeMessage,
           userMessage: "Your session has expired. Please log in again.",
           code: status,
           retryable: false,
@@ -69,7 +102,7 @@ export function classifyError(error: unknown): AppError {
       case 403:
         return {
           type: ErrorType.AUTHORIZATION,
-          message: err.message,
+          message: safeMessage,
           userMessage: "You do not have permission to perform this action.",
           code: status,
           retryable: false,
@@ -79,7 +112,7 @@ export function classifyError(error: unknown): AppError {
       case 404:
         return {
           type: ErrorType.NOT_FOUND,
-          message: err.message,
+          message: safeMessage,
           userMessage: "The requested resource was not found.",
           code: status,
           retryable: false,
@@ -89,10 +122,10 @@ export function classifyError(error: unknown): AppError {
       case 422:
         return {
           type: ErrorType.VALIDATION,
-          message: err.message,
+          message: safeMessage,
           userMessage: "Please check your input and try again.",
           code: status,
-          details: err.response.data?.errors,
+          details: error.response.data?.errors,
           retryable: false,
           timestamp,
         };
@@ -102,7 +135,7 @@ export function classifyError(error: unknown): AppError {
       case 503:
         return {
           type: ErrorType.SERVER,
-          message: err.message,
+          message: safeMessage,
           userMessage:
             "We're experiencing technical difficulties. Please try again in a few moments.",
           code: status,
@@ -113,7 +146,7 @@ export function classifyError(error: unknown): AppError {
       default:
         return {
           type: ErrorType.UNKNOWN,
-          message: err.message,
+          message: safeMessage,
           userMessage: `An error occurred (Code: ${status}). Please try again.`,
           code: status,
           retryable: status >= 500,
@@ -125,7 +158,7 @@ export function classifyError(error: unknown): AppError {
   // Default unknown error
   return {
     type: ErrorType.UNKNOWN,
-    message: err?.message || "An unexpected error occurred",
+    message: safeMessage,
     userMessage: "Something went wrong. Please try again.",
     retryable: true,
     timestamp,
