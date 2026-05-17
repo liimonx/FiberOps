@@ -1,13 +1,13 @@
+import DOMPurify from "isomorphic-dompurify";
+
 /**
  * Sanitizes a string for search queries to prevent XSS and other injection attacks.
  */
 export function sanitizeSearchQuery(query: string): string {
   if (!query) return "";
-  // Remove potentially dangerous characters and limit length
-  return query
-    .trim()
-    .replace(/[<>\"\'\&]/g, "") // Basic XSS prevention
-    .slice(0, 100);
+  // Strip out HTML tags to prevent XSS and limit length
+  const sanitized = DOMPurify.sanitize(query, { ALLOWED_TAGS: [] });
+  return sanitized.trim().slice(0, 100);
 }
 
 /**
