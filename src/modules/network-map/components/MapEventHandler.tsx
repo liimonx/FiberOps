@@ -51,18 +51,16 @@ export const MapEventHandler: React.FC<MapEventHandlerProps> = ({
     const handleMapClick = (event: mapboxgl.MapMouseEvent) => {
       // Check if layers exist before querying
       let features: mapboxgl.MapboxGeoJSONFeature[] = [];
-      const node3DLayerExists = safeHasLayer(map, "network-nodes-3d-layer");
-      const node2DLayerExists = safeHasLayer(map, "network-nodes-layer");
-      const connectionLayerExists = safeHasLayer(map, "network-connections-layer");
+      if (
+        (safeHasLayer(map, "network-nodes-3d-layer") || safeHasLayer(map, "network-nodes-layer")) &&
+        safeHasLayer(map, "network-connections-layer")
+      ) {
+        const queryLayers = ["network-connections-layer"];
+        if (safeHasLayer(map, "network-nodes-3d-layer")) queryLayers.push("network-nodes-3d-layer");
+        if (safeHasLayer(map, "network-nodes-layer")) queryLayers.push("network-nodes-layer");
 
-      const clickLayersToQuery = [];
-      if (node3DLayerExists) clickLayersToQuery.push("network-nodes-3d-layer");
-      if (node2DLayerExists) clickLayersToQuery.push("network-nodes-layer");
-      if (connectionLayerExists) clickLayersToQuery.push("network-connections-layer");
-
-      if (clickLayersToQuery.length > 0) {
         features = map.queryRenderedFeatures(event.point, {
-          layers: clickLayersToQuery,
+          layers: queryLayers,
         });
       }
 
@@ -131,7 +129,7 @@ export const MapEventHandler: React.FC<MapEventHandlerProps> = ({
           return;
         }
 
-        const source = feature.source || "network-nodes-3d";
+        const source = feature.source || "network-nodes";
         hoveredFeature = { id: elementId, source };
 
         // Set new hover state
@@ -315,18 +313,22 @@ export const MapEventHandler: React.FC<MapEventHandlerProps> = ({
           map.setPaintProperty(outageLayerId, "line-opacity", pulse);
         }
 
-        const nodesGlowLayerId = "network-nodes-glow";
-        if (safeHasLayer(map, nodesGlowLayerId)) {
-          const nodesPulse = 0.50 + Math.sin(elapsed / 400) * 0.25; // Pulse between 0.25 and 0.75
-          map.setPaintProperty(nodesGlowLayerId, "circle-opacity", [
+        const nodesGlowId = "network-nodes-glow";
+        if (safeHasLayer(map, nodesGlowId)) {
+          // Dynamic pulsing for active outages/warnings on 2D nodes
+          const baseOpacity = 0.5;
+          const pulseRange = 0.25;
+          const pulseNodes = baseOpacity + Math.sin(elapsed / 300) * pulseRange;
+
+          map.setPaintProperty(nodesGlowId, "circle-opacity", [
             "case",
             ["boolean", ["feature-state", "hover"], false],
             0.8,
             ["==", ["get", "status"], "error"],
-            nodesPulse,
+            pulseNodes,
             ["==", ["get", "status"], "warning"],
-            nodesPulse,
-            0
+            pulseNodes * 0.7,
+            0,
           ]);
         }
       } catch (error) {

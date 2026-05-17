@@ -15,26 +15,26 @@ import type { NetworkNode, NetworkConnection } from "../types";
  */
 export const MAP_COLORS = {
   // Nodes
-  core: "#10b981", // Emerald
-  pop: "#0ea5e9", // Sky Blue
-  distribution: "#34d399", // Soft Emerald
-  access: "#6ee7b7", // Mint
-  splitter: "#a855f7", // Purple
-  junction: "#94a3b8", // Slate
-  pole: "#64748b", // Dark Slate
-  onu: "#3b82f6", // Blue
-  customer: "#f43f5e", // Vibrant premium rose/pink
+  core: "#00ffcc", // Emerald
+  pop: "#00e5ff", // Sky Blue
+  distribution: "#7e22ce", // Soft Emerald
+  access: "#a855f7", // Mint
+  splitter: "#f472b6", // Purple
+  junction: "#fb7185", // Slate
+  pole: "#475569", // Dark Slate
+  onu: "#38bdf8", // Blue
+  customer: "#6ee7b7", // Rose
 
   // Connections
-  fiber_route: "#22d3ee", // Cyan
-  customer_connection: "#818cf8", // Glowing indigo/violet
+  fiber_route: "#00ffcc", // Cyan
+  customer_connection: "#c084fc", // Sky
 
   // Status
-  inactive: "#4b5563", // Gray
-  error: "#ef4444", // Red
-  warning: "#f59e0b", // Amber
+  inactive: "#334155", // Gray
+  error: "#ff0055", // Red
+  warning: "#ffaa00", // Amber
   selected: "#ffffff", // White
-  hovered: "#facc15", // Amber/Yellow for high-contrast feedback
+  hovered: "#00ffcc", // Amber/Yellow for high-contrast feedback
 
   // Backgrounds
   casing: "#020617", // Deep Navy
@@ -172,6 +172,79 @@ export const AVAILABLE_STYLES = [
 ];
 
 export const CUSTOM_LAYERS: Record<string, LayerSpecification> = {
+  /** Neon Halo for active/hovered nodes */
+  nodesGlow: {
+    id: "network-nodes-glow",
+    type: "circle",
+    source: "network-nodes",
+    paint: {
+      "circle-radius": [
+        "interpolate",
+        ["linear"],
+        ["zoom"],
+        5,
+        ["case", ["==", ["get", "type"], "core_node"], 6, 2],
+        12,
+        ["case", ["==", ["get", "type"], "core_node"], 16, ["==", ["get", "type"], "pop"], 12, 4],
+        18,
+        ["case", ["==", ["get", "type"], "core_node"], 32, ["==", ["get", "type"], "pop"], 24, 6],
+      ],
+      "circle-color": [
+        "case",
+        ["boolean", ["feature-state", "hover"], false],
+        MAP_COLORS.hovered,
+        ["==", ["get", "status"], "error"],
+        MAP_COLORS.error,
+        ["==", ["get", "status"], "warning"],
+        MAP_COLORS.warning,
+        "transparent",
+      ],
+      "circle-opacity": [
+        "case",
+        ["boolean", ["feature-state", "hover"], false],
+        0.8,
+        ["==", ["get", "status"], "error"],
+        0.6,
+        ["==", ["get", "status"], "warning"],
+        0.4,
+        0.4,
+      ],
+      "circle-blur": 1.5,
+      "circle-opacity-transition": { duration: 300 },
+      "circle-color-transition": { duration: 300 },
+    },
+  },
+
+  /** 2D Node Circles */
+  nodes: {
+    id: "network-nodes-layer",
+    type: "circle",
+    source: "network-nodes",
+    paint: {
+      "circle-radius": [
+        "interpolate",
+        ["linear"],
+        ["zoom"],
+        5,
+        ["case", ["==", ["get", "type"], "core_node"], 3, 1],
+        12,
+        ["case", ["==", ["get", "type"], "core_node"], 8, ["==", ["get", "type"], "pop"], 6, 2],
+        18,
+        ["case", ["==", ["get", "type"], "core_node"], 16, ["==", ["get", "type"], "pop"], 12, 3],
+      ],
+      "circle-color": [
+        "case",
+        ["boolean", ["feature-state", "hover"], false],
+        MAP_COLORS.hovered,
+        NODE_FILL,
+      ],
+      "circle-stroke-width": ["interpolate", ["linear"], ["zoom"], 5, 0.5, 12, 1.5, 18, 2.5],
+      "circle-stroke-color": MAP_COLORS.casing,
+      "circle-color-transition": { duration: 300 },
+      "circle-stroke-color-transition": { duration: 300 },
+    },
+  },
+
   /** Dark casing under connections for visual depth */
   connectionCasing: {
     id: "network-connections-casing",
@@ -186,15 +259,41 @@ export const CUSTOM_LAYERS: Record<string, LayerSpecification> = {
         5,
         ["case", ["boolean", ["feature-state", "hover"], false], 5.0, 3.5],
         10,
-        ["case", ["boolean", ["feature-state", "hover"], false], 10.0, 7.5],
+        ["case", ["boolean", ["feature-state", "hover"], false], 8.0, 5.0],
         15,
-        ["case", ["boolean", ["feature-state", "hover"], false], 16.0, 12.0],
+        ["case", ["boolean", ["feature-state", "hover"], false], 12.0, 7.5],
       ],
       "line-color": MAP_COLORS.casing,
       "line-opacity": ["case", ["boolean", ["feature-state", "hover"], false], 0.9, 0.7],
       "line-blur": ["case", ["boolean", ["feature-state", "hover"], false], 2.0, 1.0],
       "line-opacity-transition": { duration: 300 },
       "line-width-transition": { duration: 300 },
+    },
+  },
+
+  /** Neon glow for connections */
+  connectionsGlow: {
+    id: "network-connections-glow",
+    type: "line",
+    source: "network-connections",
+    layout: { "line-cap": "round", "line-join": "round" },
+    paint: {
+      "line-width": [
+        "interpolate",
+        ["linear"],
+        ["zoom"],
+        5,
+        ["case", ["boolean", ["feature-state", "hover"], false], 4.5, 2.5],
+        10,
+        ["case", ["boolean", ["feature-state", "hover"], false], 6.5, 4.0],
+        15,
+        ["case", ["boolean", ["feature-state", "hover"], false], 8.5, 5.5],
+      ],
+      "line-color": MAP_COLORS.fiber_route,
+      "line-opacity": 0.6,
+      "line-blur": 4,
+      "line-width-transition": { duration: 300 },
+      "line-opacity-transition": { duration: 300 },
     },
   },
 
@@ -210,7 +309,7 @@ export const CUSTOM_LAYERS: Record<string, LayerSpecification> = {
         ["linear"],
         ["zoom"],
         5,
-        ["case", ["boolean", ["feature-state", "hover"], false], 2.5, 1.5],
+        ["case", ["boolean", ["feature-state", "hover"], false], 3.0, 1.5],
         10,
         ["case", ["boolean", ["feature-state", "hover"], false], 4.5, 2.5],
         15,
@@ -370,7 +469,7 @@ export const CUSTOM_LAYERS: Record<string, LayerSpecification> = {
       ],
       "fill-extrusion-height": ["get", "height"],
       "fill-extrusion-base": ["get", "min_height"],
-      "fill-extrusion-opacity": 0.9,
+      "fill-extrusion-opacity": 0.95,
       "fill-extrusion-color-transition": { duration: 300 },
       "fill-extrusion-height-transition": { duration: 300 },
       "fill-extrusion-base-transition": { duration: 300 },
@@ -474,10 +573,13 @@ export const addCustomLayers = (map: mapboxgl.Map) => {
   const layers = [
     CUSTOM_LAYERS.coverage,
     CUSTOM_LAYERS.connectionCasing,
+    CUSTOM_LAYERS.connectionsGlow,
     CUSTOM_LAYERS.connections,
     CUSTOM_LAYERS.nodesGlow,
     CUSTOM_LAYERS.nodes,
     CUSTOM_LAYERS.outagesGlow,
+    CUSTOM_LAYERS.nodesGlow,
+    CUSTOM_LAYERS.nodes,
     CUSTOM_LAYERS.nodes3D,
     CUSTOM_LAYERS.connections3D,
     CUSTOM_LAYERS.outages,
@@ -503,7 +605,7 @@ export const updateLayerVisibility = (
   const auxiliaryMap: Record<string, string[]> = {
     "network-nodes-layer": ["network-nodes-glow"],
     "network-nodes-3d-layer": [],
-    "network-connections-layer": ["network-connections-casing"],
+    "network-connections-layer": ["network-connections-casing", "network-connections-glow"],
     "network-outages-layer": ["network-outages-glow"],
   };
 

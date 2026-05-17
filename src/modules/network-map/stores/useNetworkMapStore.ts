@@ -1,4 +1,5 @@
 "use client";
+import { LatLng, NetworkStatus } from "../types";
 
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
