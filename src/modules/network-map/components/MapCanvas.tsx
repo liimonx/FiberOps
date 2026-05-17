@@ -125,13 +125,10 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({ onMapLoad, onMapError }) =
         if (nodes3DSource)
           nodes3DSource.setData({ type: "FeatureCollection", features: node3DFeatures });
 
-        const nodesMap = new Map<string, NetworkNode>();
-        for (const n of allNodes) {
-          nodesMap.set(n.id, n);
-        }
+        const allNodesMap = new Map(allNodes.map((n) => [n.id, n]));
 
         const connectionFeatures = filteredConnections
-          .map((conn) => createConnectionFeature(conn, nodesMap))
+          .map((conn) => createConnectionFeature(conn, allNodesMap))
           .filter((f): f is GeoJSON.Feature => f != null);
         const connectionsSource = map.getSource("network-connections") as
           | mapboxgl.GeoJSONSource
@@ -143,7 +140,7 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({ onMapLoad, onMapError }) =
           });
 
         const connection3DFeatures = filteredConnections.flatMap((conn) =>
-          create3DConnectionFeatures(conn, nodesMap)
+          create3DConnectionFeatures(conn, allNodesMap)
         );
         const connections3DSource = map.getSource("network-connections-3d") as
           | mapboxgl.GeoJSONSource
@@ -158,7 +155,7 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({ onMapLoad, onMapError }) =
           ? allConnections.filter((c) => c.status === NetworkStatus.ERROR)
           : [];
         const outageFeatures = outageConnections
-          .map((conn) => createConnectionFeature(conn, nodesMap))
+          .map((conn) => createConnectionFeature(conn, allNodesMap))
           .filter((f): f is GeoJSON.Feature => f != null);
         const outagesSource = map.getSource("network-outages") as
           | mapboxgl.GeoJSONSource
