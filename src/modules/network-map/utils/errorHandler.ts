@@ -321,7 +321,7 @@ export class OfflineDetector {
 export class OfflineQueue {
   private queue: Array<{
     id: string;
-    operation: () => Promise<any>;
+    operation: () => Promise<unknown>;
     resolve: (value: unknown) => void;
     reject: (reason: unknown) => void;
     timestamp: Date;
@@ -331,7 +331,7 @@ export class OfflineQueue {
     return new Promise((resolve, reject) => {
       this.queue.push({
         id: `op_${Date.now()}_${Math.random()}`,
-        operation: operation as unknown as () => Promise<any>,
+        operation: operation as unknown as () => Promise<unknown>,
         resolve: resolve as unknown as (value: unknown) => void,
         reject: reject as unknown as (reason: unknown) => void,
         timestamp: new Date(),
