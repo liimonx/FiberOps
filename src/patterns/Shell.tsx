@@ -11,10 +11,17 @@ import {
   SideMenu,
   SideMenuItem,
   SideMenuList,
+  PhosphorIconsType,
 } from "@shohojdhara/atomix";
 import { SidebarFooter } from "@/components/SidebarFooter";
 
-const nav = [
+interface NavItem {
+  href: string;
+  label: string;
+  icon: PhosphorIconsType;
+}
+
+const nav: NavItem[] = [
   { href: "/", label: "Home", icon: "House" },
   { href: "/dashboard", label: "Dashboard", icon: "SquaresFour" },
   { href: "/network-map", label: "Network Map", icon: "MapPin" },
@@ -79,7 +86,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
                   className={`${styles.navItem} ${isActive(item.href) ? styles.navItemActive : ""}`}
                   onClick={() => setSidebarOpen(false)}
                 >
-                  <Icon name={item.icon as any} className="u-me-2" />
+                  <Icon name={item.icon} className="u-me-2" />
                   <span>{item.label}</span>
                 </SideMenuItem>
               ))}
