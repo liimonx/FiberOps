@@ -1474,7 +1474,7 @@ export const create3DConnectionFeatures = (
   
   // For simplicity in a flat ribbon, we use the average or the dominant anchor
   // Overhead (poles) usually stays high, but if it goes to a ground box, it should drop
-  let height = Math.min(sourceAnchor, targetAnchor);
+  const height = Math.min(sourceAnchor, targetAnchor);
 
   const coords: [number, number][] = connection.route?.length
     ? connection.route.map((p) => [p.lng, p.lat])
