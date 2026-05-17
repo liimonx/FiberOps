@@ -248,13 +248,17 @@ export const useNetworkMapStore = create<NetworkMapStore>()(
         
         updateNode: (nodeId, updates) =>
           set((state) => {
-            const nodes = state.nodes.map(node =>
-              node.id === nodeId ? { ...node, ...updates } : node
-            );
-            const updatedNode = nodes.find(n => n.id === nodeId);
+            const existingNode = state.nodeMap[nodeId];
+            if (!existingNode) return state;
+
+            const updatedNode = { ...existingNode, ...updates };
+            const nodes = [...state.nodes];
+            const idx = nodes.findIndex((n) => n.id === nodeId);
+            if (idx !== -1) nodes[idx] = updatedNode;
+
             return {
               nodes,
-              nodeMap: updatedNode ? { ...state.nodeMap, [nodeId]: updatedNode } : state.nodeMap,
+              nodeMap: { ...state.nodeMap, [nodeId]: updatedNode },
               lastUpdated: new Date()
             };
           }, false, 'updateNode'),
@@ -291,13 +295,17 @@ export const useNetworkMapStore = create<NetworkMapStore>()(
         
         updateConnection: (connectionId, updates) =>
           set((state) => {
-            const connections = state.connections.map(conn =>
-              conn.id === connectionId ? { ...conn, ...updates } : conn
-            );
-            const updatedConn = connections.find(c => c.id === connectionId);
+            const existingConn = state.connectionMap[connectionId];
+            if (!existingConn) return state;
+
+            const updatedConn = { ...existingConn, ...updates };
+            const connections = [...state.connections];
+            const idx = connections.findIndex((c) => c.id === connectionId);
+            if (idx !== -1) connections[idx] = updatedConn;
+
             return {
               connections,
-              connectionMap: updatedConn ? { ...state.connectionMap, [connectionId]: updatedConn } : state.connectionMap,
+              connectionMap: { ...state.connectionMap, [connectionId]: updatedConn },
               lastUpdated: new Date()
             };
           }, false, 'updateConnection'),
