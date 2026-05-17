@@ -23,11 +23,11 @@ export const MAP_COLORS = {
   junction: "#94a3b8", // Slate
   pole: "#64748b", // Dark Slate
   onu: "#3b82f6", // Blue
-  customer: "#fffff0", // Rose
+  customer: "#f43f5e", // Vibrant premium rose/pink
 
   // Connections
   fiber_route: "#22d3ee", // Cyan
-  customer_connection: "#60a5fa", // Sky
+  customer_connection: "#818cf8", // Glowing indigo/violet
 
   // Status
   inactive: "#4b5563", // Gray
@@ -179,10 +179,20 @@ export const CUSTOM_LAYERS: Record<string, LayerSpecification> = {
     source: "network-connections",
     layout: { "line-cap": "round", "line-join": "round" },
     paint: {
-      "line-width": ["interpolate", ["linear"], ["zoom"], 5, 1.2, 10, 1.6, 15, 2.2],
+      "line-width": [
+        "interpolate",
+        ["linear"],
+        ["zoom"],
+        5,
+        ["case", ["boolean", ["feature-state", "hover"], false], 5.0, 3.5],
+        10,
+        ["case", ["boolean", ["feature-state", "hover"], false], 10.0, 7.5],
+        15,
+        ["case", ["boolean", ["feature-state", "hover"], false], 16.0, 12.0],
+      ],
       "line-color": MAP_COLORS.casing,
-      "line-opacity": 0.4,
-      "line-blur": 0.5,
+      "line-opacity": ["case", ["boolean", ["feature-state", "hover"], false], 0.9, 0.7],
+      "line-blur": ["case", ["boolean", ["feature-state", "hover"], false], 2.0, 1.0],
       "line-opacity-transition": { duration: 300 },
       "line-width-transition": { duration: 300 },
     },
@@ -199,12 +209,12 @@ export const CUSTOM_LAYERS: Record<string, LayerSpecification> = {
         "interpolate",
         ["linear"],
         ["zoom"],
+        5,
+        ["case", ["boolean", ["feature-state", "hover"], false], 2.5, 1.5],
         10,
-        ["case", ["boolean", ["feature-state", "hover"], false], 1.5, 0.8],
+        ["case", ["boolean", ["feature-state", "hover"], false], 4.5, 2.5],
         15,
-        ["case", ["boolean", ["feature-state", "hover"], false], 2, 1],
-        18,
-        ["case", ["boolean", ["feature-state", "hover"], false], 3, 1.5],
+        ["case", ["boolean", ["feature-state", "hover"], false], 6.0, 3.5],
       ],
       "line-color": [
         "case",
@@ -226,6 +236,80 @@ export const CUSTOM_LAYERS: Record<string, LayerSpecification> = {
       "line-color-transition": { duration: 300 },
       "line-width-transition": { duration: 300 },
       "line-opacity-transition": { duration: 300 },
+    },
+  },
+
+  /** Neon Node Halo Layer */
+  nodesGlow: {
+    id: "network-nodes-glow",
+    type: "circle",
+    source: "network-nodes",
+    paint: {
+      "circle-radius": [
+        "interpolate",
+        ["linear"],
+        ["zoom"],
+        5,
+        2,
+        12,
+        8,
+        18,
+        32,
+      ],
+      "circle-blur": 0.8,
+      "circle-color": [
+        "case",
+        ["boolean", ["feature-state", "hover"], false],
+        MAP_COLORS.hovered,
+        ["==", ["get", "status"], "error"],
+        MAP_COLORS.error,
+        ["==", ["get", "status"], "warning"],
+        MAP_COLORS.warning,
+        "transparent"
+      ],
+      "circle-opacity": [
+        "case",
+        ["boolean", ["feature-state", "hover"], false],
+        0.8,
+        ["==", ["get", "status"], "error"],
+        0.6,
+        ["==", ["get", "status"], "warning"],
+        0.6,
+        0
+      ],
+      "circle-opacity-transition": { duration: 300 },
+      "circle-color-transition": { duration: 300 },
+      "circle-radius-transition": { duration: 300 },
+    },
+  },
+
+  /** 2D Circle Nodes Layer */
+  nodes: {
+    id: "network-nodes-layer",
+    type: "circle",
+    source: "network-nodes",
+    paint: {
+      "circle-radius": [
+        "interpolate",
+        ["linear"],
+        ["zoom"],
+        5,
+        1,
+        12,
+        4,
+        18,
+        16,
+      ],
+      "circle-color": [
+        "case",
+        ["boolean", ["feature-state", "hover"], false],
+        MAP_COLORS.hovered,
+        NODE_FILL
+      ],
+      "circle-stroke-width": 1.5,
+      "circle-stroke-color": MAP_COLORS.casing,
+      "circle-color-transition": { duration: 300 },
+      "circle-radius-transition": { duration: 300 },
     },
   },
 
@@ -391,6 +475,8 @@ export const addCustomLayers = (map: mapboxgl.Map) => {
     CUSTOM_LAYERS.coverage,
     CUSTOM_LAYERS.connectionCasing,
     CUSTOM_LAYERS.connections,
+    CUSTOM_LAYERS.nodesGlow,
+    CUSTOM_LAYERS.nodes,
     CUSTOM_LAYERS.outagesGlow,
     CUSTOM_LAYERS.nodes3D,
     CUSTOM_LAYERS.connections3D,
@@ -415,6 +501,7 @@ export const updateLayerVisibility = (
 
   // Map primary layers to their auxiliary layers
   const auxiliaryMap: Record<string, string[]> = {
+    "network-nodes-layer": ["network-nodes-glow"],
     "network-nodes-3d-layer": [],
     "network-connections-layer": ["network-connections-casing"],
     "network-outages-layer": ["network-outages-glow"],
