@@ -1188,10 +1188,10 @@
   resolved "https://registry.npmjs.org/@rtsao/scc/-/scc-1.1.0.tgz"
   integrity sha512-zt6OdqaDoOnJ1ZYsCYGt9YmWzDXl4vQdKTyJev62gFhRGKdx7mcT54V9KIjg+d2wi9EXsPvAPKe7i7WjfVWB8g==
 
-"@shohojdhara/atomix@0.6.3":
-  version "0.6.3"
-  resolved "https://registry.yarnpkg.com/@shohojdhara/atomix/-/atomix-0.6.3.tgz#ea20661145e524e8a2eb1c62e84c6b5003385e9d"
-  integrity sha512-XI+VdFSwRiL2xlBRIcn5bXrZJz3QAXYIZ0j5PsIT+qRCikIvlty9Xwehae+cOJVMXUp5bQo7zGTWxXgmBsuqJA==
+"@shohojdhara/atomix@0.6.4":
+  version "0.6.4"
+  resolved "https://registry.yarnpkg.com/@shohojdhara/atomix/-/atomix-0.6.4.tgz#5126a2bbc958355febefac4e5fb8efeaefd56492"
+  integrity sha512-nuOF6mBnLaMhrDsbL0Two1T/TSgf5jkpDfRGOOf8t56ut/ezcbeP+YZZRQVZm9awuyeBNeoCd+0pPwOFvCYWoA==
   dependencies:
     autoprefixer "^10.4.21"
     boxen "^7.1.0"
