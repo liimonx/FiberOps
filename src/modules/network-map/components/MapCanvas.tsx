@@ -194,6 +194,7 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({ onMapLoad, onMapError }) =
           "network-nodes-3d-layer",
           "network-connections-layer",
           "network-connections-casing",
+          "network-connections-glow",
         ];
         clearFilterIds.forEach((id) => {
           if (map.getLayer(id)) map.setFilter(id, null);
@@ -208,6 +209,7 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({ onMapLoad, onMapError }) =
         [
           "network-connections-layer",
           "network-connections-casing",
+          "network-connections-glow",
           "network-connections-3d-layer",
         ].forEach((id) => {
           if (map.getLayer(id)) {
