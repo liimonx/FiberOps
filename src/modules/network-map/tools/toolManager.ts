@@ -530,12 +530,12 @@ export class ToolManager {
     return this.activeTool;
   }
 
-  handleEvent(eventName: string, event: MapMouseEvent | KeyboardEvent): void {
+  handleEvent(eventName: keyof MapTool, event: MapMouseEvent | KeyboardEvent): void {
     if (!this.activeTool) return;
 
-    const handler = (this.activeTool as any)[eventName];
+    const handler = this.activeTool[eventName];
     if (typeof handler === "function") {
-      handler.call(this.activeTool, event);
+      (handler as (...args: unknown[]) => unknown).call(this.activeTool, event);
     }
   }
 }
