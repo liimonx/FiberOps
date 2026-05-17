@@ -385,12 +385,139 @@ function cleanupHeatmap(map: mapboxgl.Map) {
 }
 
 // Combined visualization component
+// Helper functions for impairment area
+function createCirclePolygon(center: { lat: number; lng: number }, radiusMeters: number, points: number = 64): GeoJSON.FeatureCollection {
+  const coords = [];
+  const km = radiusMeters / 1000;
+
+  for (let i = 0; i < points; i++) {
+    const angle = (i * 360) / points;
+    const dx = km * Math.cos((angle * Math.PI) / 180);
+    const dy = km * Math.sin((angle * Math.PI) / 180);
+
+    const lat = center.lat + (dy / 110.574);
+    const lng = center.lng + (dx / (111.32 * Math.cos((center.lat * Math.PI) / 180)));
+
+    coords.push([lng, lat]);
+  }
+  coords.push(coords[0]); // close the polygon
+
+  return {
+    type: "FeatureCollection",
+    features: [
+      {
+        type: "Feature",
+        geometry: {
+          type: "Polygon",
+          coordinates: [coords],
+        },
+        properties: {},
+      },
+      {
+        type: "Feature",
+        geometry: {
+          type: "Point",
+          coordinates: [center.lng, center.lat],
+        },
+        properties: { isCenter: true },
+      }
+    ],
+  };
+}
+
+// Render impairment area on the map
+export function ImpairmentVisualization({ mapInstance }: ToolVisualizationsProps) {
+  const impairmentArea = useNetworkMapStore((state) => state.impairmentArea);
+
+  useEffect(() => {
+    if (!mapInstance || !mapInstance.isStyleLoaded()) return;
+
+    const sourceId = "impairment-area";
+    const layerFillId = "impairment-area-fill";
+    const layerLineId = "impairment-area-line";
+    const layerCenterId = "impairment-area-center";
+
+    if (impairmentArea) {
+      const geojson = createCirclePolygon(impairmentArea.center, impairmentArea.radius);
+
+      if (mapInstance.getSource(sourceId)) {
+        (mapInstance.getSource(sourceId) as mapboxgl.GeoJSONSource).setData(geojson);
+      } else {
+        mapInstance.addSource(sourceId, {
+          type: "geojson",
+          data: geojson,
+        });
+
+        mapInstance.addLayer({
+          id: layerFillId,
+          type: "fill",
+          source: sourceId,
+          filter: ["==", "$type", "Polygon"],
+          paint: {
+            "fill-color": "#EF4444",
+            "fill-opacity": 0.15,
+          },
+        });
+
+        mapInstance.addLayer({
+          id: layerLineId,
+          type: "line",
+          source: sourceId,
+          filter: ["==", "$type", "Polygon"],
+          paint: {
+            "line-color": "#EF4444",
+            "line-width": 2,
+            "line-dasharray": [3, 3],
+          },
+        });
+
+        mapInstance.addLayer({
+          id: layerCenterId,
+          type: "circle",
+          source: sourceId,
+          filter: ["==", "$type", "Point"],
+          paint: {
+            "circle-radius": 4,
+            "circle-color": "#EF4444",
+            "circle-stroke-width": 2,
+            "circle-stroke-color": "#FFFFFF",
+          },
+        });
+      }
+    } else {
+      if (mapInstance.getLayer(layerFillId)) mapInstance.removeLayer(layerFillId);
+      if (mapInstance.getLayer(layerLineId)) mapInstance.removeLayer(layerLineId);
+      if (mapInstance.getLayer(layerCenterId)) mapInstance.removeLayer(layerCenterId);
+      if (mapInstance.getSource(sourceId)) mapInstance.removeSource(sourceId);
+    }
+  }, [mapInstance, impairmentArea]);
+
+  useEffect(() => {
+    return () => {
+      if (!mapInstance || !mapInstance.isStyleLoaded()) return;
+      const sourceId = "impairment-area";
+      const layerFillId = "impairment-area-fill";
+      const layerLineId = "impairment-area-line";
+      const layerCenterId = "impairment-area-center";
+
+      if (mapInstance.getLayer(layerFillId)) mapInstance.removeLayer(layerFillId);
+      if (mapInstance.getLayer(layerLineId)) mapInstance.removeLayer(layerLineId);
+      if (mapInstance.getLayer(layerCenterId)) mapInstance.removeLayer(layerCenterId);
+      if (mapInstance.getSource(sourceId)) mapInstance.removeSource(sourceId);
+    };
+  }, [mapInstance]);
+
+  return null;
+}
+
+// Combined visualization component
 export function ToolVisualizations({ mapInstance }: ToolVisualizationsProps) {
   return (
     <>
       <MeasurementVisualization mapInstance={mapInstance} />
       <TracePathVisualization mapInstance={mapInstance} />
       <HeatmapVisualization mapInstance={mapInstance} />
+      <ImpairmentVisualization mapInstance={mapInstance} />
     </>
   );
 }

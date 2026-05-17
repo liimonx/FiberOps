@@ -22,6 +22,8 @@ export { Toolbar } from './Toolbar';
 export { LayerControls } from './LayerControls';
 export { InspectorPanel } from './InspectorPanel';
 
+export { ImpairmentAreaPanel } from './ImpairmentAreaPanel';
+
 export { 
   ResponsiveContainer, 
   ResponsiveShow, 

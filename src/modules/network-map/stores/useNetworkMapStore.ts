@@ -75,6 +75,14 @@ interface NetworkMapStore {
   heatmapData: HeatmapData | null;
   setHeatmapData: (data: HeatmapData | null) => void;
   
+  // Impairment Tool state
+  impairmentArea: { center: LatLng; radius: number } | null;
+  setImpairmentArea: (area: { center: LatLng; radius: number } | null) => void;
+  simulatedOutageActive: boolean;
+  originalStatuses: Record<string, NetworkStatus>;
+  simulateImpairmentOutage: (affectedNodes: string[], affectedConnections: string[]) => void;
+  restoreImpairmentServices: () => void;
+
   // Selection history for undo/redo
   selectionHistory: string[];
   addToSelectionHistory: (elementId: string) => void;
@@ -132,6 +140,9 @@ export const useNetworkMapStore = create<NetworkMapStore>()(
         measurements: [],
         tracePath: null,
         heatmapData: null,
+        impairmentArea: null,
+        simulatedOutageActive: false,
+        originalStatuses: {},
         selectionHistory: [],
         isWebSocketConnected: false,
         connectionQuality: 'disconnected',
@@ -335,6 +346,84 @@ export const useNetworkMapStore = create<NetworkMapStore>()(
         setHeatmapData: (heatmapData) =>
           set({ heatmapData }, false, 'setHeatmapData'),
 
+        // Impairment actions
+        setImpairmentArea: (impairmentArea) =>
+          set({ impairmentArea }, false, 'setImpairmentArea'),
+
+        simulateImpairmentOutage: (affectedNodes, affectedConnections) =>
+          set((state) => {
+            const originalStatuses: Record<string, NetworkStatus> = {};
+            const nodes = [...state.nodes];
+            const connections = [...state.connections];
+            const nodeMap = { ...state.nodeMap };
+            const connectionMap = { ...state.connectionMap };
+
+            affectedNodes.forEach((nodeId) => {
+              const node = state.nodeMap[nodeId];
+              if (node) {
+                originalStatuses[nodeId] = node.status;
+                const updatedNode = { ...node, status: 'error' as NetworkStatus };
+                const idx = nodes.findIndex((n) => n.id === nodeId);
+                if (idx !== -1) nodes[idx] = updatedNode;
+                nodeMap[nodeId] = updatedNode;
+              }
+            });
+
+            affectedConnections.forEach((connId) => {
+              const conn = state.connectionMap[connId];
+              if (conn) {
+                originalStatuses[connId] = conn.status;
+                const updatedConn = { ...conn, status: 'error' as NetworkStatus };
+                const idx = connections.findIndex((c) => c.id === connId);
+                if (idx !== -1) connections[idx] = updatedConn;
+                connectionMap[connId] = updatedConn;
+              }
+            });
+
+            return {
+              simulatedOutageActive: true,
+              originalStatuses: { ...state.originalStatuses, ...originalStatuses },
+              nodes,
+              connections,
+              nodeMap,
+              connectionMap,
+              lastUpdated: new Date(),
+            };
+          }, false, 'simulateImpairmentOutage'),
+
+        restoreImpairmentServices: () =>
+          set((state) => {
+            if (!state.simulatedOutageActive) return state;
+            const nodes = [...state.nodes];
+            const connections = [...state.connections];
+            const nodeMap = { ...state.nodeMap };
+            const connectionMap = { ...state.connectionMap };
+
+            Object.entries(state.originalStatuses).forEach(([id, status]) => {
+              if (nodeMap[id]) {
+                const updatedNode = { ...nodeMap[id], status };
+                const idx = nodes.findIndex((n) => n.id === id);
+                if (idx !== -1) nodes[idx] = updatedNode;
+                nodeMap[id] = updatedNode;
+              } else if (connectionMap[id]) {
+                const updatedConn = { ...connectionMap[id], status };
+                const idx = connections.findIndex((c) => c.id === id);
+                if (idx !== -1) connections[idx] = updatedConn;
+                connectionMap[id] = updatedConn;
+              }
+            });
+
+            return {
+              simulatedOutageActive: false,
+              originalStatuses: {},
+              nodes,
+              connections,
+              nodeMap,
+              connectionMap,
+              lastUpdated: new Date(),
+            };
+          }, false, 'restoreImpairmentServices'),
+
         // Selection history
         addToSelectionHistory: (elementId) =>
           set((state) => ({
@@ -379,7 +468,10 @@ export const useNetworkMapStore = create<NetworkMapStore>()(
             isWebSocketConnected: false,
             connectionQuality: 'disconnected',
             renderTime: 0,
-            fps: 60
+        fps: 60,
+        impairmentArea: null,
+        simulatedOutageActive: false,
+        originalStatuses: {}
           }, false, 'reset')
       }),
       {

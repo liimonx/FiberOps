@@ -447,6 +447,38 @@ export class HeatmapTool extends BaseTool {
   }
 }
 
+// Impairment Tool - Outage simulation and impact analysis
+export class ImpairmentTool extends BaseTool {
+  public readonly id = "impairment";
+  public readonly name = "Impairment Area";
+  public readonly icon = "Warning";
+  public readonly description = "Define a blast radius to simulate outages";
+  public cursor = "crosshair";
+
+  activate(): void {
+    super.activate();
+  }
+
+  deactivate(): void {
+    super.deactivate();
+    // Do not automatically restore services or clear area on deactivate,
+    // so user can switch tools to inspect while area is active.
+    // The panel will provide explicit clear/restore buttons.
+  }
+
+  onClick(event: MapMouseEvent): void {
+    const store = useNetworkMapStore.getState();
+    const currentArea = store.impairmentArea;
+    const currentRadius = currentArea ? currentArea.radius : 1000;
+
+    store.setImpairmentArea({
+      center: event.lngLat,
+      radius: currentRadius,
+    });
+    console.log("[ImpairmentTool] Set impairment center:", event.lngLat, "Radius:", currentRadius);
+  }
+}
+
 // Tool Manager - Manages tool lifecycle and switching
 export class ToolManager {
   private tools: Map<string, MapTool> = new Map();
@@ -458,6 +490,7 @@ export class ToolManager {
     this.registerTool(new TraceTool());
     this.registerTool(new MeasureTool());
     this.registerTool(new HeatmapTool());
+    this.registerTool(new ImpairmentTool());
   }
 
   registerTool(tool: MapTool): void {

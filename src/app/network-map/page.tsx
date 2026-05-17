@@ -14,6 +14,7 @@ import {
   InteractiveTooltip,
   createNodeTooltipContent,
   createConnectionTooltipContent,
+  ImpairmentAreaPanel,
 } from "@/modules/network-map/components";
 import {
   useNetworkMapStore,
@@ -207,6 +208,7 @@ function NetworkMapContent() {
           {activeTool === "measure" && <MeasurementOverlay />}
           {activeTool === "trace" && <TracePathOverlay />}
           {activeTool === "heatmap" && <HeatmapLegend />}
+          {activeTool === "impairment" && <ImpairmentAreaPanel />}
         </div>
 
         {/* Zoom Level Indicator */}

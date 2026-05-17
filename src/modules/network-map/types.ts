@@ -74,7 +74,7 @@ export interface NetworkMapLayer {
   type: "nodes" | "connections" | "outages" | "coverage" | "customers";
 }
 
-export type ToolType = "select" | "trace" | "measure" | "heatmap";
+export type ToolType = "select" | "trace" | "measure" | "heatmap" | "impairment";
 
 export interface SearchResult {
   id: string;
