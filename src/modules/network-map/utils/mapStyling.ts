@@ -1408,15 +1408,19 @@ export const create3DNodeFeatures = (node: NetworkNode): GeoJSON.Feature[] => {
 
 export const createConnectionFeature = (
   connection: NetworkConnection,
-  nodes?: NetworkNode[]
+  nodes?: NetworkNode[] | Map<string, NetworkNode>
 ): GeoJSON.Feature | null => {
   let coords: [number, number][] = [];
 
   if (connection.route?.length) {
     coords = connection.route.map((p) => [p.lng, p.lat]);
   } else if (nodes) {
-    const s = nodes.find((n) => n.id === connection.sourceNodeId);
-    const t = nodes.find((n) => n.id === connection.targetNodeId);
+    const s = nodes instanceof Map
+      ? nodes.get(connection.sourceNodeId)
+      : nodes.find((n) => n.id === connection.sourceNodeId);
+    const t = nodes instanceof Map
+      ? nodes.get(connection.targetNodeId)
+      : nodes.find((n) => n.id === connection.targetNodeId);
     if (s && t)
       coords = [
         [s.position.lng, s.position.lat],
@@ -1443,10 +1447,14 @@ export const createConnectionFeature = (
  */
 export const create3DConnectionFeatures = (
   connection: NetworkConnection,
-  nodes: NetworkNode[]
+  nodes: NetworkNode[] | Map<string, NetworkNode>
 ): GeoJSON.Feature[] => {
-  const sourceNode = nodes.find((n) => n.id === connection.sourceNodeId);
-  const targetNode = nodes.find((n) => n.id === connection.targetNodeId);
+  const sourceNode = nodes instanceof Map
+    ? nodes.get(connection.sourceNodeId)
+    : nodes.find((n) => n.id === connection.sourceNodeId);
+  const targetNode = nodes instanceof Map
+    ? nodes.get(connection.targetNodeId)
+    : nodes.find((n) => n.id === connection.targetNodeId);
 
   if (!sourceNode || !targetNode) return [];
 
@@ -1457,7 +1465,7 @@ export const create3DConnectionFeatures = (
   
   // For simplicity in a flat ribbon, we use the average or the dominant anchor
   // Overhead (poles) usually stays high, but if it goes to a ground box, it should drop
-  let height = Math.min(sourceAnchor, targetAnchor);
+  const height = Math.min(sourceAnchor, targetAnchor);
 
   const coords: [number, number][] = connection.route?.length
     ? connection.route.map((p) => [p.lng, p.lat])
