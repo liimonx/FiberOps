@@ -3,7 +3,6 @@
 import React, { useEffect, useState, useMemo } from "react";
 import {
   Icon,
-  Card,
   Toggle,
   Button,
   Badge,
@@ -11,11 +10,10 @@ import {
   PhosphorIconsType,
 } from "@shohojdhara/atomix";
 import { useNetworkMapStore, useLayers } from "../stores/useNetworkMapStore";
-import { NetworkMapLayer, NetworkStatus } from "../types";
+import { NetworkMapLayer } from "../types";
 
 interface LayerControlsProps {
   className?: string;
-  persistKey?: string;
 }
 
 interface LayerConfig extends NetworkMapLayer {
@@ -174,9 +172,6 @@ export const LayerControls: React.FC<LayerControlsProps> = ({ className = "" }) 
 
   const activeCount = useMemo(() => layers.filter((l) => l.visible).length, [layers]);
   const totalLayers = LAYER_CONFIGS.length;
-  const progressPercentage = (activeCount / totalLayers) * 100;
-  const circumference = 2 * Math.PI * 16;
-  const strokeDashoffset = circumference - (progressPercentage / 100) * circumference;
 
   const handleToggleAll = (visible: boolean) => {
     layers.forEach((layer) => {
@@ -185,11 +180,7 @@ export const LayerControls: React.FC<LayerControlsProps> = ({ className = "" }) 
   };
 
   return (
-    <Accordion
-      title=""
-      icon={<Icon name="Stack" />}
-      className={`${className} u-w-100`}
-    >
+    <Accordion title="" icon={<Icon name="Stack" />} className={`${className} `}>
       <Accordion.Header>
         <div className="u-relative u-w-100">
           <div className="u-flex u-items-center u-justify-start u-gap-3">
@@ -234,7 +225,7 @@ export const LayerControls: React.FC<LayerControlsProps> = ({ className = "" }) 
                   {/* Visual Identity */}
                   <div className="u-relative">
                     <div
-                      className="u-rounded u-flex u-items-center u-justify-center u-w-10 u-h-10 u-shadow-sm"
+                      className="u-rounded u-flex u-items-center u-justify-center u-p-2 u-shadow-sm"
                       style={{
                         backgroundColor: `${config.color}15`,
                         border: `1px solid ${config.color}30`,
