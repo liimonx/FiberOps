@@ -1,0 +1,69 @@
+/**
+ * Tabs Component Settings Override
+ * =============================================================================
+ *
+ * Premium tab navigation settings: flat underline geometry, refined font weight,
+ * harmonized hovers, active border/indicators, and clean icon/panel spacings.
+ *
+ * @see https://atomix.design/docs/components/tabs
+ */
+
+// ── Nav button — geometry & spacing ──────────────────────────────────────────
+$tabs-nav-btn-padding-x: 12px !default;
+$tabs-nav-btn-padding-y: 8px !default;
+$tabs-nav-btn-border-radius: 0px !default; // flat underline style
+
+// ── Nav button — typography ──────────────────────────────────────────────────
+$tabs-nav-btn-font-size: 0.8125rem !default; // 13px – tight, compact label
+$tabs-nav-btn-font-weight: 500 !default;
+
+// ── Nav button — colors ──────────────────────────────────────────────────────
+$tabs-nav-btn-color: var(--atomix-tertiary-text-emphasis) !default;
+$tabs-nav-btn-active-color: var(--atomix-body-color) !default;
+$tabs-nav-btn-disabled-color: var(--atomix-disabled-text-emphasis) !default;
+$tabs-nav-btn-bg: transparent !default;
+$tabs-nav-btn-bg-hover: var(--atomix-secondary-bg-subtle) !default;
+$tabs-nav-btn-bg-active: transparent !default;
+$tabs-nav-btn-bg-disabled: transparent !default;
+
+// ── Nav button — border / indicator ──────────────────────────────────────────
+$tabs-nav-btn-border-width: 2px !default;
+$tabs-nav-btn-border-color: transparent !default;
+$tabs-nav-btn-border-active-color: var(--atomix-primary) !default;
+$tabs-nav-btn-border-disabled-color: var(--atomix-border-color) !default;
+
+// ── Spacings ─────────────────────────────────────────────────────────────────
+$tabs-nav-btns-gap: 0px !default;
+$tabs-nav-btn-inner-gap: 4px !default;
+$tab-nav-btn-icon-size: 16px !default;
+
+// ── Panel content padding ────────────────────────────────────────────────────
+$tabs-panel-padding-x: 0px !default;
+$tabs-panel-padding-y: 16px !default;
+
+// =============================================================================
+// Tabs Variable Configuration
+// =============================================================================
+@use "../../../../node_modules/@shohojdhara/atomix/src/styles/01-settings/settings.tabs" with (
+  $tabs-nav-btn-padding-x:            $tabs-nav-btn-padding-x,
+  $tabs-nav-btn-padding-y:            $tabs-nav-btn-padding-y,
+  $tabs-nav-btn-border-radius:        $tabs-nav-btn-border-radius,
+  $tabs-nav-btn-font-size:            $tabs-nav-btn-font-size,
+  $tabs-nav-btn-font-weight:          $tabs-nav-btn-font-weight,
+  $tabs-nav-btn-color:                $tabs-nav-btn-color,
+  $tabs-nav-btn-active-color:         $tabs-nav-btn-active-color,
+  $tabs-nav-btn-disabled-color:       $tabs-nav-btn-disabled-color,
+  $tabs-nav-btn-bg:                   $tabs-nav-btn-bg,
+  $tabs-nav-btn-bg-hover:             $tabs-nav-btn-bg-hover,
+  $tabs-nav-btn-bg-active:            $tabs-nav-btn-bg-active,
+  $tabs-nav-btn-bg-disabled:          $tabs-nav-btn-bg-disabled,
+  $tabs-nav-btn-border-width:         $tabs-nav-btn-border-width,
+  $tabs-nav-btn-border-color:         $tabs-nav-btn-border-color,
+  $tabs-nav-btn-border-active-color:  $tabs-nav-btn-border-active-color,
+  $tabs-nav-btn-border-disabled-color: $tabs-nav-btn-border-disabled-color,
+  $tabs-nav-btns-gap:                 $tabs-nav-btns-gap,
+  $tabs-nav-btn-inner-gap:            $tabs-nav-btn-inner-gap,
+  $tab-nav-btn-icon-size:             $tab-nav-btn-icon-size,
+  $tabs-panel-padding-x:              $tabs-panel-padding-x,
+  $tabs-panel-padding-y:              $tabs-panel-padding-y
+);

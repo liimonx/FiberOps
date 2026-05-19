@@ -1,128 +1,15 @@
 /**
- * Modal Component Variable Overrides
+ * Modal Component Additive Polish
  * =============================================================================
  *
- * Premium modal design: generous padding, strong glass backdrop blur, refined
- * typography hierarchy, and a complete set of size breakpoints.
+ * Extends the core Atomix modal component with border-separations for header and footer regions,
+ * strong typography hierarchy, and a slide-in scale entrance animation.
  *
  * @see https://atomix.design/docs/components/modal
  */
 
 @use "../01-settings/tokens" as tok;
-
-// =============================================================================
-// Component Variable Definitions
-// =============================================================================
-
-  // ---------------------------------------------------------------------------
-  // Content area
-  // ---------------------------------------------------------------------------
-  $modal-inner-padding: 1.25rem !default;
-
-  $modal-content-bg: var(--atomix-primary-bg-subtle) !default;
-
-  $modal-content-border-radius: tok.$border-radius-xxl !default;
-
-  $modal-content-box-shadow: tok.$box-shadow-lg !default;
-
-
-  // ---------------------------------------------------------------------------
-  // Header
-  // ---------------------------------------------------------------------------
-  $modal-header-padding-bottom: 0.75rem !default;
-
-  $modal-title-font-size: 1.125rem !default;
-
-
-  // ---------------------------------------------------------------------------
-  // Sub-heading
-  // ---------------------------------------------------------------------------
-  $modal-sub-margin-top: 4px !default;
-
-  $modal-sub-font-size: 0.8125rem !default;
-
-  $modal-sub-color: var(--atomix-tertiary-text-emphasis) !default;
-
-  // ---------------------------------------------------------------------------
-  // Footer
-  // ---------------------------------------------------------------------------
-  $modal-footer-items-gap: 0.5rem !default;
-
-
-  // ---------------------------------------------------------------------------
-  // Backdrop
-  // ---------------------------------------------------------------------------
-  $modal-backdrop-opacity: 0.55 !default;
-
-  $modal-backdrop-blur: 14px !default;
-
-
-  // ---------------------------------------------------------------------------
-  // Close icon
-  // ---------------------------------------------------------------------------
-  $modal-close-icon-size: 24px !default;
-
-
-  // ---------------------------------------------------------------------------
-  // Sizes
-  // ---------------------------------------------------------------------------
-  $modal-sm: 340px !default;
-
-  $modal-md: 520px !default;
-
-  $modal-lg: 800px !default;
-
-  $modal-xl: 1100px !default;
-
-// =============================================================================
-// Modal Variable Configuration
-// =============================================================================
-@use "../../../../node_modules/@shohojdhara/atomix/src/styles/01-settings/settings.modal"
-  with (
-  // ---------------------------------------------------------------------------
-  // Content area
-  // ---------------------------------------------------------------------------
-  $modal-inner-padding: $modal-inner-padding,
-  $modal-content-bg: $modal-content-bg,
-  $modal-content-border-radius: $modal-content-border-radius,
-  $modal-content-box-shadow: $modal-content-box-shadow,
-
-  // ---------------------------------------------------------------------------
-  // Header
-  // ---------------------------------------------------------------------------
-  $modal-header-padding-bottom: $modal-header-padding-bottom,
-  $modal-title-font-size: $modal-title-font-size,
-
-  // ---------------------------------------------------------------------------
-  // Sub-heading
-  // ---------------------------------------------------------------------------
-  $modal-sub-margin-top: $modal-sub-margin-top,
-  $modal-sub-font-size: $modal-sub-font-size,
-  $modal-sub-color: $modal-sub-color,
-  // ---------------------------------------------------------------------------
-  // Footer
-  // ---------------------------------------------------------------------------
-  $modal-footer-items-gap: $modal-footer-items-gap,
-
-  // ---------------------------------------------------------------------------
-  // Backdrop
-  // ---------------------------------------------------------------------------
-  $modal-backdrop-opacity: $modal-backdrop-opacity,
-  $modal-backdrop-blur: $modal-backdrop-blur,
-
-  // ---------------------------------------------------------------------------
-  // Close icon
-  // ---------------------------------------------------------------------------
-  $modal-close-icon-size: $modal-close-icon-size,
-
-  // ---------------------------------------------------------------------------
-  // Sizes
-  // ---------------------------------------------------------------------------
-  $modal-sm: $modal-sm,
-  $modal-md: $modal-md,
-  $modal-lg: $modal-lg,
-  $modal-xl: $modal-xl
-);
+@use "../01-settings/modal" as m;
 
 // =============================================================================
 // Additive Polish

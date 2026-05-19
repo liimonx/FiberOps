@@ -1,22 +1,11 @@
 /**
- * Progress Component Variable Overrides
+ * Progress Component Additive Polish
  * =============================================================================
- * 
- * Standard progress styling for Atomix documentation.
- * 
+ *
+ * Imports the progress configurations from settings and adds optional subtle
+ * styling/transition classes if needed.
+ *
  * @see https://atomix.design/docs/components/progress
  */
 
-// =============================================================================
-// Component Variable Definitions
-// =============================================================================
-
-  $progress-height: 8px !default;
-
-  $progress-border-radius: 1rem !default;
-
-@use "../../../../node_modules/@shohojdhara/atomix/src/styles/01-settings/settings.progress"
-  with (
-  $progress-height: $progress-height,
-  $progress-border-radius: $progress-border-radius
-);
+@use "../01-settings/progress" as prg;

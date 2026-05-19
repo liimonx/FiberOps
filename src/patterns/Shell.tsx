@@ -83,7 +83,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
                   key={item.href}
                   href={item.href}
                   linkComponent={Link}
-                  className={`${styles.navItem} ${isActive(item.href) ? styles.navItemActive : ""}`}
+                  className={`${styles.navItem} ${isActive(item.href) ? "is-active" : ""}`}
                   onClick={() => setSidebarOpen(false)}
                 >
                   <Icon name={item.icon} className="u-me-2" />

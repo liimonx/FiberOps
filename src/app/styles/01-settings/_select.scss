@@ -1,0 +1,85 @@
+/**
+ * Select Component Settings Override
+ * =============================================================================
+ *
+ * Premium select / combobox: consistent with input height, refined dropdown
+ * panel, smooth open animation, and clear option state colours.
+ *
+ * @see https://atomix.design/docs/components/select
+ */
+
+@use "./tokens" as tok;
+
+// ── Trigger / Container ──────────────────────────────────────────────────────
+$select-width: 100% !default;
+$select-padding-x: 0.75rem !default;
+$select-padding-y: 0.4375rem !default; // 7px — matches compact input/button
+$select-color: var(--atomix-body-color) !default;
+$select-font-size: 0.8125rem !default;   // 13px
+$select-font-size-lg: 0.875rem !default; // 14px
+$select-bg: var(--atomix-primary-bg-subtle) !default;
+$select-expanded-bg: var(--atomix-secondary-bg-subtle) !default;
+$select-border-color: var(--atomix-border-color) !default;
+$select-border-color-hover: var(--atomix-primary-border-subtle) !default;
+$select-border-radius: tok.$border-radius-xl !default; // 10px — matches input
+
+// ── Chevron / Toggle Icon ────────────────────────────────────────────────────
+$select-icon-toggle-size: 18px !default;
+$select-icon-toggle-color: var(--atomix-tertiary-text-emphasis) !default;
+$select-dropdown-icon-size: 20px !default;
+
+// ── Placeholder ──────────────────────────────────────────────────────────────
+$select-placeholder-color: var(--atomix-tertiary-text-emphasis) !default;
+
+// ── Inner Spacing ────────────────────────────────────────────────────────────
+$select-inner-spacer: 6px !default;
+
+// ── Panel (Dropdown List) ────────────────────────────────────────────────────
+$select-panel-padding-x: 6px !default;
+$select-panel-padding-y: 6px !default;
+$select-panel-spacer-y: 6px !default;
+$select-panel-bg: var(--atomix-primary-bg-subtle) !default;
+$select-dropdown-border-radius: tok.$border-radius-xxl !default;
+$select-dropdown-box-shadow: tok.$box-shadow-md !default;
+
+// ── Panel Items ──────────────────────────────────────────────────────────────
+$select-item-padding-x: 10px !default;
+$select-item-padding-y: 6px !default;
+$select-item-color: var(--atomix-body-color) !default;
+$select-item-bg: transparent !default;
+$select-item-border-radius: 0.5rem !default;
+$select-item-bg-hover: var(--atomix-secondary-bg-subtle) !default;
+
+// =============================================================================
+// Select Variable Configuration
+// =============================================================================
+@use "../../../../node_modules/@shohojdhara/atomix/src/styles/01-settings/settings.select" with (
+  $select-width:               $select-width,
+  $select-padding-x:           $select-padding-x,
+  $select-padding-y:           $select-padding-y,
+  $select-color:               $select-color,
+  $select-font-size:           $select-font-size,
+  $select-font-size-lg:        $select-font-size-lg,
+  $select-bg:                  $select-bg,
+  $select-expanded-bg:         $select-expanded-bg,
+  $select-border-color:        $select-border-color,
+  $select-border-color-hover:  $select-border-color-hover,
+  $select-border-radius:       $select-border-radius,
+  $select-icon-toggle-size:    $select-icon-toggle-size,
+  $select-icon-toggle-color:   $select-icon-toggle-color,
+  $select-dropdown-icon-size:  $select-dropdown-icon-size,
+  $select-placeholder-color:   $select-placeholder-color,
+  $select-inner-spacer:        $select-inner-spacer,
+  $select-panel-padding-x:     $select-panel-padding-x,
+  $select-panel-padding-y:     $select-panel-padding-y,
+  $select-panel-spacer-y:      $select-panel-spacer-y,
+  $select-panel-bg:            $select-panel-bg,
+  $select-panel-border-radius: $select-dropdown-border-radius,
+  $select-panel-box-shadow:    $select-dropdown-box-shadow,
+  $select-item-padding-x:      $select-item-padding-x,
+  $select-item-padding-y:      $select-item-padding-y,
+  $select-item-color:          $select-item-color,
+  $select-item-bg:             $select-item-bg,
+  $select-item-border-radius:  $select-item-border-radius,
+  $select-item-bg-hover:       $select-item-bg-hover
+);

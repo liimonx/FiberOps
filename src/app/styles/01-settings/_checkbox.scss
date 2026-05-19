@@ -1,0 +1,61 @@
+/**
+ * Checkbox Component Settings Override
+ * =============================================================================
+ *
+ * Premium checkbox: crisp 18px hit target, brand-tinted checked state,
+ * smooth border transitions, and accessible error/disabled colouring.
+ *
+ * @see https://atomix.design/docs/components/checkbox
+ */
+
+@use "./tokens" as tok;
+
+// ── Geometry ─────────────────────────────────────────────────────────────────
+$checkbox-width: 16px !default;
+$checkbox-height: 16px !default;
+$checkbox-spacer: 6px !default;
+
+// ── Typography ───────────────────────────────────────────────────────────────
+$checkbox-font-size: 0.8125rem !default; // 13px
+
+// ── Text Colors ──────────────────────────────────────────────────────────────
+$checkbox-text-color: var(--atomix-body-color) !default;
+$checkbox-checked-text-color: var(--atomix-body-color) !default;
+$checkbox-text-color-disabled: var(--atomix-tertiary-text-emphasis) !default;
+$checkbox-checked-text-color-disabled: var(--atomix-disabled-text-emphasis) !default;
+
+// ── Box Colours ──────────────────────────────────────────────────────────────
+$checkbox-bg: var(--atomix-primary-bg-subtle) !default;
+$checkbox-checked-bg: var(--atomix-primary) !default;
+$checkbox-checked-bg-hover: var(--atomix-primary-hover, var(--atomix-primary)) !default;
+$checkbox-checked-bg-disabled: var(--atomix-disabled-text-emphasis) !default;
+
+// ── Border ───────────────────────────────────────────────────────────────────
+$checkbox-border-width: 1px !default;
+$checkbox-border-color: var(--atomix-border-color) !default;
+$checkbox-border-color-hover: var(--atomix-primary) !default;
+$checkbox-border-color-disabled: var(--atomix-disabled-text-emphasis) !default;
+$checkbox-border-color-error: var(--atomix-error) !default;
+
+// =============================================================================
+// Checkbox Variable Configuration
+// =============================================================================
+@use "../../../../node_modules/@shohojdhara/atomix/src/styles/01-settings/settings.checkbox" with (
+  $checkbox-width:                        $checkbox-width,
+  $checkbox-height:                       $checkbox-height,
+  $checkbox-spacer:                       $checkbox-spacer,
+  $checkbox-font-size:                    $checkbox-font-size,
+  $checkbox-text-color:                   $checkbox-text-color,
+  $checkbox-checked-text-color:           $checkbox-checked-text-color,
+  $checkbox-text-color-disabled:          $checkbox-text-color-disabled,
+  $checkbox-checked-text-color-disabled:  $checkbox-checked-text-color-disabled,
+  $checkbox-bg:                           $checkbox-bg,
+  $checkbox-checked-bg:                   $checkbox-checked-bg,
+  $checkbox-checked-bg-hover:             $checkbox-checked-bg-hover,
+  $checkbox-checked-bg-disabled:          $checkbox-checked-bg-disabled,
+  $checkbox-border-width:                 $checkbox-border-width,
+  $checkbox-border-color:                 $checkbox-border-color,
+  $checkbox-border-color-hover:           $checkbox-border-color-hover,
+  $checkbox-border-color-disabled:        $checkbox-border-color-disabled,
+  $checkbox-border-color-error:           $checkbox-border-color-error
+);

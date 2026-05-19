@@ -1,85 +1,16 @@
 /**
- * Tooltip Component Variable Overrides
+ * Tooltip Component Additive Polish
  * =============================================================================
  *
- * Crisp tooltip surface: dark glass background, compact typography, tight
- * arrow size, generous max-width for longer labels.
+ * Applies additional visual polish (backdrop filter blur effects for a premium glass feel,
+ * tracking adjustments, line-height normalization, and entrance scale transitions)
+ * to the core Atomix Tooltip component.
  *
  * @see https://atomix.design/docs/components/tooltip
  */
 
 @use "../01-settings/tokens" as tok;
-
-// =============================================================================
-// Component Variable Definitions
-// =============================================================================
-
-  // ---------------------------------------------------------------------------
-  // Geometry
-  // ---------------------------------------------------------------------------
-  $tooltip-max-width: 220px !default;
-
-  $tooltip-padding-x: 10px !default;
-
-  $tooltip-padding-y: 6px !default;
-
-  $tooltip-arrow-size: 10px !default;
-
-
-  // ---------------------------------------------------------------------------
-  // Surface
-  // ---------------------------------------------------------------------------
-  $tooltip-bg: var(--atomix-invert-bg-subtle) !default;
-
-  $tooltip-border-radius: tok.$border-radius-lg !default;
-
-  $tooltip-border-width: null !default;
-
-  $tooltip-border-color: null !default;
-
-  $tooltip-box-shadow: tok.$box-shadow-md !default;
-
-
-  // ---------------------------------------------------------------------------
-  // Typography
-  // ---------------------------------------------------------------------------
-  $tooltip-font-size: 0.75rem !default;
-
-  // 12px — tight tooltip label
-  $tooltip-font-weight: 500 !default;
-
-  $tooltip-color: var(--atomix-invert-text-emphasis) !default;
-
-// =============================================================================
-// Tooltip Variable Configuration
-// =============================================================================
-@use "../../../../node_modules/@shohojdhara/atomix/src/styles/01-settings/settings.tooltip"
-  with (
-  // ---------------------------------------------------------------------------
-  // Geometry
-  // ---------------------------------------------------------------------------
-  $tooltip-max-width: $tooltip-max-width,
-  $tooltip-padding-x: $tooltip-padding-x,
-  $tooltip-padding-y: $tooltip-padding-y,
-  $tooltip-arrow-size: $tooltip-arrow-size,
-
-  // ---------------------------------------------------------------------------
-  // Surface
-  // ---------------------------------------------------------------------------
-  $tooltip-bg: $tooltip-bg,
-  $tooltip-border-radius: $tooltip-border-radius,
-  $tooltip-border-width: $tooltip-border-width,
-  $tooltip-border-color: $tooltip-border-color,
-  $tooltip-box-shadow: $tooltip-box-shadow,
-
-  // ---------------------------------------------------------------------------
-  // Typography
-  // ---------------------------------------------------------------------------
-  $tooltip-font-size: $tooltip-font-size,
-  // 12px — tight tooltip label
-  $tooltip-font-weight: $tooltip-font-weight,
-  $tooltip-color: $tooltip-color
-);
+@use "../01-settings/tooltip" as tt;
 
 // =============================================================================
 // Additive Polish

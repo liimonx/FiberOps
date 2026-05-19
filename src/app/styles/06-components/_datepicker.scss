@@ -1,160 +1,17 @@
 /**
- * Datepicker Component Variable Overrides
+ * Datepicker Component Additive Polish
  * =============================================================================
  *
- * Premium calendar picker: glass-tinted popup, brand selected cells,
- * refined day/week sizing, crisp typography hierarchy, and smooth transitions.
+ * Applies additional visual polish (calendar popup entry animation, weekday labels,
+ * range caps, and modern day cell interactions) to the core Atomix Datepicker component.
  *
  * @see https://atomix.design/docs/components/datepicker
  */
 
-// =============================================================================
-// Component Variable Definitions
-// =============================================================================
-
-  // ---------------------------------------------------------------------------
-  // Calendar popup padding
-  // ---------------------------------------------------------------------------
-  $datepicker-padding-x: 10px !default;
-
-  $datepicker-padding-y: 12px !default;
-
-
-  // ---------------------------------------------------------------------------
-  // Surface
-  // ---------------------------------------------------------------------------
-  $datepicker-border-radius: 0.875rem !default;
-
-  // 14px — generously rounded popup
-  $datepicker-border-width: 1px !default;
-
-  $datepicker-border-color: var(--atomix-border-color) !default;
-
-  // ---------------------------------------------------------------------------
-  // Body inner padding
-  // ---------------------------------------------------------------------------
-  $datepicker-body-padding-x: 6px !default;
-
-  $datepicker-body-padding-y: 6px !default;
-
-
-  // ---------------------------------------------------------------------------
-  // Month header typography
-  // ---------------------------------------------------------------------------
-  $datepicker-month-font-size: 0.875rem !default;
-
-  // 14px
-  $datepicker-month-font-weight: 700 !default;
-
-
-  // ---------------------------------------------------------------------------
-  // Year label typography
-  // ---------------------------------------------------------------------------
-  $datepicker-year-font-size: 0.875rem !default;
-
-  $datepicker-year-font-weight: 700 !default;
-
-
-  // ---------------------------------------------------------------------------
-  // Weekday header row
-  // ---------------------------------------------------------------------------
-  $datepicker-week-font-size: 0.6875rem !default;
-
-  // 11px — small column labels
-  $datepicker-week-font-weight: 600 !default;
-
-  $datepicker-week-width: 36px !default;
-
-  $datepicker-week-height: 32px !default;
-
-
-  // ---------------------------------------------------------------------------
-  // Day cells
-  // ---------------------------------------------------------------------------
-  $datepicker-day-font-size: 0.8125rem !default;
-
-  // 13px
-  $datepicker-day-font-weight: 400 !default;
-
-  $datepicker-day-width: 36px !default;
-
-  $datepicker-day-height: 36px !default;
-
-  $datepicker-day-hover-bg: var(--atomix-secondary-bg-subtle) !default;
-
-  $datepicker-day-border-radius: 9999px !default;
-
-
-  // pill day cells
-  // ---------------------------------------------------------------------------
-  // Special day states
-   // ---------------------------------------------------------------------------
+@use "../01-settings/datepicker" as dp;
 
 // =============================================================================
-// Datepicker Variable Configuration
-// =============================================================================
-@use "../../../../node_modules/@shohojdhara/atomix/src/styles/01-settings/settings.datepicker"
-  with (
-  // ---------------------------------------------------------------------------
-  // Calendar popup padding
-  // ---------------------------------------------------------------------------
-  $datepicker-padding-x: $datepicker-padding-x,
-  $datepicker-padding-y: $datepicker-padding-y,
-
-  // ---------------------------------------------------------------------------
-  // Surface
-  // ---------------------------------------------------------------------------
-  $datepicker-border-radius: $datepicker-border-radius,
-  // 14px — generously rounded popup
-  $datepicker-border-width: $datepicker-border-width,
-  $datepicker-border-color: $datepicker-border-color,
-  // ---------------------------------------------------------------------------
-  // Body inner padding
-  // ---------------------------------------------------------------------------
-  $datepicker-body-padding-x: $datepicker-body-padding-x,
-  $datepicker-body-padding-y: $datepicker-body-padding-y,
-
-  // ---------------------------------------------------------------------------
-  // Month header typography
-  // ---------------------------------------------------------------------------
-  $datepicker-month-font-size: $datepicker-month-font-size,
-  // 14px
-  $datepicker-month-font-weight: $datepicker-month-font-weight,
-
-  // ---------------------------------------------------------------------------
-  // Year label typography
-  // ---------------------------------------------------------------------------
-  $datepicker-year-font-size: $datepicker-year-font-size,
-  $datepicker-year-font-weight: $datepicker-year-font-weight,
-
-  // ---------------------------------------------------------------------------
-  // Weekday header row
-  // ---------------------------------------------------------------------------
-  $datepicker-week-font-size: $datepicker-week-font-size,
-  // 11px — small column labels
-  $datepicker-week-font-weight: $datepicker-week-font-weight,
-  $datepicker-week-width: $datepicker-week-width,
-  $datepicker-week-height: $datepicker-week-height,
-
-  // ---------------------------------------------------------------------------
-  // Day cells
-  // ---------------------------------------------------------------------------
-  $datepicker-day-font-size: $datepicker-day-font-size,
-  // 13px
-  $datepicker-day-font-weight: $datepicker-day-font-weight,
-  $datepicker-day-width: $datepicker-day-width,
-  $datepicker-day-height: $datepicker-day-height,
-  $datepicker-day-hover-bg: $datepicker-day-hover-bg,
-  $datepicker-day-border-radius: $datepicker-day-border-radius,
-
-  // pill day cells
-  // ---------------------------------------------------------------------------
-  // Special day states
-   // ---------------------------------------------------------------------------
-);
-
-// =============================================================================
-// Additive Polish
+// Additive Polish & Enhancements
 // =============================================================================
 .c-datepicker {
   // Calendar popup — entrance animation + border

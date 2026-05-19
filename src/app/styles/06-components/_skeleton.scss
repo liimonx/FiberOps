@@ -1,60 +1,14 @@
 /**
- * Skeleton Component Variable Overrides
+ * Skeleton Component Additive Polish
  * =============================================================================
  *
- * Refined loading skeleton: slightly warmer shimmer colours that read well on
- * both light and dark surfaces without being too stark.
+ * Adds refined border-radius properties to distinct skeleton layout shapes
+ * (text lines, circles, cards, and rounded containers).
  *
  * @see https://atomix.design/docs/components/skeleton
  */
 
-// =============================================================================
-// Component Variable Definitions
-// =============================================================================
-
-  // ---------------------------------------------------------------------------
-  // Size scale
-  // ---------------------------------------------------------------------------
-  $skeleton-sizes: (
-      sm: 12px,
-      md: 16px,
-      lg: 24px,
-      xl: 32px,
-      xxl: 40px,
-      3xl: 48px,
-      4xl: 56px
-    ) !default;
-
-
-  // ---------------------------------------------------------------------------
-  // Shimmer colours — muted, works on glass surfaces
-  // ---------------------------------------------------------------------------
-  $skeleton-color: rgba(0, 0, 0, 0.05) !default;
-
-  $skeleton-color-gradient-end: rgba(0, 0, 0, 0.1) !default;
-
-  $skeleton-gradient-from-color: rgba(0, 0, 0, 0.05) !default;
-
-  $skeleton-gradient-to-color: rgba(0, 0, 0, 0.1) !default;
-
-// =============================================================================
-// Skeleton Variable Configuration
-// =============================================================================
-@use "../../../../node_modules/@shohojdhara/atomix/src/styles/01-settings/settings.skeleton"
-  with (
-  // ---------------------------------------------------------------------------
-  // Size scale
-  // ---------------------------------------------------------------------------
-  $skeleton-sizes: $skeleton-sizes,
-
-  // ---------------------------------------------------------------------------
-  // Shimmer colours — muted, works on glass surfaces
-  // ---------------------------------------------------------------------------
-  $skeleton-color: $skeleton-color,
-  $skeleton-color-gradient-end: $skeleton-color-gradient-end,
-  $skeleton-gradient-from-color: $skeleton-gradient-from-color,
-  $skeleton-gradient-to-color: $skeleton-gradient-to-color
-);
+@use "../01-settings/skeleton" as sk;
 
 // =============================================================================
 // Additive Polish

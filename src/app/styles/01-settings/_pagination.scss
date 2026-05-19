@@ -1,0 +1,67 @@
+/**
+ * Pagination Component Settings Override
+ * =============================================================================
+ *
+ * Clean pagination: pill-shaped controls, brand-tinted active state, smooth
+ * hover transitions, and well-proportioned sizes across the sm/md/lg scale.
+ *
+ * @see https://atomix.design/docs/components/pagination
+ */
+
+@use "./tokens" as tok;
+
+// ── Sizes ────────────────────────────────────────────────────────────────────
+$pagination-size: 34px !default;
+$pagination-size-sm: 26px !default;
+$pagination-size-lg: 42px !default;
+
+// ── Spacing ──────────────────────────────────────────────────────────────────
+$pagination-padding-x: 8px !default;
+$pagination-padding-y: 8px !default;
+
+// ── Typography ───────────────────────────────────────────────────────────────
+$pagination-font-size: 0.875rem !default; // 14px
+
+// ── Colors — Default ─────────────────────────────────────────────────────────
+$pagination-color: var(--atomix-secondary-text-emphasis) !default;
+$pagination-bg: transparent !default;
+$pagination-border-radius: 9999px !default; // pill
+
+// ── Focus ────────────────────────────────────────────────────────────────────
+$pagination-focus-border-width: 2px !default;
+$pagination-focus-border-color: var(--atomix-primary) !default;
+
+// ── Hover ────────────────────────────────────────────────────────────────────
+$pagination-hover-color: var(--atomix-body-color) !default;
+$pagination-hover-bg: var(--atomix-secondary-bg-subtle) !default;
+
+// ── Active ───────────────────────────────────────────────────────────────────
+$pagination-active-color: #ffffff !default;
+$pagination-active-bg: var(--atomix-primary) !default;
+
+// ── Disabled ─────────────────────────────────────────────────────────────────
+$pagination-disabled-color: var(--atomix-disabled-text-emphasis) !default;
+$pagination-disabled-bg: transparent !default;
+
+// =============================================================================
+// Pagination Variable Configuration
+// =============================================================================
+@use "../../../../node_modules/@shohojdhara/atomix/src/styles/01-settings/settings.pagination" with (
+  $pagination-size:               $pagination-size,
+  $pagination-size-sm:            $pagination-size-sm,
+  $pagination-size-lg:            $pagination-size-lg,
+  $pagination-padding-x:          $pagination-padding-x,
+  $pagination-padding-y:          $pagination-padding-y,
+  $pagination-font-size:          $pagination-font-size,
+  $pagination-color:              $pagination-color,
+  $pagination-bg:                 $pagination-bg,
+  $pagination-border-radius:      $pagination-border-radius,
+  $pagination-focus-border-width: $pagination-focus-border-width,
+  $pagination-focus-border-color: $pagination-focus-border-color,
+  $pagination-hover-color:        $pagination-hover-color,
+  $pagination-hover-bg:           $pagination-hover-bg,
+  $pagination-active-color:       $pagination-active-color,
+  $pagination-active-bg:          $pagination-active-bg,
+  $pagination-disabled-color:     $pagination-disabled-color,
+  $pagination-disabled-bg:        $pagination-disabled-bg
+);

@@ -1,0 +1,89 @@
+/**
+ * Avatar Component Settings Override
+ * =============================================================================
+ *
+ * Configures the premium avatar system: size scale, initials hierarchy,
+ * border-radius mappings, and interactive state stylings.
+ *
+ * @see https://atomix.design/docs/components/avatar
+ */
+
+// ── Geometry & Sizing ────────────────────────────────────────────────────────
+// Size map — xs / sm / md / lg / xl
+$avatar-size: (
+  xs: 24px,
+  sm: 32px,
+  md: 40px,
+  lg: 48px,
+  xl: 64px
+) !default;
+
+// Border radius map — matching the sizes + circle option
+$avatar-border-radius: (
+  xs: 4px,
+  sm: 6px,
+  md: 8px,
+  lg: 10px,
+  xl: 12px,
+  circle: 50%
+) !default;
+
+// ── Colors & Borders ────────────────────────────────────────────────────────
+$avatar-color: var(--atomix-body-color) !default;
+$avatar-bg: var(--atomix-secondary-bg-subtle) !default;
+$avatar-border-width: 2px !default;
+$avatar-border-color: var(--atomix-border-color) !default;
+
+// ── Typography ──────────────────────────────────────────────────────────────
+// Initials typography settings
+$avatar-initials-font-weight: 700 !default;
+$avatar-initials-font-size: (
+  xs: 0.625rem,  // 10px
+  sm: 0.6875rem, // 11px
+  md: 0.875rem,  // 14px
+  lg: 1rem,      // 16px
+  xl: 1.25rem    // 20px
+) !default;
+
+// ── Behavior & Layout ───────────────────────────────────────────────────────
+$avatar-fit: cover !default;
+
+// Interactive hover/active states
+$avatar-hover-opacity: 0.85 !default;
+$avatar-focus-ring-width: 2px !default;
+$avatar-focus-ring-color: var(--atomix-primary) !default;
+$avatar-disabled-opacity: 0.45 !default;
+
+// ── Custom Extensions ────────────────────────────────────────────────────────
+// Presence indicator dot settings
+$avatar-presence-size: 10px !default;
+$avatar-presence-bg: var(--atomix-success) !default;
+
+// Stacked avatar groups negative margin
+$avatar-group-overlap: -8px !default;
+
+// =============================================================================
+// Avatar Variable Configuration
+// =============================================================================
+@use "../../../../node_modules/@shohojdhara/atomix/src/styles/01-settings/settings.avatar" with (
+  // ── Geometry & Sizing ──
+  $avatar-size:                  $avatar-size,
+  $avatar-border-radius:         $avatar-border-radius,
+
+  // ── Colors & Borders ──
+  $avatar-color:                 $avatar-color,
+  $avatar-bg:                    $avatar-bg,
+  $avatar-border-width:          $avatar-border-width,
+  $avatar-border-color:          $avatar-border-color,
+
+  // ── Initials Typography ──
+  $avatar-initials-font-weight:  $avatar-initials-font-weight,
+  $avatar-initials-font-size:    $avatar-initials-font-size,
+
+  // ── Interactive & Behavior ──
+  $avatar-fit:                   $avatar-fit,
+  $avatar-hover-opacity:         $avatar-hover-opacity,
+  $avatar-focus-ring-width:      $avatar-focus-ring-width,
+  $avatar-focus-ring-color:      $avatar-focus-ring-color,
+  $avatar-disabled-opacity:      $avatar-disabled-opacity
+);

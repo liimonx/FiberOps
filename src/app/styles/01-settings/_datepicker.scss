@@ -1,0 +1,71 @@
+/**
+ * Datepicker Component Settings Override
+ * =============================================================================
+ *
+ * Configures the premium calendar picker: surface radii, weekday and day cell
+ * geometry, typography settings, and hover states.
+ *
+ * @see https://atomix.design/docs/components/datepicker
+ */
+
+// ── Calendar Popup Padding ───────────────────────────────────────────────────
+$datepicker-padding-x: 10px !default;
+$datepicker-padding-y: 12px !default;
+
+// ── Calendar Popup Surface ───────────────────────────────────────────────────
+$datepicker-border-radius: 0.875rem !default; // 14px — generously rounded
+$datepicker-border-width: 1px !default;
+$datepicker-border-color: var(--atomix-border-color) !default;
+
+// ── Body Inner Padding ───────────────────────────────────────────────────────
+$datepicker-body-padding-x: 6px !default;
+$datepicker-body-padding-y: 6px !default;
+
+// ── Month Header Typography ──────────────────────────────────────────────────
+$datepicker-month-font-size: 0.875rem !default; // 14px
+$datepicker-month-font-weight: 700 !default;
+
+// ── Year Label Typography ────────────────────────────────────────────────────
+$datepicker-year-font-size: 0.875rem !default;
+$datepicker-year-font-weight: 700 !default;
+
+// ── Weekday Header Row ───────────────────────────────────────────────────────
+$datepicker-week-font-size: 0.6875rem !default; // 11px
+$datepicker-week-font-weight: 600 !default;
+$datepicker-week-width: 36px !default;
+$datepicker-week-height: 32px !default;
+
+// ── Day Cells ────────────────────────────────────────────────────────────────
+$datepicker-day-font-size: 0.8125rem !default; // 13px
+$datepicker-day-font-weight: 400 !default;
+$datepicker-day-width: 36px !default;
+$datepicker-day-height: 36px !default;
+$datepicker-day-hover-bg: var(--atomix-secondary-bg-subtle) !default;
+$datepicker-day-border-radius: 9999px !default;
+
+// =============================================================================
+// Datepicker Variable Configuration
+// =============================================================================
+@use "../../../../node_modules/@shohojdhara/atomix/src/styles/01-settings/settings.datepicker" with (
+  $datepicker-padding-x:         $datepicker-padding-x,
+  $datepicker-padding-y:         $datepicker-padding-y,
+  $datepicker-border-radius:     $datepicker-border-radius,
+  $datepicker-border-width:      $datepicker-border-width,
+  $datepicker-border-color:      $datepicker-border-color,
+  $datepicker-body-padding-x:    $datepicker-body-padding-x,
+  $datepicker-body-padding-y:    $datepicker-body-padding-y,
+  $datepicker-month-font-size:   $datepicker-month-font-size,
+  $datepicker-month-font-weight: $datepicker-month-font-weight,
+  $datepicker-year-font-size:    $datepicker-year-font-size,
+  $datepicker-year-font-weight:  $datepicker-year-font-weight,
+  $datepicker-week-font-size:    $datepicker-week-font-size,
+  $datepicker-week-font-weight:  $datepicker-week-font-weight,
+  $datepicker-week-width:        $datepicker-week-width,
+  $datepicker-week-height:       $datepicker-week-height,
+  $datepicker-day-font-size:     $datepicker-day-font-size,
+  $datepicker-day-font-weight:   $datepicker-day-font-weight,
+  $datepicker-day-width:         $datepicker-day-width,
+  $datepicker-day-height:        $datepicker-day-height,
+  $datepicker-day-hover-bg:      $datepicker-day-hover-bg,
+  $datepicker-day-border-radius: $datepicker-day-border-radius
+);

@@ -1,0 +1,41 @@
+/**
+ * Badge Component Settings Override
+ * =============================================================================
+ *
+ * Tight, premium badges: mono-weight labels, consistent vertical padding across
+ * all size variants, and clear icon alignment.
+ *
+ * @see https://atomix.design/docs/components/badge
+ */
+
+// ── Typography ──────────────────────────────────────────────────────────────
+$badge-font-size: 0.625rem !default; // 10px — micro label
+$badge-font-weight: 600 !default;
+
+// ── Padding ──────────────────────────────────────────────────────────────────
+$badge-padding-x: 6px !default;
+$badge-padding-y: 2px !default;
+$badge-padding-y-sm: 1px !default;
+$badge-padding-y-lg: 4px !default;
+
+// ── Border Radius ────────────────────────────────────────────────────────────
+$badge-border-radius: 9999px !default; // pill by default
+
+// ── Icon ─────────────────────────────────────────────────────────────────────
+$badge-icon-size: 12px !default;
+$badge-inner-items-gap: 3px !default;
+
+// =============================================================================
+// Badge Variable Configuration
+// =============================================================================
+@use "../../../../node_modules/@shohojdhara/atomix/src/styles/01-settings/settings.badge" with (
+  $badge-font-size:       $badge-font-size,
+  $badge-font-weight:     $badge-font-weight,
+  $badge-padding-x:       $badge-padding-x,
+  $badge-padding-y:       $badge-padding-y,
+  $badge-padding-y-sm:    $badge-padding-y-sm,
+  $badge-padding-y-lg:    $badge-padding-y-lg,
+  $badge-border-radius:   $badge-border-radius,
+  $badge-icon-size:       $badge-icon-size,
+  $badge-inner-items-gap: $badge-inner-items-gap
+);

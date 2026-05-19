@@ -1,0 +1,79 @@
+/**
+ * Toggle Component Settings Override
+ * =============================================================================
+ *
+ * Premium toggle switch: pill track with brand-blue on state, white handle,
+ * tight label typography, and a smooth spring slide transition.
+ *
+ * @see https://atomix.design/docs/components/toggle
+ */
+
+@use "./tokens" as tok;
+
+// ── Label Gap ────────────────────────────────────────────────────────────────
+$toggle-gap: 8px !default;
+
+// ── Track Colours ────────────────────────────────────────────────────────────
+$toggle-switch-on-bg: var(--atomix-primary) !default;
+$toggle-switch-off-bg: var(--atomix-tertiary-bg-subtle) !default;
+$toggle-switch-disabled-bg: var(--atomix-secondary-bg-subtle) !default;
+$toggle-switch-border-radius: 9999px !default; // pill track
+$toggle-switch-box-shadow: tok.$box-shadow-inset !default;
+
+// ── Track Sizes — SM ─────────────────────────────────────────────────────────
+$toggle-switch-width-sm: 44px !default;
+$toggle-switch-height-sm: 24px !default;
+
+// ── Track Sizes — MD (Default) ───────────────────────────────────────────────
+$toggle-switch-width-md: 32px !default;
+$toggle-switch-height-md: 18px !default;
+$toggle-switch-width: 32px !default;
+$toggle-switch-height: 18px !default;
+
+// ── Handle ───────────────────────────────────────────────────────────────────
+$toggle-switch-handle-bg: #ffffff !default;
+$toggle-switch-handle-border-radius: 9999px !default;
+$toggle-switch-handle-margin: 2px !default;
+
+// ── Handle Sizes — SM ────────────────────────────────────────────────────────
+$toggle-switch-handle-width-sm: 20px !default;
+$toggle-switch-handle-height-sm: 20px !default;
+
+// ── Handle Sizes — MD (Default) ──────────────────────────────────────────────
+$toggle-switch-handle-width-md: 14px !default;
+$toggle-switch-handle-height-md: 14px !default;
+$toggle-switch-handle-width: 14px !default;
+$toggle-switch-handle-height: 14px !default;
+
+// ── Label ────────────────────────────────────────────────────────────────────
+$toggle-label-font-size: 0.8125rem !default; // 13px
+$toggle-label-color: var(--atomix-body-color) !default;
+
+// =============================================================================
+// Toggle Variable Configuration
+// =============================================================================
+@use "../../../../node_modules/@shohojdhara/atomix/src/styles/01-settings/settings.toggle" with (
+  $toggle-gap:                          $toggle-gap,
+  $toggle-switch-on-bg:                 $toggle-switch-on-bg,
+  $toggle-switch-off-bg:                $toggle-switch-off-bg,
+  $toggle-switch-disabled-bg:           $toggle-switch-disabled-bg,
+  $toggle-switch-border-radius:         $toggle-switch-border-radius,
+  $toggle-switch-box-shadow:            $toggle-switch-box-shadow,
+  $toggle-switch-width-sm:              $toggle-switch-width-sm,
+  $toggle-switch-height-sm:             $toggle-switch-height-sm,
+  $toggle-switch-width-md:              $toggle-switch-width-md,
+  $toggle-switch-height-md:             $toggle-switch-height-md,
+  $toggle-switch-width:                 $toggle-switch-width,
+  $toggle-switch-height:                $toggle-switch-height,
+  $toggle-switch-handle-bg:             $toggle-switch-handle-bg,
+  $toggle-switch-handle-border-radius:  $toggle-switch-handle-border-radius,
+  $toggle-switch-handle-margin:         $toggle-switch-handle-margin,
+  $toggle-switch-handle-width-sm:       $toggle-switch-handle-width-sm,
+  $toggle-switch-handle-height-sm:      $toggle-switch-handle-height-sm,
+  $toggle-switch-handle-width-md:       $toggle-switch-handle-width-md,
+  $toggle-switch-handle-height-md:      $toggle-switch-handle-height-md,
+  $toggle-switch-handle-width:          $toggle-switch-handle-width,
+  $toggle-switch-handle-height:         $toggle-switch-handle-height,
+  $toggle-label-font-size:              $toggle-label-font-size,
+  $toggle-label-color:                  $toggle-label-color
+);

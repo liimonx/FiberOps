@@ -1,0 +1,37 @@
+/**
+ * Skeleton Component Settings Override
+ * =============================================================================
+ *
+ * Refined loading skeleton: slightly warmer shimmer colours that read well on
+ * both light and dark surfaces without being too stark.
+ *
+ * @see https://atomix.design/docs/components/skeleton
+ */
+
+// ── Size scale ───────────────────────────────────────────────────────────────
+$skeleton-sizes: (
+  sm: 12px,
+  md: 16px,
+  lg: 24px,
+  xl: 32px,
+  xxl: 40px,
+  3xl: 48px,
+  4xl: 56px
+) !default;
+
+// ── Shimmer colours — muted, works on glass surfaces ─────────────────────────
+$skeleton-color: rgba(0, 0, 0, 0.05) !default;
+$skeleton-color-gradient-end: rgba(0, 0, 0, 0.1) !default;
+$skeleton-gradient-from-color: rgba(0, 0, 0, 0.05) !default;
+$skeleton-gradient-to-color: rgba(0, 0, 0, 0.1) !default;
+
+// =============================================================================
+// Skeleton Variable Configuration
+// =============================================================================
+@use "../../../../node_modules/@shohojdhara/atomix/src/styles/01-settings/settings.skeleton" with (
+  $skeleton-sizes:                $skeleton-sizes,
+  $skeleton-color:               $skeleton-color,
+  $skeleton-color-gradient-end:  $skeleton-color-gradient-end,
+  $skeleton-gradient-from-color: $skeleton-gradient-from-color,
+  $skeleton-gradient-to-color:   $skeleton-gradient-to-color
+);

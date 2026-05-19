@@ -1,88 +1,15 @@
 /**
- * Nav Component Variable Overrides
+ * Nav Component Additive Polish
  * =============================================================================
  *
- * Refined horizontal/vertical nav links: consistent padding, clear active
- * state, smooth hover transition, and proper icon sizing.
+ * Applies additional visual polish (custom border radius, active item styles,
+ * transition timings, and focus indicators) to the core Atomix Nav component.
  *
  * @see https://atomix.design/docs/components/nav
  */
 
 @use "../01-settings/tokens" as tok;
-
-// =============================================================================
-// Component Variable Definitions
-// =============================================================================
-
-  // ---------------------------------------------------------------------------
-  // Link geometry
-  // ---------------------------------------------------------------------------
-  $nav-link-padding-x: 12px !default;
-
-  $nav-link-padding-y: 8px !default;
-
-  $nav-item-gap-x: 4px !default;
-
-  $nav-link-inner-gap: 6px !default;
-
-
-  // ---------------------------------------------------------------------------
-  // Typography
-  // ---------------------------------------------------------------------------
-  $nav-link-font-size: 0.875rem !default;
-
-  // 14px
-  $nav-link-font-weight: 500 !default;
-
-
-  // ---------------------------------------------------------------------------
-  // Colors
-  // ---------------------------------------------------------------------------
-  $nav-link-color: var(--atomix-secondary-text-emphasis) !default;
-
-  $nav-link-hover-color: var(--atomix-body-color) !default;
-
-  $nav-link-bg: transparent !default;
-
-  $nav-link-hover-bg: var(--atomix-secondary-bg-subtle) !default;
-
-  // ---------------------------------------------------------------------------
-  // Icon
-  // ---------------------------------------------------------------------------
-  $nav-icon-size: 18px !default;
-
-// =============================================================================
-// Nav Variable Configuration
-// =============================================================================
-@use "../../../../node_modules/@shohojdhara/atomix/src/styles/01-settings/settings.nav"
-  with (
-  // ---------------------------------------------------------------------------
-  // Link geometry
-  // ---------------------------------------------------------------------------
-  $nav-link-padding-x: $nav-link-padding-x,
-  $nav-link-padding-y: $nav-link-padding-y,
-  $nav-item-gap-x: $nav-item-gap-x,
-  $nav-link-inner-gap: $nav-link-inner-gap,
-
-  // ---------------------------------------------------------------------------
-  // Typography
-  // ---------------------------------------------------------------------------
-  $nav-link-font-size: $nav-link-font-size,
-  // 14px
-  $nav-link-font-weight: $nav-link-font-weight,
-
-  // ---------------------------------------------------------------------------
-  // Colors
-  // ---------------------------------------------------------------------------
-  $nav-link-color: $nav-link-color,
-  $nav-link-hover-color: $nav-link-hover-color,
-  $nav-link-bg: $nav-link-bg,
-  $nav-link-hover-bg: $nav-link-hover-bg,
-  // ---------------------------------------------------------------------------
-  // Icon
-  // ---------------------------------------------------------------------------
-  $nav-icon-size: $nav-icon-size
-);
+@use "../01-settings/nav" as nv;
 
 // =============================================================================
 // Additive Polish

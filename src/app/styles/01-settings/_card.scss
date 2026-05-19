@@ -1,0 +1,76 @@
+/**
+ * Card Component Settings Override
+ * =============================================================================
+ *
+ * Premium card system: complete variable coverage for all spacing, typography,
+ * surface colour, icon styling, shadow, and hover states.
+ *
+ * @see https://atomix.design/docs/components/card
+ */
+
+@use "./tokens" as tok;
+
+// ── Row-Layout Inner Spacing ──────────────────────────────────────────────────
+$card-row-spacer-y: 0.875rem !default; // 14px
+$card-row-spacer-x: 0.875rem !default; // 14px
+
+// ── Internal Vertical Rhythm ─────────────────────────────────────────────────
+$card-title-spacer-y: 0.375rem !default;  // 6px — tighter title → text gap
+$card-action-spacer-y: 0.875rem !default; // 14px
+$card-header-spacer-y: 0.875rem !default; // 14px
+
+// ── Typography ──────────────────────────────────────────────────────────────
+$card-title-color: var(--atomix-body-color) !default;
+$card-title-font-size: 1rem !default; // 16px — clear heading
+$card-text-color: var(--atomix-secondary-text-emphasis) !default;
+$card-text-font-size: 0.875rem !default; // 14px
+
+// ── Borders & Radii ──────────────────────────────────────────────────────────
+$card-border-width: 0px !default;
+$card-border-color: transparent !default;
+$card-border-radius: tok.$border-radius-xxl !default;     // 16px — modern rounded card
+$card-image-border-radius: tok.$border-radius-sm !default; // 12px — tighter image corners
+
+// ── Shadows ──────────────────────────────────────────────────────────────────
+$card-boxshadow: tok.$box-shadow !default;
+$card-hover-box-shadow: tok.$box-shadow-md !default;
+
+// ── Surfaces ─────────────────────────────────────────────────────────────────
+$card-bg: var(--atomix-primary-bg-subtle) !default;
+$card-bg-hover: var(--atomix-secondary-bg-subtle) !default;
+$card-height: 100% !default;
+$card-width: 100% !default;
+
+// ── Icon Slot ────────────────────────────────────────────────────────────────
+$card-icon-size: 16px !default;
+$card-icon-padding: 0.75rem !default;
+$card-icon-bg: var(--atomix-brand-bg-subtle) !default;
+$card-icon-color: var(--atomix-brand-text-emphasis) !default;
+
+// ── Capabilities ─────────────────────────────────────────────────────────────
+$card-hover: false !default; // Hover handled additively in components layer
+
+// =============================================================================
+// Card Variable Configuration
+// =============================================================================
+@use "../../../../node_modules/@shohojdhara/atomix/src/styles/01-settings/settings.card" with (
+  $card-title-color:          $card-title-color,
+  $card-title-font-size:      $card-title-font-size,
+  $card-text-color:           $card-text-color,
+  $card-text-font-size:       $card-text-font-size,
+  $card-border-width:         $card-border-width,
+  $card-border-color:         $card-border-color,
+  $card-border-radius:        $card-border-radius,
+  $card-image-border-radius:  $card-image-border-radius,
+  $card-boxshadow:            $card-boxshadow,
+  $card-hover-box-shadow:     $card-hover-box-shadow,
+  $card-bg:                   $card-bg,
+  $card-bg-hover:             $card-bg-hover,
+  $card-height:               $card-height,
+  $card-width:                $card-width,
+  $card-icon-size:            $card-icon-size,
+  $card-icon-padding:         $card-icon-padding,
+  $card-icon-bg:              $card-icon-bg,
+  $card-icon-color:           $card-icon-color,
+  $card-hover:                $card-hover
+);

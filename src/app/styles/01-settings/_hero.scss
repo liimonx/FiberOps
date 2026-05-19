@@ -1,0 +1,71 @@
+/**
+ * Hero Component Settings Override
+ * =============================================================================
+ *
+ * Configures the premium hero system: full variable coverage for spacing, background,
+ * overlay, typography, actions, and content.
+ *
+ * @see https://atomix.design/docs/components/hero
+ */
+
+// ── Spacing — Generous Vertical Breathing Room ──────────────────────────────
+$hero-padding-x: 0px !default; // full-bleed horizontally
+$hero-padding-y: 8rem !default;  // 128px — impactful vertical space
+$hero-spacer-y: 5rem !default;   // 80px — column gutter rhythm
+
+// ── Background & Overlay ─────────────────────────────────────────────────────
+$hero-bg: transparent !default;
+$hero-overlay: var(--atomix-brand-bg-subtle) !default;
+$hero-overlay-opacity: 0.45 !default;
+
+// ── Subtitle Typography ──────────────────────────────────────────────────────
+$hero-subtitle-font-size: 0.8125rem !default; // 13px — eyebrow label
+$hero-subtitle-color: var(--atomix-primary) !default;
+$hero-subtitle-font-weight: 700 !default;
+$hero-subtitle-margin-bottom: 0.75rem !default; // 12px
+
+// ── Title Typography ─────────────────────────────────────────────────────────
+$hero-title-font-size: 4.5rem !default; // 72px — display impact
+$hero-title-color: var(--atomix-body-color) !default;
+$hero-title-font-weight: 900 !default;
+
+// ── Body Text Typography ─────────────────────────────────────────────────────
+$hero-text-font-size: 1.125rem !default; // 18px — comfortable reading
+$hero-text-color: var(--atomix-secondary-text-emphasis) !default;
+$hero-text-font-weight: 400 !default;
+$hero-text-margin-top: 1.25rem !default; // 20px
+
+// ── Actions Row ──────────────────────────────────────────────────────────────
+$hero-actions-margin-top: 2.5rem !default; // 40px
+$hero-actions-inner-gap: 0.75rem !default;  // 12px
+
+// ── Grid & Content Width ─────────────────────────────────────────────────────
+$hero-grid-gutter: 64px !default;
+$hero-content-width: 820px !default;
+
+// =============================================================================
+// Hero Variable Configuration
+// =============================================================================
+@use "../../../../node_modules/@shohojdhara/atomix/src/styles/01-settings/settings.hero" with (
+  $hero-padding-x:              $hero-padding-x,
+  $hero-padding-y:              $hero-padding-y,
+  $hero-spacer-y:               $hero-spacer-y,
+  $hero-bg:                     $hero-bg,
+  $hero-overlay:                $hero-overlay,
+  $hero-overlay-opacity:        $hero-overlay-opacity,
+  $hero-subtitle-font-size:     $hero-subtitle-font-size,
+  $hero-subtitle-color:         $hero-subtitle-color,
+  $hero-subtitle-font-weight:   $hero-subtitle-font-weight,
+  $hero-subtitle-margin-bottom: $hero-subtitle-margin-bottom,
+  $hero-title-font-size:        $hero-title-font-size,
+  $hero-title-color:            $hero-title-color,
+  $hero-title-font-weight:      $hero-title-font-weight,
+  $hero-text-font-size:         $hero-text-font-size,
+  $hero-text-color:             $hero-text-color,
+  $hero-text-font-weight:       $hero-text-font-weight,
+  $hero-text-margin-top:        $hero-text-margin-top,
+  $hero-actions-margin-top:     $hero-actions-margin-top,
+  $hero-actions-inner-gap:      $hero-actions-inner-gap,
+  $hero-grid-gutter:            $hero-grid-gutter,
+  $hero-content-width:          $hero-content-width
+);

@@ -1,130 +1,26 @@
 /**
- * Avatar Component Variable Overrides
+ * Avatar Component Additive Polish
  * =============================================================================
  *
- * Premium avatar system: precise size scale, clean initials hierarchy,
- * brand-tinted focus ring, and subtle hover overlay.
+ * Applies additional visual polish (tactile click lift, presence indicators,
+ * and overlapping avatar group layouts) to the core Atomix Avatar component.
  *
  * @see https://atomix.design/docs/components/avatar
  */
 
+@use "../01-settings/avatar" as av;
 @use "../01-settings/tokens" as tok;
 
 // =============================================================================
-// Component Variable Definitions
-// =============================================================================
-
-  // ---------------------------------------------------------------------------
-  // Size map — xs / sm / md / lg / xl
-  // ---------------------------------------------------------------------------
-  $avatar-size: (xs: 24px, sm: 32px, md: 40px, lg: 48px, xl: 64px) !default;
-
-
-  // ---------------------------------------------------------------------------
-  // Border radius map — same keys
-  // ---------------------------------------------------------------------------
-  $avatar-border-radius: (xs: 4px, sm: 6px, md: 8px, lg: 10px, xl: 12px, circle: 50%) !default;
-
-
-  // ---------------------------------------------------------------------------
-  // Colors
-  // ---------------------------------------------------------------------------
-  $avatar-color: var(--atomix-body-color) !default;
-
-  $avatar-bg: var(--atomix-secondary-bg-subtle) !default;
-
-  $avatar-border-width: 2px !default;
-
-  $avatar-border-color: var(--atomix-border-color) !default;
-
-  // ---------------------------------------------------------------------------
-  // Image fit
-  // ---------------------------------------------------------------------------
-  $avatar-fit: cover !default;
-
-
-  // ---------------------------------------------------------------------------
-  // Initials typography
-  // ---------------------------------------------------------------------------
-  $avatar-initials-font-weight: 700 !default;
-
-  $avatar-initials-font-size: (
-    xs: 0.625rem,
-    // 10px
-    sm: 0.6875rem,
-    // 11px
-    md: 0.875rem,
-    // 14px
-    lg: 1rem,
-    // 16px
-    xl: 1.25rem,
-    // 20px
-  ) !default;
-
-
-  // ---------------------------------------------------------------------------
-  // Interactive states
-  // ---------------------------------------------------------------------------
-  $avatar-hover-opacity: 0.85 !default;
-
-  $avatar-focus-ring-width: 2px !default;
-
-  $avatar-focus-ring-color: var(--atomix-primary) !default;
-
-  $avatar-disabled-opacity: 0.45 !default;
-
-// =============================================================================
-// Avatar Variable Configuration
-// =============================================================================
-@use "../../../../node_modules/@shohojdhara/atomix/src/styles/01-settings/settings.avatar"
-  with (
-  // ---------------------------------------------------------------------------
-  // Size map — xs / sm / md / lg / xl
-  // ---------------------------------------------------------------------------
-  $avatar-size: $avatar-size,
-
-  // ---------------------------------------------------------------------------
-  // Border radius map — same keys
-  // ---------------------------------------------------------------------------
-  $avatar-border-radius: $avatar-border-radius,
-
-  // ---------------------------------------------------------------------------
-  // Colors
-  // ---------------------------------------------------------------------------
-  $avatar-color: $avatar-color,
-  $avatar-bg: $avatar-bg,
-  $avatar-border-width: $avatar-border-width,
-  $avatar-border-color: $avatar-border-color,
-  // ---------------------------------------------------------------------------
-  // Image fit
-  // ---------------------------------------------------------------------------
-  $avatar-fit: $avatar-fit,
-
-  // ---------------------------------------------------------------------------
-  // Initials typography
-  // ---------------------------------------------------------------------------
-  $avatar-initials-font-weight: $avatar-initials-font-weight,
-  $avatar-initials-font-size: $avatar-initials-font-size,
-
-  // ---------------------------------------------------------------------------
-  // Interactive states
-  // ---------------------------------------------------------------------------
-  $avatar-hover-opacity: $avatar-hover-opacity,
-  $avatar-focus-ring-width: $avatar-focus-ring-width,
-  $avatar-focus-ring-color: $avatar-focus-ring-color,
-  $avatar-disabled-opacity: $avatar-disabled-opacity
-);
-
-// =============================================================================
-// Additive Polish
+// Additive Polish & Enhancements
 // =============================================================================
 .c-avatar {
   transition:
-    opacity 0.18s cubic-bezier(0.4, 0, 0.2, 1),
-    transform 0.18s cubic-bezier(0.4, 0, 0.2, 1),
-    box-shadow 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+    opacity tok.$transition-duration-fast tok.$easing,
+    transform tok.$transition-duration-fast tok.$easing,
+    box-shadow tok.$transition-duration-fast tok.$easing;
 
-  // Clickable avatar — pointer + lift
+  // Clickable interactive state enhancements (pointer cursor + dynamic lift)
   &[role="button"],
   &--interactive {
     cursor: pointer;
@@ -139,30 +35,30 @@
     }
 
     &:focus-visible {
-      outline: 2px solid var(--atomix-primary);
+      outline: av.$avatar-focus-ring-width solid av.$avatar-focus-ring-color;
       outline-offset: 2px;
     }
   }
 
-  // Group stacking — negative margin overlaps
+  // Stacking negative margin overlaps within an avatar group
   &-group .c-avatar {
-    margin-inline-start: -8px;
-    border: 2px solid var(--atomix-primary-bg-subtle);
+    margin-inline-start: av.$avatar-group-overlap;
+    border: av.$avatar-border-width solid var(--atomix-primary-bg-subtle);
 
     &:first-child {
       margin-inline-start: 0;
     }
   }
 
-  // Presence indicator — online/offline dot
+  // Presence status indicator dot (e.g. online indicator)
   &__presence {
     position: absolute;
     bottom: 0;
     right: 0;
-    width: 10px;
-    height: 10px;
+    width: av.$avatar-presence-size;
+    height: av.$avatar-presence-size;
     border-radius: 50%;
-    border: 2px solid var(--atomix-primary-bg-subtle);
-    background: var(--atomix-success);
+    border: av.$avatar-border-width solid var(--atomix-primary-bg-subtle);
+    background: av.$avatar-presence-bg;
   }
 }

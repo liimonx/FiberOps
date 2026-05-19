@@ -1,0 +1,19 @@
+/**
+ * Progress Component Settings Override
+ * =============================================================================
+ *
+ * Configures the premium progress bar system: compact heights and rounded capsule styling.
+ *
+ * @see https://atomix.design/docs/components/progress
+ */
+
+$progress-height: 8px !default;
+$progress-border-radius: 1rem !default;
+
+// =============================================================================
+// Progress Variable Configuration
+// =============================================================================
+@use "../../../../node_modules/@shohojdhara/atomix/src/styles/01-settings/settings.progress" with (
+  $progress-height:        $progress-height,
+  $progress-border-radius: $progress-border-radius
+);

@@ -1,406 +1,18 @@
 /**
- * Footer Component Variable Overrides
+ * Footer Component Additive BEM Polish
  * =============================================================================
  *
- * Premium documentation footer: full variable coverage for layout geometry,
- * brand typography, section headers, link affordances, social icons, and
- * bottom bar — with additive BEM polish for animated links, social hover
- * gradients, a frosted glass option, and refined mobile behaviour.
+ * These selectors extend the compiled Atomix output without touching internals.
+ * Adds subtle top-border gradient, brand name tracking, translation link hover accents,
+ * brand-specific social hover transitions/transforms, and responsive pill back-to-top animations.
  *
  * @see https://atomix.design/docs/components/footer
  */
 
-// =============================================================================
-// Component Variable Definitions
-// =============================================================================
+@use "../01-settings/footer" as f;
 
-  // ---------------------------------------------------------------------------
-  // 1. Base Layout
-  // ---------------------------------------------------------------------------
-  $footer-padding-y: 4rem !default;
-
-  // generous vertical breathing room
-  $footer-padding-x: 1.5rem !default;
-
-  // match navbar horizontal gutter
-  $footer-container-max-width: 1440px !default;
-
-  // full-width rail cap
-  $footer-bg: var(--atomix-body-bg) !default;
-
-  $footer-color: var(--atomix-body-color) !default;
-
-  $footer-border-width: 1px !default;
-
-  $footer-border-color: var(--atomix-border-color) !default;
-
-  // ---------------------------------------------------------------------------
-  // 2. Brand
-  // ---------------------------------------------------------------------------
-  $footer-brand-margin-bottom: 2rem !default;
-
-  $footer-brand-logo-max-width: 180px !default;
-
-  $footer-brand-logo-max-height: 48px !default;
-
-  $footer-brand-name-font-size: 1.375rem !default;
-
-  // 22px — confident headline
-  $footer-brand-name-font-weight: 800 !default;
-
-  $footer-brand-name-color: var(--atomix-body-color) !default;
-
-  $footer-brand-description-font-size: 0.875rem !default;
-
-  $footer-brand-description-color: var(--atomix-secondary-text-emphasis) !default;
-
-  $footer-brand-description-margin-top: 0.75rem !default;
-
-  $footer-brand-logo-margin-bottom: 1rem !default;
-
-  $footer-brand-logo-hover-opacity: 0.75 !default;
-
-
-  // ---------------------------------------------------------------------------
-  // 3. Section Headers
-  // ---------------------------------------------------------------------------
-  $footer-section-margin-bottom: 2rem !default;
-
-  $footer-section-title-font-size: 0.6875rem !default;
-
-  // 11px — all-caps label
-  $footer-section-title-font-weight: 700 !default;
-
-  $footer-section-title-color: var(--atomix-body-color) !default;
-
-  $footer-section-title-margin-bottom: 1rem !default;
-
-  $footer-section-content-gap: 0.375rem !default;
-
-  // 6px — tighter link stack
-  $footer-section-header-gap: 0.5rem !default;
-
-  $footer-section-toggle-padding: 0.625rem 0 !default;
-
-
-  // ---------------------------------------------------------------------------
-  // 4. Links
-  // ---------------------------------------------------------------------------
-  $footer-link-color: var(--atomix-secondary-text-emphasis) !default;
-
-  $footer-link-hover-color: var(--atomix-body-color) !default;
-
-  $footer-link-active-color: var(--atomix-primary) !default;
-
-  $footer-link-disabled-color: var(--atomix-tertiary-text-emphasis) !default;
-
-  $footer-link-text-decoration: none !default;
-
-  $footer-link-hover-text-decoration: none !default;
-
-  $footer-link-padding: 0.25rem 0 !default;
-
-  $footer-link-transition: color 0.18s cubic-bezier(0.4, 0, 0.2, 1) !default;
-
-  // ---------------------------------------------------------------------------
-  // 5. Social Icons
-  // ---------------------------------------------------------------------------
-  $footer-social-gap: 0.625rem !default;
-
-  $footer-social-margin-top: 1.25rem !default;
-
-  $footer-social-link-size: 2.25rem !default;
-
-  // 36px — neat grid
-  $footer-social-link-size-sm: 1.875rem !default;
-
-  // 30px
-  $footer-social-link-size-lg: 2.75rem !default;
-
-  // 44px
-  $footer-social-link-bg: var(--atomix-secondary-bg-subtle) !default;
-
-  $footer-social-link-color: var(--atomix-secondary-text-emphasis) !default;
-
-  $footer-social-link-hover-bg: var(--atomix-primary) !default;
-
-  $footer-social-link-hover-color: #fff !default;
-
-  $footer-social-link-border-radius: 0.5rem !default;
-
-  // square-ish with soft corners
-  $footer-social-link-transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1) !default;
-
-  // ---------------------------------------------------------------------------
-  // 6. Newsletter
-  // ---------------------------------------------------------------------------
-  $footer-newsletter-bg: var(--atomix-secondary-bg-subtle) !default;
-
-  $footer-newsletter-padding: 2rem !default;
-
-  $footer-newsletter-border-radius: 1rem !default;
-
-  $footer-newsletter-title-font-size: 1.125rem !default;
-
-  $footer-newsletter-title-font-weight: 700 !default;
-
-  $footer-newsletter-title-color: var(--atomix-body-color) !default;
-
-  $footer-newsletter-title-margin-bottom: 0.5rem !default;
-
-  $footer-newsletter-description-font-size: 0.875rem !default;
-
-  $footer-newsletter-description-color: var(--atomix-secondary-text-emphasis) !default;
-
-  $footer-newsletter-description-margin-bottom: 1rem !default;
-
-  $footer-newsletter-input-border: 1px solid var(--atomix-border-color) !default;
-
-  $footer-newsletter-input-border-radius: 0.5rem !default;
-
-  $footer-newsletter-input-padding: 0.75rem 1rem !default;
-
-  $footer-newsletter-input-font-size: 0.875rem !default;
-
-  $footer-newsletter-input-bg: var(--atomix-body-bg) !default;
-
-  $footer-newsletter-input-color: var(--atomix-body-color) !default;
-
-  $footer-newsletter-input-focus-border-color: var(--atomix-primary) !default;
-
-  $footer-newsletter-input-focus-box-shadow: 0 0 0 3px
-    rgba(var(--atomix-primary-rgb, 6, 182, 212), 0.2) !default;
-
-  $footer-newsletter-button-bg: var(--atomix-primary) !default;
-
-  $footer-newsletter-button-color: #fff !default;
-
-  $footer-newsletter-button-hover-bg: var(--atomix-primary) !default;
-
-  $footer-newsletter-button-padding: 0.75rem 1.5rem !default;
-
-  $footer-newsletter-button-border-radius: 0.5rem !default;
-
-  $footer-newsletter-button-font-weight: 600 !default;
-
-  $footer-newsletter-button-transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1) !default;
-
-  // ---------------------------------------------------------------------------
-  // 7. Bottom Bar
-  // ---------------------------------------------------------------------------
-  $footer-bottom-padding-top: 1.5rem !default;
-
-  $footer-bottom-margin-top: 2.5rem !default;
-
-  $footer-bottom-border-top: 1px solid var(--atomix-border-color) !default;
-
-  $footer-copyright-font-size: 0.8125rem !default;
-
-  // 13px — muted copy
-  $footer-copyright-color: var(--atomix-tertiary-text-emphasis) !default;
-
-  $footer-back-to-top-color: var(--atomix-body-color) !default;
-
-  $footer-back-to-top-hover-color: #fff !default;
-
-  $footer-back-to-top-font-size: 0.8125rem !default;
-
-  $footer-back-to-top-font-weight: 600 !default;
-
-  $footer-back-to-top-transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1) !default;
-
-  // ---------------------------------------------------------------------------
-  // 8. Divider
-  // ---------------------------------------------------------------------------
-  $footer-divider-margin: 2rem 0 !default;
-
-  $footer-divider-border: 1px solid var(--atomix-border-color) !default;
-
-  $footer-divider-opacity: 0.6 !default;
-
-
-  // ---------------------------------------------------------------------------
-  // 9. Size Variants
-  // ---------------------------------------------------------------------------
-  $footer-padding-sm: 2rem !default;
-
-  $footer-padding-md: 3rem !default;
-
-  $footer-padding-lg: 5rem !default;
-
-
-  // ---------------------------------------------------------------------------
-  // 10. Responsive
-  // ---------------------------------------------------------------------------
-  $footer-mobile-padding-y: 2.5rem !default;
-
-  $footer-mobile-section-margin-bottom: 1.5rem !default;
-
-  $footer-mobile-brand-margin-bottom: 1.25rem !default;
-
-
-  // ---------------------------------------------------------------------------
-  // 11. Sticky
-  // ---------------------------------------------------------------------------
-  $footer-sticky-z-index: 100 !default;
-
-  $footer-sticky-box-shadow: 0 -2px 16px rgba(0, 0, 0, 0.08) !default;
-
-// =============================================================================
-// Footer Variable Configuration
-// =============================================================================
-@use "../../../../node_modules/@shohojdhara/atomix/src/styles/01-settings/settings.footer"
-  with (
-  // ---------------------------------------------------------------------------
-  // 1. Base Layout
-  // ---------------------------------------------------------------------------
-  $footer-padding-y: $footer-padding-y,
-  // generous vertical breathing room
-  $footer-padding-x: $footer-padding-x,
-  // match navbar horizontal gutter
-  $footer-container-max-width: $footer-container-max-width,
-  // full-width rail cap
-  $footer-bg: $footer-bg,
-  $footer-color: $footer-color,
-  $footer-border-width: $footer-border-width,
-  $footer-border-color: $footer-border-color,
-  // ---------------------------------------------------------------------------
-  // 2. Brand
-  // ---------------------------------------------------------------------------
-  $footer-brand-margin-bottom: $footer-brand-margin-bottom,
-  $footer-brand-logo-max-width: $footer-brand-logo-max-width,
-  $footer-brand-logo-max-height: $footer-brand-logo-max-height,
-  $footer-brand-name-font-size: $footer-brand-name-font-size,
-  // 22px — confident headline
-  $footer-brand-name-font-weight: $footer-brand-name-font-weight,
-  $footer-brand-name-color: $footer-brand-name-color,
-  $footer-brand-description-font-size: $footer-brand-description-font-size,
-  $footer-brand-description-color: $footer-brand-description-color,
-  $footer-brand-description-margin-top: $footer-brand-description-margin-top,
-  $footer-brand-logo-margin-bottom: $footer-brand-logo-margin-bottom,
-  $footer-brand-logo-hover-opacity: $footer-brand-logo-hover-opacity,
-
-  // ---------------------------------------------------------------------------
-  // 3. Section Headers
-  // ---------------------------------------------------------------------------
-  $footer-section-margin-bottom: $footer-section-margin-bottom,
-  $footer-section-title-font-size: $footer-section-title-font-size,
-  // 11px — all-caps label
-  $footer-section-title-font-weight: $footer-section-title-font-weight,
-  $footer-section-title-color: $footer-section-title-color,
-  $footer-section-title-margin-bottom: $footer-section-title-margin-bottom,
-  $footer-section-content-gap: $footer-section-content-gap,
-  // 6px — tighter link stack
-  $footer-section-header-gap: $footer-section-header-gap,
-  $footer-section-toggle-padding: $footer-section-toggle-padding,
-
-  // ---------------------------------------------------------------------------
-  // 4. Links
-  // ---------------------------------------------------------------------------
-  $footer-link-color: $footer-link-color,
-  $footer-link-hover-color: $footer-link-hover-color,
-  $footer-link-active-color: $footer-link-active-color,
-  $footer-link-disabled-color: $footer-link-disabled-color,
-  $footer-link-text-decoration: $footer-link-text-decoration,
-  $footer-link-hover-text-decoration: $footer-link-hover-text-decoration,
-  $footer-link-padding: $footer-link-padding,
-  $footer-link-transition: $footer-link-transition,
-  // ---------------------------------------------------------------------------
-  // 5. Social Icons
-  // ---------------------------------------------------------------------------
-  $footer-social-gap: $footer-social-gap,
-  $footer-social-margin-top: $footer-social-margin-top,
-  $footer-social-link-size: $footer-social-link-size,
-  // 36px — neat grid
-  $footer-social-link-size-sm: $footer-social-link-size-sm,
-  // 30px
-  $footer-social-link-size-lg: $footer-social-link-size-lg,
-  // 44px
-  $footer-social-link-bg: $footer-social-link-bg,
-  $footer-social-link-color: $footer-social-link-color,
-  $footer-social-link-hover-bg: $footer-social-link-hover-bg,
-  $footer-social-link-hover-color: $footer-social-link-hover-color,
-  $footer-social-link-border-radius: $footer-social-link-border-radius,
-  // square-ish with soft corners
-  $footer-social-link-transition: $footer-social-link-transition,
-  // ---------------------------------------------------------------------------
-  // 6. Newsletter
-  // ---------------------------------------------------------------------------
-  $footer-newsletter-bg: $footer-newsletter-bg,
-  $footer-newsletter-padding: $footer-newsletter-padding,
-  $footer-newsletter-border-radius: $footer-newsletter-border-radius,
-  $footer-newsletter-title-font-size: $footer-newsletter-title-font-size,
-  $footer-newsletter-title-font-weight: $footer-newsletter-title-font-weight,
-  $footer-newsletter-title-color: $footer-newsletter-title-color,
-  $footer-newsletter-title-margin-bottom: $footer-newsletter-title-margin-bottom,
-  $footer-newsletter-description-font-size: $footer-newsletter-description-font-size,
-  $footer-newsletter-description-color: $footer-newsletter-description-color,
-  $footer-newsletter-description-margin-bottom: $footer-newsletter-description-margin-bottom,
-  $footer-newsletter-input-border: $footer-newsletter-input-border,
-  $footer-newsletter-input-border-radius: $footer-newsletter-input-border-radius,
-  $footer-newsletter-input-padding: $footer-newsletter-input-padding,
-  $footer-newsletter-input-font-size: $footer-newsletter-input-font-size,
-  $footer-newsletter-input-bg: $footer-newsletter-input-bg,
-  $footer-newsletter-input-color: $footer-newsletter-input-color,
-  $footer-newsletter-input-focus-border-color: $footer-newsletter-input-focus-border-color,
-  $footer-newsletter-input-focus-box-shadow: $footer-newsletter-input-focus-box-shadow,
-  $footer-newsletter-button-bg: $footer-newsletter-button-bg,
-  $footer-newsletter-button-color: $footer-newsletter-button-color,
-  $footer-newsletter-button-hover-bg: $footer-newsletter-button-hover-bg,
-  $footer-newsletter-button-padding: $footer-newsletter-button-padding,
-  $footer-newsletter-button-border-radius: $footer-newsletter-button-border-radius,
-  $footer-newsletter-button-font-weight: $footer-newsletter-button-font-weight,
-  $footer-newsletter-button-transition: $footer-newsletter-button-transition,
-  // ---------------------------------------------------------------------------
-  // 7. Bottom Bar
-  // ---------------------------------------------------------------------------
-  $footer-bottom-padding-top: $footer-bottom-padding-top,
-  $footer-bottom-margin-top: $footer-bottom-margin-top,
-  $footer-bottom-border-top: $footer-bottom-border-top,
-  $footer-copyright-font-size: $footer-copyright-font-size,
-  // 13px — muted copy
-  $footer-copyright-color: $footer-copyright-color,
-  $footer-back-to-top-color: $footer-back-to-top-color,
-  $footer-back-to-top-hover-color: $footer-back-to-top-hover-color,
-  $footer-back-to-top-font-size: $footer-back-to-top-font-size,
-  $footer-back-to-top-font-weight: $footer-back-to-top-font-weight,
-  $footer-back-to-top-transition: $footer-back-to-top-transition,
-  // ---------------------------------------------------------------------------
-  // 8. Divider
-  // ---------------------------------------------------------------------------
-  $footer-divider-margin: $footer-divider-margin,
-  $footer-divider-border: $footer-divider-border,
-  $footer-divider-opacity: $footer-divider-opacity,
-
-  // ---------------------------------------------------------------------------
-  // 9. Size Variants
-  // ---------------------------------------------------------------------------
-  $footer-padding-sm: $footer-padding-sm,
-  $footer-padding-md: $footer-padding-md,
-  $footer-padding-lg: $footer-padding-lg,
-
-  // ---------------------------------------------------------------------------
-  // 10. Responsive
-  // ---------------------------------------------------------------------------
-  $footer-mobile-padding-y: $footer-mobile-padding-y,
-  $footer-mobile-section-margin-bottom: $footer-mobile-section-margin-bottom,
-  $footer-mobile-brand-margin-bottom: $footer-mobile-brand-margin-bottom,
-
-  // ---------------------------------------------------------------------------
-  // 11. Sticky
-  // ---------------------------------------------------------------------------
-  $footer-sticky-z-index: $footer-sticky-z-index,
-  $footer-sticky-box-shadow: $footer-sticky-box-shadow
-);
-
-// =============================================================================
-// Additive BEM Polish
-// These selectors extend the compiled Atomix output without touching internals.
-// =============================================================================
 .c-footer {
-  // --------------------------------------------------------------------------
-  // Root — subtle top-border gradient for visual lift
-  // --------------------------------------------------------------------------
+  // ── Root — subtle top-border gradient for visual lift ──
   border-top-color: var(--atomix-border-color);
   border-image: linear-gradient(
       90deg,
@@ -411,9 +23,7 @@
     )
     1;
 
-  // --------------------------------------------------------------------------
-  // Brand name — letter-spacing refinement for premium feel
-  // --------------------------------------------------------------------------
+  // ── Brand name — letter-spacing refinement for premium feel ──
   &__brand {
     &-name h3 {
       letter-spacing: -0.03em;
@@ -425,9 +35,7 @@
     }
   }
 
-  // --------------------------------------------------------------------------
-  // Section title — all-caps small-label treatment
-  // --------------------------------------------------------------------------
+  // ── Section title — all-caps small-label treatment ──
   &__section-title {
     text-transform: uppercase;
     letter-spacing: 0.08em;
@@ -435,9 +43,7 @@
     opacity: 0.55;
   }
 
-  // --------------------------------------------------------------------------
-  // Link — sliding underline accent (override default ::before width-grow)
-  // --------------------------------------------------------------------------
+  // ── Link — sliding underline accent (override default ::before width-grow) ──
   &__link {
     font-size: 0.9rem;
     line-height: 1.5;
@@ -467,9 +73,7 @@
     }
   }
 
-  // --------------------------------------------------------------------------
-  // Social link — rounded square with brand-specific gradients on hover
-  // --------------------------------------------------------------------------
+  // ── Social link — rounded square with brand-specific gradients on hover ──
   &__social-link {
     border-radius: 0.5rem;
     border: 1px solid var(--atomix-border-color);
@@ -510,9 +114,7 @@
     }
   }
 
-  // --------------------------------------------------------------------------
-  // Bottom bar — ensures copyright + back-to-top are always baseline-aligned
-  // --------------------------------------------------------------------------
+  // ── Bottom bar — ensures copyright + back-to-top are always baseline-aligned ──
   &__bottom {
     gap: 1rem;
     flex-wrap: wrap;
@@ -523,9 +125,7 @@
     font-size: 0.8125rem;
   }
 
-  // --------------------------------------------------------------------------
-  // Back-to-top — pill button with primary fill on hover
-  // --------------------------------------------------------------------------
+  // ── Back-to-top — pill button with primary fill on hover ──
   &__back-to-top {
     border-radius: 2rem;
     padding: 0.5rem 1.125rem;
@@ -563,9 +163,7 @@
     }
   }
 
-  // --------------------------------------------------------------------------
-  // Divider — faded gradient rule (override solid rule with gradient)
-  // --------------------------------------------------------------------------
+  // ── Divider — faded gradient rule (override solid rule with gradient) ──
   &__divider {
     background: linear-gradient(
       90deg,
@@ -577,9 +175,7 @@
     opacity: 0.6;
   }
 
-  // --------------------------------------------------------------------------
-  // Reduced motion — strip all transitions and transforms
-  // --------------------------------------------------------------------------
+  // ── Reduced motion — strip all transitions and transforms ──
   @media (prefers-reduced-motion: reduce) {
     &__link,
     &__social-link,

@@ -1,0 +1,83 @@
+/**
+ * Callout Component Settings Override
+ * =============================================================================
+ *
+ * Premium alerts and toasts: generous padding, refined typography hierarchy,
+ * elevated shadow, and consistent icon/close sizing.
+ *
+ * @see https://atomix.design/docs/components/callout
+ */
+
+@use "./tokens" as tok;
+
+// ── Container ────────────────────────────────────────────────────────────────
+$callout-width: 100% !default;
+$callout-padding-x: 16px !default;
+$callout-padding-y: 14px !default;
+$callout-bg: var(--atomix-primary-bg-subtle) !default;
+$callout-border-radius: 0.875rem !default;
+$callout-border-color: var(--atomix-border-color) !default;
+$callout-border-width: 1px !default;
+$callout-box-shadow: tok.$box-shadow-sm !default;
+
+// ── Title ────────────────────────────────────────────────────────────────────
+$callout-title-font-size: 0.9375rem !default; // 15px
+$callout-title-font-weight: 700 !default;
+$callout-title-color: var(--atomix-body-color) !default;
+
+// ── Body Text ────────────────────────────────────────────────────────────────
+$callout-text-font-size: 0.875rem !default; // 14px
+$callout-text-font-weight: 400 !default;
+$callout-text-color: var(--atomix-secondary-text-emphasis) !default;
+
+// ── Message Spacer ───────────────────────────────────────────────────────────
+$callout-message-spacer: 10px !default;
+
+// ── Icon ─────────────────────────────────────────────────────────────────────
+$callout-icon-size: 20px !default;
+$callout-icon-color: var(--atomix-primary) !default;
+
+// ── Close Button ─────────────────────────────────────────────────────────────
+$callout-close-btn-size: 20px !default;
+
+// ── Actions ──────────────────────────────────────────────────────────────────
+$callout-actions-spacer: 8px !default;
+$callout-actions-spacer-y: 12px !default;
+
+// ── Toast-Specific Padding ───────────────────────────────────────────────────
+$callout-tost-padding-x: 16px !default;
+$callout-tost-padding-y: 14px !default;
+$callout-toast-bg: var(--atomix-primary-bg-subtle) !default;
+
+// ── Toast Z-Index ────────────────────────────────────────────────────────────
+$callout-toast-z-index: 1050 !default;
+
+// =============================================================================
+// Callout Variable Configuration
+// =============================================================================
+@use "../../../../node_modules/@shohojdhara/atomix/src/styles/01-settings/settings.callout" with (
+  $callout-width:            $callout-width,
+  $callout-padding-x:        $callout-padding-x,
+  $callout-padding-y:        $callout-padding-y,
+  $callout-bg:               $callout-bg,
+  $callout-border-radius:    $callout-border-radius,
+  $callout-border-color:     $callout-border-color,
+  $callout-border-width:     $callout-border-width,
+  $callout-box-shadow:       $callout-box-shadow,
+  $callout-title-font-size:  $callout-title-font-size,
+  $callout-title-font-weight: $callout-title-font-weight,
+  $callout-title-color:      $callout-title-color,
+  $callout-text-font-size:   $callout-text-font-size,
+  $callout-text-font-weight: $callout-text-font-weight,
+  $callout-text-color:       $callout-text-color,
+  $callout-message-spacer:   $callout-message-spacer,
+  $callout-icon-size:        $callout-icon-size,
+  $callout-icon-color:       $callout-icon-color,
+  $callout-close-btn-size:   $callout-close-btn-size,
+  $callout-actions-spacer:   $callout-actions-spacer,
+  $callout-actions-spacer-y: $callout-actions-spacer-y,
+  $callout-tost-padding-x:   $callout-tost-padding-x,
+  $callout-tost-padding-y:   $callout-tost-padding-y,
+  $callout-toast-bg:         $callout-toast-bg,
+  $callout-toast-z-index:    $callout-toast-z-index
+);

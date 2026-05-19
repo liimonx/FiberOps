@@ -1,171 +1,33 @@
 /**
- * Tabs Component Variable Overrides
+ * Tabs Component Additive Polish
  * =============================================================================
  *
- * Premium tab navigation: pill-inspired radius, gradient active indicator,
- * refined spacing, smooth panel fade-in, and clean icon sizing.
+ * Extends core tabs with solid separator base line, flex equal-distribution rails,
+ * premium gradient sliding indicator lines under active buttons, and panel slide transitions.
  *
  * @see https://atomix.design/docs/components/tabs
  */
 
 @use "../01-settings/tokens" as tok;
-
-// =============================================================================
-// Component Variable Definitions
-// =============================================================================
-
-  // ---------------------------------------------------------------------------
-  // Nav button — geometry & spacing
-  // ---------------------------------------------------------------------------
-  $tabs-nav-btn-padding-x: 12px !default;
-
-  $tabs-nav-btn-padding-y: 8px !default;
-
-  $tabs-nav-btn-border-radius: 0px !default;
-
-
-  // flat underline style
-  // ---------------------------------------------------------------------------
-  // Nav button — typography
-  // ---------------------------------------------------------------------------
-  $tabs-nav-btn-font-size: 0.8125rem !default;
-
-  // 13px – tight, compact label
-  $tabs-nav-btn-font-weight: 500 !default;
-
-
-  // ---------------------------------------------------------------------------
-  // Nav button — colors (default / hover / active / disabled)
-  // ---------------------------------------------------------------------------
-  $tabs-nav-btn-color: var(--atomix-tertiary-text-emphasis) !default;
-
-  $tabs-nav-btn-active-color: var(--atomix-body-color) !default;
-
-  $tabs-nav-btn-disabled-color: var(--atomix-disabled-text-emphasis) !default;
-
-  $tabs-nav-btn-bg: transparent !default;
-
-  $tabs-nav-btn-bg-hover: var(--atomix-secondary-bg-subtle) !default;
-
-  $tabs-nav-btn-bg-active: transparent !default;
-
-  $tabs-nav-btn-bg-disabled: transparent !default;
-
-
-  // ---------------------------------------------------------------------------
-  // Nav button — border / indicator
-  // ---------------------------------------------------------------------------
-  $tabs-nav-btn-border-width: 2px !default;
-
-  $tabs-nav-btn-border-color: transparent !default;
-
-  $tabs-nav-btn-border-active-color: var(--atomix-primary) !default;
-
-  $tabs-nav-btn-border-disabled-color: var(--atomix-border-color) !default;
-
-  // ---------------------------------------------------------------------------
-  // Gap between tab buttons
-  // ---------------------------------------------------------------------------
-  $tabs-nav-btns-gap: 0px !default;
-
-  $tabs-nav-btn-inner-gap: 4px !default;
-
-
-  // ---------------------------------------------------------------------------
-  // Icon inside button
-  // ---------------------------------------------------------------------------
-  $tab-nav-btn-icon-size: 16px !default;
-
-
-  // ---------------------------------------------------------------------------
-  // Panel content padding
-  // ---------------------------------------------------------------------------
-  $tabs-panel-padding-x: 0px !default;
-
-  $tabs-panel-padding-y: 16px !default;
-
-// =============================================================================
-// Tabs Variable Configuration
-// =============================================================================
-@use "../../../../node_modules/@shohojdhara/atomix/src/styles/01-settings/settings.tabs"
-  with (
-  // ---------------------------------------------------------------------------
-  // Nav button — geometry & spacing
-  // ---------------------------------------------------------------------------
-  $tabs-nav-btn-padding-x: $tabs-nav-btn-padding-x,
-  $tabs-nav-btn-padding-y: $tabs-nav-btn-padding-y,
-  $tabs-nav-btn-border-radius: $tabs-nav-btn-border-radius,
-
-  // flat underline style
-  // ---------------------------------------------------------------------------
-  // Nav button — typography
-  // ---------------------------------------------------------------------------
-  $tabs-nav-btn-font-size: $tabs-nav-btn-font-size,
-  // 13px – tight, compact label
-  $tabs-nav-btn-font-weight: $tabs-nav-btn-font-weight,
-
-  // ---------------------------------------------------------------------------
-  // Nav button — colors (default / hover / active / disabled)
-  // ---------------------------------------------------------------------------
-  $tabs-nav-btn-color: $tabs-nav-btn-color,
-  $tabs-nav-btn-active-color: $tabs-nav-btn-active-color,
-  $tabs-nav-btn-disabled-color: $tabs-nav-btn-disabled-color,
-  $tabs-nav-btn-bg: $tabs-nav-btn-bg,
-  $tabs-nav-btn-bg-hover: $tabs-nav-btn-bg-hover,
-  $tabs-nav-btn-bg-active: $tabs-nav-btn-bg-active,
-  $tabs-nav-btn-bg-disabled: $tabs-nav-btn-bg-disabled,
-
-  // ---------------------------------------------------------------------------
-  // Nav button — border / indicator
-  // ---------------------------------------------------------------------------
-  $tabs-nav-btn-border-width: $tabs-nav-btn-border-width,
-  $tabs-nav-btn-border-color: $tabs-nav-btn-border-color,
-  $tabs-nav-btn-border-active-color: $tabs-nav-btn-border-active-color,
-  $tabs-nav-btn-border-disabled-color: $tabs-nav-btn-border-disabled-color,
-  // ---------------------------------------------------------------------------
-  // Gap between tab buttons
-  // ---------------------------------------------------------------------------
-  $tabs-nav-btns-gap: $tabs-nav-btns-gap,
-  $tabs-nav-btn-inner-gap: $tabs-nav-btn-inner-gap,
-
-  // ---------------------------------------------------------------------------
-  // Icon inside button
-  // ---------------------------------------------------------------------------
-  $tab-nav-btn-icon-size: $tab-nav-btn-icon-size,
-
-  // ---------------------------------------------------------------------------
-  // Panel content padding
-  // ---------------------------------------------------------------------------
-  $tabs-panel-padding-x: $tabs-panel-padding-x,
-  $tabs-panel-padding-y: $tabs-panel-padding-y
-);
+@use "../01-settings/tabs" as t;
 
 // =============================================================================
 // Additive Visual Enhancements
-// These selectors sit on top of the compiled Atomix output — purely additive,
-// no BEM internals are changed here.
 // =============================================================================
-
 .c-tabs {
-  // --------------------------------------------------------------------------
-  // Nav container — bottom separator line beneath all tabs
-  // --------------------------------------------------------------------------
+  // ── Nav container — bottom separator line beneath all tabs ──
   &__nav {
     position: relative;
     border-bottom: 1px solid var(--atomix-border-color);
     gap: 0;
   }
 
-  // --------------------------------------------------------------------------
-  // Individual nav item — equal flex distribution
-  // --------------------------------------------------------------------------
+  // ── Individual nav item — equal flex distribution ──
   &__nav-item {
     flex: 1;
   }
 
-  // --------------------------------------------------------------------------
-  // Nav button — refined interaction layer
-  // --------------------------------------------------------------------------
+  // ── Nav button — refined interaction layer ──
   &__nav-btn {
     position: relative;
     white-space: nowrap;
@@ -222,9 +84,7 @@
     }
   }
 
-  // --------------------------------------------------------------------------
-  // Panel — fade-in with a subtle upward slide
-  // --------------------------------------------------------------------------
+  // ── Panel — fade-in with a subtle upward slide ──
   &__panel {
     transition:
       opacity tok.$transition-duration tok.$easing,
@@ -236,9 +96,7 @@
     }
   }
 
-  // --------------------------------------------------------------------------
-  // Panel body — comfortable reading width
-  // --------------------------------------------------------------------------
+  // ── Panel body — comfortable reading width ──
   &__panel-body {
     padding-top: 16px;
     padding-bottom: 6px;

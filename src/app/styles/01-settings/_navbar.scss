@@ -1,0 +1,89 @@
+/**
+ * Navbar Component Settings Override
+ * =============================================================================
+ *
+ * Premium top navigation bar: full-bleed frosted glass, refined height &
+ * padding, smooth item transitions, and well-proportioned icon sizing.
+ *
+ * @see https://atomix.design/docs/components/navbar
+ */
+
+@use "./tokens" as tok;
+
+// ── Container & Layout ───────────────────────────────────────────────────────
+$navbar-padding-x: 1rem !default; // 16px — compact rails
+$navbar-padding-y: 0.5rem !default; // vertical rhythm controlled by height
+$navbar-container-max-width: 1440px !default; // cap at wide viewports
+$navbar-height: 48px !default; // slightly taller for breathing room
+
+// ── Appearance ───────────────────────────────────────────────────────────────
+$navbar-bg: transparent !default;
+$navbar-border-width: 1px !default;
+$navbar-border-color: var(--atomix-border-color) !default;
+$navbar-box-shadow: tok.$box-shadow-sm !default;
+
+// ── Brand / Logo ─────────────────────────────────────────────────────────────
+$navbar-brand-margin-end: 1.5rem !default; // 24px — space before nav links
+$navbar-brand-font-size: 0.9375rem !default; // 17px — confident but not heavy
+$navbar-brand-font-weight: 700 !default;
+$navbar-brand-color: var(--atomix-body-color) !default;
+
+// ── Mobile Toggler ───────────────────────────────────────────────────────────
+$navbar-toggler-size: 2rem !default; // 36px — generous touch target
+$navbar-toggler-color: var(--atomix-body-color) !default;
+$navbar-toggler-bg: transparent !default;
+$navbar-toggler-border: 0 !default;
+$navbar-toggler-border-radius: 0.5rem !default;
+$navbar-toggler-focus-shadow: 0 0 0 3px rgba(var(--atomix-primary-rgb, 6, 182, 212), 0.25) !default;
+
+// ── Collapse / Mobile Menu ───────────────────────────────────────────────────
+$navbar-collapse-padding-top: 0.5rem !default;
+$navbar-collapse-transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1) !default;
+
+// ── Backdrop (mobile overlay) ────────────────────────────────────────────────
+$navbar-backdrop-bg: transparent !default;
+$navbar-backdrop-z-index: 0 !default;
+
+// ── Z-index ──────────────────────────────────────────────────────────────────
+$navbar-z-index: 1030 !default;
+$navbar-fixed-z-index: 1030 !default;
+
+// ── Dark mode ────────────────────────────────────────────────────────────────
+$navbar-bg-dark: transparent !default;
+$navbar-border-color-dark: var(--atomix-gray-7) !default;
+$navbar-brand-color-dark: var(--atomix-gray-1) !default;
+$navbar-toggler-color-dark: var(--atomix-gray-1) !default;
+
+// =============================================================================
+// Navbar Variable Configuration
+// =============================================================================
+@use "../../../../node_modules/@shohojdhara/atomix/src/styles/01-settings/settings.navbar" with (
+  $navbar-padding-x:             $navbar-padding-x,
+  $navbar-padding-y:             $navbar-padding-y,
+  $navbar-container-max-width:   $navbar-container-max-width,
+  $navbar-height:                $navbar-height,
+  $navbar-bg:                    $navbar-bg,
+  $navbar-border-width:          $navbar-border-width,
+  $navbar-border-color:          $navbar-border-color,
+  $navbar-box-shadow:            $navbar-box-shadow,
+  $navbar-brand-margin-end:      $navbar-brand-margin-end,
+  $navbar-brand-font-size:       $navbar-brand-font-size,
+  $navbar-brand-font-weight:     $navbar-brand-font-weight,
+  $navbar-brand-color:           $navbar-brand-color,
+  $navbar-toggler-size:          $navbar-toggler-size,
+  $navbar-toggler-color:         $navbar-toggler-color,
+  $navbar-toggler-bg:            $navbar-toggler-bg,
+  $navbar-toggler-border:         $navbar-toggler-border,
+  $navbar-toggler-border-radius: $navbar-toggler-border-radius,
+  $navbar-toggler-focus-shadow:  $navbar-toggler-focus-shadow,
+  $navbar-collapse-padding-top:  $navbar-collapse-padding-top,
+  $navbar-collapse-transition:   $navbar-collapse-transition,
+  $navbar-backdrop-bg:           $navbar-backdrop-bg,
+  $navbar-backdrop-z-index:      $navbar-backdrop-z-index,
+  $navbar-z-index:               $navbar-z-index,
+  $navbar-fixed-z-index:         $navbar-fixed-z-index,
+  $navbar-bg-dark:               $navbar-bg-dark,
+  $navbar-border-color-dark:     $navbar-border-color-dark,
+  $navbar-brand-color-dark:      $navbar-brand-color-dark,
+  $navbar-toggler-color-dark:    $navbar-toggler-color-dark
+);

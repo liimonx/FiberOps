@@ -1,138 +1,15 @@
 /**
- * Menu Component Variable Overrides
+ * Menu Component Additive Polish
  * =============================================================================
  *
- * Refined navigation menu: tighter item geometry, clear subitem hierarchy,
- * smooth hover backgrounds, and polished mega-menu grid spacing.
+ * Extends the core Atomix navigation menu component with smooth link hover state transitions,
+ * custom divider opacity spacing, and uppercase megamenu group label treatment.
  *
  * @see https://atomix.design/docs/components/menu
  */
 
 @use "../01-settings/tokens" as tok;
-
-// =============================================================================
-// Component Variable Definitions
-// =============================================================================
-
-  // ---------------------------------------------------------------------------
-  // Container
-  // ---------------------------------------------------------------------------
-  $menu-min-width: 180px !default;
-
-  $menu-container-width: 1600px !default;
-
-  $menu-padding-x: 8px !default;
-
-  $menu-padding-y: 8px !default;
-
-  $menu-bg: var(--atomix-primary-bg-subtle) !default;
-
-  $menu-border-radius: 1rem !default;
-
-  $menu-box-shadow: tok.$box-shadow-md !default;
-
-  $menu-items-gap: 2px !default;
-
-
-  // ---------------------------------------------------------------------------
-  // Items
-  // ---------------------------------------------------------------------------
-  $menu-item-padding-x: 10px !default;
-
-  $menu-item-padding-y: 8px !default;
-
-  $menu-item-inner-gap: 8px !default;
-
-  $menu-item-color: var(--atomix-body-color) !default;
-
-  $menu-item-font-size: 0.875rem !default;
-
-  // 14px
-  $menu-item-font-weight: 500 !default;
-
-  $menu-item-bg: transparent !default;
-
-  $menu-item-bg-hover: var(--atomix-secondary-bg-subtle) !default;
-
-  $menu-item-bg-active: var(--atomix-brand-bg-subtle) !default;
-
-  $menu-item-icon-size: 18px !default;
-
-
-  // ---------------------------------------------------------------------------
-  // Sub-items — visually quieter than primary items
-  // ---------------------------------------------------------------------------
-  $menu-subitem-color: var(--atomix-secondary-text-emphasis) !default;
-
-  $menu-subitem-color-active: var(--atomix-brand-text-emphasis) !default;
-
-  $menu-subitem-font-weight: 400 !default;
-
-  $menu-subitem-font-weight-active: 600 !default;
-
-
-  // ---------------------------------------------------------------------------
-  // Mega menu
-  // ---------------------------------------------------------------------------
-  $menu-mega-padding-x: 56px !default;
-
-  $menu-mega-padding-y: 28px !default;
-
-  $menu-mega-grid-gap: 40px !default;
-
-  $menu-mega-header-title-font-size: 1rem !default;
-
-  $menu-mega-header-title-font-weight: 600 !default;
-
-// =============================================================================
-// Menu Variable Configuration
-// =============================================================================
-@use "../../../../node_modules/@shohojdhara/atomix/src/styles/01-settings/settings.menu"
-  with (
-  // ---------------------------------------------------------------------------
-  // Container
-  // ---------------------------------------------------------------------------
-  $menu-min-width: $menu-min-width,
-  $menu-container-width: $menu-container-width,
-  $menu-padding-x: $menu-padding-x,
-  $menu-padding-y: $menu-padding-y,
-  $menu-bg: $menu-bg,
-  $menu-border-radius: $menu-border-radius,
-  $menu-box-shadow: $menu-box-shadow,
-  $menu-items-gap: $menu-items-gap,
-
-  // ---------------------------------------------------------------------------
-  // Items
-  // ---------------------------------------------------------------------------
-  $menu-item-padding-x: $menu-item-padding-x,
-  $menu-item-padding-y: $menu-item-padding-y,
-  $menu-item-inner-gap: $menu-item-inner-gap,
-  $menu-item-color: $menu-item-color,
-  $menu-item-font-size: $menu-item-font-size,
-  // 14px
-  $menu-item-font-weight: $menu-item-font-weight,
-  $menu-item-bg: $menu-item-bg,
-  $menu-item-bg-hover: $menu-item-bg-hover,
-  $menu-item-bg-active: $menu-item-bg-active,
-  $menu-item-icon-size: $menu-item-icon-size,
-
-  // ---------------------------------------------------------------------------
-  // Sub-items — visually quieter than primary items
-  // ---------------------------------------------------------------------------
-  $menu-subitem-color: $menu-subitem-color,
-  $menu-subitem-color-active: $menu-subitem-color-active,
-  $menu-subitem-font-weight: $menu-subitem-font-weight,
-  $menu-subitem-font-weight-active: $menu-subitem-font-weight-active,
-
-  // ---------------------------------------------------------------------------
-  // Mega menu
-  // ---------------------------------------------------------------------------
-  $menu-mega-padding-x: $menu-mega-padding-x,
-  $menu-mega-padding-y: $menu-mega-padding-y,
-  $menu-mega-grid-gap: $menu-mega-grid-gap,
-  $menu-mega-header-title-font-size: $menu-mega-header-title-font-size,
-  $menu-mega-header-title-font-weight: $menu-mega-header-title-font-weight
-);
+@use "../01-settings/menu" as m;
 
 // =============================================================================
 // Additive Polish

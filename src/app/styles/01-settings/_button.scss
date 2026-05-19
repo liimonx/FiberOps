@@ -1,0 +1,156 @@
+/**
+ * Button Component Settings Override
+ * =============================================================================
+ *
+ * Premium button system: precise sizing scale, refined typography, multi-layer
+ * elevation hover lift, crisp focus rings, and clean disabled states — all via
+ * the Atomix @use variable override API.
+ *
+ * @see https://atomix.design/docs/components/button
+ */
+
+@use "sass:map";
+@use "./tokens" as tok;
+
+// ── Base Geometry & Spacing ──────────────────────────────────────────────────
+$btn-padding-y: 0.4375rem !default; // 7px
+$btn-padding-x: 0.875rem !default;  // 14px
+$btn-line-height: 1.25 !default;
+$btn-border-width: 1px !default;
+$btn-inner-gap: 5px !default;
+
+// ── Typography ──────────────────────────────────────────────────────────────
+$btn-font-size: 0.8125rem !default; // 13px – tight, professional label
+$btn-font-weight: 600 !default;
+$btn-letter-spacing: 0.01em !default; // subtle tracking – aids readability
+$btn-text-transform: none !default;
+$btn-white-space: nowrap !default;
+
+// ── Icon Sizing ─────────────────────────────────────────────────────────────
+$btn-icon-size: 15px !default;
+$btn-icon-size-sm: 13px !default;
+$btn-icon-size-lg: 18px !default;
+
+// ── Sizing — sm ──────────────────────────────────────────────────────────────
+$btn-padding-y-sm: 0.25rem !default; // 4px
+$btn-padding-x-sm: 0.625rem !default; // 10px
+$btn-font-size-sm: 0.75rem !default; // 12px
+
+// ── Sizing — lg ──────────────────────────────────────────────────────────────
+$btn-padding-y-lg: 0.625rem !default; // 10px
+$btn-padding-x-lg: 1.375rem !default; // 22px
+$btn-font-size-lg: 0.875rem !default; // 14px
+
+// ── Border Radius ────────────────────────────────────────────────────────────
+$btn-border-radius: tok.$border-radius-xl !default;    // 10px
+$btn-border-radius-sm: tok.$border-radius-lg !default; // 8px
+$btn-border-radius-lg: tok.$border-radius-xl !default; // 10px
+
+// ── Shadows ──────────────────────────────────────────────────────────────────
+$btn-box-shadow: tok.$box-shadow-xs !default;
+$btn-hover-shadow: tok.$box-shadow-sm !default;
+$btn-active-shadow: tok.$box-shadow-xs !default;
+
+// ── Hover & Active Micro-Transforms ─────────────────────────────────────────
+$btn-hover-transform: translateY(-1px) !default;
+$btn-active-transform: translateY(0px) !default;
+
+// ── Hover Color Blend Amounts ───────────────────────────────────────────────
+$btn-hover-bg-shade-amount: 75% !default;
+$btn-hover-bg-tint-amount: 80% !default;
+$btn-hover-border-shade-amount: 18% !default;
+$btn-hover-border-tint-amount: 8% !default;
+$btn-active-bg-shade-amount: 18% !default;
+$btn-active-bg-tint-amount: 18% !default;
+$btn-active-border-shade-amount: 22% !default;
+$btn-active-border-tint-amount: 8% !default;
+
+// ── Focus Ring ───────────────────────────────────────────────────────────────
+$btn-focus-width: 3px !default;
+$btn-focus-shadow-opacity: 0.22 !default;
+$btn-focus-outline: 2px solid var(--atomix-primary) !default;
+$btn-focus-outline-offset: 2px !default;
+
+// ── Disabled State ───────────────────────────────────────────────────────────
+$btn-disabled-opacity: 0.5 !default;
+$btn-disabled-color: var(--atomix-disabled-text-emphasis) !default;
+$btn-disabled-bg: var(--atomix-secondary-bg-subtle) !default;
+$btn-disabled-border-color: var(--atomix-border-color) !default;
+
+// ── Link Variant ─────────────────────────────────────────────────────────────
+$btn-link-color: var(--atomix-brand-text-emphasis) !default;
+$btn-link-color-hover: var(--atomix-primary-hover, var(--atomix-primary)) !default;
+$btn-link-font-weight: 500 !default;
+$btn-link-border-color: var(--atomix-brand-border-subtle) !default;
+$btn-link-border-color-hover: var(--atomix-primary) !default;
+
+// ── Transition ───────────────────────────────────────────────────────────────
+$btn-transition: (
+  color tok.$transition-duration tok.$easing,
+  background-color tok.$transition-duration tok.$easing,
+  border-color tok.$transition-duration tok.$easing,
+  box-shadow tok.$transition-duration tok.$easing,
+  transform tok.$transition-duration tok.$easing,
+  opacity tok.$transition-duration tok.$easing
+) !default;
+
+// ── Capabilities ─────────────────────────────────────────────────────────────
+$enable-button-pointers: true !default;
+$enable-gradients: false !default;
+
+// =============================================================================
+// Button Variable Configuration
+// =============================================================================
+@use "../../../../node_modules/@shohojdhara/atomix/src/styles/01-settings/settings.button" with (
+  $btn-padding-y:                  $btn-padding-y,
+  $btn-padding-x:                  $btn-padding-x,
+  $btn-line-height:                $btn-line-height,
+  $btn-border-width:               $btn-border-width,
+  $btn-inner-gap:                  $btn-inner-gap,
+  $btn-font-size:                  $btn-font-size,
+  $btn-font-weight:                $btn-font-weight,
+  $btn-letter-spacing:             $btn-letter-spacing,
+  $btn-text-transform:             $btn-text-transform,
+  $btn-white-space:                $btn-white-space,
+  $btn-icon-size:                  $btn-icon-size,
+  $btn-icon-size-sm:               $btn-icon-size-sm,
+  $btn-icon-size-lg:               $btn-icon-size-lg,
+  $btn-padding-y-sm:               $btn-padding-y-sm,
+  $btn-padding-x-sm:               $btn-padding-x-sm,
+  $btn-font-size-sm:               $btn-font-size-sm,
+  $btn-padding-y-lg:               $btn-padding-y-lg,
+  $btn-padding-x-lg:               $btn-padding-x-lg,
+  $btn-font-size-lg:               $btn-font-size-lg,
+  $btn-border-radius:              $btn-border-radius,
+  $btn-border-radius-sm:           $btn-border-radius-sm,
+  $btn-border-radius-lg:           $btn-border-radius-lg,
+  $btn-box-shadow:                 $btn-box-shadow,
+  $btn-hover-shadow:               $btn-hover-shadow,
+  $btn-active-shadow:              $btn-active-shadow,
+  $btn-hover-transform:            $btn-hover-transform,
+  $btn-active-transform:           $btn-active-transform,
+  $btn-hover-bg-shade-amount:      $btn-hover-bg-shade-amount,
+  $btn-hover-bg-tint-amount:       $btn-hover-bg-tint-amount,
+  $btn-hover-border-shade-amount:  $btn-hover-border-shade-amount,
+  $btn-hover-border-tint-amount:   $btn-hover-border-tint-amount,
+  $btn-active-bg-shade-amount:     $btn-active-bg-shade-amount,
+  $btn-active-bg-tint-amount:      $btn-active-bg-tint-amount,
+  $btn-active-border-shade-amount: $btn-active-border-shade-amount,
+  $btn-active-border-tint-amount:  $btn-active-border-tint-amount,
+  $btn-focus-width:                $btn-focus-width,
+  $btn-focus-shadow-opacity:       $btn-focus-shadow-opacity,
+  $btn-focus-outline:              $btn-focus-outline,
+  $btn-focus-outline-offset:       $btn-focus-outline-offset,
+  $btn-disabled-opacity:           $btn-disabled-opacity,
+  $btn-disabled-color:             $btn-disabled-color,
+  $btn-disabled-bg:                $btn-disabled-bg,
+  $btn-disabled-border-color:      $btn-disabled-border-color,
+  $btn-link-color:                 $btn-link-color,
+  $btn-link-color-hover:           $btn-link-color-hover,
+  $btn-link-font-weight:           $btn-link-font-weight,
+  $btn-link-border-color:          $btn-link-border-color,
+  $btn-link-border-color-hover:    $btn-link-border-color-hover,
+  $btn-transition:                 $btn-transition,
+  $enable-button-pointers:         $enable-button-pointers,
+  $enable-gradients:               $enable-gradients
+);

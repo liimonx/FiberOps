@@ -1,185 +1,19 @@
 /**
- * Navbar Component Variable Overrides
+ * Navbar Component Additive Polish
  * =============================================================================
  *
- * Premium top navigation bar: full-bleed frosted glass, refined height &
- * padding, smooth item transitions, and well-proportioned icon sizing.
+ * Applies additional visual polish (centered alignment inside containers, logo scaling transitions,
+ * toggler scaling gestures with focus highlights, collapse overlays) to the
+ * core Atomix Navbar component.
  *
  * @see https://atomix.design/docs/components/navbar
  */
 
 @use "../01-settings/tokens" as tok;
-
-// =============================================================================
-// Component Variable Definitions
-// =============================================================================
-
-  // ---------------------------------------------------------------------------
-  // Container & Layout
-  // ---------------------------------------------------------------------------
-  $navbar-padding-x: 1rem !default;
-
-  // 16px — compact rails
-  $navbar-padding-y: 0.5rem !default;
-
-  // vertical rhythm controlled by height
-  $navbar-container-max-width: 1440px !default;
-
-  // cap at wide viewports
-  $navbar-height: 48px !default;
-
-
-  // slightly taller for breathing room
-  // ---------------------------------------------------------------------------
-  // Appearance
-  // ---------------------------------------------------------------------------
-  $navbar-bg: transparent !default;
-
-  $navbar-border-width: 1px !default;
-
-  $navbar-border-color: var(--atomix-border-color) !default;
-
-  $navbar-box-shadow: tok.$box-shadow-sm !default;
-
-
-  // ---------------------------------------------------------------------------
-  // Brand / Logo
-  // ---------------------------------------------------------------------------
-  $navbar-brand-margin-end: 1.5rem !default;
-
-  // 24px — space before nav links
-  $navbar-brand-font-size: 0.9375rem !default;
-
-  // 17px — confident but not heavy
-  $navbar-brand-font-weight: 700 !default;
-
-  $navbar-brand-color: var(--atomix-body-color) !default;
-
-  // ---------------------------------------------------------------------------
-  // Mobile Toggler
-  // ---------------------------------------------------------------------------
-  $navbar-toggler-size: 2rem !default;
-
-  // 36px — generous touch target
-  $navbar-toggler-color: var(--atomix-body-color) !default;
-
-  $navbar-toggler-bg: transparent !default;
-
-  $navbar-toggler-border: 0 !default;
-
-  $navbar-toggler-border-radius: 0.5rem !default;
-
-  $navbar-toggler-focus-shadow: 0 0 0 3px
-    rgba(var(--atomix-primary-rgb, 6, 182, 212), 0.25) !default;
-
-  // ---------------------------------------------------------------------------
-  // Collapse / Mobile Menu
-  // ---------------------------------------------------------------------------
-  $navbar-collapse-padding-top: 0.5rem !default;
-
-  $navbar-collapse-transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1) !default;
-
-  // ---------------------------------------------------------------------------
-  // Backdrop (mobile overlay)
-  // ---------------------------------------------------------------------------
-  $navbar-backdrop-bg: transparent !default;
-
-  $navbar-backdrop-z-index: 0 !default;
-
-
-  // ---------------------------------------------------------------------------
-  // Z-index
-  // ---------------------------------------------------------------------------
-  $navbar-z-index: 1030 !default;
-
-  $navbar-fixed-z-index: 1030 !default;
-
-
-  // ---------------------------------------------------------------------------
-  // Dark mode
-  // ---------------------------------------------------------------------------
-  $navbar-bg-dark: transparent !default;
-
-  $navbar-border-color-dark: var(--atomix-gray-7) !default;
-
-  $navbar-brand-color-dark: var(--atomix-gray-1) !default;
-
-  $navbar-toggler-color-dark: var(--atomix-gray-1) !default;
-
-// =============================================================================
-// Navbar Variable Configuration
-// =============================================================================
-@use "../../../../node_modules/@shohojdhara/atomix/src/styles/01-settings/settings.navbar"
-  with (
-  // ---------------------------------------------------------------------------
-  // Container & Layout
-  // ---------------------------------------------------------------------------
-  $navbar-padding-x: $navbar-padding-x,
-  // 16px — compact rails
-  $navbar-padding-y: $navbar-padding-y,
-  // vertical rhythm controlled by height
-  $navbar-container-max-width: $navbar-container-max-width,
-  // cap at wide viewports
-  $navbar-height: $navbar-height,
-
-  // slightly taller for breathing room
-  // ---------------------------------------------------------------------------
-  // Appearance
-  // ---------------------------------------------------------------------------
-  $navbar-bg: $navbar-bg,
-  $navbar-border-width: $navbar-border-width,
-  $navbar-border-color: $navbar-border-color,
-  $navbar-box-shadow: $navbar-box-shadow,
-
-  // ---------------------------------------------------------------------------
-  // Brand / Logo
-  // ---------------------------------------------------------------------------
-  $navbar-brand-margin-end: $navbar-brand-margin-end,
-  // 24px — space before nav links
-  $navbar-brand-font-size: $navbar-brand-font-size,
-  // 17px — confident but not heavy
-  $navbar-brand-font-weight: $navbar-brand-font-weight,
-  $navbar-brand-color: $navbar-brand-color,
-  // ---------------------------------------------------------------------------
-  // Mobile Toggler
-  // ---------------------------------------------------------------------------
-  $navbar-toggler-size: $navbar-toggler-size,
-  // 36px — generous touch target
-  $navbar-toggler-color: $navbar-toggler-color,
-  $navbar-toggler-bg: $navbar-toggler-bg,
-  $navbar-toggler-border: $navbar-toggler-border,
-  $navbar-toggler-border-radius: $navbar-toggler-border-radius,
-  $navbar-toggler-focus-shadow: $navbar-toggler-focus-shadow,
-  // ---------------------------------------------------------------------------
-  // Collapse / Mobile Menu
-  // ---------------------------------------------------------------------------
-  $navbar-collapse-padding-top: $navbar-collapse-padding-top,
-  $navbar-collapse-transition: $navbar-collapse-transition,
-  // ---------------------------------------------------------------------------
-  // Backdrop (mobile overlay)
-  // ---------------------------------------------------------------------------
-  $navbar-backdrop-bg: $navbar-backdrop-bg,
-  $navbar-backdrop-z-index: $navbar-backdrop-z-index,
-
-  // ---------------------------------------------------------------------------
-  // Z-index
-  // ---------------------------------------------------------------------------
-  $navbar-z-index: $navbar-z-index,
-  $navbar-fixed-z-index: $navbar-fixed-z-index,
-
-  // ---------------------------------------------------------------------------
-  // Dark mode
-  // ---------------------------------------------------------------------------
-  $navbar-bg-dark: $navbar-bg-dark,
-  $navbar-border-color-dark: $navbar-border-color-dark,
-  $navbar-brand-color-dark: $navbar-brand-color-dark,
-  $navbar-toggler-color-dark: $navbar-toggler-color-dark
-);
+@use "../01-settings/navbar" as nb;
 
 // =============================================================================
 // Additive BEM Polish
-// These selectors are purely additive — they extend the compiled Atomix output
-// without touching any internal BEM internals.
 // =============================================================================
 .c-navbar {
   background: transparent !important;
@@ -187,17 +21,14 @@
   &:hover {
     background: transparent !important;
   }
-  // --------------------------------------------------------------------------
-  // Container — centered gutter with safe min padding on small screens
-  // --------------------------------------------------------------------------
+
+  // ── Container — centered gutter with safe min padding on small screens ──
   &__container {
     // Ensure items are always vertically centred regardless of height override
     align-items: center;
   }
 
-  // --------------------------------------------------------------------------
-  // Brand — smooth colour transition + letter-spacing refinement
-  // --------------------------------------------------------------------------
+  // ── Brand — smooth colour transition + letter-spacing refinement ──
   &__brand {
     letter-spacing: -0.02em;
     transition: opacity 0.3s cubic-bezier(0.23, 1, 0.32, 1);
@@ -213,9 +44,7 @@
     }
   }
 
-  // --------------------------------------------------------------------------
-  // Toggler — rounded pill with hover fill + active ripple
-  // --------------------------------------------------------------------------
+  // ── Toggler — rounded pill with hover fill + active ripple ──
   &__toggler {
     border-radius: tok.$border-radius-lg;
     transition:
@@ -248,9 +77,7 @@
     }
   }
 
-  // --------------------------------------------------------------------------
-  // Collapse — vertical slide in on mobile
-  // --------------------------------------------------------------------------
+  // ── Collapse — vertical slide in on mobile ──
   &__collapse {
     // Desktop: reset any mobile overrides
     @media (min-width: 768px) {

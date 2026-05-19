@@ -1,0 +1,41 @@
+/**
+ * Popover Component Settings Override
+ * =============================================================================
+ *
+ * Premium floating popover: generous padding, glass-tinted surface, elevated
+ * multi-layer shadow, refined border radius, and a spring open animation.
+ *
+ * @see https://atomix.design/docs/components/popover
+ */
+
+@use "./tokens" as tok;
+
+// ── Geometry ─────────────────────────────────────────────────────────────────
+$popover-max-width: 320px !default;
+$popover-padding-x: 16px !default;
+$popover-padding-y: 14px !default;
+$popover-inner-gap-x: 12px !default;
+$popover-inner-gap-y: 10px !default;
+$popover-arrow-size: 10px !default;
+$popover-arrow-offset: 8px !default;
+
+// ── Surface ──────────────────────────────────────────────────────────────────
+$popover-bg: var(--atomix-primary-bg-subtle) !default;
+$popover-border-radius: tok.$border-radius-xxl !default;
+$popover-box-shadow: tok.$box-shadow-md !default;
+
+// =============================================================================
+// Popover Variable Configuration
+// =============================================================================
+@use "../../../../node_modules/@shohojdhara/atomix/src/styles/01-settings/settings.popover" with (
+  $popover-max-width:    $popover-max-width,
+  $popover-padding-x:    $popover-padding-x,
+  $popover-padding-y:    $popover-padding-y,
+  $popover-inner-gap-x:  $popover-inner-gap-x,
+  $popover-inner-gap-y:  $popover-inner-gap-y,
+  $popover-arrow-size:   $popover-arrow-size,
+  $popover-arrow-offset: $popover-arrow-offset,
+  $popover-bg:           $popover-bg,
+  $popover-border-radius: $popover-border-radius,
+  $popover-box-shadow:   $popover-box-shadow
+);

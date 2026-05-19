@@ -1,0 +1,96 @@
+/**
+ * Data Table Component Settings Override
+ * =============================================================================
+ *
+ * Premium data table: glass-tinted surface, contrasting header, refined cell
+ * padding, clear row states (hover / striped / selected), brand-tinted sort
+ * icon and resize handle, polished search input and pagination zone.
+ *
+ * @see https://atomix.design/docs/components/data-table
+ */
+
+@use "./tokens" as tok;
+
+// ── Table Surface ────────────────────────────────────────────────────────────
+$data-table-bg: var(--atomix-primary-bg-subtle) !default;
+$data-table-color: var(--atomix-body-color) !default;
+$data-table-border-color: var(--atomix-border-color) !default;
+$data-table-border-width: 1px !default;
+$data-table-border-style: solid !default;
+$data-table-border-radius: 0.875rem !default;
+
+// ── Header ───────────────────────────────────────────────────────────────────
+$data-table-header-bg: var(--atomix-secondary-bg-subtle) !default;
+$data-table-header-color: var(--atomix-body-color) !default;
+$data-table-header-font-weight: 600 !default;
+
+// ── Cell Padding — Base / Dense ──────────────────────────────────────────────
+$data-table-cell-padding-y: 0.5rem !default;
+$data-table-cell-padding-x: 0.75rem !default;
+$data-table-cell-padding-y-sm: 0.3125rem !default;
+$data-table-cell-padding-x-sm: 0.5rem !default; // 5px
+
+// ── Row States ───────────────────────────────────────────────────────────────
+$data-table-striped-bg: rgba(0, 0, 0, 0.025) !default;
+$data-table-hover-bg: var(--atomix-secondary-bg-subtle) !default;
+
+// ── Pagination Zone ──────────────────────────────────────────────────────────
+$data-table-pagination-padding-y: 0.5rem !default;
+$data-table-pagination-padding-x: 0.75rem !default;
+$data-table-pagination-bg: var(--atomix-primary-bg-subtle) !default;
+$data-table-pagination-border-color: var(--atomix-border-color) !default;
+$data-table-pagination-hover-bg: var(--atomix-secondary-bg-subtle) !default;
+$data-table-pagination-active-bg: var(--atomix-primary) !default;
+$data-table-pagination-active-color: #ffffff !default;
+$data-table-pagination-disabled-color: var(--atomix-disabled-text-emphasis) !default;
+
+// ── Search Input ─────────────────────────────────────────────────────────────
+$data-table-search-bg: var(--atomix-primary-bg-subtle) !default;
+$data-table-search-border-color: var(--atomix-border-color) !default;
+$data-table-search-focus-border-color: var(--atomix-primary) !default;
+$data-table-search-padding-y: 0.5rem !default;
+$data-table-search-padding-x: 0.75rem !default;
+$data-table-search-border-radius: 0.625rem !default;
+
+// ── Sort Icon ────────────────────────────────────────────────────────────────
+$data-table-sort-icon-size: 0.875rem !default;
+$data-table-sort-icon-color: var(--atomix-tertiary-text-emphasis) !default;
+$data-table-sort-icon-active-color: var(--atomix-primary) !default;
+
+// =============================================================================
+// Data Table Variable Configuration
+// =============================================================================
+@use "../../../../node_modules/@shohojdhara/atomix/src/styles/01-settings/settings.data-table" with (
+  $data-table-bg:                         $data-table-bg,
+  $data-table-color:                      $data-table-color,
+  $data-table-border-color:               $data-table-border-color,
+  $data-table-border-width:               $data-table-border-width,
+  $data-table-border-style:               $data-table-border-style,
+  $data-table-border-radius:              $data-table-border-radius,
+  $data-table-header-bg:                  $data-table-header-bg,
+  $data-table-header-color:               $data-table-header-color,
+  $data-table-header-font-weight:         $data-table-header-font-weight,
+  $data-table-cell-padding-y:             $data-table-cell-padding-y,
+  $data-table-cell-padding-x:             $data-table-cell-padding-x,
+  $data-table-cell-padding-y-sm:          $data-table-cell-padding-y-sm,
+  $data-table-cell-padding-x-sm:          $data-table-cell-padding-x-sm,
+  $data-table-striped-bg:                 $data-table-striped-bg,
+  $data-table-hover-bg:                   $data-table-hover-bg,
+  $data-table-pagination-padding-y:       $data-table-pagination-padding-y,
+  $data-table-pagination-padding-x:       $data-table-pagination-padding-x,
+  $data-table-pagination-bg:              $data-table-pagination-bg,
+  $data-table-pagination-border-color:    $data-table-pagination-border-color,
+  $data-table-pagination-hover-bg:        $data-table-pagination-hover-bg,
+  $data-table-pagination-active-bg:       $data-table-pagination-active-bg,
+  $data-table-pagination-active-color:    $data-table-pagination-active-color,
+  $data-table-pagination-disabled-color:  $data-table-pagination-disabled-color,
+  $data-table-search-bg:                  $data-table-search-bg,
+  $data-table-search-border-color:        $data-table-search-border-color,
+  $data-table-search-focus-border-color:  $data-table-search-focus-border-color,
+  $data-table-search-padding-y:           $data-table-search-padding-y,
+  $data-table-search-padding-x:           $data-table-search-padding-x,
+  $data-table-search-border-radius:       $data-table-search-border-radius,
+  $data-table-sort-icon-size:             $data-table-sort-icon-size,
+  $data-table-sort-icon-color:            $data-table-sort-icon-color,
+  $data-table-sort-icon-active-color:     $data-table-sort-icon-active-color
+);

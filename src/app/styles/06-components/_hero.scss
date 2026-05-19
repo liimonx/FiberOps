@@ -1,162 +1,15 @@
 /**
- * Hero Component Variable Overrides
+ * Hero Component Additive Polish
  * =============================================================================
  *
- * Premium hero system: full variable coverage for spacing, background,
- * overlay, typography, actions, and content—plus additive BEM polish for
- * text hierarchy, actions, center/end variants, and a floating entrance
- * animation with reduced-motion safety.
+ * Applies additional visual polish (eyebrow subtitle styling, modern gradient text,
+ * center and end auto-margin layout alignments, and smooth slider item transitions)
+ * to the core Atomix Hero component.
  *
  * @see https://atomix.design/docs/components/hero
  */
 
-// =============================================================================
-// Component Variable Definitions
-// =============================================================================
-
-  // ---------------------------------------------------------------------------
-  // Spacing — generous vertical breathing room
-  // ---------------------------------------------------------------------------
-  $hero-padding-x: 0px !default;
-
-  // full-bleed horizontally
-  $hero-padding-y: 8rem !default;
-
-  // 128px — impactful vertical space
-  $hero-spacer-y: 5rem !default;
-
-
-  // 80px — column gutter rhythm
-  // ---------------------------------------------------------------------------
-  // Background & overlay
-  // ---------------------------------------------------------------------------
-  $hero-bg: transparent !default;
-
-  $hero-overlay: var(--atomix-brand-bg-subtle) !default;
-
-  $hero-overlay-opacity: 0.45 !default;
-
-
-  // ---------------------------------------------------------------------------
-  // Subtitle typography
-  // ---------------------------------------------------------------------------
-  $hero-subtitle-font-size: 0.8125rem !default;
-
-  // 13px — compact eyebrow label
-  $hero-subtitle-color: var(--atomix-primary) !default;
-
-  $hero-subtitle-font-weight: 700 !default;
-
-  $hero-subtitle-margin-bottom: 0.75rem !default;
-
-
-  // 12px
-  // ---------------------------------------------------------------------------
-  // Title typography
-  // ---------------------------------------------------------------------------
-  $hero-title-font-size: 4.5rem !default;
-
-  // 72px — display impact
-  $hero-title-color: var(--atomix-body-color) !default;
-
-  $hero-title-font-weight: 900 !default;
-
-
-  // ---------------------------------------------------------------------------
-  // Body text typography
-  // ---------------------------------------------------------------------------
-  $hero-text-font-size: 1.125rem !default;
-
-  // 18px — comfortable reading
-  $hero-text-color: var(--atomix-secondary-text-emphasis) !default;
-
-  $hero-text-font-weight: 400 !default;
-
-  $hero-text-margin-top: 1.25rem !default;
-
-
-  // 20px
-  // ---------------------------------------------------------------------------
-  // Actions row
-  // ---------------------------------------------------------------------------
-  $hero-actions-margin-top: 2.5rem !default;
-
-  // 40px
-  $hero-actions-inner-gap: 0.75rem !default;
-
-
-  // 12px
-  // ---------------------------------------------------------------------------
-  // Grid & content width
-  // ---------------------------------------------------------------------------
-  $hero-grid-gutter: 64px !default;
-
-  $hero-content-width: 820px !default;
-
-// =============================================================================
-// Hero Variable Configuration
-// =============================================================================
-@use "../../../../node_modules/@shohojdhara/atomix/src/styles/01-settings/settings.hero"
-  with (
-  // ---------------------------------------------------------------------------
-  // Spacing — generous vertical breathing room
-  // ---------------------------------------------------------------------------
-  $hero-padding-x: $hero-padding-x,
-  // full-bleed horizontally
-  $hero-padding-y: $hero-padding-y,
-  // 128px — impactful vertical space
-  $hero-spacer-y: $hero-spacer-y,
-
-  // 80px — column gutter rhythm
-  // ---------------------------------------------------------------------------
-  // Background & overlay
-  // ---------------------------------------------------------------------------
-  $hero-bg: $hero-bg,
-  $hero-overlay: $hero-overlay,
-  $hero-overlay-opacity: $hero-overlay-opacity,
-
-  // ---------------------------------------------------------------------------
-  // Subtitle typography
-  // ---------------------------------------------------------------------------
-  $hero-subtitle-font-size: $hero-subtitle-font-size,
-  // 13px — compact eyebrow label
-  $hero-subtitle-color: $hero-subtitle-color,
-  $hero-subtitle-font-weight: $hero-subtitle-font-weight,
-  $hero-subtitle-margin-bottom: $hero-subtitle-margin-bottom,
-
-  // 12px
-  // ---------------------------------------------------------------------------
-  // Title typography
-  // ---------------------------------------------------------------------------
-  $hero-title-font-size: $hero-title-font-size,
-  // 72px — display impact
-  $hero-title-color: $hero-title-color,
-  $hero-title-font-weight: $hero-title-font-weight,
-
-  // ---------------------------------------------------------------------------
-  // Body text typography
-  // ---------------------------------------------------------------------------
-  $hero-text-font-size: $hero-text-font-size,
-  // 18px — comfortable reading
-  $hero-text-color: $hero-text-color,
-  $hero-text-font-weight: $hero-text-font-weight,
-  $hero-text-margin-top: $hero-text-margin-top,
-
-  // 20px
-  // ---------------------------------------------------------------------------
-  // Actions row
-  // ---------------------------------------------------------------------------
-  $hero-actions-margin-top: $hero-actions-margin-top,
-  // 40px
-  $hero-actions-inner-gap: $hero-actions-inner-gap,
-
-  // 12px
-  // ---------------------------------------------------------------------------
-  // Grid & content width
-  // ---------------------------------------------------------------------------
-  $hero-grid-gutter: $hero-grid-gutter,
-  $hero-content-width: $hero-content-width
-);
+@use "../01-settings/hero" as hr;
 
 // =============================================================================
 // Additive Polish
@@ -167,9 +20,7 @@
     background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
     padding 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
-  // ---------------------------------------------------------------------------
-  // Overlay — soft radial pulse for depth
-  // ---------------------------------------------------------------------------
+  // ── Overlay — soft radial pulse for depth ──
   &__overlay {
     background: radial-gradient(
       ellipse 80% 60% at 50% 0%,
@@ -178,9 +29,7 @@
     );
   }
 
-  // ---------------------------------------------------------------------------
-  // Subtitle — eyebrow badge treatment
-  // ---------------------------------------------------------------------------
+  // ── Subtitle — eyebrow badge treatment ──
   &__subtitle {
     display: inline-flex;
     align-items: center;
@@ -192,9 +41,7 @@
     line-height: 1;
   }
 
-  // ---------------------------------------------------------------------------
-  // Title — gradient text + tight tracking
-  // ---------------------------------------------------------------------------
+  // ── Title — gradient text + tight tracking ──
   &__title {
     background: linear-gradient(
       175deg,
@@ -208,25 +55,19 @@
     line-height: 1.05;
   }
 
-  // ---------------------------------------------------------------------------
-  // Body text — comfortable reading column
-  // ---------------------------------------------------------------------------
+  // ── Body text — comfortable reading column ──
   &__text {
     opacity: 0.72;
     max-width: 42rem;
     line-height: 1.75;
   }
 
-  // ---------------------------------------------------------------------------
-  // Actions — staggered entrance
-  // ---------------------------------------------------------------------------
+  // ── Actions — staggered entrance ──
   &__actions {
     flex-wrap: wrap;
   }
 
-  // ---------------------------------------------------------------------------
-  // Image — rounded, slight shadow lift
-  // ---------------------------------------------------------------------------
+  // ── Image — rounded, slight shadow lift ──
   &__image {
     border-radius: 1.25rem;
     box-shadow:
@@ -234,9 +75,7 @@
       0 8px 16px -4px rgba(0, 0, 0, 0.12);
   }
 
-  // ---------------------------------------------------------------------------
-  // Center variant — text auto-centering helpers
-  // ---------------------------------------------------------------------------
+  // ── Center variant — text auto-centering helpers ──
   &--center {
     .c-hero__text {
       margin-left: auto;
@@ -248,9 +87,7 @@
     }
   }
 
-  // ---------------------------------------------------------------------------
-  // End variant — right-aligned text helpers
-  // ---------------------------------------------------------------------------
+  // ── End variant — right-aligned text helpers ──
   &--end {
     .c-hero__text {
       margin-left: auto;
@@ -261,9 +98,7 @@
     }
   }
 
-  // ---------------------------------------------------------------------------
-  // Full-viewport — smooth min-height entrance
-  // ---------------------------------------------------------------------------
+  // ── Full-viewport — smooth min-height entrance ──
   &--full-vh {
     .c-hero__content {
       padding-top: 2rem;
@@ -271,16 +106,12 @@
     }
   }
 
-  // ---------------------------------------------------------------------------
-  // Slider — cross-fade transition refinement
-  // ---------------------------------------------------------------------------
+  // ── Slider — cross-fade transition refinement ──
   &__slider-item {
     transition: opacity 1.1s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-  // ---------------------------------------------------------------------------
-  // Reduced motion — disable all animations & transitions
-  // ---------------------------------------------------------------------------
+  // ── Reduced motion — disable all animations & transitions ──
   @media (prefers-reduced-motion: reduce) {
     transition: none;
 
