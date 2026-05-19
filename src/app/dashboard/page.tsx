@@ -14,7 +14,6 @@ import {
   AreaChart,
   Callout,
   DonutChart,
-  Avatar,
 } from "@shohojdhara/atomix";
 import { ClientOnly } from "@/components/ClientOnly";
 
@@ -84,7 +83,7 @@ export default function DashboardPage() {
 
       <Grid className="u-mb-6">
         <GridCol xs={12} sm={6} lg={3}>
-          <Card className="u-h-100" appearance="ghost" glass>
+          <Card className="u-h-100">
             <div className="u-flex u-justify-between u-items-center u-mb-4">
               <span className="u-text-secondary-emphasis u-text-sm u-font-bold">
                 Total Customers
@@ -97,7 +96,7 @@ export default function DashboardPage() {
         </GridCol>
 
         <GridCol xs={12} sm={6} lg={3}>
-          <Card className="u-h-100" appearance="ghost" glass>
+          <Card className="u-h-100">
             <div className="u-flex u-justify-between u-items-center u-mb-4">
               <span className="u-text-secondary-emphasis u-text-sm u-font-bold">
                 Active Incidents
@@ -110,7 +109,7 @@ export default function DashboardPage() {
         </GridCol>
 
         <GridCol xs={12} sm={6} lg={3}>
-          <Card className="u-h-100" appearance="ghost" glass>
+          <Card className="u-h-100">
             <div className="u-flex u-justify-between u-items-center u-mb-4">
               <span className="u-text-secondary-emphasis u-text-sm u-font-bold">
                 Avg. Signal Health
@@ -125,7 +124,7 @@ export default function DashboardPage() {
         </GridCol>
 
         <GridCol xs={12} sm={6} lg={3}>
-          <Card className="u-h-100" glass appearance="ghost">
+          <Card className="u-h-100">
             <div className="u-flex u-justify-between u-items-center u-mb-4">
               <span className="u-text-secondary-emphasis u-text-sm u-font-bold">
                 Open Work Orders
@@ -140,7 +139,7 @@ export default function DashboardPage() {
 
       <Grid className="u-mb-6">
         <GridCol xs={12} lg={8}>
-          <Card className="u-h-100" title="Network Usage Trends" glass>
+          <Card className="u-h-100" title="Network Usage Trends">
             <div className="u-h-100 u-min-h-300 u-flex u-items-center u-justify-center">
               {isUsageLoading ? (
                 <div className="u-text-secondary-emphasis">Loading Trends...</div>
@@ -180,7 +179,7 @@ export default function DashboardPage() {
           </Card>
         </GridCol>
         <GridCol xs={12} lg={4}>
-          <Card className="u-h-100" title="Active Outages" glass appearance="ghost">
+          <Card className="u-h-100" title="Active Outages">
             <div className="u-flex u-flex-column u-gap-4">
               <Callout
                 variant="error"
@@ -214,17 +213,20 @@ export default function DashboardPage() {
 
       <Grid className="u-mb-6">
         <GridCol xs={12} lg={4}>
-          <Card title="Customer Segments" className="u-h-100" glass>
-            <div style={{ height: "250px" }} className="u-w-100 u-flex u-items-center u-justify-center">
+          <Card title="Customer Segments" className="u-h-100">
+            <div
+              style={{ height: "250px" }}
+              className="u-w-100 u-flex u-items-center u-justify-center"
+            >
               <ClientOnly>
-                <DonutChart 
+                <DonutChart
                   datasets={[
                     {
                       label: "Segments",
                       data: customerSegments,
-                    }
+                    },
                   ]}
-                  interactive={true} 
+                  interactive={true}
                   showLegend={true}
                 />
               </ClientOnly>
@@ -232,7 +234,7 @@ export default function DashboardPage() {
           </Card>
         </GridCol>
         <GridCol xs={12} lg={8}>
-          <Card title="Recent Work Orders" className="u-overflow-x-auto u-h-100" glass>
+          <Card title="Recent Work Orders" className="u-overflow-x-auto u-h-100">
             <DataTable columns={workOrderColumns} data={recentWorkOrders} rowKey="id" />
           </Card>
         </GridCol>

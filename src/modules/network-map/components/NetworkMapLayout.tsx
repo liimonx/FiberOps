@@ -53,7 +53,7 @@ export const NetworkMapLayout: React.FC<NetworkMapLayoutProps> = ({
           className="u-absolute u-top-4 u-start-4 u-w-80 u-pointer-events-auto"
           aria-label="Search"
         >
-          <Card glass={true} className="u-p-0 u-shadow-xl">
+          <Card className="u-p-0 u-shadow-xl">
             {searchPanel}
           </Card>
         </nav>
@@ -71,7 +71,7 @@ export const NetworkMapLayout: React.FC<NetworkMapLayoutProps> = ({
           className="u-absolute u-bottom-4 u-start-4 u-pointer-events-auto u-w-80"
           aria-label="Layer controls"
         >
-          <Card glass={true} className="u-p-0 u-shadow-xl">
+          <Card className="u-p-0 u-shadow-xl">
             {layerControls}
           </Card>
         </aside>

@@ -159,7 +159,7 @@ export const InteractiveTooltip: React.FC<InteractiveTooltipProps> = ({
       onMouseLeave={onMouseLeave}
     >
       {content && (
-        <Card glass={{ blurAmount: 5 }} appearance="ghost">
+        <Card>
           {/* Header */}
           <Card.Header>
             <div className="u-flex-shrink-0">

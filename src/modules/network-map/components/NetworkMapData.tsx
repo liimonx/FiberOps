@@ -96,8 +96,6 @@ function NetworkMapDataSync({ children }: NetworkMapDataProps) {
     return (
       <div className="u-w-100 u-h-100 u-flex u-items-center u-justify-center u-p-8 u-bg-dark">
         <Card
-          glass={true}
-          appearance="ghost"
           className="u-p-8 u-text-center u-max-w-md u-border-solid u-border-secondary-subtle"
         >
           <Icon name="Warning" size={48} className="u-text-warning u-mb-4" />
@@ -160,7 +158,6 @@ function NetworkStatusIndicators({
       aria-live="polite"
     >
       <Badge
-        glass={{ blurAmount: 10 }}
         variant={
           isConnected ? (connectionQuality === "good" ? "success" : "warning") : "error"
         }
@@ -172,7 +169,6 @@ function NetworkStatusIndicators({
 
       {isFetching && (
         <Badge
-          glass={{ blurAmount: 10 }}
           variant="primary"
           icon={<Icon name="ArrowsCounterClockwise" size={"sm"} className="u-animate-spin" />}
           label="Syncing..."
@@ -182,7 +178,6 @@ function NetworkStatusIndicators({
 
       {activeIncidents > 0 && (
         <Badge
-          glass={{ blurAmount: 10 }}
           variant="error"
           icon={<Icon name="Warning" size={"sm"} />}
           label={`${activeIncidents} Active Incidents`}
@@ -193,7 +188,6 @@ function NetworkStatusIndicators({
 
       {degradedNodes > 0 && (
         <Badge
-          glass={{ blurAmount: 10 }}
           variant="warning"
           icon={<Icon name="Warning" size={"sm"} />}
           label={`${degradedNodes} Degraded`}
@@ -204,7 +198,6 @@ function NetworkStatusIndicators({
 
       {downNodes > 0 && (
         <Badge
-          glass={{ blurAmount: 10 }}
           variant="error"
           icon={<Icon name="Warning" size={"sm"} />}
           label={`${downNodes} Down`}

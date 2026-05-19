@@ -93,8 +93,6 @@ export class ErrorBoundary extends Component<Props, State> {
       return (
         <div className="u-flex u-flex-column u-items-center u-justify-center u-h-100 u-w-100 u-p-10">
           <Card
-            glass={true}
-            appearance="ghost"
             className="u-max-w-md u-w-100 u-p-8 u-text-center u-border-solid u-border-error"
           >
             <div className="u-inline-flex u-items-center u-justify-center u-w-16 u-h-16 u-rounded-circle u-bg-error-subtle u-border u-border-solid u-border-error u-mb-6">

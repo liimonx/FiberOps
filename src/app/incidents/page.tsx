@@ -118,7 +118,7 @@ export default function IncidentsPage() {
 
       <Grid className="u-mb-6">
         <GridCol xs={12} lg={4}>
-          <Card glass={true} className="u-h-100 u-flex u-flex-column">
+          <Card className="u-h-100 u-flex u-flex-column">
             <h2 className="u-text-lg u-font-bold u-mb-4">Live Network Map</h2>
             <div
               className="u-bg-dark u-rounded u-border u-border-secondary-subtle u-flex-grow-1 u-flex u-items-center u-justify-center u-relative"
@@ -146,7 +146,7 @@ export default function IncidentsPage() {
         </GridCol>
 
         <GridCol xs={12} lg={8}>
-          <Card glass={true} className="u-h-100">
+          <Card className="u-h-100">
             <div className="u-flex u-justify-between u-items-center u-mb-4">
               <h2 className="u-text-lg u-font-bold">Incident Log</h2>
               <div className="u-w-25">

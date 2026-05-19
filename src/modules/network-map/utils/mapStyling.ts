@@ -17,29 +17,38 @@ export const MAP_COLORS = {
   // Nodes
   core: "#00ffcc", // Emerald
   pop: "#00e5ff", // Sky Blue
-  distribution: "#7e22ce", // Soft Emerald
-  access: "#a855f7", // Mint
-  splitter: "#f472b6", // Purple
-  junction: "#fb7185", // Slate
+  distribution: "#7e22ce", // Violet/Purple
+  access: "#a855f7", // Soft Purple
+  splitter: "#f472b6", // Pink/Rose
+  junction: "#fb7185", // Coral
   pole: "#475569", // Dark Slate
   onu: "#38bdf8", // Blue
-  customer: "#6ee7b7", // Rose
+  customer: "#6ee7b7", // Mint Green
 
   // Connections
   fiber_route: "#00ffcc", // Cyan
-  customer_connection: "#c084fc", // Sky
+  customer_connection: "#c084fc", // Lavender
 
   // Status
   inactive: "#334155", // Gray
   error: "#ff0055", // Red
   warning: "#ffaa00", // Amber
   selected: "#ffffff", // White
-  hovered: "#00ffcc", // Amber/Yellow for high-contrast feedback
+  hovered: "#ffe600", // Neon Yellow for bright, high-contrast feedback
 
   // Backgrounds
   casing: "#020617", // Deep Navy
   coverage: "#064e3b", // Deep Emerald
 } as const;
+
+// 3D geometry cache for optimal render performance
+const node3DCache = new Map<string, GeoJSON.Feature[]>();
+const connection3DCache = new Map<string, GeoJSON.Feature[]>();
+
+export const clearGeometryCaches = () => {
+  node3DCache.clear();
+  connection3DCache.clear();
+};
 
 /**
  * Standard heights for 3D infrastructure (meters)
@@ -207,11 +216,12 @@ export const CUSTOM_LAYERS: Record<string, LayerSpecification> = {
         0.6,
         ["==", ["get", "status"], "warning"],
         0.4,
-        0.4,
+        0.1, // Ambient glow for active nodes
       ],
       "circle-blur": 1.5,
       "circle-opacity-transition": { duration: 300 },
       "circle-color-transition": { duration: 300 },
+      "circle-radius-transition": { duration: 300 },
     },
   },
 
@@ -242,6 +252,7 @@ export const CUSTOM_LAYERS: Record<string, LayerSpecification> = {
       "circle-stroke-color": MAP_COLORS.casing,
       "circle-color-transition": { duration: 300 },
       "circle-stroke-color-transition": { duration: 300 },
+      "circle-radius-transition": { duration: 300 },
     },
   },
 
@@ -289,7 +300,12 @@ export const CUSTOM_LAYERS: Record<string, LayerSpecification> = {
         15,
         ["case", ["boolean", ["feature-state", "hover"], false], 8.5, 5.5],
       ],
-      "line-color": MAP_COLORS.fiber_route,
+      "line-color": [
+        "case",
+        ["boolean", ["feature-state", "hover"], false],
+        MAP_COLORS.hovered,
+        LINE_COLOR,
+      ],
       "line-opacity": 0.6,
       "line-blur": 4,
       "line-width-transition": { duration: 300 },
@@ -338,80 +354,6 @@ export const CUSTOM_LAYERS: Record<string, LayerSpecification> = {
     },
   },
 
-  /** Neon Node Halo Layer */
-  nodesGlow: {
-    id: "network-nodes-glow",
-    type: "circle",
-    source: "network-nodes",
-    paint: {
-      "circle-radius": [
-        "interpolate",
-        ["linear"],
-        ["zoom"],
-        5,
-        2,
-        12,
-        8,
-        18,
-        32,
-      ],
-      "circle-blur": 0.8,
-      "circle-color": [
-        "case",
-        ["boolean", ["feature-state", "hover"], false],
-        MAP_COLORS.hovered,
-        ["==", ["get", "status"], "error"],
-        MAP_COLORS.error,
-        ["==", ["get", "status"], "warning"],
-        MAP_COLORS.warning,
-        "transparent"
-      ],
-      "circle-opacity": [
-        "case",
-        ["boolean", ["feature-state", "hover"], false],
-        0.8,
-        ["==", ["get", "status"], "error"],
-        0.6,
-        ["==", ["get", "status"], "warning"],
-        0.6,
-        0
-      ],
-      "circle-opacity-transition": { duration: 300 },
-      "circle-color-transition": { duration: 300 },
-      "circle-radius-transition": { duration: 300 },
-    },
-  },
-
-  /** 2D Circle Nodes Layer */
-  nodes: {
-    id: "network-nodes-layer",
-    type: "circle",
-    source: "network-nodes",
-    paint: {
-      "circle-radius": [
-        "interpolate",
-        ["linear"],
-        ["zoom"],
-        5,
-        1,
-        12,
-        4,
-        18,
-        16,
-      ],
-      "circle-color": [
-        "case",
-        ["boolean", ["feature-state", "hover"], false],
-        MAP_COLORS.hovered,
-        NODE_FILL
-      ],
-      "circle-stroke-width": 1.5,
-      "circle-stroke-color": MAP_COLORS.casing,
-      "circle-color-transition": { duration: 300 },
-      "circle-radius-transition": { duration: 300 },
-    },
-  },
-
   /** Glowing corridor for outage identification */
   outagesGlow: {
     id: "network-outages-glow",
@@ -455,11 +397,12 @@ export const CUSTOM_LAYERS: Record<string, LayerSpecification> = {
     },
   },
 
-  /** 3D Extruded Blocks for Nodes */
+  /** 3D ExtrBlocks for Nodes */
   nodes3D: {
     id: "network-nodes-3d-layer",
     type: "fill-extrusion",
     source: "network-nodes-3d",
+    minzoom: 14,
     paint: {
       "fill-extrusion-color": [
         "case",
@@ -512,14 +455,15 @@ export const addCustomLayers = (map: mapboxgl.Map) => {
     map.setPaintProperty("background", "background-color", "#020617");
   }
 
-  // Find a label layer to insert the 3D buildings beneath it
-  if (!map.isStyleLoaded()) return;
-  const styleLayers = map.getStyle()?.layers || [];
+  // Find a label layer to insert the 3D buildings beneath it safely
   let labelLayerId: string | undefined;
-  for (let i = 0; i < styleLayers.length; i++) {
-    if (styleLayers[i].type === "symbol" && styleLayers[i].layout) {
-      labelLayerId = styleLayers[i].id;
-      break;
+  if (map.isStyleLoaded()) {
+    const styleLayers = map.getStyle()?.layers || [];
+    for (let i = 0; i < styleLayers.length; i++) {
+      if (styleLayers[i].type === "symbol" && styleLayers[i].layout) {
+        labelLayerId = styleLayers[i].id;
+        break;
+      }
     }
   }
 
@@ -570,19 +514,18 @@ export const addCustomLayers = (map: mapboxgl.Map) => {
     }
   });
 
+  // Layer stack order arranged from background depth to high-contrast foreground
   const layers = [
     CUSTOM_LAYERS.coverage,
     CUSTOM_LAYERS.connectionCasing,
     CUSTOM_LAYERS.connectionsGlow,
     CUSTOM_LAYERS.connections,
-    CUSTOM_LAYERS.nodesGlow,
-    CUSTOM_LAYERS.nodes,
     CUSTOM_LAYERS.outagesGlow,
+    CUSTOM_LAYERS.outages,
     CUSTOM_LAYERS.nodesGlow,
     CUSTOM_LAYERS.nodes,
     CUSTOM_LAYERS.nodes3D,
     CUSTOM_LAYERS.connections3D,
-    CUSTOM_LAYERS.outages,
   ];
 
   layers.forEach((layer) => {
@@ -671,6 +614,16 @@ export const createNodeFeature = (node: NetworkNode): GeoJSON.Feature => ({
 });
 
 export const create3DNodeFeatures = (node: NetworkNode): GeoJSON.Feature[] => {
+  const cacheKey = `${node.id}-${node.position.lng}-${node.position.lat}-${node.type}-${node.status}`;
+  if (node3DCache.has(cacheKey)) {
+    return node3DCache.get(cacheKey)!;
+  }
+  const result = _create3DNodeFeaturesInternal(node);
+  node3DCache.set(cacheKey, result);
+  return result;
+};
+
+const _create3DNodeFeaturesInternal = (node: NetworkNode): GeoJSON.Feature[] => {
   let radius = 0.0001; // ~10m
   const height = NODE_HEIGHTS[node.type] || 15;
 
@@ -1454,6 +1407,34 @@ export const create3DConnectionFeatures = (
   connection: NetworkConnection,
   nodes: NetworkNode[] | Map<string, NetworkNode>
 ): GeoJSON.Feature[] => {
+  let sNode: NetworkNode | undefined;
+  let tNode: NetworkNode | undefined;
+  if (nodes instanceof Map) {
+    sNode = nodes.get(connection.sourceNodeId);
+    tNode = nodes.get(connection.targetNodeId);
+  } else {
+    sNode = nodes.find((n) => n.id === connection.sourceNodeId);
+    tNode = nodes.find((n) => n.id === connection.targetNodeId);
+  }
+  if (!sNode || !tNode) return [];
+
+  const routeKey = connection.route?.map(r => `${r.lng},${r.lat}`).join("|") || 
+                   `${sNode.position.lng},${sNode.position.lat}|${tNode.position.lng},${tNode.position.lat}`;
+  const cacheKey = `${connection.id}-${connection.sourceNodeId}-${connection.targetNodeId}-${connection.type}-${connection.status}-${routeKey}`;
+  
+  if (connection3DCache.has(cacheKey)) {
+    return connection3DCache.get(cacheKey)!;
+  }
+  
+  const result = _create3DConnectionFeaturesInternal(connection, nodes);
+  connection3DCache.set(cacheKey, result);
+  return result;
+};
+
+const _create3DConnectionFeaturesInternal = (
+  connection: NetworkConnection,
+  nodes: NetworkNode[] | Map<string, NetworkNode>
+): GeoJSON.Feature[] => {
   let sourceNode: NetworkNode | undefined;
   let targetNode: NetworkNode | undefined;
 
@@ -1492,12 +1473,15 @@ export const create3DConnectionFeatures = (
     const p1 = coords[i];
     const p2 = coords[i + 1];
 
-    const dx = p2[0] - p1[0];
+    const midLatRad = ((p1[1] + p2[1]) / 2) * Math.PI / 180;
+    const cosLat = Math.cos(midLatRad);
+
+    const dx = (p2[0] - p1[0]) * cosLat;
     const dy = p2[1] - p1[1];
     const len = Math.sqrt(dx * dx + dy * dy);
     if (len === 0) continue;
 
-    const nx = (-dy / len) * width;
+    const nx = ((-dy / len) * width) / cosLat;
     const ny = (dx / len) * width;
 
     features.push({

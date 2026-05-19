@@ -64,7 +64,7 @@ export const ImpairmentAreaPanel: React.FC = () => {
 
   if (!impairmentArea) {
     return (
-      <Card glass className="u-p-4 u-w-100">
+      <Card className="u-p-4 u-w-100">
         <div className="u-flex u-items-center u-gap-2">
           <Icon name="Info" size={20} className="u-text-secondary" />
           <span className="u-text-sm u-text-secondary">Click on the map to define the impairment blast radius.</span>
@@ -88,7 +88,7 @@ export const ImpairmentAreaPanel: React.FC = () => {
   };
 
   return (
-    <Card glass className="u-p-4 u-w-100">
+    <Card className="u-p-4 u-w-100">
       <div className="u-flex u-items-center u-justify-between u-mb-4">
         <h3 className="u-m-0 u-text-sm u-font-bold u-flex u-items-center u-gap-2">
           <Icon name="Warning" size={16} className="u-text-error" />

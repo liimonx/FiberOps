@@ -189,7 +189,6 @@ export const LayerControls: React.FC<LayerControlsProps> = ({ className = "" }) 
       title=""
       icon={<Icon name="Stack" />}
       className={`${className} u-w-100`}
-      glass={{ blurAmount: 5 }}
     >
       <Accordion.Header>
         <div className="u-relative u-w-100">

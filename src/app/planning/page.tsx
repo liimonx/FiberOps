@@ -17,7 +17,7 @@ export default function PlanningPage() {
         </Button>
       </div>
 
-      <Card glass={true} className="u-w-100 u-text-center u-py-8">
+      <Card className="u-w-100 u-text-center u-py-8">
         <h2 className="u-text-xl u-font-bold u-mb-2">Module Coming Soon</h2>
         <p className="u-text-secondary-emphasis">
           The planning module is currently under active development.

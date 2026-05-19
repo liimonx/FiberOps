@@ -60,7 +60,7 @@ export const InspectorPanel: React.FC<InspectorPanelProps> = ({
 
   if (!hasSelection) {
     return (
-      <Card glass={true} className={`u-w-auto ${className}`}>
+      <Card className={`u-w-auto ${className}`}>
         <div className="u-flex u-flex-column u-items-center u-gap-4">
           <Icon
             name="CursorClick"
@@ -97,7 +97,6 @@ export const InspectorPanel: React.FC<InspectorPanelProps> = ({
       className="u-outline-none"
     >
       <Card
-        glass={{ blurAmount: 5, mode: "shader" }}
         className={`u-overflow-hidden ${isCollapsed ? "u-h-auto u-w-auto" : "u-h-100 u-w-100"} ${className}`}
         variant={
           selectedNode?.status == "active"

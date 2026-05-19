@@ -118,7 +118,10 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({ onMapLoad, onMapError }) =
         if (nodesSource)
           nodesSource.setData({ type: "FeatureCollection", features: nodeFeatures });
 
-        const node3DFeatures = filteredNodes.flatMap(create3DNodeFeatures);
+        const currentZoom = map.getZoom();
+        const render3D = currentZoom >= 13.5;
+
+        const node3DFeatures = render3D ? filteredNodes.flatMap(create3DNodeFeatures) : [];
         const nodes3DSource = map.getSource("network-nodes-3d") as
           | mapboxgl.GeoJSONSource
           | undefined;
@@ -139,9 +142,11 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({ onMapLoad, onMapError }) =
             features: connectionFeatures,
           });
 
-        const connection3DFeatures = filteredConnections.flatMap((conn) =>
-          create3DConnectionFeatures(conn, allNodesMap)
-        );
+        const connection3DFeatures = render3D
+          ? filteredConnections.flatMap((conn) =>
+              create3DConnectionFeatures(conn, allNodesMap)
+            )
+          : [];
         const connections3DSource = map.getSource("network-connections-3d") as
           | mapboxgl.GeoJSONSource
           | undefined;
@@ -376,6 +381,8 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({ onMapLoad, onMapError }) =
     return () => ro.disconnect();
   }, [isReady]);
 
+  const isZoomedInFor3D = viewport.zoom >= 13.5;
+
   useEffect(() => {
     if (!mapRef.current || !isReady) return;
     const map = mapRef.current;
@@ -390,13 +397,12 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({ onMapLoad, onMapError }) =
     };
 
     apply();
-  }, [nodes, connections, isReady, layers, updateMapData]);
+  }, [nodes, connections, isReady, layers, updateMapData, isZoomedInFor3D]);
 
   if (mapError) {
     return (
       <div className="u-absolute u-inset-0 u-flex u-items-center u-justify-center u-bg-dark u-p-6">
         <Card
-          glass={true}
           className="u-max-w-md u-w-100 u-p-8 u-text-center u-bg-white-opacity-5"
         >
           <div className="u-inline-flex u-items-center u-justify-center u-w-16 u-h-16 u-rounded-circle u-bg-error-subtle u-border u-border-solid u-border-error u-mb-6">

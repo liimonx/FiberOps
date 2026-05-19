@@ -76,7 +76,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
             <Badge variant="info" label="Mocked" />
           </div>
 
-          <SideMenu glass>
+          <SideMenu>
             <SideMenuList>
               {nav.map((item) => (
                 <SideMenuItem

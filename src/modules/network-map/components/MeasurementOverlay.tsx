@@ -17,7 +17,7 @@ export function MeasurementOverlay({ onClose }: MeasurementOverlayProps) {
 
   return (
     <div className="overlay-measurement">
-      <Card glass={{ blurAmount: 5, mode: "shader" }}>
+      <Card>
         <div className="u-flex u-justify-between u-items-center u-mb-4">
           <div className="u-flex u-items-center u-gap-3">
             <div className="u-w-8 u-h-8 u-rounded u-bg-primary-subtle u-flex u-items-center u-justify-center">
@@ -119,7 +119,7 @@ export function TracePathOverlay({ onClose }: { onClose?: () => void }) {
 
   return (
     <div className="overlay-trace">
-      <Card glass={{ blurAmount: 5, mode: "shader" }}>
+      <Card>
         <div className="u-flex u-justify-between u-items-center u-mb-4">
           <div className="u-flex u-items-center u-gap-3">
             <div className="u-p-2 u-p-2 u-rounded u-bg-success-subtle u-flex u-items-center u-justify-center">
@@ -205,7 +205,7 @@ export function HeatmapLegend({ onClose }: { onClose?: () => void }) {
 
   return (
     <div className="overlay-heatmap">
-      <Card glass={{ blurAmount: 5, mode: "shader" }}>
+      <Card>
         <div className="u-flex u-justify-between u-items-center u-mb-4">
           <div className="u-flex u-items-center u-gap-2">
             <Icon name="Fire" size={18} className="u-text-error" />

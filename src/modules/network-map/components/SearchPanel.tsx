@@ -2,7 +2,12 @@
 
 import React, { useState } from "react";
 import { Card, Icon } from "@shohojdhara/atomix";
-import { NetworkNode, NetworkConnection, AssetCategory, CategorizedResult } from "../types";
+import {
+  NetworkNode,
+  NetworkConnection,
+  AssetCategory,
+  CategorizedResult,
+} from "../types";
 import { useAssetSearch } from "../hooks/useAssetSearch";
 import { SearchInput } from "./SearchInput";
 import { CategoryFilterTabs } from "./CategoryFilterTabs";
@@ -91,7 +96,7 @@ export const SearchPanel: React.FC<SearchPanelProps> = ({
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <Card glass={{ blurAmount: 5, mode: "shader" }} className={`  ${className}`}>
+    <Card className={`${className}`}>
       <SearchInput
         value={query}
         onChange={setQuery}

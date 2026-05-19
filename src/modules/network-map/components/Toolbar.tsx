@@ -147,7 +147,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
       role="toolbar"
       aria-label="Map tools"
     >
-      <Card glass={true}>
+      <Card>
         <div
           className="u-flex u-flex-column u-gap-1"
           role="group"
