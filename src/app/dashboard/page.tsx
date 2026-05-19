@@ -169,7 +169,7 @@ export default function DashboardPage() {
                       yAxis: {
                         showGrid: true,
                         label: "Usage (Mbps)",
-                        formatter: (val: any) => `${val}M`,
+                        formatter: (val: unknown) => `${val}M`,
                       },
                     }}
                   />
