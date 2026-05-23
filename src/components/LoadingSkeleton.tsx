@@ -27,7 +27,7 @@ export function LoadingSkeleton({ type = "card", count = 1 }: SkeletonProps) {
         <Grid className="u-mb-6">
           {[1, 2, 3, 4].map((i) => (
             <GridCol xs={12} sm={6} lg={3} key={i}>
-              <Card className="u-h-100">
+              <Card>
                 <div className="u-flex u-items-center u-gap-3 u-mb-3">
                   <div
                     className="u-bg-secondary-subtle u-rounded"
@@ -56,7 +56,7 @@ export function LoadingSkeleton({ type = "card", count = 1 }: SkeletonProps) {
         {/* Content skeleton */}
         <Grid>
           <GridCol xs={12} lg={8}>
-            <Card className="u-h-100">
+            <Card>
               <div
                 className="u-bg-secondary-subtle u-rounded u-mb-4"
                 style={{ height: "24px", width: "30%" }}
@@ -68,7 +68,7 @@ export function LoadingSkeleton({ type = "card", count = 1 }: SkeletonProps) {
             </Card>
           </GridCol>
           <GridCol xs={12} lg={4}>
-            <Card className="u-h-100">
+            <Card>
               <div
                 className="u-bg-secondary-subtle u-rounded u-mb-4"
                 style={{ height: "24px", width: "40%" }}

@@ -3,7 +3,7 @@
 import React, { useMemo } from "react";
 import { Card, Button, Icon } from "@shohojdhara/atomix";
 import { useNetworkMapStore } from "../stores/useNetworkMapStore";
-import { NetworkNodeType, LatLng } from "../types";
+import { computeImpairmentImpact } from "../utils/impairmentUtils";
 
 export const ImpairmentAreaPanel: React.FC = () => {
   const impairmentArea = useNetworkMapStore((state) => state.impairmentArea);
@@ -20,46 +20,11 @@ export const ImpairmentAreaPanel: React.FC = () => {
     (state) => state.restoreImpairmentServices
   );
 
-  // Haversine formula
-  const getDistance = (p1: LatLng, p2: LatLng) => {
-    const R = 6371e3; // meters
-    const phi1 = (p1.lat * Math.PI) / 180;
-    const phi2 = (p2.lat * Math.PI) / 180;
-    const dPhi = ((p2.lat - p1.lat) * Math.PI) / 180;
-    const dLambda = ((p2.lng - p1.lng) * Math.PI) / 180;
-
-    const a =
-      Math.sin(dPhi / 2) * Math.sin(dPhi / 2) +
-      Math.cos(phi1) * Math.cos(phi2) * Math.sin(dLambda / 2) * Math.sin(dLambda / 2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
-    return R * c;
-  };
-
   const impactData = useMemo(() => {
-    if (!impairmentArea) return { nodes: [], connections: [], customersCount: 0 };
-
-    const impactedNodes = nodes.filter(
-      (n) => getDistance(impairmentArea.center, n.position) <= impairmentArea.radius
-    );
-
-    const impactedNodeIds = new Set(impactedNodes.map((n) => n.id));
-
-    const impactedConnections = connections.filter(
-      (c) =>
-        impactedNodeIds.has(c.sourceNodeId) || impactedNodeIds.has(c.targetNodeId)
-    );
-
-    // Simple calculation: customers physically in the blast radius
-    const customersCount = impactedNodes.filter(
-      (n) => n.type === NetworkNodeType.CUSTOMER
-    ).length;
-
-    return {
-      nodes: impactedNodes,
-      connections: impactedConnections,
-      customersCount,
-    };
+    if (!impairmentArea) {
+      return { nodes: [], connections: [], customersCount: 0 };
+    }
+    return computeImpairmentImpact(impairmentArea, nodes, connections);
   }, [impairmentArea, nodes, connections]);
 
   if (!impairmentArea) {

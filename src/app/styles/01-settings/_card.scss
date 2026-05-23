@@ -26,8 +26,8 @@ $card-text-color: var(--atomix-secondary-text-emphasis) !default;
 $card-text-font-size: 0.875rem !default; // 14px
 
 // ── Borders & Radii ──────────────────────────────────────────────────────────
-$card-border-width: 0px !default;
-$card-border-color: transparent !default;
+$card-border-width: 1px !default;
+$card-border-color: #5b885b3d !default;
 $card-border-radius: tok.$border-radius-xxl !default;     // 16px — modern rounded card
 $card-image-border-radius: tok.$border-radius-sm !default; // 12px — tighter image corners
 

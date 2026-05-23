@@ -1,19 +1,17 @@
 "use client";
 
-import { useCallback, useState, useEffect } from "react";
+import { useCallback, useMemo } from "react";
 import { Icon } from "@shohojdhara/atomix";
 import {
   NetworkMapDataProvider,
   MapCanvas,
   SearchPanel,
-  Toolbar,
+  MapToolbar,
   LayerControls,
   InspectorPanel,
   MapEventHandler,
   MapControls,
   InteractiveTooltip,
-  createNodeTooltipContent,
-  createConnectionTooltipContent,
   ImpairmentAreaPanel,
 } from "@/modules/network-map/components";
 import {
@@ -25,21 +23,21 @@ import {
 } from "@/modules/network-map/stores/useNetworkMapStore";
 import { CategorizedResult } from "@/modules/network-map/types";
 import { flyToLocation } from "@/modules/network-map/utils/mapUtils";
-import { getMapInstance } from "@/modules/network-map/components/MapCanvas";
+import { useMapInstance } from "@/modules/network-map/hooks/useMapInstance";
+import { useMapHoverTooltip } from "@/modules/network-map/hooks/useMapHoverTooltip";
 import {
   MeasurementOverlay,
   TracePathOverlay,
   HeatmapLegend,
 } from "@/modules/network-map/components/MeasurementOverlay";
 import { ToolVisualizations } from "@/modules/network-map/components/ToolVisualizations";
-import { useTooltipHover } from "@/modules/network-map/hooks/useTooltipHover";
 
-// Wrapper component to access store hooks
 function NetworkMapContent() {
   const nodes = useNodes();
   const connections = useConnections();
   const selectedNode = useSelectedNode();
   const activeTool = useNetworkMapStore((state) => state.interaction.activeTool);
+  const setActiveTool = useNetworkMapStore((state) => state.setActiveTool);
 
   const selectedElementId = useNetworkMapStore(
     (state) => state.interaction.selectedElementId
@@ -49,39 +47,54 @@ function NetworkMapContent() {
     (state) => state.addToSelectionHistory
   );
 
-  // Track the live map instance for ToolVisualizations
-  const [mapInstance, setMapInstance] = useState<mapboxgl.Map | null>(null);
-  useEffect(() => {
-    // Poll until the map is ready (MapCanvas mounts it asynchronously)
-    const interval = setInterval(() => {
-      const map = getMapInstance();
-      if (map) {
-        setMapInstance(map);
-        clearInterval(interval);
-      }
-    }, 200);
-    return () => clearInterval(interval);
-  }, []);
-
-  // Resolve selected connection from store
+  const mapInstance = useMapInstance();
   const selectedConnection = useConnectionById(selectedNode ? null : selectedElementId);
 
-  // Use the custom hook for tooltip hover logic
+  const showHoverTooltip =
+    activeTool === "select" && !selectedNode && !selectedConnection;
+
+  const tooltipCallbacks = useMemo(
+    () => ({
+      onViewDetails: (id: string) => {
+        setSelectedElement(id);
+        addToSelectionHistory(id);
+      },
+      onTracePath: (nodeId: string) => {
+        setActiveTool("trace");
+        setSelectedElement(nodeId);
+        addToSelectionHistory(nodeId);
+      },
+      onViewRoute: (connectionId: string) => {
+        setSelectedElement(connectionId);
+        addToSelectionHistory(connectionId);
+      },
+      onCheckHealth: (connectionId: string) => {
+        setSelectedElement(connectionId);
+        addToSelectionHistory(connectionId);
+      },
+    }),
+    [setSelectedElement, addToSelectionHistory, setActiveTool]
+  );
+
   const {
     tooltip,
-    showTooltip,
-    hideTooltip,
-    handleMouseEnter: handleTooltipMouseEnter,
-    handleMouseLeave: handleTooltipMouseLeave,
-  } = useTooltipHover();
+    hoverTarget,
+    handleNodeHover,
+    handleConnectionHover,
+    handleTooltipMouseEnter,
+    handleTooltipMouseLeave,
+  } = useMapHoverTooltip({
+    nodes,
+    connections,
+    enabled: showHoverTooltip,
+    callbacks: tooltipCallbacks,
+  });
 
-  // Handle search result selection — fly to actual node coordinates
   const handleSelectResult = useCallback(
     (result: CategorizedResult) => {
       setSelectedElement(result.id);
       addToSelectionHistory(result.id);
 
-      // Look up the actual node position
       const node = nodes.find((n) => n.id === result.id);
       if (node) {
         flyToLocation(mapInstance, [node.position.lng, node.position.lat], 15);
@@ -94,44 +107,8 @@ function NetworkMapContent() {
     setSelectedElement(null);
   }, [setSelectedElement]);
 
-  // Tooltip handlers wired to MapEventHandler - stable implementation
-  const handleNodeHover = useCallback(
-    (nodeId: string | null, event: mapboxgl.MapMouseEvent) => {
-      if (!nodeId) {
-        hideTooltip(); // The hook handles the delay internally
-        return;
-      }
-
-      const node = nodes.find((n) => n.id === nodeId);
-      if (node && event.point) {
-        const content = createNodeTooltipContent(node);
-        showTooltip(content, event.point.x, event.point.y);
-      }
-    },
-    [nodes, showTooltip, hideTooltip]
-  );
-
-  const handleConnectionHover = useCallback(
-    (connectionId: string | null, event: mapboxgl.MapMouseEvent) => {
-      if (!connectionId) {
-        hideTooltip(); // The hook handles the delay internally
-        return;
-      }
-
-      const connection = connections.find((c) => c.id === connectionId);
-      if (connection && event.point) {
-        const content = createConnectionTooltipContent(connection);
-        showTooltip(content, event.point.x, event.point.y);
-      }
-    },
-    [connections, showTooltip, hideTooltip]
-  );
-
-  // Node click → behaviour depends on active tool
   const handleNodeClick = useCallback(
     (nodeId: string) => {
-      // Trace and Measure tools handle their own click logic via ToolManager.
-      // Don't override their state by forcing a selection/fly-to here.
       if (activeTool === "trace" || activeTool === "measure") return;
 
       setSelectedElement(nodeId);
@@ -145,7 +122,6 @@ function NetworkMapContent() {
     [activeTool, nodes, setSelectedElement, addToSelectionHistory, mapInstance]
   );
 
-  // Connection click → select
   const handleConnectionClick = useCallback(
     (connectionId: string) => {
       setSelectedElement(connectionId);
@@ -156,10 +132,8 @@ function NetworkMapContent() {
 
   return (
     <div className="network-map-page">
-      {/* Map Canvas - Full Screen Background */}
       <MapCanvas />
 
-      {/* Map Event Handler for click/hover interactions */}
       <MapEventHandler
         onNodeClick={handleNodeClick}
         onNodeHover={handleNodeHover}
@@ -167,9 +141,7 @@ function NetworkMapContent() {
         onConnectionHover={handleConnectionHover}
       />
 
-      {/* Floating UI Panels */}
       <div className="map-overlay">
-        {/* Search Panel — Top Left */}
         <div className="overlay-top-left">
           <SearchPanel
             nodes={nodes}
@@ -178,22 +150,18 @@ function NetworkMapContent() {
           />
         </div>
 
-        {/* Toolbar — Top Right */}
         <div className="overlay-top-right">
-          <Toolbar position="top-right" />
+          <MapToolbar />
         </div>
 
-        {/* Map Controls (Zoom/Compass) — Right Side, below Toolbar */}
         <div className="overlay-bottom-right">
-          <MapControls position="bottom-right" />
+          <MapControls />
         </div>
 
-        {/* Layer Controls — Bottom Left */}
         <div className="overlay-bottom-left">
           <LayerControls />
         </div>
 
-        {/* Inspector Panel — Right Side, below controls */}
         {(selectedNode || selectedConnection) && (
           <div className="overlay-inspector">
             <InspectorPanel
@@ -203,25 +171,22 @@ function NetworkMapContent() {
             />
           </div>
         )}
+
         <div className="overlay-bottom-center">
-          {/* Tool overlays — shown when the relevant tool is active */}
           {activeTool === "measure" && <MeasurementOverlay />}
           {activeTool === "trace" && <TracePathOverlay />}
           {activeTool === "heatmap" && <HeatmapLegend />}
           {activeTool === "impairment" && <ImpairmentAreaPanel />}
         </div>
-
-        {/* Zoom Level Indicator */}
-        <ZoomLevelIndicator />
       </div>
 
-      {/* Mapbox GL layer visualizations (measurement lines, trace path, heatmap) */}
       {mapInstance && <ToolVisualizations mapInstance={mapInstance} />}
 
-      {/* Interactive Tooltip — follows mouse on hover */}
-      {!selectedNode && !selectedConnection && tooltip.content && (
+      {showHoverTooltip && tooltip.content && (
         <InteractiveTooltip
           content={tooltip.content}
+          node={hoverTarget.node ?? undefined}
+          connection={hoverTarget.connection ?? undefined}
           visible={tooltip.visible}
           position={{ x: tooltip.x, y: tooltip.y }}
           onMouseEnter={handleTooltipMouseEnter}
@@ -293,8 +258,8 @@ function NetworkMapContent() {
 
         @media (max-width: 768px) {
           .overlay-top-left {
-            width: calc(100% - 80px);
-            max-width: 280px;
+            width: auto;
+            max-width: calc(100% - 80px);
           }
 
           .overlay-inspector {
@@ -316,7 +281,6 @@ function NetworkMapContent() {
   );
 }
 
-// Zoom level indicator component
 function ZoomLevelIndicator() {
   const zoom = useNetworkMapStore((state) => state.viewport.zoom);
 

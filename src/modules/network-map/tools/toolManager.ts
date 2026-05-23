@@ -7,6 +7,7 @@ import {
   MeasurementPoint,
   TracePath,
   NetworkStatus,
+  ToolType,
 } from "../types";
 import { useNetworkMapStore } from "../stores/useNetworkMapStore";
 
@@ -506,20 +507,31 @@ export class ToolManager {
     return Array.from(this.tools.values());
   }
 
-  setActiveTool(toolId: string): void {
-    // Deactivate current tool
+  setActiveTool(
+    toolId: string,
+    options?: { syncStore?: boolean }
+  ): void {
+    const syncStore = options?.syncStore !== false;
+
+    if (this.activeTool?.id === toolId) {
+      if (syncStore) {
+        useNetworkMapStore.getState().setActiveTool(toolId as ToolType);
+      }
+      return;
+    }
+
     if (this.activeTool) {
       this.activeTool.deactivate();
     }
 
-    // Activate new tool
     const newTool = this.tools.get(toolId);
     if (newTool) {
       this.activeTool = newTool;
       newTool.activate();
 
-      // Update store
-      useNetworkMapStore.getState().setActiveTool(toolId as any);
+      if (syncStore) {
+        useNetworkMapStore.getState().setActiveTool(toolId as ToolType);
+      }
       console.log("[ToolManager] Active tool changed to:", newTool.name);
     } else {
       console.warn("[ToolManager] Tool not found:", toolId);

@@ -1,5 +1,5 @@
 import { bench, describe } from 'vitest';
-import { create3DConnectionFeatures, createConnectionFeature } from './mapStyling';
+import { createConnectionFeature } from './mapStyling';
 import { NetworkConnection, NetworkNode, NetworkNodeType, NetworkStatus, ConnectionType } from '../types';
 
 const generateData = (nodeCount: number, connectionCount: number) => {
@@ -27,16 +27,16 @@ const generateData = (nodeCount: number, connectionCount: number) => {
 const { nodes, connections } = generateData(10000, 5000);
 
 describe('mapStyling performance', () => {
-  bench('create3DConnectionFeatures - unoptimized (array lookup)', () => {
+  bench('createConnectionFeature - array lookup', () => {
     connections.forEach(conn => {
-      create3DConnectionFeatures(conn, nodes);
+      createConnectionFeature(conn, nodes);
     });
   });
 
-  bench('create3DConnectionFeatures - optimized (map lookup)', () => {
+  bench('createConnectionFeature - map lookup', () => {
     const nodesMap = new Map(nodes.map(n => [n.id, n]));
     connections.forEach(conn => {
-      create3DConnectionFeatures(conn, nodesMap);
+      createConnectionFeature(conn, nodesMap);
     });
   });
 });

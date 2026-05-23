@@ -1,0 +1,14 @@
+diff --git a/node_modules/@shohojdhara/atomix/src/styles/05-objects/_index.scss b/node_modules/@shohojdhara/atomix/src/styles/05-objects/_index.scss
+index 0d1e069..a8f3c21 100644
+--- a/node_modules/@shohojdhara/atomix/src/styles/05-objects/_index.scss
++++ b/node_modules/@shohojdhara/atomix/src/styles/05-objects/_index.scss
+@@ -1,3 +1,10 @@
++// Load modules before @forward so mixins from @use dependencies resolve under Turbopack.
++@use 'objects.container' as container;
++@use 'objects.grid' as grid;
++@use 'objects.masonry-grid' as masonry-grid;
++@use 'objects.block' as block;
++
+ // Forward all objects files
+ @forward 'objects.container';
+ @forward 'objects.grid';

@@ -49,6 +49,9 @@ function NetworkMapDataSync({ children }: NetworkMapDataProps) {
   const setError = useNetworkMapStore((state) => state.setError);
   const setWebSocketConnected = useNetworkMapStore((state) => state.setWebSocketConnected);
   const setConnectionQuality = useNetworkMapStore((state) => state.setConnectionQuality);
+  const simulatedOutageActive = useNetworkMapStore(
+    (state) => state.simulatedOutageActive
+  );
 
   // Consolidated sync effect
   useEffect(() => {
@@ -61,6 +64,9 @@ function NetworkMapDataSync({ children }: NetworkMapDataProps) {
     } else {
       setError(null);
     }
+
+    // Do not overwrite in-memory outage simulation when the user is previewing impact
+    if (simulatedOutageActive) return;
 
     if (nodes.length > 0) {
       setNodes(nodes);
@@ -75,7 +81,8 @@ function NetworkMapDataSync({ children }: NetworkMapDataProps) {
     isLoading, 
     error, 
     isConnected, 
-    connectionQuality, 
+    connectionQuality,
+    simulatedOutageActive,
     setNodes, 
     setConnections, 
     setLoading, 

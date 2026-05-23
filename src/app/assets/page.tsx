@@ -109,7 +109,7 @@ export default function AssetsPage() {
 
       <Grid className="u-mb-6">
         <GridCol xs={12} lg={selectedAsset ? 7 : 12}>
-          <Card className="u-h-100">
+          <Card>
             <div className="u-mb-4">
               <Input
                 placeholder="Search assets by ID, type, or location..."
@@ -127,7 +127,7 @@ export default function AssetsPage() {
 
         {selectedAsset && (
           <GridCol xs={12} lg={5}>
-            <Card className="u-h-100">
+            <Card>
               <div className="u-flex u-justify-between u-items-start u-mb-6">
                 <div>
                   <h2 className="u-text-lg u-font-bold u-mb-1">{selectedAsset.id}</h2>

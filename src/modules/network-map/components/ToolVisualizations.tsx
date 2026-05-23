@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import mapboxgl from "mapbox-gl";
 import { useNetworkMapStore } from "../stores/useNetworkMapStore";
 import { MeasurementPoint, TracePath, HeatmapData } from "../types";
+import { createImpairmentCircleGeoJSON } from "../utils/impairmentUtils";
 
 interface ToolVisualizationsProps {
   mapInstance?: mapboxgl.Map | null;
@@ -384,45 +385,84 @@ function cleanupHeatmap(map: mapboxgl.Map) {
   }
 }
 
-// Combined visualization component
-// Helper functions for impairment area
-function createCirclePolygon(center: { lat: number; lng: number }, radiusMeters: number, points: number = 64): GeoJSON.FeatureCollection {
-  const coords = [];
-  const km = radiusMeters / 1000;
+const IMPAIRMENT_SOURCE_ID = "impairment-area";
+const IMPAIRMENT_FILL_LAYER_ID = "impairment-area-fill";
+const IMPAIRMENT_LINE_LAYER_ID = "impairment-area-line";
+const IMPAIRMENT_CENTER_LAYER_ID = "impairment-area-center";
 
-  for (let i = 0; i < points; i++) {
-    const angle = (i * 360) / points;
-    const dx = km * Math.cos((angle * Math.PI) / 180);
-    const dy = km * Math.sin((angle * Math.PI) / 180);
+const BLAST_FILTER: mapboxgl.Expression = ["==", ["get", "role"], "blast"];
+const CENTER_FILTER: mapboxgl.Expression = ["==", ["get", "role"], "center"];
 
-    const lat = center.lat + (dy / 110.574);
-    const lng = center.lng + (dx / (111.32 * Math.cos((center.lat * Math.PI) / 180)));
-
-    coords.push([lng, lat]);
+function removeImpairmentLayers(map: mapboxgl.Map) {
+  for (const id of [
+    IMPAIRMENT_CENTER_LAYER_ID,
+    IMPAIRMENT_LINE_LAYER_ID,
+    IMPAIRMENT_FILL_LAYER_ID,
+  ]) {
+    if (map.getLayer(id)) map.removeLayer(id);
   }
-  coords.push(coords[0]); // close the polygon
+  if (map.getSource(IMPAIRMENT_SOURCE_ID)) map.removeSource(IMPAIRMENT_SOURCE_ID);
+}
 
-  return {
-    type: "FeatureCollection",
-    features: [
-      {
-        type: "Feature",
-        geometry: {
-          type: "Polygon",
-          coordinates: [coords],
-        },
-        properties: {},
-      },
-      {
-        type: "Feature",
-        geometry: {
-          type: "Point",
-          coordinates: [center.lng, center.lat],
-        },
-        properties: { isCenter: true },
-      }
-    ],
-  };
+function syncImpairmentLayers(
+  map: mapboxgl.Map,
+  impairmentArea: { center: { lat: number; lng: number }; radius: number } | null
+) {
+  if (!map.isStyleLoaded()) return;
+
+  if (!impairmentArea) {
+    removeImpairmentLayers(map);
+    return;
+  }
+
+  const geojson = createImpairmentCircleGeoJSON(
+    impairmentArea.center,
+    impairmentArea.radius
+  );
+
+  const existing = map.getSource(IMPAIRMENT_SOURCE_ID) as mapboxgl.GeoJSONSource | undefined;
+  if (existing) {
+    existing.setData(geojson);
+    return;
+  }
+
+  map.addSource(IMPAIRMENT_SOURCE_ID, { type: "geojson", data: geojson });
+
+  map.addLayer({
+    id: IMPAIRMENT_FILL_LAYER_ID,
+    type: "fill",
+    source: IMPAIRMENT_SOURCE_ID,
+    filter: BLAST_FILTER,
+    paint: {
+      "fill-color": "#EF4444",
+      "fill-opacity": 0.18,
+    },
+  });
+
+  map.addLayer({
+    id: IMPAIRMENT_LINE_LAYER_ID,
+    type: "line",
+    source: IMPAIRMENT_SOURCE_ID,
+    filter: BLAST_FILTER,
+    paint: {
+      "line-color": "#EF4444",
+      "line-width": 2,
+      "line-dasharray": [3, 3],
+    },
+  });
+
+  map.addLayer({
+    id: IMPAIRMENT_CENTER_LAYER_ID,
+    type: "circle",
+    source: IMPAIRMENT_SOURCE_ID,
+    filter: CENTER_FILTER,
+    paint: {
+      "circle-radius": 5,
+      "circle-color": "#EF4444",
+      "circle-stroke-width": 2,
+      "circle-stroke-color": "#FFFFFF",
+    },
+  });
 }
 
 // Render impairment area on the map
@@ -430,80 +470,27 @@ export function ImpairmentVisualization({ mapInstance }: ToolVisualizationsProps
   const impairmentArea = useNetworkMapStore((state) => state.impairmentArea);
 
   useEffect(() => {
-    if (!mapInstance || !mapInstance.isStyleLoaded()) return;
+    if (!mapInstance) return;
 
-    const sourceId = "impairment-area";
-    const layerFillId = "impairment-area-fill";
-    const layerLineId = "impairment-area-line";
-    const layerCenterId = "impairment-area-center";
+    const apply = () => syncImpairmentLayers(mapInstance, impairmentArea);
 
-    if (impairmentArea) {
-      const geojson = createCirclePolygon(impairmentArea.center, impairmentArea.radius);
-
-      if (mapInstance.getSource(sourceId)) {
-        (mapInstance.getSource(sourceId) as mapboxgl.GeoJSONSource).setData(geojson);
-      } else {
-        mapInstance.addSource(sourceId, {
-          type: "geojson",
-          data: geojson,
-        });
-
-        mapInstance.addLayer({
-          id: layerFillId,
-          type: "fill",
-          source: sourceId,
-          filter: ["==", "$type", "Polygon"],
-          paint: {
-            "fill-color": "#EF4444",
-            "fill-opacity": 0.15,
-          },
-        });
-
-        mapInstance.addLayer({
-          id: layerLineId,
-          type: "line",
-          source: sourceId,
-          filter: ["==", "$type", "Polygon"],
-          paint: {
-            "line-color": "#EF4444",
-            "line-width": 2,
-            "line-dasharray": [3, 3],
-          },
-        });
-
-        mapInstance.addLayer({
-          id: layerCenterId,
-          type: "circle",
-          source: sourceId,
-          filter: ["==", "$type", "Point"],
-          paint: {
-            "circle-radius": 4,
-            "circle-color": "#EF4444",
-            "circle-stroke-width": 2,
-            "circle-stroke-color": "#FFFFFF",
-          },
-        });
-      }
+    if (mapInstance.isStyleLoaded()) {
+      apply();
     } else {
-      if (mapInstance.getLayer(layerFillId)) mapInstance.removeLayer(layerFillId);
-      if (mapInstance.getLayer(layerLineId)) mapInstance.removeLayer(layerLineId);
-      if (mapInstance.getLayer(layerCenterId)) mapInstance.removeLayer(layerCenterId);
-      if (mapInstance.getSource(sourceId)) mapInstance.removeSource(sourceId);
+      mapInstance.once("style.load", apply);
     }
+
+    mapInstance.on("style.load", apply);
+    return () => {
+      mapInstance.off("style.load", apply);
+    };
   }, [mapInstance, impairmentArea]);
 
   useEffect(() => {
     return () => {
-      if (!mapInstance || !mapInstance.isStyleLoaded()) return;
-      const sourceId = "impairment-area";
-      const layerFillId = "impairment-area-fill";
-      const layerLineId = "impairment-area-line";
-      const layerCenterId = "impairment-area-center";
-
-      if (mapInstance.getLayer(layerFillId)) mapInstance.removeLayer(layerFillId);
-      if (mapInstance.getLayer(layerLineId)) mapInstance.removeLayer(layerLineId);
-      if (mapInstance.getLayer(layerCenterId)) mapInstance.removeLayer(layerCenterId);
-      if (mapInstance.getSource(sourceId)) mapInstance.removeSource(sourceId);
+      if (mapInstance?.isStyleLoaded()) {
+        removeImpairmentLayers(mapInstance);
+      }
     };
   }, [mapInstance]);
 

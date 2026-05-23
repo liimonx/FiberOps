@@ -2,11 +2,16 @@
 
 import React, { useEffect, useRef } from "react";
 import mapboxgl from "mapbox-gl";
-import { getMapInstance } from "./MapCanvas";
+import { useMapInstance } from "../hooks/useMapInstance";
 import { useNetworkMapStore } from "../stores/useNetworkMapStore";
 import { useAccessibilityAnnounce } from "./AccessibilityAnnouncer";
 import { getToolManager } from "../tools/toolManager";
 import { safeHasLayer, fitMapBounds, flyToLocation } from "../utils/mapUtils";
+import {
+  getNetworkQueryableLayers,
+  isConnectionLayerId,
+  isNodeLayerId,
+} from "../utils/mapStyling/queryLayers";
 
 interface MapEventHandlerProps {
   onNodeClick?: (nodeId: string, event: mapboxgl.MapMouseEvent) => void;
@@ -27,23 +32,30 @@ export const MapEventHandler: React.FC<MapEventHandlerProps> = ({
 }) => {
   const setSelectedElement = useNetworkMapStore((state) => state.setSelectedElement);
   const setHoveredElement = useNetworkMapStore((state) => state.setHoveredElement);
-  const setActiveTool = useNetworkMapStore((state) => state.setActiveTool);
   const activeTool = useNetworkMapStore((state) => state.interaction.activeTool);
   const { announce } = useAccessibilityAnnounce();
   const prevToolRef = useRef(activeTool);
 
-  // Sync tool manager with store's active tool
+  const map = useMapInstance();
+
+  // Sync tool manager with store's active tool (store is source of truth for UI)
   useEffect(() => {
     const toolManager = getToolManager();
     if (activeTool !== toolManager.getActiveTool()?.id) {
-      toolManager.setActiveTool(activeTool);
+      toolManager.setActiveTool(activeTool, { syncStore: false });
     }
   }, [activeTool]);
 
   useEffect(() => {
-    const map = getMapInstance();
     if (!map) return;
     const toolManager = getToolManager();
+
+    const resolveCursor = (hasFeature: boolean): string => {
+      const tool = toolManager.getActiveTool();
+      if (!tool) return "";
+      if (hasFeature && tool.id === "select") return "pointer";
+      return tool.cursor ?? "";
+    };
 
 
 
@@ -51,17 +63,9 @@ export const MapEventHandler: React.FC<MapEventHandlerProps> = ({
     const handleMapClick = (event: mapboxgl.MapMouseEvent) => {
       // Check if layers exist before querying
       let features: mapboxgl.MapboxGeoJSONFeature[] = [];
-      if (
-        (safeHasLayer(map, "network-nodes-3d-layer") || safeHasLayer(map, "network-nodes-layer")) &&
-        safeHasLayer(map, "network-connections-layer")
-      ) {
-        const queryLayers = ["network-connections-layer"];
-        if (safeHasLayer(map, "network-nodes-3d-layer")) queryLayers.push("network-nodes-3d-layer");
-        if (safeHasLayer(map, "network-nodes-layer")) queryLayers.push("network-nodes-layer");
-
-        features = map.queryRenderedFeatures(event.point, {
-          layers: queryLayers,
-        });
+      const queryLayers = getNetworkQueryableLayers(map, safeHasLayer);
+      if (queryLayers.length > 0) {
+        features = map.queryRenderedFeatures(event.point, { layers: queryLayers });
       }
 
       // Delegate to ToolManager
@@ -77,9 +81,9 @@ export const MapEventHandler: React.FC<MapEventHandlerProps> = ({
         const feature = features[0];
         const elementId = feature.properties?.id;
 
-        if (feature.layer && (feature.layer.id === "network-nodes-3d-layer" || feature.layer.id === "network-nodes-layer")) {
+        if (isNodeLayerId(feature.layer?.id)) {
           onNodeClick?.(elementId as string, event);
-        } else if (feature.layer && feature.layer.id === "network-connections-layer") {
+        } else if (isConnectionLayerId(feature.layer?.id)) {
           onConnectionClick?.(elementId as string, event);
         }
       } else {
@@ -93,16 +97,8 @@ export const MapEventHandler: React.FC<MapEventHandlerProps> = ({
     // Handle mouse move for hover effects
     const handleMouseMove = (event: mapboxgl.MapMouseEvent) => {
       // Check if layers exist before querying
-      const node3DLayerExists = safeHasLayer(map, "network-nodes-3d-layer");
-      const node2DLayerExists = safeHasLayer(map, "network-nodes-layer");
-      const connectionLayerExists = safeHasLayer(map, "network-connections-layer");
-
-      if (!node3DLayerExists && !node2DLayerExists && !connectionLayerExists) return;
-
-      const layersToQuery = [];
-      if (node3DLayerExists) layersToQuery.push("network-nodes-3d-layer");
-      if (node2DLayerExists) layersToQuery.push("network-nodes-layer");
-      if (connectionLayerExists) layersToQuery.push("network-connections-layer");
+      const layersToQuery = getNetworkQueryableLayers(map, safeHasLayer);
+      if (layersToQuery.length === 0) return;
 
       const features = map.queryRenderedFeatures(event.point, {
         layers: layersToQuery,
@@ -125,7 +121,7 @@ export const MapEventHandler: React.FC<MapEventHandlerProps> = ({
           setHoveredElement(null);
           onNodeHover?.(null, event);
           onConnectionHover?.(null, event);
-          map.getCanvas().style.cursor = "";
+          map.getCanvas().style.cursor = resolveCursor(false);
           return;
         }
 
@@ -137,13 +133,13 @@ export const MapEventHandler: React.FC<MapEventHandlerProps> = ({
           { source: source as string, id: elementId as string | number },
           { hover: true }
         );
-        map.getCanvas().style.cursor = "pointer";
+        map.getCanvas().style.cursor = resolveCursor(true);
 
-        if (feature.layer?.id === "network-nodes-3d-layer" || feature.layer?.id === "network-nodes-layer") {
+        if (isNodeLayerId(feature.layer?.id)) {
           setHoveredElement(elementId as string);
           onNodeHover?.(elementId as string, event);
           onConnectionHover?.(null, event);
-        } else if (feature.layer?.id === "network-connections-layer") {
+        } else if (isConnectionLayerId(feature.layer?.id)) {
           setHoveredElement(elementId as string);
           onConnectionHover?.(elementId as string, event);
           onNodeHover?.(null, event);
@@ -153,7 +149,7 @@ export const MapEventHandler: React.FC<MapEventHandlerProps> = ({
         setHoveredElement(null);
         onNodeHover?.(null, event);
         onConnectionHover?.(null, event);
-        map.getCanvas().style.cursor = "";
+        map.getCanvas().style.cursor = resolveCursor(false);
       }
     };
 
@@ -169,7 +165,7 @@ export const MapEventHandler: React.FC<MapEventHandlerProps> = ({
       setHoveredElement(null);
       onNodeHover?.(null, { point: { x: 0, y: 0 }, lngLat: { lng: 0, lat: 0 } } as mapboxgl.MapMouseEvent);
       onConnectionHover?.(null, { point: { x: 0, y: 0 }, lngLat: { lng: 0, lat: 0 } } as mapboxgl.MapMouseEvent);
-      map.getCanvas().style.cursor = "";
+      map.getCanvas().style.cursor = resolveCursor(false);
     };
 
     // Add event listeners
@@ -232,50 +228,16 @@ export const MapEventHandler: React.FC<MapEventHandlerProps> = ({
           map.resetNorth({ duration: 500 });
           announce("Map orientation reset to north", "polite");
           break;
-        case "v":
-        case "V":
-          if (!event.ctrlKey && !event.metaKey) {
-            event.preventDefault();
-            setActiveTool("select");
-            announce("Select tool activated", "polite");
-          }
-          break;
-        case "t":
-        case "T":
-          if (!event.ctrlKey && !event.metaKey) {
-            event.preventDefault();
-            setActiveTool("trace");
-            announce("Trace path tool activated", "polite");
-          }
-          break;
-        case "m":
-        case "M":
-          if (!event.ctrlKey && !event.metaKey) {
-            event.preventDefault();
-            setActiveTool("measure");
-            announce("Measure tool activated", "polite");
-          }
-          break;
-        case "h":
-        case "H":
-          if (!event.ctrlKey && !event.metaKey) {
-            event.preventDefault();
-            setActiveTool("heatmap");
-            announce("Heatmap tool activated", "polite");
-          }
-          break;
-        case "i":
-        case "I":
-          if (!event.ctrlKey && !event.metaKey) {
-            event.preventDefault();
-            setActiveTool("impairment");
-            announce("Impairment tool activated", "polite");
-          }
-          break;
         case "Escape":
-          setSelectedElement(null);
-          setHoveredElement(null);
-          announce("Selection cleared", "polite");
+          toolManager.handleEvent("onKeyDown", event);
+          if (activeTool === "select") {
+            setSelectedElement(null);
+            setHoveredElement(null);
+            announce("Selection cleared", "polite");
+          }
+          break;
+        default:
+          toolManager.handleEvent("onKeyDown", event);
           break;
       }
     };
@@ -314,20 +276,17 @@ export const MapEventHandler: React.FC<MapEventHandlerProps> = ({
         }
 
         const nodesGlowId = "network-nodes-glow";
-        if (safeHasLayer(map, nodesGlowId)) {
-          // Dynamic pulsing for active outages/warnings on 2D nodes
-          const baseOpacity = 0.5;
-          const pulseRange = 0.25;
-          const pulseNodes = baseOpacity + Math.sin(elapsed / 300) * pulseRange;
+        if (safeHasLayer(map, nodesGlowId) && map.getZoom() >= 9) {
+          const pulseNodes = 0.28 + Math.sin(elapsed / 400) * 0.1;
 
           map.setPaintProperty(nodesGlowId, "circle-opacity", [
             "case",
             ["boolean", ["feature-state", "hover"], false],
-            0.8,
+            0.55,
             ["==", ["get", "status"], "error"],
             pulseNodes,
             ["==", ["get", "status"], "warning"],
-            pulseNodes * 0.7,
+            pulseNodes * 0.75,
             0,
           ]);
         }
@@ -361,6 +320,8 @@ export const MapEventHandler: React.FC<MapEventHandlerProps> = ({
       }
     };
   }, [
+    map,
+    activeTool,
     setSelectedElement,
     setHoveredElement,
     onNodeClick,
@@ -370,7 +331,6 @@ export const MapEventHandler: React.FC<MapEventHandlerProps> = ({
     onMapClick,
     onMapMove,
     announce,
-    setActiveTool,
   ]);
 
   // This component doesn't render anything visible

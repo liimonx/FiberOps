@@ -46,7 +46,7 @@ describe('InteractiveTooltip Null Safety', () => {
     );
     // The component always renders when content is truthy, but controls visibility with CSS.
     // Instead of being null, it should be in the document.
-    expect(container.querySelector('[role="dialog"]')).toBeInTheDocument();
+    expect(container.querySelector('[role="tooltip"]')).toBeInTheDocument();
   });
 
   it('should not render when visible is true but content is null', () => {
@@ -69,7 +69,7 @@ describe('InteractiveTooltip Null Safety', () => {
         visible={true}
       />
     );
-    expect(screen.queryByRole('dialog')).toBeInTheDocument();
+    expect(screen.queryByRole('tooltip')).toBeInTheDocument();
   });
 
   it('should render when content is provided with empty details array', () => {
@@ -86,7 +86,7 @@ describe('InteractiveTooltip Null Safety', () => {
         visible={true}
       />
     );
-    expect(container.querySelector('[role="dialog"]')).toBeInTheDocument();
+    expect(container.querySelector('[role="tooltip"]')).toBeInTheDocument();
   });
 
   it('should handle undefined actions array safely', () => {
@@ -104,7 +104,7 @@ describe('InteractiveTooltip Null Safety', () => {
         visible={true}
       />
     );
-    expect(container.querySelector('[role="dialog"]')).toBeInTheDocument();
+    expect(container.querySelector('[role="tooltip"]')).toBeInTheDocument();
   });
 
   it('should not throw when accessing content properties with null content', () => {
@@ -138,7 +138,7 @@ describe('InteractiveTooltip Null Safety', () => {
           visible={true}
         />
       );
-      expect(container.querySelector('[role="dialog"]')).toBeInTheDocument();
+      expect(container.querySelector('[role="tooltip"]')).toBeInTheDocument();
     });
 
     it('should render with numeric values in details', () => {
@@ -158,7 +158,7 @@ describe('InteractiveTooltip Null Safety', () => {
           visible={true}
         />
       );
-      expect(screen.queryByRole('dialog')).toBeInTheDocument();
+      expect(screen.queryByRole('tooltip')).toBeInTheDocument();
     });
 
     it('should render with metadata object', () => {
@@ -176,7 +176,7 @@ describe('InteractiveTooltip Null Safety', () => {
           visible={true}
         />
       );
-      expect(screen.queryByRole('dialog')).toBeInTheDocument();
+      expect(screen.queryByRole('tooltip')).toBeInTheDocument();
     });
   });
 });

@@ -2,138 +2,183 @@
 
 import React, { useCallback, useState, useEffect } from "react";
 import { Button, Card, Icon } from "@shohojdhara/atomix";
-import { getMapInstance } from "./MapCanvas";
-import { useResponsive } from "../hooks/useResponsive";
+import { useMapInstance } from "../hooks/useMapInstance";
 import { useAccessibilityAnnounce } from "./AccessibilityAnnouncer";
+import {
+  BUILDINGS_LAYER_ID,
+  updateLayerVisibility,
+} from "../utils/mapStyling";
 
 interface MapControlsProps {
   className?: string;
-  position?: "top-right" | "bottom-right" | "top-left" | "bottom-left";
   showCompass?: boolean;
+  showBasemapToggle?: boolean;
+  showBuildingsToggle?: boolean;
+  showZoom?: boolean;
 }
 
 export const MapControls: React.FC<MapControlsProps> = ({
   className = "",
-  position = "top-right",
   showCompass = true,
+  showBasemapToggle = true,
+  showBuildingsToggle = true,
+  showZoom = true,
 }) => {
-  const { isMobile } = useResponsive();
+  const mapInstance = useMapInstance();
   const { announce } = useAccessibilityAnnounce();
   const [isSatelliteView, setIsSatelliteView] = useState(false);
+  const [showBuildings, setShowBuildings] = useState(true);
+
+  const applyBuildingsVisibility = useCallback(
+    (visible: boolean) => {
+      if (!mapInstance?.getLayer(BUILDINGS_LAYER_ID)) return;
+      updateLayerVisibility(mapInstance, BUILDINGS_LAYER_ID, visible);
+    },
+    [mapInstance]
+  );
+
+  useEffect(() => {
+    if (!mapInstance) return;
+
+    const syncBuildings = () => applyBuildingsVisibility(showBuildings);
+    syncBuildings();
+    mapInstance.on("style.load", syncBuildings);
+
+    return () => {
+      mapInstance.off("style.load", syncBuildings);
+    };
+  }, [mapInstance, showBuildings, applyBuildingsVisibility]);
+
+  const handleToggleBuildings = useCallback(() => {
+    const next = !showBuildings;
+    setShowBuildings(next);
+    applyBuildingsVisibility(next);
+    announce(next ? "3D buildings shown" : "3D buildings hidden", "polite");
+  }, [showBuildings, applyBuildingsVisibility, announce]);
 
   const handleZoomIn = useCallback(() => {
-    const map = getMapInstance();
-    if (map) {
-      map.zoomIn();
+    if (mapInstance) {
+      mapInstance.zoomIn();
       announce("Map zoomed in", "polite");
     }
-  }, [announce]);
+  }, [mapInstance, announce]);
 
   const handleZoomOut = useCallback(() => {
-    const map = getMapInstance();
-    if (map) {
-      map.zoomOut();
+    if (mapInstance) {
+      mapInstance.zoomOut();
       announce("Map zoomed out", "polite");
     }
-  }, [announce]);
-
+  }, [mapInstance, announce]);
 
   const handleResetPitch = useCallback(() => {
-    const map = getMapInstance();
-    if (map) {
-      map.setPitch(0);
+    if (mapInstance) {
+      mapInstance.setPitch(0);
       announce("Map pitch reset", "polite");
     }
-  }, [announce]);
+  }, [mapInstance, announce]);
 
   const handleToggleSatellite = useCallback(() => {
-    const map = getMapInstance();
-    if (!map) return;
+    if (!mapInstance) return;
 
     const newStyle = isSatelliteView
       ? "mapbox://styles/mapbox/dark-v11"
       : "mapbox://styles/mapbox/satellite-streets-v12";
 
-    map.setStyle(newStyle);
+    mapInstance.setStyle(newStyle);
+    mapInstance.once("style.load", () => applyBuildingsVisibility(showBuildings));
     setIsSatelliteView(!isSatelliteView);
     announce(
       isSatelliteView ? "Switched to dark map view" : "Switched to satellite view",
       "polite"
     );
-  }, [isSatelliteView, announce]);
-
-  const positionClasses = {
-    "top-right": "u-absolute u-top-0 u-end-0 u-mt-40 u-me-2",
-    "bottom-right": "u-absolute u-bottom-0 u-end-0 u-mb-4 u-me-4",
-    "top-left": "u-absolute u-top-0 u-start-0 u-mt-4 u-ms-4",
-    "bottom-left": "u-absolute u-bottom-0 u-start-0 u-mb-4 u-ms-4",
-  };
+  }, [mapInstance, isSatelliteView, showBuildings, applyBuildingsVisibility, announce]);
 
   return (
-    <div className={` ${positionClasses[position]} ${className}`}>
+    <div className={className}>
       <Card>
         <div
           className="u-flex u-flex-column u-gap-1"
           role="toolbar"
           aria-label="Map controls"
         >
-          {/* Zoom controls */}
-          <div
-            className="u-flex u-flex-column u-gap-1"
-            role="group"
-            aria-label="Zoom controls"
-          >
-            <Button
-              variant="secondary"
-              size={"sm"}
-              iconName="Plus"
-              iconOnly
-              onClick={handleZoomIn}
-              aria-label="Zoom in"
-            />
-            <Button
-              variant="secondary"
-              size={"sm"}
-              iconName="Minus"
-              iconOnly
-              onClick={handleZoomOut}
-              aria-label="Zoom out"
-            />
-          </div>
+          {showZoom && (
+            <div
+              className="u-flex u-flex-column u-gap-1"
+              role="group"
+              aria-label="Zoom controls"
+            >
+              <Button
+                variant="secondary"
+                size="sm"
+                iconName="Plus"
+                iconOnly
+                onClick={handleZoomIn}
+                aria-label="Zoom in"
+              />
+              <Button
+                variant="secondary"
+                size="sm"
+                iconName="Minus"
+                iconOnly
+                onClick={handleZoomOut}
+                aria-label="Zoom out"
+              />
+            </div>
+          )}
 
-          <div className="u-border-top u-border-solid u-border-secondary-subtle u-opacity-20 u-my-1" />
+          {(showBasemapToggle || showBuildingsToggle) && showZoom && (
+            <div className="u-border-top u-border-solid u-border-secondary-subtle u-opacity-20 u-my-1" />
+          )}
 
-          {/* View mode controls */}
-          <div
-            className="u-flex u-flex-column u-gap-1"
-            role="group"
-            aria-label="View mode controls"
-          >
-            <Button
-              variant={isSatelliteView ? "primary" : "secondary"}
-              size={"sm"}
-              iconName={isSatelliteView ? "GlobeHemisphereWest" : "Globe"}
-              iconOnly
-              onClick={handleToggleSatellite}
-              aria-label={
-                isSatelliteView ? "Switch to dark map view" : "Switch to satellite view"
-              }
-            />
-          </div>
+          {(showBasemapToggle || showBuildingsToggle) && (
+            <div
+              className="u-flex u-flex-column u-gap-1"
+              role="group"
+              aria-label="View mode controls"
+            >
+              {showBasemapToggle && (
+                <Button
+                  variant={isSatelliteView ? "primary" : "secondary"}
+                  size="sm"
+                  iconName={isSatelliteView ? "GlobeHemisphereWest" : "Globe"}
+                  iconOnly
+                  onClick={handleToggleSatellite}
+                  aria-label={
+                    isSatelliteView
+                      ? "Switch to dark map view"
+                      : "Switch to satellite view"
+                  }
+                />
+              )}
+              {showBuildingsToggle && (
+                <Button
+                  variant={showBuildings ? "primary" : "secondary"}
+                  size="sm"
+                  iconName={showBuildings ? "Buildings" : "EyeSlash"}
+                  iconOnly
+                  onClick={handleToggleBuildings}
+                  aria-label={
+                    showBuildings ? "Hide 3D buildings" : "Show 3D buildings"
+                  }
+                />
+              )}
+            </div>
+          )}
 
-          <div className="u-border-top u-border-solid u-border-secondary-subtle u-opacity-20 u-my-1" />
+          {showCompass && (showZoom || showBasemapToggle || showBuildingsToggle) && (
+            <div className="u-border-top u-border-solid u-border-secondary-subtle u-opacity-20 u-my-1" />
+          )}
 
-          {/* Compass controls */}
           {showCompass && (
             <div
               className="u-flex u-flex-column u-gap-1"
               role="group"
               aria-label="Orientation controls"
             >
-              <CompassControl size={"sm"} />
+              <CompassControl size="sm" />
               <Button
                 variant="secondary"
-                size={"sm"}
+                size="sm"
                 iconName="GlobeHemisphereWest"
                 iconOnly
                 onClick={handleResetPitch}
@@ -147,26 +192,24 @@ export const MapControls: React.FC<MapControlsProps> = ({
   );
 };
 
-// Enhanced controls component with bearing indicator
 export const CompassControl: React.FC<{ size?: "sm" | "md" }> = ({ size = "md" }) => {
+  const mapInstance = useMapInstance();
   const [bearing, setBearing] = useState(0);
 
   useEffect(() => {
-    const map = getMapInstance();
-    if (!map) return;
+    if (!mapInstance) return;
 
-    const updateBearing = () => setBearing(map.getBearing());
-    map.on("rotate", updateBearing);
+    const updateBearing = () => setBearing(mapInstance.getBearing());
+    mapInstance.on("rotate", updateBearing);
     updateBearing();
 
     return () => {
-      map.off("rotate", updateBearing);
+      mapInstance.off("rotate", updateBearing);
     };
-  }, []);
+  }, [mapInstance]);
 
   const handleResetBearing = () => {
-    const map = getMapInstance();
-    if (map) map.resetNorth();
+    mapInstance?.resetNorth();
   };
 
   return (
@@ -177,14 +220,10 @@ export const CompassControl: React.FC<{ size?: "sm" | "md" }> = ({ size = "md" }
       aria-label={`Reset map orientation, current bearing: ${Math.round(bearing)} degrees`}
       iconOnly
       icon={
-        <div
-          style={{
-            transform: `rotate(${-bearing}deg)`,
-          }}
-        >
+        <div style={{ transform: `rotate(${-bearing}deg)` }}>
           <Icon name="NavigationArrow" size={16} />
         </div>
       }
-    ></Button>
+    />
   );
 };

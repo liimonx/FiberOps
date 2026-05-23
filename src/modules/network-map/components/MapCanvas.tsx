@@ -18,7 +18,8 @@ import {
   createNodeFeature,
   createConnectionFeature,
   create3DNodeFeatures,
-  create3DConnectionFeatures,
+  ZOOM_NODES_3D_MIN,
+  ZOOM_SHOW_CUSTOMER_CONNECTIONS,
 } from "../utils/mapStyling";
 import {
   visibleConnectionTypesFromLayers,
@@ -26,7 +27,7 @@ import {
   isCoverageLayerVisible,
   isOutagesLayerVisible,
 } from "../utils/layerVisibility";
-import { NetworkNodeType, NetworkStatus } from "../types";
+import { ConnectionType, NetworkNodeType, NetworkStatus } from "../types";
 import type { NetworkMapLayer } from "../types";
 import type { NetworkNode, NetworkConnection } from "../types";
 
@@ -105,11 +106,20 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({ onMapLoad, onMapError }) =
             ? []
             : allNodes.filter((n) => nodeTypeSet.has(String(n.type)));
 
+        const currentZoom = map.getZoom();
+
         const connTypeSet = new Set(connTypes.map(String));
-        const filteredConnections =
+        let filteredConnections =
           connTypes.length === 0
             ? []
             : allConnections.filter((c) => connTypeSet.has(String(c.type)));
+
+        // Overview: trunk only — last-mile starbursts wash out the map
+        if (currentZoom < ZOOM_SHOW_CUSTOMER_CONNECTIONS) {
+          filteredConnections = filteredConnections.filter(
+            (c) => c.type === ConnectionType.FIBER_ROUTE
+          );
+        }
 
         const nodeFeatures = filteredNodes.map(createNodeFeature);
         const nodesSource = map.getSource("network-nodes") as
@@ -118,8 +128,7 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({ onMapLoad, onMapError }) =
         if (nodesSource)
           nodesSource.setData({ type: "FeatureCollection", features: nodeFeatures });
 
-        const currentZoom = map.getZoom();
-        const render3D = currentZoom >= 13.5;
+        const render3D = currentZoom >= ZOOM_NODES_3D_MIN - 0.5;
 
         const node3DFeatures = render3D ? filteredNodes.flatMap(create3DNodeFeatures) : [];
         const nodes3DSource = map.getSource("network-nodes-3d") as
@@ -140,20 +149,6 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({ onMapLoad, onMapError }) =
           connectionsSource.setData({
             type: "FeatureCollection",
             features: connectionFeatures,
-          });
-
-        const connection3DFeatures = render3D
-          ? filteredConnections.flatMap((conn) =>
-              create3DConnectionFeatures(conn, allNodesMap)
-            )
-          : [];
-        const connections3DSource = map.getSource("network-connections-3d") as
-          | mapboxgl.GeoJSONSource
-          | undefined;
-        if (connections3DSource)
-          connections3DSource.setData({
-            type: "FeatureCollection",
-            features: connection3DFeatures,
           });
 
         const outageConnections = isOutagesLayerVisible(layerState)
@@ -207,26 +202,12 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({ onMapLoad, onMapError }) =
           if (map.getLayer(id)) map.setFilter(id, null);
         });
 
-        const nodesVis = nodeTypes.length === 0 ? "none" : "visible";
-        ["network-nodes-layer", "network-nodes-3d-layer"].forEach((id) => {
-          if (map.getLayer(id)) {
-            map.setLayoutProperty(id, "visibility", nodesVis);
-          }
-        });
-        [
-          "network-connections-layer",
-          "network-connections-casing",
-          "network-connections-glow",
-          "network-connections-3d-layer",
-        ].forEach((id) => {
-          if (map.getLayer(id)) {
-            map.setLayoutProperty(
-              id,
-              "visibility",
-              connTypes.length === 0 ? "none" : "visible"
-            );
-          }
-        });
+        const nodesVisible = nodeTypes.length > 0;
+        updateLayerVisibility(map, "network-nodes-layer", nodesVisible);
+        updateLayerVisibility(map, "network-nodes-3d-layer", nodesVisible);
+
+        const connectionsVisible = connTypes.length > 0;
+        updateLayerVisibility(map, "network-connections-layer", connectionsVisible);
 
         if (map.getLayer("network-outages-layer")) {
           updateLayerVisibility(
@@ -381,7 +362,8 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({ onMapLoad, onMapError }) =
     return () => ro.disconnect();
   }, [isReady]);
 
-  const isZoomedInFor3D = viewport.zoom >= 13.5;
+  const isZoomedInFor3D = viewport.zoom >= ZOOM_NODES_3D_MIN - 0.5;
+  const isOverviewZoom = viewport.zoom < ZOOM_SHOW_CUSTOMER_CONNECTIONS;
 
   useEffect(() => {
     if (!mapRef.current || !isReady) return;
@@ -397,7 +379,7 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({ onMapLoad, onMapError }) =
     };
 
     apply();
-  }, [nodes, connections, isReady, layers, updateMapData, isZoomedInFor3D]);
+  }, [nodes, connections, isReady, layers, updateMapData, isZoomedInFor3D, isOverviewZoom]);
 
   if (mapError) {
     return (

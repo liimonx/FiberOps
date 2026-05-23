@@ -1,4 +1,5 @@
 import mapboxgl from "mapbox-gl";
+import { getNetworkQueryableLayers } from "./mapStyling/queryLayers";
 
 /**
  * Utility function to fit map bounds to a set of coordinates or bounds
@@ -56,11 +57,12 @@ export const safeHasLayer = (map: mapboxgl.Map | null, id: string) => {
 export const getFeaturesAtPoint = (
   map: mapboxgl.Map | null,
   point: mapboxgl.Point,
-  layerIds: string[] = ["network-nodes-3d-layer", "network-connections-layer"]
+  layerIds?: string[]
 ) => {
   if (!map || !map.getStyle()) return [];
 
-  const existingLayers = layerIds.filter((id) => safeHasLayer(map, id));
+  const existingLayers =
+    layerIds ?? getNetworkQueryableLayers(map, safeHasLayer);
   if (existingLayers.length === 0) return [];
 
   return map.queryRenderedFeatures(point, {

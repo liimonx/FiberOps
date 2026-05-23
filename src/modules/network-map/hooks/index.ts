@@ -24,6 +24,19 @@ export {
 // Real-time updates hook
 export { useRealTimeUpdates, useOptimisticUpdate } from './useRealTimeUpdates';
 
+export { useMapInstance } from './useMapInstance';
+
+export { useLayerStats } from './useLayerStats';
+export type { LayerStats } from './useLayerStats';
+
+export { useMapKeyboardShortcuts, isTypingInField } from './useMapKeyboardShortcuts';
+
+export { useMapHoverTooltip } from './useMapHoverTooltip';
+export type { HoverTarget, UseMapHoverTooltipOptions } from './useMapHoverTooltip';
+
+export { useTooltipHover } from './useTooltipHover';
+export type { TooltipState, UseTooltipHoverOptions } from './useTooltipHover';
+
 // Tool interaction hooks
 export { 
   useMapTools, 

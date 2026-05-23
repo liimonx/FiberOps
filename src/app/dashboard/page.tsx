@@ -83,7 +83,7 @@ export default function DashboardPage() {
 
       <Grid className="u-mb-6">
         <GridCol xs={12} sm={6} lg={3}>
-          <Card className="u-h-100">
+          <Card>
             <div className="u-flex u-justify-between u-items-center u-mb-4">
               <span className="u-text-secondary-emphasis u-text-sm u-font-bold">
                 Total Customers
@@ -96,7 +96,7 @@ export default function DashboardPage() {
         </GridCol>
 
         <GridCol xs={12} sm={6} lg={3}>
-          <Card className="u-h-100">
+          <Card>
             <div className="u-flex u-justify-between u-items-center u-mb-4">
               <span className="u-text-secondary-emphasis u-text-sm u-font-bold">
                 Active Incidents
@@ -109,7 +109,7 @@ export default function DashboardPage() {
         </GridCol>
 
         <GridCol xs={12} sm={6} lg={3}>
-          <Card className="u-h-100">
+          <Card>
             <div className="u-flex u-justify-between u-items-center u-mb-4">
               <span className="u-text-secondary-emphasis u-text-sm u-font-bold">
                 Avg. Signal Health
@@ -124,7 +124,7 @@ export default function DashboardPage() {
         </GridCol>
 
         <GridCol xs={12} sm={6} lg={3}>
-          <Card className="u-h-100">
+          <Card>
             <div className="u-flex u-justify-between u-items-center u-mb-4">
               <span className="u-text-secondary-emphasis u-text-sm u-font-bold">
                 Open Work Orders

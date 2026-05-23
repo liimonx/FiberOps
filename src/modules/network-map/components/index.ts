@@ -18,7 +18,8 @@ export { CategoryFilterTabs } from './CategoryFilterTabs';
 export { SearchResultsList } from './SearchResultsList';
 export { QuickActions } from './QuickActions';
 
-export { Toolbar } from './Toolbar';
+export { MapToolbar, Toolbar } from './MapToolbar';
+export type { MapToolbarProps } from './MapToolbar';
 export { LayerControls } from './LayerControls';
 export { InspectorPanel } from './InspectorPanel';
 

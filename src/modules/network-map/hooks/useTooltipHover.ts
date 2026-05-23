@@ -12,7 +12,10 @@ export interface TooltipState {
  * Options for useTooltipHover
  */
 export interface UseTooltipHoverOptions {
+  /** Delay before hiding after pointer leaves (ms). */
   delay?: number;
+  /** Delay before showing after hover starts (ms). */
+  showDelay?: number;
   autoHide?: boolean;
 }
 
@@ -21,7 +24,7 @@ export interface UseTooltipHoverOptions {
  * Fixed 300ms delay and hover-aware hide logic.
  */
 export function useTooltipHover(options: UseTooltipHoverOptions = {}) {
-  const { delay = 300, autoHide = true } = options;
+  const { delay = 300, showDelay = 0, autoHide = true } = options;
   const [tooltip, setTooltip] = useState<TooltipState>({
     content: null,
     x: 0,
@@ -31,20 +34,48 @@ export function useTooltipHover(options: UseTooltipHoverOptions = {}) {
 
   const hoverRef = useRef(false);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const pendingShowRef = useRef<{ content: TooltipContent; x: number; y: number } | null>(
+    null
+  );
 
   const clearPendingTimeout = useCallback(() => {
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
       timeoutRef.current = null;
     }
+    pendingShowRef.current = null;
   }, []);
 
   const showTooltip = useCallback(
     (content: TooltipContent, x: number, y: number) => {
       clearPendingTimeout();
-      setTooltip({ content, x, y, visible: true });
+      pendingShowRef.current = { content, x, y };
+
+      if (showDelay <= 0) {
+        setTooltip({ content, x, y, visible: true });
+        return;
+      }
+
+      setTooltip((prev) => ({
+        content,
+        x,
+        y,
+        visible: prev.visible,
+      }));
+
+      timeoutRef.current = setTimeout(() => {
+        const pending = pendingShowRef.current;
+        if (pending) {
+          setTooltip({
+            content: pending.content,
+            x: pending.x,
+            y: pending.y,
+            visible: true,
+          });
+        }
+      }, showDelay);
     },
-    [clearPendingTimeout]
+    [clearPendingTimeout, showDelay]
   );
 
   const hideTooltip = useCallback(

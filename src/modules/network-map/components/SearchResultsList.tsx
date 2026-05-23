@@ -46,7 +46,10 @@ export const SearchResultsList: React.FC<SearchResultsListProps> = ({
             className={`u-flex u-items-center u-gap-3 u-py-3 u-px-4 u-rounded u-cursor-pointer u-transition-all ${
               isHighlighted ? "u-bg-primary-subtle u-shadow-sm" : "u-bg-transparent"
             }`}
-            onClick={() => onSelect(result)}
+            onMouseDown={(e) => {
+              e.preventDefault();
+              onSelect(result);
+            }}
             onMouseEnter={() => onHighlight(index)}
           >
             <div

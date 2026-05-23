@@ -7,147 +7,48 @@ import {
   Button,
   Badge,
   Accordion,
-  PhosphorIconsType,
 } from "@shohojdhara/atomix";
-import { useNetworkMapStore, useLayers } from "../stores/useNetworkMapStore";
-import { NetworkMapLayer } from "../types";
+import {
+  useNetworkMapStore,
+  useLayers,
+  useNodes,
+  useConnections,
+} from "../stores/useNetworkMapStore";
+import { LAYER_CONFIGS } from "../constants/layerConfig";
+import { useLayerStats } from "../hooks/useLayerStats";
+import { useResponsive } from "../hooks/useResponsive";
+import { useAccessibilityAnnounce } from "./AccessibilityAnnouncer";
 
 interface LayerControlsProps {
   className?: string;
+  defaultExpanded?: boolean;
 }
 
-interface LayerConfig extends NetworkMapLayer {
-  icon: PhosphorIconsType;
-  description: string;
-  color: string;
-  stats?: {
-    total: number;
-    active: number;
-    alerts: number;
-  };
-}
-
-const LAYER_CONFIGS: LayerConfig[] = [
-  {
-    id: "fiber-routes",
-    name: "Fiber Routes",
-    visible: true,
-    type: "connections",
-    icon: "GitBranch",
-    description: "Fiber optic backbone & distribution",
-    color: "#06b6d4",
-    stats: { total: 124, active: 120, alerts: 4 },
-  },
-  {
-    id: "infrastructure",
-    name: "Core Nodes",
-    visible: true,
-    type: "nodes",
-    icon: "HardDrive",
-    description: "Core and Distribution infrastructure",
-    color: "#8b5cf6",
-    stats: { total: 12, active: 12, alerts: 0 },
-  },
-  {
-    id: "pops",
-    name: "Points of Presence",
-    visible: true,
-    type: "nodes",
-    icon: "Pulse",
-    description: "Network service hubs",
-    color: "#ec4899",
-    stats: { total: 8, active: 7, alerts: 1 },
-  },
-  {
-    id: "splitters",
-    name: "Splitters",
-    visible: true,
-    type: "nodes",
-    icon: "GitFork",
-    description: "Passive optical splitters",
-    color: "#8b5cf6",
-    stats: { total: 32, active: 30, alerts: 2 },
-  },
-  {
-    id: "junction-boxes",
-    name: "Junction Boxes",
-    visible: true,
-    type: "nodes",
-    icon: "Package",
-    description: "Fiber termination points",
-    color: "#94a3b8",
-    stats: { total: 45, active: 44, alerts: 1 },
-  },
-  {
-    id: "poles",
-    name: "Utility Poles",
-    visible: true,
-    type: "nodes",
-    icon: "MapPin",
-    description: "Aerial distribution points",
-    color: "#64748b",
-    stats: { total: 156, active: 150, alerts: 6 },
-  },
-  {
-    id: "onus",
-    name: "ONU Units",
-    visible: true,
-    type: "nodes",
-    icon: "HardDrive",
-    description: "Optical Network Units",
-    color: "#f59e0b",
-    stats: { total: 85, active: 82, alerts: 3 },
-  },
-  {
-    id: "customers",
-    name: "Client Endpoints",
-    visible: true,
-    type: "nodes",
-    icon: "Users",
-    description: "Customer connection points",
-    color: "#f59e0b",
-    stats: { total: 1240, active: 1198, alerts: 42 },
-  },
-  {
-    id: "customer-connections",
-    name: "Drop Cables",
-    visible: true,
-    type: "connections",
-    icon: "Link",
-    description: "Last-mile customer connections",
-    color: "#38bdf8",
-    stats: { total: 1240, active: 1198, alerts: 42 },
-  },
-  {
-    id: "outages",
-    name: "Active Outages",
-    visible: true,
-    type: "outages",
-    icon: "WarningCircle",
-    description: "Current service interruptions",
-    color: "#ef4444",
-    stats: { total: 8, active: 8, alerts: 8 },
-  },
-  {
-    id: "coverage",
-    name: "Service Coverage",
-    visible: true,
-    type: "coverage",
-    icon: "MapTrifold",
-    description: "Regional network availability",
-    color: "#10b981",
-    stats: { total: 12, active: 12, alerts: 0 },
-  },
-];
-
-export const LayerControls: React.FC<LayerControlsProps> = ({ className = "" }) => {
+export const LayerControls: React.FC<LayerControlsProps> = ({
+  className = "",
+  defaultExpanded,
+}) => {
+  const { isMobile } = useResponsive();
   const layers = useLayers();
+  const nodes = useNodes();
+  const connections = useConnections();
+  const layerStats = useLayerStats(nodes, connections);
   const toggleLayer = useNetworkMapStore((state) => state.toggleLayer);
   const setLayerVisibility = useNetworkMapStore((state) => state.setLayerVisibility);
   const updateLayers = useNetworkMapStore((state) => state.updateLayers);
-  const [hoveredLayer, setHoveredLayer] = useState<string | null>(null);
+  const { announce } = useAccessibilityAnnounce();
 
-  // Sync configured layers with store layers
+  const [hoveredLayer, setHoveredLayer] = useState<string | null>(null);
+  const [expanded, setExpanded] = useState(
+    defaultExpanded ?? !isMobile
+  );
+
+  useEffect(() => {
+    if (defaultExpanded === undefined) {
+      setExpanded(!isMobile);
+    }
+  }, [isMobile, defaultExpanded]);
+
   useEffect(() => {
     const missingLayers = LAYER_CONFIGS.filter(
       (config) => !layers.some((l) => l.id === config.id)
@@ -166,8 +67,14 @@ export const LayerControls: React.FC<LayerControlsProps> = ({ className = "" }) 
     }
   }, [layers, updateLayers]);
 
-  const handleToggle = (layerId: string) => {
+  const handleToggle = (layerId: string, layerName: string) => {
     toggleLayer(layerId);
+    const layer = layers.find((l) => l.id === layerId);
+    const nextVisible = layer ? !layer.visible : true;
+    announce(
+      `${layerName} layer ${nextVisible ? "shown" : "hidden"}`,
+      "polite"
+    );
   };
 
   const activeCount = useMemo(() => layers.filter((l) => l.visible).length, [layers]);
@@ -177,28 +84,55 @@ export const LayerControls: React.FC<LayerControlsProps> = ({ className = "" }) 
     layers.forEach((layer) => {
       setLayerVisibility(layer.id, visible);
     });
+    announce(visible ? "All layers shown" : "All layers hidden", "polite");
   };
 
+  if (!expanded) {
+    return (
+      <Button
+        variant="secondary"
+        size="sm"
+        iconName="Stack"
+        onClick={() => setExpanded(true)}
+        aria-label={`Map layers, ${activeCount} of ${totalLayers} visible`}
+        className={className}
+      >
+        Layers ({activeCount}/{totalLayers})
+      </Button>
+    );
+  }
+
   return (
-    <Accordion title="" icon={<Icon name="Stack" />} className={`${className} `}>
+    <Accordion title="" icon={<Icon name="Stack" />} className={className}>
       <Accordion.Header>
         <div className="u-relative u-w-100">
-          <div className="u-flex u-items-center u-justify-start u-gap-3">
-            <div className="u-rounded-circle u-bg-primary u-text-white u-shadow-lg u-p-2">
-              <Icon name="Stack" size={20} weight="bold" />
+          <div className="u-flex u-items-center u-justify-between u-gap-3">
+            <div className="u-flex u-items-center u-gap-3">
+              <div className="u-rounded-circle u-bg-primary u-text-white u-shadow-lg u-p-2">
+                <Icon name="Stack" size={20} weight="bold" />
+              </div>
+              <div className="u-sm-flex u-none u-flex-column u-text-start">
+                <span className="u-text-base u-font-bold u-text-primary">Map Layers</span>
+                <span className="u-text-xs u-text-secondary-emphasis u-opacity-75">
+                  {activeCount} of {totalLayers} visibility layers
+                </span>
+              </div>
             </div>
-            <div className="u-sm-flex u-none u-flex-column u-text-start">
-              <span className="u-text-base u-font-bold u-text-primary">Map Layers</span>
-              <span className="u-text-xs u-text-secondary-emphasis u-opacity-75">
-                {activeCount} of {totalLayers} visibility layers
-              </span>
-            </div>
+            {isMobile && (
+              <Button
+                variant="secondary"
+                size="sm"
+                iconName="X"
+                iconOnly
+                onClick={() => setExpanded(false)}
+                aria-label="Collapse layer controls"
+              />
+            )}
           </div>
         </div>
       </Accordion.Header>
 
       <Accordion.Body className="u-border-primary-subtle u-shadow-lg">
-        {/* Meaningful Layer List */}
         <div
           className="u-overflow-y-auto u-flex u-flex-column u-gap-2 u-h-90"
           role="group"
@@ -208,7 +142,8 @@ export const LayerControls: React.FC<LayerControlsProps> = ({ className = "" }) 
             const layer = layers.find((l) => l.id === config.id);
             const isVisible = layer?.visible ?? config.visible;
             const isHovered = hoveredLayer === config.id;
-            const hasAlerts = config.stats && config.stats.alerts > 0;
+            const stats = layerStats[config.id];
+            const hasAlerts = stats && stats.alerts > 0;
 
             return (
               <div
@@ -222,7 +157,6 @@ export const LayerControls: React.FC<LayerControlsProps> = ({ className = "" }) 
                 onMouseLeave={() => setHoveredLayer(null)}
               >
                 <div className="u-flex u-items-center u-gap-3 u-p-2">
-                  {/* Visual Identity */}
                   <div className="u-relative">
                     <div
                       className="u-rounded u-flex u-items-center u-justify-center u-p-2 u-shadow-sm"
@@ -233,7 +167,7 @@ export const LayerControls: React.FC<LayerControlsProps> = ({ className = "" }) 
                     >
                       <Icon
                         name={config.icon}
-                        size={"sm"}
+                        size="sm"
                         style={{ color: config.color }}
                         weight={isVisible ? "duotone" : "regular"}
                       />
@@ -250,10 +184,14 @@ export const LayerControls: React.FC<LayerControlsProps> = ({ className = "" }) 
                       >
                         {config.name}
                       </span>
-                      {config.stats && isVisible && (
+                      {stats && isVisible && stats.total > 0 && (
                         <Badge
                           variant={hasAlerts ? "error" : "success"}
-                          label={hasAlerts ? `${config.stats.alerts} Issues` : "Healthy"}
+                          label={
+                            hasAlerts
+                              ? `${stats.alerts} Issues`
+                              : `${stats.active}/${stats.total}`
+                          }
                           className="u-text-xs u-py-0 u-px-1"
                         />
                       )}
@@ -263,11 +201,10 @@ export const LayerControls: React.FC<LayerControlsProps> = ({ className = "" }) 
                     </span>
                   </div>
 
-                  {/* Compact Toggle */}
                   <div className="u-ms-auto">
                     <Toggle
                       checked={isVisible}
-                      onChange={() => handleToggle(config.id)}
+                      onChange={() => handleToggle(config.id, config.name)}
                     />
                   </div>
                 </div>
@@ -276,7 +213,6 @@ export const LayerControls: React.FC<LayerControlsProps> = ({ className = "" }) 
           })}
         </div>
 
-        {/* Action Footer */}
         <div className="u-flex u-gap-2 u-p-3">
           <Button
             variant="primary"

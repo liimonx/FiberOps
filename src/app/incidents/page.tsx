@@ -146,7 +146,7 @@ export default function IncidentsPage() {
         </GridCol>
 
         <GridCol xs={12} lg={8}>
-          <Card className="u-h-100">
+          <Card>
             <div className="u-flex u-justify-between u-items-center u-mb-4">
               <h2 className="u-text-lg u-font-bold">Incident Log</h2>
               <div className="u-w-25">

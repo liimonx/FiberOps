@@ -2,6 +2,13 @@
 @use "./styles/index.scss";
 :root {
   color-scheme: dark;
+
+  /* Ambient palette — FiberOps cyan + purple on slate-950 (see _colors.scss) */
+  --ambient-base: #020617;
+  --ambient-base-mid: #0c1428;
+  --ambient-cyan-rgb: 6, 182, 212;
+  --ambient-purple-rgb: 147, 51, 234;
+  --ambient-teal-rgb: 14, 116, 144;
 }
 
 html {
@@ -11,48 +18,68 @@ html {
 body {
   min-height: 100%;
   margin: 0;
-  /* Deep dark base */
+  background-color: var(--atomix-body-bg, var(--ambient-base));
 
-  /* Additional static gradients to give depth */
+  /* Layered depth: corner glows + soft center wash + vertical base gradient */
   background-image:
-    radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
-    radial-gradient(at 100% 100%, rgba(236, 72, 153, 0.1) 0px, transparent 50%);
+    radial-gradient(
+      ellipse 92% 72% at 0% -8%,
+      rgba(var(--ambient-cyan-rgb), 0.13) 0%,
+      transparent 58%
+    ),
+    radial-gradient(
+      ellipse 88% 68% at 100% 108%,
+      rgba(var(--ambient-purple-rgb), 0.1) 0%,
+      transparent 56%
+    ),
+    radial-gradient(
+      ellipse 55% 42% at 50% 48%,
+      rgba(var(--ambient-teal-rgb), 0.045) 0%,
+      transparent 72%
+    ),
+    linear-gradient(
+      168deg,
+      var(--ambient-base) 0%,
+      var(--ambient-base-mid) 45%,
+      var(--ambient-base) 100%
+    );
   background-attachment: fixed;
   background-size: 100% 100%;
 }
 
-/* Liquid floating orbs for glassmorphism */
+/* Liquid floating orbs — brand-tinted, lower chroma than static washes */
 body::before,
 body::after {
   content: "";
   position: fixed;
   border-radius: 50%;
-  filter: blur(120px);
+  filter: blur(140px);
   z-index: -1;
-  animation: liquid-float 24s infinite ease-in-out alternate;
+  opacity: 0.9;
+  animation: liquid-float 28s infinite ease-in-out alternate;
   pointer-events: none;
   will-change: transform;
 }
 
 body::before {
-  width: 50vw;
-  height: 50vh;
-  min-width: 300px;
-  min-height: 300px;
-  background: rgba(124, 58, 237, 0.25); /* Deep Violet */
-  top: -15vh;
-  left: -10vw;
+  width: 48vw;
+  height: 48vh;
+  min-width: 280px;
+  min-height: 280px;
+  background: rgba(var(--ambient-purple-rgb), 0.13);
+  top: -18vh;
+  left: -12vw;
 }
 
 body::after {
-  width: 40vw;
-  height: 60vh;
-  min-width: 250px;
-  min-height: 250px;
-  background: rgba(14, 165, 233, 0.25); /* Cyan / Sky Blue */
-  bottom: -15vh;
-  right: -10vw;
-  animation-delay: -12s;
+  width: 42vw;
+  height: 55vh;
+  min-width: 240px;
+  min-height: 240px;
+  background: rgba(var(--ambient-cyan-rgb), 0.11);
+  bottom: -18vh;
+  right: -12vw;
+  animation-delay: -14s;
 }
 
 @keyframes liquid-float {
@@ -60,13 +87,20 @@ body::after {
     transform: translate(0, 0) scale(1);
   }
   33% {
-    transform: translate(8vw, -6vh) scale(1.15);
+    transform: translate(5vw, -4vh) scale(1.08);
   }
   66% {
-    transform: translate(-5vw, 8vh) scale(0.85);
+    transform: translate(-4vw, 5vh) scale(0.94);
   }
   100% {
-    transform: translate(6vw, 4vh) scale(1.05);
+    transform: translate(4vw, 3vh) scale(1.04);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body::before,
+  body::after {
+    animation: none;
   }
 }
 

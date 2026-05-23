@@ -79,7 +79,7 @@ export default function Home() {
       {/* Quick Stats */}
       <Grid className="u-mb-8">
         <GridCol xs={12} sm={6} lg={3}>
-          <Card className="u-h-100">
+          <Card>
             <div className="u-flex u-items-center u-gap-3 u-mb-3">
               <div className="u-bg-primary-subtle u-rounded u-p-2">
                 <Icon name="Users" className="" size="lg" />
@@ -97,7 +97,7 @@ export default function Home() {
         </GridCol>
 
         <GridCol xs={12} sm={6} lg={3}>
-          <Card className="u-h-100">
+          <Card>
             <div className="u-flex u-items-center u-gap-3 u-mb-3">
               <div className="u-bg-error-subtle u-rounded u-p-2">
                 <Icon name="Warning" className="u-text-error" size="lg" />
@@ -115,7 +115,7 @@ export default function Home() {
         </GridCol>
 
         <GridCol xs={12} sm={6} lg={3}>
-          <Card className="u-h-100">
+          <Card>
             <div className="u-flex u-items-center u-gap-3 u-mb-3">
               <div className="u-bg-success-subtle u-rounded u-p-2">
                 <Icon name="Pulse" className="u-text-success" size="lg" />
@@ -132,7 +132,7 @@ export default function Home() {
         </GridCol>
 
         <GridCol xs={12} sm={6} lg={3}>
-          <Card className="u-h-100">
+          <Card>
             <div className="u-flex u-items-center u-gap-3 u-mb-3">
               <div className="u-bg-warning-subtle u-rounded u-p-2">
                 <Icon name="Clipboard" className="u-text-warning" size="lg" />

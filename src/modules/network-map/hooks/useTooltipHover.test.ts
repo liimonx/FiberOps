@@ -179,6 +179,23 @@ describe('useTooltipHover', () => {
     expect(result.current.tooltip.visible).toBe(false);
   });
 
+  it('should show tooltip after showDelay', () => {
+    const { result } = renderHook(() => useTooltipHover({ showDelay: 200 }));
+
+    act(() => {
+      result.current.showTooltip(mockContent, 100, 200);
+    });
+
+    expect(result.current.tooltip.visible).toBe(false);
+    expect(result.current.tooltip.content).toEqual(mockContent);
+
+    act(() => {
+      vi.advanceTimersByTime(200);
+    });
+
+    expect(result.current.tooltip.visible).toBe(true);
+  });
+
   it('should NOT hide automatically when autoHide is false', () => {
     const { result } = renderHook(() => useTooltipHover({ autoHide: false }));
     

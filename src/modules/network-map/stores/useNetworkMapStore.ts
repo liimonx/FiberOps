@@ -367,6 +367,10 @@ export const useNetworkMapStore = create<NetworkMapStore>()(
             const nodeMap = { ...state.nodeMap };
             const connectionMap = { ...state.connectionMap };
 
+            const layers = state.layers.map((layer) =>
+              layer.id === "outages" ? { ...layer, visible: true } : layer
+            );
+
             affectedNodes.forEach((nodeId) => {
               const node = state.nodeMap[nodeId];
               if (node) {
@@ -396,6 +400,7 @@ export const useNetworkMapStore = create<NetworkMapStore>()(
               connections,
               nodeMap,
               connectionMap,
+              layers,
               lastUpdated: new Date(),
             };
           }, false, 'simulateImpairmentOutage'),

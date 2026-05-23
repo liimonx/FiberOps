@@ -152,7 +152,7 @@ export const InteractiveTooltip: React.FC<InteractiveTooltipProps> = ({
         visibility: visible ? "visible" : "hidden",
         transition: "opacity 200ms cubic-bezier(0.4, 0, 0.2, 1), visibility 200ms",
       }}
-      role="dialog"
+      role="tooltip"
       aria-label={`${content?.title || "Tooltip"} details`}
       aria-hidden={!visible}
       onMouseEnter={onMouseEnter}
@@ -316,117 +316,8 @@ export const InteractiveTooltip: React.FC<InteractiveTooltipProps> = ({
   );
 };
 
-// Utility to create tooltip content from node
-export const createNodeTooltipContent = (node: NetworkNode): TooltipContent => ({
-  title: node.name,
-  status: node.status,
-  details: [
-    { label: "Type", value: node.type, icon: "Tag" as PhosphorIconsType },
-    { label: "ID", value: node.id, icon: "Fingerprint" as PhosphorIconsType },
-    ...(node.capacity
-      ? [
-          {
-            label: "Capacity",
-            value: `${node.capacity} ports`,
-            icon: "HardDrives" as PhosphorIconsType,
-          },
-        ]
-      : []),
-    ...(node.utilization !== undefined
-      ? [
-          {
-            label: "Utilization",
-            value: `${node.utilization}%`,
-            icon: "Gauge" as PhosphorIconsType,
-          },
-        ]
-      : []),
-    {
-      label: "Location",
-      value: `${node.position.lat.toFixed(4)}, ${node.position.lng.toFixed(4)}`,
-      icon: "MapPin" as PhosphorIconsType,
-    },
-  ],
-  actions: [
-    {
-      label: "View Details",
-      icon: "Eye" as PhosphorIconsType,
-      onClick: () => {},
-      variant: "primary",
-    },
-    {
-      label: "Trace Path",
-      icon: "GitBranch" as PhosphorIconsType,
-      onClick: () => {},
-      variant: "secondary",
-    },
-  ],
-  metadata: node.metadata,
-});
-
-// Utility to create tooltip content from connection
-export const createConnectionTooltipContent = (
-  connection: NetworkConnection
-): TooltipContent => {
-  const { bandwidth, utilization } = connection;
-  const currentSpeed =
-    bandwidth && utilization !== undefined ? (bandwidth * utilization) / 100 : null;
-
-  return {
-    title: `Connection ${connection.id}`,
-    status: connection.status,
-    details: [
-      {
-        label: "From",
-        value: connection.sourceNodeId,
-        icon: "ArrowRight" as PhosphorIconsType,
-      },
-      {
-        label: "To",
-        value: connection.targetNodeId,
-        icon: "ArrowLeft" as PhosphorIconsType,
-      },
-      ...(bandwidth
-        ? [
-            {
-              label: "Bandwidth",
-              value: `${bandwidth} Mbps`,
-              icon: "Lightning" as PhosphorIconsType,
-            },
-          ]
-        : []),
-      ...(currentSpeed !== null
-        ? [
-            {
-              label: "Current Speed",
-              value: `${currentSpeed.toFixed(2)} Mbps`,
-              icon: "TrendUp" as PhosphorIconsType,
-            },
-          ]
-        : []),
-      ...(utilization !== undefined
-        ? [
-            {
-              label: "Utilization",
-              value: `${utilization}%`,
-              icon: "Gauge" as PhosphorIconsType,
-            },
-          ]
-        : []),
-    ],
-    actions: [
-      {
-        label: "View Route",
-        icon: "MapTrifold" as PhosphorIconsType,
-        onClick: () => {},
-        variant: "primary",
-      },
-      {
-        label: "Check Health",
-        icon: "Heartbeat" as PhosphorIconsType,
-        onClick: () => {},
-        variant: "secondary",
-      },
-    ],
-  };
-};
+export {
+  createNodeTooltipContent,
+  createConnectionTooltipContent,
+} from "../utils/tooltipContent";
+export type { TooltipContentCallbacks } from "../utils/tooltipContent";

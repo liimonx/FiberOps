@@ -28,6 +28,8 @@ export function useRealTimeUpdates(options: UseRealTimeUpdatesOptions = {}) {
 
   // Handle incoming messages
   const handleMessage = useCallback((message: WebSocketMessage) => {
+    if (useNetworkMapStore.getState().simulatedOutageActive) return;
+
     // Validate message again just in case (service already does it, but double check doesn't hurt for types)
     const validation = safeValidateData(webSocketMessageSchema, message);
     if (!validation.success) return;

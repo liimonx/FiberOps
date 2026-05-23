@@ -19,7 +19,6 @@ export function useMapTools(options: UseMapToolsOptions = {}) {
 
   // Get current tool from store
   const activeToolId = useNetworkMapStore((state) => state.interaction.activeTool);
-  const setActiveTool = useNetworkMapStore((state) => state.setActiveTool);
 
   // Update map ref when it changes
   useEffect(() => {
@@ -32,9 +31,8 @@ export function useMapTools(options: UseMapToolsOptions = {}) {
 
     const toolManager = toolManagerRef.current;
 
-    // Set initial tool from store
     if (activeToolId) {
-      toolManager.setActiveTool(activeToolId);
+      toolManager.setActiveTool(activeToolId, { syncStore: false });
     }
 
     return () => {
@@ -46,15 +44,10 @@ export function useMapTools(options: UseMapToolsOptions = {}) {
     };
   }, [enabled, activeToolId]);
 
-  // Handle tool switching
-  const switchTool = useCallback(
-    (toolId: ToolType) => {
-      const toolManager = toolManagerRef.current;
-      toolManager.setActiveTool(toolId);
-      setActiveTool(toolId);
-    },
-    [setActiveTool]
-  );
+  // Handle tool switching (toolManager updates the store)
+  const switchTool = useCallback((toolId: ToolType) => {
+    toolManagerRef.current.setActiveTool(toolId);
+  }, []);
 
   // Event handlers that delegate to active tool
   const handleClick = useCallback(
