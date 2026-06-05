@@ -271,12 +271,12 @@ export const useTouchGestures = (options: TouchGestureOptions = {}) => {
 export const useMapTouchGestures = (mapRef: React.RefObject<HTMLDivElement>) => {
   const [isPinching, setIsPinching] = useState(false);
 
-  const handlePinch = useCallback((scale: number) => {
+  const handlePinch = useCallback(() => {
     setIsPinching(true);
     // Scale will be handled by Mapbox's native pinch zoom
   }, []);
 
-  const handlePan = useCallback((delta: TouchPosition) => {
+  const handlePan = useCallback(() => {
     if (isPinching) return;
     // Pan will be handled by Mapbox's native drag
   }, [isPinching]);
@@ -292,16 +292,20 @@ export const useMapTouchGestures = (mapRef: React.RefObject<HTMLDivElement>) => 
 
     const bindHandlers = bind();
     
-    element.addEventListener('touchstart', bindHandlers.onTouchStart as any, { passive: true });
-    element.addEventListener('touchmove', bindHandlers.onTouchMove as any, { passive: true });
-    element.addEventListener('touchend', bindHandlers.onTouchEnd as any, { passive: true });
-    element.addEventListener('touchcancel', bindHandlers.onTouchEnd as any, { passive: true });
+    const onTouchStart = bindHandlers.onTouchStart as unknown as EventListener;
+    const onTouchMove = bindHandlers.onTouchMove as unknown as EventListener;
+    const onTouchEnd = bindHandlers.onTouchEnd as unknown as EventListener;
+
+    element.addEventListener('touchstart', onTouchStart, { passive: true });
+    element.addEventListener('touchmove', onTouchMove, { passive: true });
+    element.addEventListener('touchend', onTouchEnd, { passive: true });
+    element.addEventListener('touchcancel', onTouchEnd, { passive: true });
 
     return () => {
-      element.removeEventListener('touchstart', bindHandlers.onTouchStart as any);
-      element.removeEventListener('touchmove', bindHandlers.onTouchMove as any);
-      element.removeEventListener('touchend', bindHandlers.onTouchEnd as any);
-      element.removeEventListener('touchcancel', bindHandlers.onTouchEnd as any);
+      element.removeEventListener('touchstart', onTouchStart);
+      element.removeEventListener('touchmove', onTouchMove);
+      element.removeEventListener('touchend', onTouchEnd);
+      element.removeEventListener('touchcancel', onTouchEnd);
     };
   }, [mapRef, bind]);
 

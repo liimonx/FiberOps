@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import { Icon } from "@shohojdhara/atomix";
 import { NetworkStatus } from "../types";
 import { NETWORK_STATUS_COLORS } from "../constants";
 
@@ -20,7 +19,6 @@ export const StatusIndicator: React.FC<StatusIndicatorProps> = ({
   size = "md",
   showLabel = true,
   pulse = false,
-  animated = true,
   className = "",
   label,
 }) => {

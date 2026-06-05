@@ -1,5 +1,9 @@
 "use client";
 
+import { createLogger } from "@/lib/logger";
+
+const offlineLog = createLogger("OfflineDetector");
+
 // Error types for better categorization
 export enum ErrorType {
   NETWORK = "NETWORK",
@@ -256,9 +260,39 @@ export class ErrorLogger {
   }
 
   private static sendToTrackingService(error: AppError): void {
-    // Integrate with Sentry, LogRocket, etc.
-    // Example: Sentry.captureException(new Error(error.message), { extra: error });
-    console.log("Error sent to tracking service:", error);
+    // Forward to an external error-tracking endpoint when configured. Replace
+    // this with a Sentry/LogRocket SDK call as needed, e.g.:
+    //   Sentry.captureException(new Error(error.message), { extra: error });
+    const endpoint = process.env.NEXT_PUBLIC_ERROR_ENDPOINT;
+
+    if (!endpoint || typeof window === "undefined") {
+      // No tracking sink configured: surface the error to the console so it is
+      // not silently swallowed in production.
+      console.error("[ErrorLogger]", error);
+      return;
+    }
+
+    try {
+      const payload = JSON.stringify({
+        ...error,
+        timestamp: error.timestamp.toISOString(),
+      });
+
+      if (typeof navigator !== "undefined" && "sendBeacon" in navigator) {
+        navigator.sendBeacon(endpoint, payload);
+      } else {
+        void fetch(endpoint, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: payload,
+          keepalive: true,
+        }).catch(() => {
+          /* best-effort: never throw from the logger */
+        });
+      }
+    } catch {
+      /* best-effort: never throw from the logger */
+    }
   }
 }
 
@@ -314,19 +348,24 @@ export async function retryWithBackoff<T>(
 // Offline detection utility
 export class OfflineDetector {
   private static listeners: Array<(isOnline: boolean) => void> = [];
-  private static isOnline: boolean = navigator.onLine;
+  private static isOnline: boolean =
+    typeof navigator !== "undefined" ? navigator.onLine : true;
+
+  // Stable bound handlers so add/removeEventListener reference the same function.
+  private static handleOnline = () => this.handleOnlineStatus(true);
+  private static handleOffline = () => this.handleOnlineStatus(false);
 
   static init(): void {
     if (typeof window !== "undefined") {
-      window.addEventListener("online", () => this.handleOnlineStatus(true));
-      window.addEventListener("offline", () => this.handleOnlineStatus(false));
+      window.addEventListener("online", this.handleOnline);
+      window.addEventListener("offline", this.handleOffline);
     }
   }
 
   static destroy(): void {
     if (typeof window !== "undefined") {
-      window.removeEventListener("online", () => this.handleOnlineStatus(true));
-      window.removeEventListener("offline", () => this.handleOnlineStatus(false));
+      window.removeEventListener("online", this.handleOnline);
+      window.removeEventListener("offline", this.handleOffline);
     }
   }
 
@@ -345,9 +384,7 @@ export class OfflineDetector {
     this.isOnline = online;
     this.listeners.forEach((listener) => listener(online));
 
-    if (process.env.NODE_ENV === "development") {
-      console.log(`[OfflineDetector] Status changed: ${online ? "Online" : "Offline"}`);
-    }
+    offlineLog.info(`Status changed: ${online ? "Online" : "Offline"}`);
   }
 }
 

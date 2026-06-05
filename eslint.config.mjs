@@ -14,6 +14,20 @@ const eslintConfig = defineConfig([
     "next-env.d.ts",
     "public/mockServiceWorker.js",
   ]),
+  // Tests and tooling configs legitimately use `any` to exercise invalid inputs
+  // and to bridge build-tool type mismatches.
+  {
+    files: [
+      "**/*.test.ts",
+      "**/*.test.tsx",
+      "**/*.bench.ts",
+      "**/*.config.ts",
+      "vitest.setup.ts",
+    ],
+    rules: {
+      "@typescript-eslint/no-explicit-any": "off",
+    },
+  },
 ]);
 
 export default eslintConfig;

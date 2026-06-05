@@ -1,12 +1,15 @@
 import { delay, http, HttpResponse, ws } from "msw";
 import { assets, customers, incidents } from "@/mocks/data";
+import { createLogger } from "@/lib/logger";
+
+const log = createLogger("MSW");
 
 const chat = ws.link("ws://localhost:8080/ws");
 
 export const handlers = [
   // WebSocket Mocking
   chat.addEventListener("connection", ({ client }) => {
-    console.log("[MSW] WebSocket connected:", client.id);
+    log.info("WebSocket connected:", client.id);
 
     // Send initial heartbeat
     client.send(
@@ -41,7 +44,7 @@ export const handlers = [
 
     client.addEventListener("close", () => {
       clearInterval(interval);
-      console.log("[MSW] WebSocket disconnected:", client.id);
+      log.info("WebSocket disconnected:", client.id);
     });
   }),
 

@@ -10,8 +10,6 @@ describe('ErrorLogger', () => {
     timestamp: new Date(),
   };
 
-  const originalEnv = process.env.NODE_ENV;
-
   beforeEach(() => {
     ErrorLogger.clear();
     vi.spyOn(console, 'error').mockImplementation(() => {});
@@ -19,7 +17,7 @@ describe('ErrorLogger', () => {
   });
 
   afterEach(() => {
-    process.env.NODE_ENV = originalEnv;
+    vi.unstubAllEnvs();
     vi.restoreAllMocks();
   });
 
@@ -44,7 +42,7 @@ describe('ErrorLogger', () => {
 
   describe('environment-specific logging', () => {
     it('should log to console in development environment', () => {
-      process.env.NODE_ENV = 'development';
+      vi.stubEnv('NODE_ENV', 'development');
 
       ErrorLogger.log(mockError);
 
@@ -52,13 +50,16 @@ describe('ErrorLogger', () => {
       expect(console.log).not.toHaveBeenCalled();
     });
 
-    it('should send to tracking service in production environment', () => {
-      process.env.NODE_ENV = 'production';
+    it('should fall back to console.error in production when no tracking endpoint is configured', () => {
+      vi.stubEnv('NODE_ENV', 'production');
 
       ErrorLogger.log(mockError);
 
-      expect(console.error).not.toHaveBeenCalled();
-      expect(console.log).toHaveBeenCalledWith('Error sent to tracking service:', mockError);
+      // Without NEXT_PUBLIC_ERROR_ENDPOINT, the error is surfaced via console.error
+      // rather than silently swallowed, and the development "[ErrorLogger]" debug
+      // log is not used.
+      expect(console.log).not.toHaveBeenCalled();
+      expect(console.error).toHaveBeenCalledWith('[ErrorLogger]', mockError);
     });
   });
 });

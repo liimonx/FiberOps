@@ -10,6 +10,9 @@ import {
   ToolType,
 } from "../types";
 import { useNetworkMapStore } from "../stores/useNetworkMapStore";
+import { createLogger } from "@/lib/logger";
+
+const log = createLogger("ToolManager");
 
 // Tool interface defining common methods
 export interface MapTool {
@@ -42,10 +45,10 @@ export interface MapMouseEvent {
   originalEvent: MouseEvent;
   features?: Array<{
     layer?: { id: string };
-    properties?: Record<string, any> | null;
+    properties?: Record<string, unknown> | null;
     geometry?: {
       type: string;
-      coordinates?: any;
+      coordinates?: unknown;
     } | null;
   }>;
 }
@@ -59,11 +62,11 @@ abstract class BaseTool implements MapTool {
   public cursor: string = "default";
 
   activate(): void {
-    console.log(`[Tool] ${this.name} activated`);
+    log.info(`[Tool] ${this.name} activated`);
   }
 
   deactivate(): void {
-    console.log(`[Tool] ${this.name} deactivated`);
+    log.info(`[Tool] ${this.name} deactivated`);
   }
 }
 
@@ -81,7 +84,7 @@ export class SelectTool extends BaseTool {
     // Find clicked feature
     if (event.features && event.features.length > 0) {
       const feature = event.features[0];
-      const elementId = feature.properties?.id;
+      const elementId = feature.properties?.id as string | undefined;
 
       if (elementId) {
         store.setSelectedElement(elementId);
@@ -121,7 +124,7 @@ export class TraceTool extends BaseTool {
     if (!event.features || event.features.length === 0) return;
 
     const feature = event.features[0];
-    const nodeId = feature.properties?.id;
+    const nodeId = feature.properties?.id as string | undefined;
 
     if (!nodeId) return;
 
@@ -129,7 +132,7 @@ export class TraceTool extends BaseTool {
     if (!this.sourceNode) {
       this.sourceNode = nodeId;
       store.setSelectedElement(nodeId);
-      console.log("[Trace] Source node selected:", nodeId);
+      log.info("[Trace] Source node selected:", nodeId);
       return;
     }
 
@@ -145,7 +148,7 @@ export class TraceTool extends BaseTool {
     const nodes = store.nodes;
     const connections = store.connections;
 
-    console.log("[Trace] Tracing path from", sourceId, "to", targetId);
+    log.info("[Trace] Tracing path from", sourceId, "to", targetId);
 
     // BFS to find path
     const path = this.findPathBFS(sourceId, targetId, nodes, connections);
@@ -162,9 +165,9 @@ export class TraceTool extends BaseTool {
       };
 
       store.setTracePath(tracePath);
-      console.log("[Trace] Path found:", tracePath);
+      log.info("[Trace] Path found:", tracePath);
     } else {
-      console.warn("[Trace] No path found between", sourceId, "and", targetId);
+      log.warn("[Trace] No path found between", sourceId, "and", targetId);
       store.setTracePath(null);
     }
   }
@@ -297,7 +300,7 @@ export class MeasureTool extends BaseTool {
     };
 
     store.addMeasurement(newPoint);
-    console.log("[Measure] Added point:", newPoint);
+    log.info("[Measure] Added point:", newPoint);
   }
 
   onKeyDown(event: KeyboardEvent): void {
@@ -308,10 +311,9 @@ export class MeasureTool extends BaseTool {
 
       if (measurements.length > 0) {
         // Remove last measurement (need to implement remove in store)
-        const updated = measurements.slice(0, -1);
         // For now, just clear all
         store.clearMeasurements();
-        console.log("[Measure] Cleared measurements");
+        log.info("[Measure] Cleared measurements");
       }
     }
   }
@@ -367,7 +369,7 @@ export class HeatmapTool extends BaseTool {
     const nodes = store.nodes;
     const connections = store.connections;
 
-    console.log("[Heatmap] Generating heatmap:", this.heatmapType);
+    log.info("[Heatmap] Generating heatmap:", this.heatmapType);
 
     let dataPoints: Array<{ position: LatLng; intensity: number; value?: number }> = [];
 
@@ -430,7 +432,7 @@ export class HeatmapTool extends BaseTool {
     };
 
     store.setHeatmapData(heatmapData);
-    console.log("[Heatmap] Generated with", dataPoints.length, "data points");
+    log.info("[Heatmap] Generated with", dataPoints.length, "data points");
   }
 
   private calculateNodeDensity(node: NetworkNode, allNodes: NetworkNode[]): number {
@@ -476,7 +478,7 @@ export class ImpairmentTool extends BaseTool {
       center: event.lngLat,
       radius: currentRadius,
     });
-    console.log("[ImpairmentTool] Set impairment center:", event.lngLat, "Radius:", currentRadius);
+    log.info("[ImpairmentTool] Set impairment center:", event.lngLat, "Radius:", currentRadius);
   }
 }
 
@@ -496,7 +498,7 @@ export class ToolManager {
 
   registerTool(tool: MapTool): void {
     this.tools.set(tool.id, tool);
-    console.log("[ToolManager] Registered tool:", tool.name);
+    log.info("[ToolManager] Registered tool:", tool.name);
   }
 
   getTool(toolId: string): MapTool | undefined {
@@ -532,9 +534,9 @@ export class ToolManager {
       if (syncStore) {
         useNetworkMapStore.getState().setActiveTool(toolId as ToolType);
       }
-      console.log("[ToolManager] Active tool changed to:", newTool.name);
+      log.info("[ToolManager] Active tool changed to:", newTool.name);
     } else {
-      console.warn("[ToolManager] Tool not found:", toolId);
+      log.warn("[ToolManager] Tool not found:", toolId);
     }
   }
 

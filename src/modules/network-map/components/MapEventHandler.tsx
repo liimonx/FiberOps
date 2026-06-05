@@ -1,17 +1,20 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import React, { useEffect } from "react";
 import mapboxgl from "mapbox-gl";
 import { useMapInstance } from "../hooks/useMapInstance";
 import { useNetworkMapStore } from "../stores/useNetworkMapStore";
 import { useAccessibilityAnnounce } from "./AccessibilityAnnouncer";
 import { getToolManager } from "../tools/toolManager";
-import { safeHasLayer, fitMapBounds, flyToLocation } from "../utils/mapUtils";
+import { safeHasLayer } from "../utils/mapUtils";
 import {
   getNetworkQueryableLayers,
   isConnectionLayerId,
   isNodeLayerId,
 } from "../utils/mapStyling/queryLayers";
+import { createLogger } from "@/lib/logger";
+
+const log = createLogger("MapEventHandler");
 
 interface MapEventHandlerProps {
   onNodeClick?: (nodeId: string, event: mapboxgl.MapMouseEvent) => void;
@@ -19,7 +22,7 @@ interface MapEventHandlerProps {
   onConnectionClick?: (connectionId: string, event: mapboxgl.MapMouseEvent) => void;
   onConnectionHover?: (connectionId: string | null, event: mapboxgl.MapMouseEvent) => void;
   onMapClick?: (event: mapboxgl.MapMouseEvent) => void;
-  onMapMove?: (event: mapboxgl.MapMouseEvent) => void;
+  onMapMove?: (event: mapboxgl.MapboxEvent) => void;
 }
 
 export const MapEventHandler: React.FC<MapEventHandlerProps> = ({
@@ -34,7 +37,6 @@ export const MapEventHandler: React.FC<MapEventHandlerProps> = ({
   const setHoveredElement = useNetworkMapStore((state) => state.setHoveredElement);
   const activeTool = useNetworkMapStore((state) => state.interaction.activeTool);
   const { announce } = useAccessibilityAnnounce();
-  const prevToolRef = useRef(activeTool);
 
   const map = useMapInstance();
 
@@ -168,10 +170,15 @@ export const MapEventHandler: React.FC<MapEventHandlerProps> = ({
       map.getCanvas().style.cursor = resolveCursor(false);
     };
 
+    const handleMapMoveEvent = (event: mapboxgl.MapboxEvent) => {
+      onMapMove?.(event);
+    };
+
     // Add event listeners
     map.on("click", handleMapClick);
     map.on("mousemove", handleMouseMove);
     map.on("mouseleave", handleMouseLeave);
+    map.on("move", handleMapMoveEvent);
 
     // Add keyboard navigation support
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -293,7 +300,7 @@ export const MapEventHandler: React.FC<MapEventHandlerProps> = ({
       } catch (error) {
         // Silently catch errors if style becomes unavailable during execution
         // This is common during rapid theme switching or hot reloads
-        console.debug("[MapEventHandler] Animation frame skipped:", error);
+        log.debug("Animation frame skipped:", error);
       }
 
       animationFrame = requestAnimationFrame(animateMap);
@@ -313,6 +320,7 @@ export const MapEventHandler: React.FC<MapEventHandlerProps> = ({
         map.off("click", handleMapClick);
         map.off("mousemove", handleMouseMove);
         map.off("mouseleave", handleMouseLeave);
+        map.off("move", handleMapMoveEvent);
       }
 
       if (mapContainer) {

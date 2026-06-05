@@ -4,9 +4,11 @@ import { useEffect, useRef, useCallback } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useNetworkMapStore } from '../stores/useNetworkMapStore';
 import { getWebSocketService, WebSocketMessage } from '../services/websocketService';
-import { NetworkStatus } from '../types';
 import { safeValidateData } from '../utils/validation';
 import { webSocketMessageSchema } from '../schemas/webSocketMessage.schema';
+import { createLogger } from '@/lib/logger';
+
+const log = createLogger('RealTime');
 
 interface UseRealTimeUpdatesOptions {
   enabled?: boolean;
@@ -47,7 +49,7 @@ export function useRealTimeUpdates(options: UseRealTimeUpdatesOptions = {}) {
           break;
           
         case 'incident_alert':
-          console.log('[RealTime] New incident alert:', validatedMessage.data);
+          log.info('New incident alert:', validatedMessage.data);
           break;
           
         case 'status_broadcast':
@@ -63,7 +65,7 @@ export function useRealTimeUpdates(options: UseRealTimeUpdatesOptions = {}) {
           break;
       }
     } catch (error) {
-      console.error('[RealTime] Error handling message:', error);
+      log.error('Error handling message:', error);
       setError('Failed to process real-time update');
     }
   }, [updateNode, updateConnection, setConnectionQuality, setError]);
@@ -80,7 +82,7 @@ export function useRealTimeUpdates(options: UseRealTimeUpdatesOptions = {}) {
     // Initial connection
     wsService.connect().catch(err => {
       // We log as a warning because the map can still function in static mode
-      console.warn('[RealTime] Live feed unavailable:', err.message);
+      log.warn('Live feed unavailable:', err.message);
       // We don't call setError here anymore to avoid blocking the UI with a fatal error
     });
 
@@ -148,6 +150,6 @@ export function useOptimisticUpdate<T extends { id: string }, TVariables>(
       queryClient.setQueryData(queryKey, previousData);
       throw error;
     }
-  }, [queryClient, updateMutation]);
+  }, [queryClient, updateMutation, queryKey]);
 }
 

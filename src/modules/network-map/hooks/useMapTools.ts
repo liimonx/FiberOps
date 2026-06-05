@@ -2,7 +2,7 @@
 
 import { useEffect, useCallback, useRef } from "react";
 import mapboxgl from "mapbox-gl";
-import { getToolManager, MapTool, MapMouseEvent } from "../tools/toolManager";
+import { getToolManager, MapMouseEvent } from "../tools/toolManager";
 import { useNetworkMapStore } from "../stores/useNetworkMapStore";
 import { ToolType } from "../types";
 
@@ -148,7 +148,6 @@ export function useMapTools(options: UseMapToolsOptions = {}) {
 export function useMeasurementTool() {
   const measurements = useNetworkMapStore((state) => state.measurements);
   const clearMeasurements = useNetworkMapStore((state) => state.clearMeasurements);
-  const toolManagerRef = useRef(getToolManager());
 
   const getTotalDistance = useCallback(() => {
     return measurements.reduce((sum, point) => sum + (point.distance || 0), 0);
@@ -209,8 +208,10 @@ export function useHeatmapTool() {
   const toolManagerRef = useRef(getToolManager());
 
   const setHeatmapType = useCallback((type: "density" | "utilization" | "incidents") => {
-    const heatmapTool = toolManagerRef.current.getTool("heatmap") as any;
-    if (heatmapTool && heatmapTool.setHeatmapType) {
+    const heatmapTool = toolManagerRef.current.getTool("heatmap") as
+      | { setHeatmapType?: (type: "density" | "utilization" | "incidents") => void }
+      | undefined;
+    if (heatmapTool?.setHeatmapType) {
       heatmapTool.setHeatmapType(type);
     }
   }, []);

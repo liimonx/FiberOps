@@ -11,6 +11,9 @@ import {
   useConnections,
 } from "../stores/useNetworkMapStore";
 import { MAPBOX_CONFIG } from "../constants";
+import { createLogger } from "@/lib/logger";
+
+const log = createLogger("MapCanvas");
 import { EnhancedLoadingState } from "./EnhancedLoadingState";
 import {
   addCustomLayers,
@@ -78,7 +81,7 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({ onMapLoad, onMapError }) =
     try {
       addCustomLayers(map);
     } catch (error) {
-      console.error("[MapCanvas] Layer init failed:", error);
+      log.error("Layer init failed:", error);
       throw error;
     }
   }, []);
@@ -224,12 +227,14 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({ onMapLoad, onMapError }) =
           );
         }
       } catch (error) {
-        console.error("[MapCanvas] Update failed:", error);
+        log.error("Update failed:", error);
       }
     },
     [initializeLayers, createCircleCoordinates]
   );
 
+  // Map instance is created once on mount; re-running when viewport/store callbacks
+  // change would tear down and recreate the map on every pan/zoom.
   useEffect(() => {
     if (!mapContainer.current || mapRef.current || tokenError) return;
     mapboxgl.accessToken = MAPBOX_CONFIG.ACCESS_TOKEN as string;
@@ -261,7 +266,7 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({ onMapLoad, onMapError }) =
 
       // Re-initialize layers when style changes (e.g., satellite/dark mode toggle)
       map.on("style.load", () => {
-        console.log("[MapCanvas] Style changed, re-initializing layers...");
+        log.info("Style changed, re-initializing layers...");
 
         try {
           // Re-add custom layers and sources
@@ -276,7 +281,7 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({ onMapLoad, onMapError }) =
             }
 
             const currentState = useNetworkMapStore.getState();
-            console.log("[MapCanvas] Restoring data:", {
+            log.info("Restoring data:", {
               nodes: currentState.nodes.length,
               connections: currentState.connections.length,
               layers:
@@ -300,16 +305,13 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({ onMapLoad, onMapError }) =
               }
             });
 
-            console.log("[MapCanvas] Layers and data restored successfully");
+            log.info("Layers and data restored successfully");
           };
 
           // Start the wait loop
           waitForStyleAndUpdate();
         } catch (error) {
-          console.error(
-            "[MapCanvas] Failed to restore layers after style change:",
-            error
-          );
+          log.error("Failed to restore layers after style change:", error);
         }
       });
 
@@ -349,6 +351,7 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({ onMapLoad, onMapError }) =
         setMapLoading(false);
       }, 0);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- intentional mount-only init
   }, []);
 
   useEffect(() => {

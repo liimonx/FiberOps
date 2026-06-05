@@ -43,11 +43,16 @@ export const LayerControls: React.FC<LayerControlsProps> = ({
     defaultExpanded ?? !isMobile
   );
 
-  useEffect(() => {
+  // Sync expansion to the responsive breakpoint without a setState-in-effect.
+  // Adjusting state during render is React's recommended pattern for deriving
+  // from a changed input while still allowing manual user toggles.
+  const [prevIsMobile, setPrevIsMobile] = useState(isMobile);
+  if (isMobile !== prevIsMobile) {
+    setPrevIsMobile(isMobile);
     if (defaultExpanded === undefined) {
       setExpanded(!isMobile);
     }
-  }, [isMobile, defaultExpanded]);
+  }
 
   useEffect(() => {
     const missingLayers = LAYER_CONFIGS.filter(

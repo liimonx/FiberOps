@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Icon, Badge } from "@shohojdhara/atomix";
+import { Icon } from "@shohojdhara/atomix";
 import { OfflineDetector } from "../utils/errorHandler";
 import { useVisibility } from "../../../hooks/useVisibility";
 
@@ -29,7 +29,7 @@ export function OfflineIndicator({ className = "" }: OfflineIndicatorProps) {
     });
 
     return unsubscribe;
-  }, []);
+  }, [setShowBanner]);
 
   if (!showBanner) return null;
 
@@ -96,42 +96,36 @@ export function DataFreshnessIndicator({
   staleThreshold = 60000, // 1 minute
   className = "",
 }: DataFreshnessIndicatorProps) {
-  const [isStale, setIsStale] = useState(false);
-  const [lastUpdateText, setLastUpdateText] = useState("");
+  // A ticking clock so the relative time stays live; staleness and the label
+  // are derived during render rather than mirrored into state via an effect.
+  const [now, setNow] = useState(() => Date.now());
 
   useEffect(() => {
-    if (!lastUpdated) {
-      setIsStale(true);
-      setLastUpdateText("Never updated");
-      return;
-    }
-
-    const updateStaleness = () => {
-      const now = new Date();
-      const age = now.getTime() - lastUpdated.getTime();
-      const stale = age > staleThreshold;
-
-      setIsStale(stale);
-
-      // Format relative time
-      const minutes = Math.floor(age / 60000);
-      const seconds = Math.floor((age % 60000) / 1000);
-
-      if (minutes === 0) {
-        setLastUpdateText(`${seconds}s ago`);
-      } else if (minutes < 60) {
-        setLastUpdateText(`${minutes}m ago`);
-      } else {
-        const hours = Math.floor(minutes / 60);
-        setLastUpdateText(`${hours}h ago`);
-      }
-    };
-
-    updateStaleness();
-    const interval = setInterval(updateStaleness, 1000);
-
+    const interval = setInterval(() => setNow(Date.now()), 1000);
     return () => clearInterval(interval);
-  }, [lastUpdated, staleThreshold]);
+  }, []);
+
+  let isStale: boolean;
+  let lastUpdateText: string;
+
+  if (!lastUpdated) {
+    isStale = true;
+    lastUpdateText = "Never updated";
+  } else {
+    const age = now - lastUpdated.getTime();
+    isStale = age > staleThreshold;
+
+    const minutes = Math.floor(age / 60000);
+    const seconds = Math.floor((age % 60000) / 1000);
+
+    if (minutes === 0) {
+      lastUpdateText = `${seconds}s ago`;
+    } else if (minutes < 60) {
+      lastUpdateText = `${minutes}m ago`;
+    } else {
+      lastUpdateText = `${Math.floor(minutes / 60)}h ago`;
+    }
+  }
 
   return (
     <div

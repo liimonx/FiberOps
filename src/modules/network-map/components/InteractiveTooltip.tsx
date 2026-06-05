@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useCallback, useRef, useEffect, useLayoutEffect } from "react";
+import React, { useState, useCallback, useRef, useLayoutEffect } from "react";
 import { Icon, Card, Button, PhosphorIconsType, ButtonGroup } from "@shohojdhara/atomix";
 import { NetworkNode, NetworkConnection, NetworkStatus } from "../types";
 import { StatusIndicator } from "./StatusIndicator";
@@ -41,7 +41,6 @@ interface InteractiveTooltipProps {
 export const InteractiveTooltip: React.FC<InteractiveTooltipProps> = ({
   content,
   node,
-  connection,
   position,
   visible,
   onClose,
@@ -301,7 +300,7 @@ export const InteractiveTooltip: React.FC<InteractiveTooltipProps> = ({
                     variant={action.variant || "secondary"}
                     size="sm"
                     iconName={action.icon}
-                    onClick={action.onClick}
+                    onClick={() => handleActionClick(index)}
                     fullWidth
                   >
                     {action.label}

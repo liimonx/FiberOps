@@ -1,6 +1,9 @@
 "use client";
 
 import gsap from 'gsap';
+import { createLogger } from '@/lib/logger';
+
+const log = createLogger('Animation');
 
 // Animation presets for consistent timing and easing
 export const animationPresets = {
@@ -314,7 +317,7 @@ export class AnimationPerformanceMonitor {
         
         // Log if FPS drops below threshold
         if (this.fps < 30) {
-          console.warn(`[Animation] Low FPS detected: ${this.fps}`);
+          log.warn(`Low FPS detected: ${this.fps}`);
         }
       }
       

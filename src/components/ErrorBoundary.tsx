@@ -2,6 +2,9 @@
 
 import { Component, ErrorInfo, ReactNode } from "react";
 import { Card, Button, Icon } from "@shohojdhara/atomix";
+import { createLogger } from "@/lib/logger";
+
+const log = createLogger("ErrorBoundary");
 
 interface Props {
   children: ReactNode;
@@ -24,7 +27,7 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error("Uncaught error:", error, errorInfo);
+    log.error("Uncaught error:", error, errorInfo);
   }
 
   public render() {

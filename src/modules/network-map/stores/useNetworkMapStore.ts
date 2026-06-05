@@ -123,7 +123,7 @@ const initialInteraction: MapInteractionState = {
 export const useNetworkMapStore = create<NetworkMapStore>()(
   devtools(
     persist(
-      (set, get) => ({
+      (set) => ({
         // Initial state
         viewport: initialViewport,
         layers: DEFAULT_LAYERS,
@@ -275,7 +275,7 @@ export const useNetworkMapStore = create<NetworkMapStore>()(
               ),
               // We should also update connectionMap here, but for simplicity let's just filter it in the next sync or do it now
               connectionMap: Object.fromEntries(
-                Object.entries(state.connectionMap).filter(([_, c]) => 
+                Object.entries(state.connectionMap).filter(([, c]) =>
                   c.sourceNodeId !== nodeId && c.targetNodeId !== nodeId
                 )
               ),

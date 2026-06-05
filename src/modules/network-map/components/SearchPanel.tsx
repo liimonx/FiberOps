@@ -52,11 +52,16 @@ export const SearchPanel: React.FC<SearchPanelProps> = ({
 
   const [isOpen, setIsOpen] = useState(false);
 
-  useEffect(() => {
+  // Sync collapse to the responsive breakpoint without a setState-in-effect.
+  // Adjusting state during render is React's recommended pattern here since the
+  // panel can also be collapsed/expanded manually by the user.
+  const [prevIsMobile, setPrevIsMobile] = useState(isMobile);
+  if (isMobile !== prevIsMobile) {
+    setPrevIsMobile(isMobile);
     if (defaultCollapsed === undefined) {
       setCollapsed(isMobile);
     }
-  }, [isMobile, defaultCollapsed]);
+  }
 
   useEffect(() => {
     const handleSearchFocusShortcut = (e: KeyboardEvent) => {

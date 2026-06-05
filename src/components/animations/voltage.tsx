@@ -3,6 +3,9 @@ import { gsap } from 'gsap'
 import { useGSAP } from '@gsap/react'
 import { useReducedMotion } from './useReducedMotion'
 import styles from './voltage.module.scss'
+import { createLogger } from '@/lib/logger'
+
+const log = createLogger('Voltage')
 
 export interface VoltageRef {
     play: () => void
@@ -86,7 +89,7 @@ const Voltage = memo(
                             setPluginsLoaded(true)
                         })
                         .catch((error) => {
-                            console.error('Failed to load GSAP plugins:', error)
+                            log.error('Failed to load GSAP plugins:', error)
                             // Set as loaded anyway to prevent blocking the component
                             setPluginsLoaded(true)
                         })
@@ -230,7 +233,7 @@ const Voltage = memo(
 
                             isInitializedRef.current = true
                         } catch (error) {
-                            console.warn('Voltage animation initialization failed:', error)
+                            log.warn('Voltage animation initialization failed:', error)
                         }
                     }
                 },

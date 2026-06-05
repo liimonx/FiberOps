@@ -4,24 +4,27 @@ import type {
   IncidentRepository,
 } from "@/services/repositories";
 import { mockAssets, mockCustomers, mockIncidents } from "./mockData";
+import { createLogger } from "@/lib/logger";
+
+const log = createLogger("Mock");
 
 export const mockAssetRepository: AssetRepository = {
   list: async () => {
-    console.log('[MockAssetRepository] list() called, returning', mockAssets.length, 'assets');
+    log.info('AssetRepository.list() called, returning', mockAssets.length, 'assets');
     return { items: mockAssets };
   },
 };
 
 export const mockCustomerRepository: CustomerRepository = {
   list: async () => {
-    console.log('[MockCustomerRepository] list() called, returning', mockCustomers.length, 'customers');
+    log.info('CustomerRepository.list() called, returning', mockCustomers.length, 'customers');
     return { items: mockCustomers };
   },
 };
 
 export const mockIncidentRepository: IncidentRepository = {
   list: async () => {
-    console.log('[MockIncidentRepository] list() called, returning', mockIncidents.length, 'incidents');
+    log.info('IncidentRepository.list() called, returning', mockIncidents.length, 'incidents');
     return { items: mockIncidents };
   },
 };

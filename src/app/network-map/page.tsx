@@ -155,6 +155,7 @@ function NetworkMapContent() {
         </div>
 
         <div className="overlay-bottom-right">
+          <ZoomLevelIndicator />
           <MapControls />
         </div>
 
@@ -230,6 +231,10 @@ function NetworkMapContent() {
           position: absolute;
           bottom: 16px;
           right: 16px;
+          display: flex;
+          flex-direction: column;
+          align-items: flex-end;
+          gap: 8px;
           pointer-events: auto;
         }
 
@@ -291,9 +296,6 @@ function ZoomLevelIndicator() {
 
       <style jsx>{`
         .zoom-indicator {
-          position: absolute;
-          bottom: 16px;
-          right: 16px;
           display: flex;
           align-items: center;
           gap: 4px;

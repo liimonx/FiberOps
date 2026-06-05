@@ -1,4 +1,7 @@
 import { z } from "zod";
+import { createLogger } from "@/lib/logger";
+
+const log = createLogger("Validation");
 
 /**
  * Validates data against a Zod schema and returns the parsed data.
@@ -6,7 +9,7 @@ import { z } from "zod";
  */
 export function validateData<T>(schema: z.ZodSchema<T>, data: unknown): T {
   if (!schema) {
-    console.error("[Validation Error] Schema is undefined. Check for circular dependencies.");
+    log.error("Schema is undefined. Check for circular dependencies.");
     throw new Error("Validation failed: Schema is undefined");
   }
   try {
@@ -16,7 +19,7 @@ export function validateData<T>(schema: z.ZodSchema<T>, data: unknown): T {
       const details = error.issues
         .map((e: z.ZodIssue) => `${e.path.join(".")}: ${e.message}`)
         .join(", ");
-      console.error(`[Validation Error] ${details}`, { data });
+      log.error(`${details}`, { data });
       throw new Error(`Data validation failed: ${details}`);
     }
     throw error;

@@ -26,7 +26,7 @@ This frontend is built with a **frontend-first architecture** using mocked data 
 - **Forms & Validation:** React Hook Form + Zod
 - **Mock API:** MSW (Mock Service Worker)
 - **Animation:** GSAP
-- **Icons:** Lucide React
+- **Icons:** Phosphor Icons (`@phosphor-icons/react`)
 - **Code Quality:** ESLint + Prettier
 
 ## 📦 Key Modules
@@ -70,15 +70,13 @@ This frontend is built with a **frontend-first architecture** using mocked data 
 
 ## 📐 Architecture
 
-- `src/app/` - Next.js App Router pages and layouts.
+- `src/app/` - Next.js App Router pages, layouts, and global styles.
 - `src/components/` - Reusable UI primitives (no business logic).
-- `src/patterns/` - Composite reusable sections (e.g., DashboardShell, PageHeader).
-- `src/modules/` - Feature-owned code (dashboard, network-map, assets, etc.).
-- `src/services/` - API adapter layer with repository interfaces.
+- `src/patterns/` - Composite reusable sections (e.g., Shell).
+- `src/modules/` - Feature-owned code (network-map, etc.), including its own stores, hooks, and utilities.
+- `src/services/` - API adapter layer with repository interfaces and mock implementations.
 - `src/mocks/` - MSW handlers and mock telecom datasets.
-- `src/foundation/` - Theme, tokens, spacing, typography, etc.
 - `src/types/` - Strict TypeScript domain models.
-- `src/stores/` - Zustand global state stores.
 
 ## 🎨 Design Direction
 

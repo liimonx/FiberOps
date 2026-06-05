@@ -3,12 +3,15 @@
 import React, { Component, ErrorInfo, ReactNode } from "react";
 import { Icon, Button, Card } from "@shohojdhara/atomix";
 import { classifyError, ErrorLogger } from "../utils/errorHandler";
+import { createLogger } from "@/lib/logger";
+
+const log = createLogger("MapErrorBoundary");
 
 interface Props {
   children: ReactNode;
   fallback?: ReactNode;
   onError?: (error: Error, errorInfo: ErrorInfo) => void;
-  resetKeys?: Array<any>;
+  resetKeys?: Array<unknown>;
 }
 
 export interface ErrorBoundaryFallbackProps {
@@ -38,7 +41,7 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error("[ErrorBoundary] Caught error:", error, errorInfo);
+    log.error("Caught error:", error, errorInfo);
 
     this.setState({
       error,

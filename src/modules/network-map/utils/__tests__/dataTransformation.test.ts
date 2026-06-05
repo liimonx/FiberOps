@@ -82,10 +82,10 @@ describe('dataTransformation', () => {
       const asset = {
         id: 'asset-unknown',
         name: 'Unknown Kind',
-        kind: 'unknown' as any,
+        kind: 'unknown',
         status: 'active',
         location: { lat: 0, lng: 0 }
-      };
+      } as unknown as Asset;
 
       const result = transformAssetToNode(asset);
       expect(result.type).toBe(NetworkNodeType.ACCESS_NODE);
@@ -96,9 +96,9 @@ describe('dataTransformation', () => {
         id: 'asset-unknown-status',
         name: 'Unknown Status',
         kind: 'pop',
-        status: 'unknown' as any,
+        status: 'unknown',
         location: { lat: 0, lng: 0 }
-      };
+      } as unknown as Asset;
 
       const result = transformAssetToNode(asset);
       expect(result.status).toBe(NetworkStatus.ACTIVE);
@@ -160,8 +160,8 @@ describe('dataTransformation', () => {
           id: `cust-${status}`,
           name: 'Test',
           plan: 'Basic',
-          status: status as any
-        };
+          status,
+        } as unknown as Customer;
         const result = transformCustomerToNode(customer);
         expect(result.status).toBe(expected);
       });

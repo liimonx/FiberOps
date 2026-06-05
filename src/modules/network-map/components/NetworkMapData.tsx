@@ -11,6 +11,9 @@ import { useNetworkMapStore } from "../stores/useNetworkMapStore";
 import { ErrorBoundary } from "./ErrorBoundary";
 import { EnhancedLoadingState } from "./EnhancedLoadingState";
 import { NetworkStatus } from "../types";
+import { createLogger } from "@/lib/logger";
+
+const log = createLogger("NetworkMap");
 
 interface NetworkMapDataProps {
   children: React.ReactNode;
@@ -21,10 +24,7 @@ function NetworkMapDataSync({ children }: NetworkMapDataProps) {
   const { nodes, connections, isLoading, error, isFetching } = useNetworkData();
 
   const handleConnectionChange = useCallback((connected: boolean) => {
-    console.log(
-      "[NetworkMap] WebSocket connection:",
-      connected ? "connected" : "disconnected"
-    );
+    log.info("WebSocket connection:", connected ? "connected" : "disconnected");
   }, []);
 
   const { isConnected, connectionQuality } = useRealTimeUpdates({
@@ -68,11 +68,10 @@ function NetworkMapDataSync({ children }: NetworkMapDataProps) {
     // Do not overwrite in-memory outage simulation when the user is previewing impact
     if (simulatedOutageActive) return;
 
-    if (nodes.length > 0) {
+    // Keep store topology in sync with the latest successful payload, including
+    // valid empty responses so stale entities are not left on the map.
+    if (!error) {
       setNodes(nodes);
-    }
-    
-    if (connections.length > 0) {
       setConnections(connections);
     }
   }, [

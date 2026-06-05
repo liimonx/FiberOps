@@ -2,32 +2,43 @@
 
 import Link from "next/link";
 import { Card, Button, Icon, Grid, GridCol } from "@shohojdhara/atomix";
+import type { PhosphorIconsType } from "@shohojdhara/atomix";
 
-const quickActions = [
+const quickActions: {
+  title: string;
+  description: string;
+  href: string;
+  icon: PhosphorIconsType;
+  color: string;
+}[] = [
   {
     title: "Network Map",
-    description: "View and manage fiber infrastructure",
+    description:
+      "Explore routes, nodes, and service areas with live geographic context.",
     href: "/network-map",
     icon: "MapPin",
     color: "primary",
   },
   {
-    title: "Active Incidents",
-    description: "Monitor and resolve network issues",
+    title: "Incidents",
+    description:
+      "Track outages, degradations, and restoration status across the network.",
     href: "/incidents",
     icon: "Warning",
     color: "error",
   },
   {
     title: "Work Orders",
-    description: "Track field operations and tasks",
+    description:
+      "Manage installation, repair, and maintenance tasks for field teams.",
     href: "/work-orders",
     icon: "Clipboard",
     color: "success",
   },
   {
-    title: "Asset Management",
-    description: "Browse and inspect network assets",
+    title: "Assets",
+    description:
+      "Inspect cabinets, splitters, ONTs, and passive plant inventory.",
     href: "/assets",
     icon: "Package",
     color: "warning",
@@ -38,28 +49,28 @@ const recentActivity = [
   {
     id: 1,
     type: "incident",
-    message: "Node Alpha outage detected",
+    message: "INC-1042: Fiber cut reported at Node Alpha — ticket auto-created",
     time: "10 minutes ago",
     severity: "error",
   },
   {
     id: 2,
     type: "workorder",
-    message: "WO-991 assigned to John Doe",
+    message: "WO-991 assigned to field technician J. Doe",
     time: "25 minutes ago",
     severity: "info",
   },
   {
     id: 3,
     type: "maintenance",
-    message: "Scheduled maintenance on Splitter 08",
+    message: "PM-220: Preventive maintenance scheduled for Splitter S-08",
     time: "2 hours ago",
     severity: "warning",
   },
   {
     id: 4,
     type: "success",
-    message: "Customer ONT installation completed",
+    message: "ONT provisioning completed for residential subscriber",
     time: "3 hours ago",
     severity: "success",
   },
@@ -68,101 +79,110 @@ const recentActivity = [
 export default function Home() {
   return (
     <div className="u-py-6 u-w-100">
-      {/* Hero Section */}
       <div className="u-mb-8">
-        <h1 className="u-text-3xl u-font-bold u-mb-2">Welcome to FiberOps</h1>
-        <p className="u-text-secondary-emphasis u-text-lg">
-          Monitor, manage, and optimize your fiber network operations in real-time.
+        <p className="u-text-xs u-text-secondary-emphasis u-text-uppercase u-tracking-wider u-mb-2">
+          Network operations
+        </p>
+        <h1 className="u-text-3xl u-font-bold u-mb-2">FiberOps Operations Center</h1>
+        <p className="u-text-secondary-emphasis u-text-lg u-mb-0">
+          Unified visibility and control for fiber infrastructure, field operations,
+          and customer service. Use the modules below to monitor health, respond to
+          events, and coordinate work across your organization.
         </p>
       </div>
 
-      {/* Quick Stats */}
-      <Grid className="u-mb-8">
-        <GridCol xs={12} sm={6} lg={3}>
-          <Card>
-            <div className="u-flex u-items-center u-gap-3 u-mb-3">
-              <div className="u-bg-primary-subtle u-rounded u-p-2">
-                <Icon name="Users" className="" size="lg" />
-              </div>
-              <div>
-                <div className="u-text-xs u-text-secondary-emphasis">Total Customers</div>
-                <div className="u-text-xl u-font-bold">12,492</div>
-              </div>
-            </div>
-            <div className="u-text-xs u-text-success u-flex u-items-center u-gap-1">
-              <Icon name="TrendUp" size="sm" />
-              <span>+124 this month</span>
-            </div>
-          </Card>
-        </GridCol>
-
-        <GridCol xs={12} sm={6} lg={3}>
-          <Card>
-            <div className="u-flex u-items-center u-gap-3 u-mb-3">
-              <div className="u-bg-error-subtle u-rounded u-p-2">
-                <Icon name="Warning" className="u-text-error" size="lg" />
-              </div>
-              <div>
-                <div className="u-text-xs u-text-secondary-emphasis">s</div>
-                <div className="u-text-xl u-font-bold">3</div>
-              </div>
-            </div>
-            <div className="u-text-xs u-text-danger u-flex u-items-center u-gap-1">
-              <Icon name="TrendDown" size="sm" />
-              <span>-1 since yesterday</span>
-            </div>
-          </Card>
-        </GridCol>
-
-        <GridCol xs={12} sm={6} lg={3}>
-          <Card>
-            <div className="u-flex u-items-center u-gap-3 u-mb-3">
-              <div className="u-bg-success-subtle u-rounded u-p-2">
-                <Icon name="Pulse" className="u-text-success" size="lg" />
-              </div>
-              <div>
-                <div className="u-text-xs u-text-secondary-emphasis">Signal Health</div>
-                <div className="u-text-xl u-font-bold">94%</div>
-              </div>
-            </div>
-            <div className="u-text-xs u-text-secondary-emphasis">
-              Stable across all nodes
-            </div>
-          </Card>
-        </GridCol>
-
-        <GridCol xs={12} sm={6} lg={3}>
-          <Card>
-            <div className="u-flex u-items-center u-gap-3 u-mb-3">
-              <div className="u-bg-warning-subtle u-rounded u-p-2">
-                <Icon name="Clipboard" className="u-text-warning" size="lg" />
-              </div>
-              <div>
-                <div className="u-text-xs u-text-secondary-emphasis">
-                  Open Work Orders
-                </div>
-                <div className="u-text-xl u-font-bold">28</div>
-              </div>
-            </div>
-            <div className="u-text-xs u-text-warning">5 high priority</div>
-          </Card>
-        </GridCol>
-      </Grid>
-
-      {/* Quick Actions */}
       <div className="u-mb-8">
-        <h2 className="u-text-xl u-font-bold u-mb-4">Quick Actions</h2>
+        <h2 className="u-text-xl u-font-bold u-mb-4">Key metrics</h2>
+        <Grid>
+          <GridCol xs={12} sm={6} lg={3}>
+            <Card>
+              <div className="u-flex u-items-center u-gap-3 u-mb-3">
+                <div className="u-bg-primary-subtle u-rounded u-p-2">
+                  <Icon name="Users" size="lg" />
+                </div>
+                <div>
+                  <div className="u-text-xs u-text-secondary-emphasis">
+                    Active subscribers
+                  </div>
+                  <div className="u-text-xl u-font-bold">12,492</div>
+                </div>
+              </div>
+              <div className="u-text-xs u-text-success u-flex u-items-center u-gap-1">
+                <Icon name="TrendUp" size="sm" />
+                <span>+124 net adds this month</span>
+              </div>
+            </Card>
+          </GridCol>
+
+          <GridCol xs={12} sm={6} lg={3}>
+            <Card>
+              <div className="u-flex u-items-center u-gap-3 u-mb-3">
+                <div className="u-bg-error-subtle u-rounded u-p-2">
+                  <Icon name="Warning" className="u-text-error" size="lg" />
+                </div>
+                <div>
+                  <div className="u-text-xs u-text-secondary-emphasis">
+                    Open incidents
+                  </div>
+                  <div className="u-text-xl u-font-bold">3</div>
+                </div>
+              </div>
+              <div className="u-text-xs u-text-danger u-flex u-items-center u-gap-1">
+                <Icon name="TrendDown" size="sm" />
+                <span>1 resolved since yesterday</span>
+              </div>
+            </Card>
+          </GridCol>
+
+          <GridCol xs={12} sm={6} lg={3}>
+            <Card>
+              <div className="u-flex u-items-center u-gap-3 u-mb-3">
+                <div className="u-bg-success-subtle u-rounded u-p-2">
+                  <Icon name="Pulse" className="u-text-success" size="lg" />
+                </div>
+                <div>
+                  <div className="u-text-xs u-text-secondary-emphasis">
+                    Network availability
+                  </div>
+                  <div className="u-text-xl u-font-bold">99.4%</div>
+                </div>
+              </div>
+              <div className="u-text-xs u-text-secondary-emphasis">
+                Rolling 24-hour average across all nodes
+              </div>
+            </Card>
+          </GridCol>
+
+          <GridCol xs={12} sm={6} lg={3}>
+            <Card>
+              <div className="u-flex u-items-center u-gap-3 u-mb-3">
+                <div className="u-bg-warning-subtle u-rounded u-p-2">
+                  <Icon name="Clipboard" className="u-text-warning" size="lg" />
+                </div>
+                <div>
+                  <div className="u-text-xs u-text-secondary-emphasis">
+                    Open work orders
+                  </div>
+                  <div className="u-text-xl u-font-bold">28</div>
+                </div>
+              </div>
+              <div className="u-text-xs u-text-warning">5 marked high priority</div>
+            </Card>
+          </GridCol>
+        </Grid>
+      </div>
+
+      <div className="u-mb-8">
+        <h2 className="u-text-xl u-font-bold u-mb-4">Applications</h2>
         <Grid>
           {quickActions.map((action) => (
             <GridCol xs={12} sm={6} lg={3} key={action.href}>
               <Link href={action.href} className="u-text-decoration-none">
-                <Card
-                  className="u-h-100 u-cursor-pointer u-transition-all u-duration-200 hover:u-scale-105 hover:u-shadow-lg"
-                >
+                <Card className="u-h-100 u-cursor-pointer u-transition-all u-duration-200 hover:u-scale-105 hover:u-shadow-lg">
                   <div className="u-flex u-items-start u-gap-3">
                     <div className={`u-bg-${action.color}-subtle u-rounded u-p-3`}>
                       <Icon
-                        name={action.icon as any}
+                        name={action.icon}
                         className={`u-text-${action.color}`}
                         size="lg"
                       />
@@ -182,9 +202,15 @@ export default function Home() {
         </Grid>
       </div>
 
-      {/* Recent Activity */}
       <div>
-        <h2 className="u-text-xl u-font-bold u-mb-4">Recent Activity</h2>
+        <div className="u-flex u-justify-between u-items-center u-mb-4">
+          <h2 className="u-text-xl u-font-bold u-mb-0">Activity feed</h2>
+          <Link href="/dashboard" className="u-text-decoration-none">
+            <Button variant="outline-secondary" size="sm">
+              View dashboard
+            </Button>
+          </Link>
+        </div>
         <Card>
           <div className="u-flex u-flex-column u-gap-3">
             {recentActivity.map((activity) => (
@@ -217,11 +243,6 @@ export default function Home() {
                 </div>
               </div>
             ))}
-          </div>
-          <div className="u-mt-4 u-text-center">
-            <Button variant="outline-secondary" size="sm">
-              View All Activity
-            </Button>
           </div>
         </Card>
       </div>

@@ -1,11 +1,14 @@
 "use client";
 
-import { NetworkNode, NetworkConnection } from "../types";
+import { NetworkStatus } from "../types";
 import { safeValidateData } from "../utils/validation";
 import {
   webSocketMessageSchema,
   WebSocketMessageSchema,
 } from "../schemas/webSocketMessage.schema";
+import { createLogger } from "@/lib/logger";
+
+const log = createLogger("WebSocket");
 
 export type WebSocketMessage = WebSocketMessageSchema;
 export type WebSocketEventHandler = (message: WebSocketMessage) => void;
@@ -58,7 +61,7 @@ export class WebSocketService {
       // Set connection timeout
       const connectionTimeout = setTimeout(() => {
         if (this.ws?.readyState !== WebSocket.OPEN) {
-          console.error("[WebSocket] Connection timeout");
+          log.error("Connection timeout");
           this.ws?.close();
           reject(new Error("WebSocket connection timed out"));
         }
@@ -69,7 +72,7 @@ export class WebSocketService {
 
         this.ws.onopen = () => {
           clearTimeout(connectionTimeout);
-          console.log("[WebSocket] Connected successfully");
+          log.info("Connected successfully");
           this.reconnectAttempts = 0;
           this.startHeartbeat();
           this.flushMessageBuffer();
@@ -84,14 +87,14 @@ export class WebSocketService {
             if (validationResult.success) {
               this.handleMessage(validationResult.data);
             } else {
-              console.warn(
-                "[WebSocket] Received malformed message:",
+              log.warn(
+                "Received malformed message:",
                 validationResult.error,
                 rawData
               );
             }
           } catch (error) {
-            console.error("[WebSocket] Failed to parse message:", error);
+            log.error("Failed to parse message:", error);
           }
         };
 
@@ -100,11 +103,11 @@ export class WebSocketService {
           const isConnecting = this.ws?.readyState === WebSocket.CONNECTING;
           
           if (isConnecting) {
-            console.warn(
-              `[WebSocket] Connection failed for ${this.config.url}. (Check if backend is running)`
+            log.warn(
+              `Connection failed for ${this.config.url}. (Check if backend is running)`
             );
           } else if (this.ws?.readyState === WebSocket.OPEN) {
-            console.error("[WebSocket] Live connection error:", event);
+            log.error("Live connection error:", event);
           }
         };
 
@@ -126,7 +129,7 @@ export class WebSocketService {
           }
         };
       } catch (error) {
-        console.error("[WebSocket] Failed to connect:", error);
+        log.error("Failed to connect:", error);
         reject(error);
       }
     });
@@ -153,9 +156,9 @@ export class WebSocketService {
     } else {
       if (this.messageBuffer.length < this.config.maxBufferSize) {
         this.messageBuffer.push(message);
-        console.warn("[WebSocket] Message buffered - connection not ready");
+        log.warn("Message buffered - connection not ready");
       } else {
-        console.error("[WebSocket] Message buffer full - dropping message");
+        log.error("Message buffer full - dropping message");
       }
     }
   }
@@ -195,7 +198,7 @@ export class WebSocketService {
       try {
         handler(message);
       } catch (e) {
-        console.error(`[WebSocket] Error in ${message.type} handler:`, e);
+        log.error(`Error in ${message.type} handler:`, e);
       }
     });
 
@@ -204,14 +207,14 @@ export class WebSocketService {
       try {
         handler(message);
       } catch (e) {
-        console.error("[WebSocket] Error in generic message handler:", e);
+        log.error("Error in generic message handler:", e);
       }
     });
   }
 
   private attemptReconnect(): void {
     if (this.reconnectAttempts >= this.config.maxReconnectAttempts) {
-      console.error("[WebSocket] Max reconnection attempts reached");
+      log.error("Max reconnection attempts reached");
       this.notifyConnectionFailure();
       return;
     }
@@ -222,14 +225,12 @@ export class WebSocketService {
       30000 // Cap delay at 30 seconds
     );
 
-    console.log(
-      `[WebSocket] Reconnecting in ${delay}ms (attempt ${this.reconnectAttempts})`
+    log.info(
+      `Reconnecting in ${delay}ms (attempt ${this.reconnectAttempts})`
     );
 
     this.reconnectTimer = setTimeout(() => {
-      this.connect().catch((err) =>
-        console.error("[WebSocket] Reconnection failed:", err)
-      );
+      this.connect().catch((err) => log.error("Reconnection failed:", err));
     }, delay);
   }
 
@@ -269,12 +270,12 @@ export class WebSocketService {
           type: "status_broadcast",
           data: {
             nodeId: "system",
-            status: "disconnected" as any,
+            status: NetworkStatus.ERROR,
             timestamp: new Date().toISOString(),
           },
         });
       } catch (e) {
-        console.error("[WebSocket] Error in connection_error handler:", e);
+        log.error("Error in connection_error handler:", e);
       }
     });
   }

@@ -1,5 +1,9 @@
 "use client";
 
+import { createLogger } from "@/lib/logger";
+
+const log = createLogger("Performance");
+
 // Performance monitoring and optimization utilities
 export class PerformanceOptimizer {
   private static frameCount = 0;
@@ -28,8 +32,8 @@ export class PerformanceOptimizer {
         this.callbacks.forEach(cb => cb(this.fps));
         
         // Warn if FPS drops below threshold
-        if (this.fps < 30 && process.env.NODE_ENV === 'development') {
-          console.warn(`[Performance] Low FPS detected: ${this.fps}`);
+        if (this.fps < 30) {
+          log.warn(`Low FPS detected: ${this.fps}`);
         }
       }
       
@@ -71,8 +75,8 @@ export class PerformanceOptimizer {
     const end = performance.now();
     const duration = end - start;
     
-    if (duration > 16 && process.env.NODE_ENV === 'development') {
-      console.warn(`[Performance] ${label} took ${duration.toFixed(2)}ms (>16ms threshold)`);
+    if (duration > 16) {
+      log.warn(`${label} took ${duration.toFixed(2)}ms (>16ms threshold)`);
     }
     
     return result;
@@ -267,11 +271,13 @@ export class MemoryManager {
 
   // Monitor memory usage (Chrome only)
   static getMemoryUsage(): { usedJSHeapSize: number; totalJSHeapSize: number } | null {
-    if ('memory' in performance) {
-      const mem = (performance as any).memory;
+    const perf = performance as Performance & {
+      memory?: { usedJSHeapSize: number; totalJSHeapSize: number };
+    };
+    if (perf.memory) {
       return {
-        usedJSHeapSize: mem.usedJSHeapSize,
-        totalJSHeapSize: mem.totalJSHeapSize
+        usedJSHeapSize: perf.memory.usedJSHeapSize,
+        totalJSHeapSize: perf.memory.totalJSHeapSize
       };
     }
     return null;
@@ -283,7 +289,7 @@ export class MemoryManager {
     if (usage) {
       const usedMB = usage.usedJSHeapSize / 1024 / 1024;
       if (usedMB > thresholdMB && process.env.NODE_ENV === 'development') {
-        console.warn(`[Memory] High memory usage: ${usedMB.toFixed(2)}MB`);
+        log.warn(`High memory usage: ${usedMB.toFixed(2)}MB`);
       }
     }
   }

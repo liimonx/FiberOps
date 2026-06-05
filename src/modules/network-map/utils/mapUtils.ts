@@ -46,7 +46,7 @@ export const flyToLocation = (
 export const safeHasLayer = (map: mapboxgl.Map | null, id: string) => {
   try {
     return !!(map && map.getStyle() && map.getLayer(id));
-  } catch (e) {
+  } catch {
     return false;
   }
 };

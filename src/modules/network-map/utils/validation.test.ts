@@ -18,7 +18,10 @@ describe('Validation Utilities', () => {
     it('should throw an error when schema is undefined', () => {
       const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
       expect(() => validateData(undefined as any, {})).toThrow('Validation failed: Schema is undefined');
-      expect(consoleErrorSpy).toHaveBeenCalledWith(expect.stringContaining('[Validation Error] Schema is undefined'));
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        '[Validation]',
+        'Schema is undefined. Check for circular dependencies.'
+      );
       consoleErrorSpy.mockRestore();
     });
 

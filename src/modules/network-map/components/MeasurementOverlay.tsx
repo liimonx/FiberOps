@@ -102,7 +102,7 @@ export function MeasurementOverlay({ onClose }: MeasurementOverlayProps) {
 }
 
 // Trace path overlay component
-export function TracePathOverlay({ onClose }: { onClose?: () => void }) {
+export function TracePathOverlay() {
   const traceData = useTraceTool();
   const {
     tracePath,
@@ -191,7 +191,7 @@ export function TracePathOverlay({ onClose }: { onClose?: () => void }) {
 }
 
 // Heatmap legend component
-export function HeatmapLegend({ onClose }: { onClose?: () => void }) {
+export function HeatmapLegend() {
   const { heatmapData, hasHeatmap, setHeatmapType, clearHeatmap } = useHeatmapTool();
   const [activeHeatmapType, setActiveHeatmapType] = React.useState<
     "density" | "utilization" | "incidents"

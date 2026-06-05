@@ -4,6 +4,9 @@ import { useGSAP } from '@gsap/react'
 
 import styles from './shiny.module.scss'
 import { useReducedMotion } from './useReducedMotion'
+import { createLogger } from '@/lib/logger'
+
+const log = createLogger('Shiny')
 
 const useShinyAnimation = (isDegenMode: boolean, isReducedMotion: boolean) => {
     const shinyRef = useRef<HTMLDivElement>(null)
@@ -20,7 +23,7 @@ const useShinyAnimation = (isDegenMode: boolean, isReducedMotion: boolean) => {
                     setPluginsLoaded(true)
                 })
                 .catch((error) => {
-                    console.error('Failed to load GSAP plugins:', error)
+                    log.error('Failed to load GSAP plugins:', error)
                     // Set as loaded anyway to prevent blocking the component
                     setPluginsLoaded(true)
                 })
@@ -85,30 +88,30 @@ const useShinyAnimation = (isDegenMode: boolean, isReducedMotion: boolean) => {
         { scope: shinyRef, dependencies: [pluginsLoaded, isReducedMotion] }
     )
 
-    const animate = contextSafe(() => {
+    // Build and run the animation inside the effect so refs are only read on
+    // commit (not during render). `contextSafe` from useGSAP is stable.
+    useEffect(() => {
         if (!isInitializedRef.current || !initTimelineRef.current || !shinyRef.current || !pluginsLoaded) {
             return
         }
 
-        if (isDegenMode && !isReducedMotion) {
-            gsap.set('.js-shiny', { opacity: 1 })
-            gsap.set('.js-shiny-shinBorder', { opacity: 1 })
-            gsap.to('.js-shiny-inner-glow', { opacity: '0.5' })
+        const animate = contextSafe(() => {
+            if (isDegenMode && !isReducedMotion) {
+                gsap.set('.js-shiny', { opacity: 1 })
+                gsap.set('.js-shiny-shinBorder', { opacity: 1 })
+                gsap.to('.js-shiny-inner-glow', { opacity: '0.5' })
 
-            initTimelineRef.current.restart()
-        } else {
-            gsap.set('.js-shiny', { opacity: 0 })
-            gsap.set('.js-shiny-shinBorder', { opacity: 0 })
-            gsap.to('.js-shiny-inner-glow', { opacity: '0' })
-            gsap.to('.js-shiny-main-bg', { opacity: '0' })
-        }
-    })
+                initTimelineRef.current?.restart()
+            } else {
+                gsap.set('.js-shiny', { opacity: 0 })
+                gsap.set('.js-shiny-shinBorder', { opacity: 0 })
+                gsap.to('.js-shiny-inner-glow', { opacity: '0' })
+                gsap.to('.js-shiny-main-bg', { opacity: '0' })
+            }
+        })
 
-    useEffect(() => {
-        if (isInitializedRef.current && pluginsLoaded) {
-            animate()
-        }
-    }, [isDegenMode, animate, pluginsLoaded])
+        animate()
+    }, [isDegenMode, isReducedMotion, pluginsLoaded, contextSafe])
 
     useEffect(() => {
         return () => {

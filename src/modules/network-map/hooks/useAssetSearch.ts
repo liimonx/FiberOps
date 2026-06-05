@@ -4,7 +4,6 @@ import { useState, useEffect, useCallback } from "react";
 import { 
   NetworkNode, 
   NetworkConnection, 
-  SearchResult, 
   NetworkNodeType,
   AssetCategory,
   CategorizedResult
@@ -132,7 +131,7 @@ export const useAssetSearch = ({
   /**
    * Handle result selection - clears search state
    */
-  const handleSelectResult = useCallback((result: CategorizedResult) => {
+  const handleSelectResult = useCallback(() => {
     setQuery("");
     setResults([]);
     setHighlightedIndex(-1);

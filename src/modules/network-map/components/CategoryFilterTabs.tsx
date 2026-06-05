@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Icon, Button, Badge } from "@shohojdhara/atomix";
+import { Button, Badge } from "@shohojdhara/atomix";
 import { AssetCategory } from "../types";
 
 interface CategoryFilterTabsProps {

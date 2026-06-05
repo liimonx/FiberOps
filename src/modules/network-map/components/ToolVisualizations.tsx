@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import mapboxgl from "mapbox-gl";
 import { useNetworkMapStore } from "../stores/useNetworkMapStore";
 import { MeasurementPoint, TracePath, HeatmapData } from "../types";

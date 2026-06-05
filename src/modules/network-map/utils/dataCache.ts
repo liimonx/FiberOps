@@ -1,6 +1,6 @@
 "use client";
 
-import { NetworkNode, NetworkConnection } from '../types';
+import { NetworkNode } from '../types';
 
 // In-memory cache with TTL
 interface CacheEntry<T> {
