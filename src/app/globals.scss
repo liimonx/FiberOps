@@ -1,15 +1,36 @@
 @use "./accessibility.scss";
 @use "./styles/index.scss";
-:root {
+
+/* Light mode ambient palette */
+:root,
+[data-atomix-color-mode="light"] {
+  color-scheme: light;
+
+  --ambient-base: #f8fafc;
+  --ambient-base-mid: #f1f5f9;
+  --ambient-base-lift: #e8eef5;
+  --ambient-cyan-rgb: 6, 182, 212;
+  --ambient-purple-rgb: 147, 51, 234;
+  --ambient-indigo-rgb: 99, 102, 241;
+  --ambient-cyan-wash: 0.05;
+  --ambient-purple-wash: 0.04;
+  --ambient-indigo-wash: 0.03;
+  --atomix-body-bg: var(--ambient-base);
+}
+
+/* Dark mode ambient palette */
+[data-atomix-color-mode="dark"] {
   color-scheme: dark;
 
-  /* Ambient palette — FiberOps cyan + purple on rich midnight (see _colors.scss) */
   --ambient-base: #060914;
   --ambient-base-mid: #0e1528;
   --ambient-base-lift: #141b2e;
   --ambient-cyan-rgb: 34, 211, 238;
   --ambient-purple-rgb: 168, 85, 247;
   --ambient-indigo-rgb: 99, 102, 241;
+  --ambient-cyan-wash: 0.08;
+  --ambient-purple-wash: 0.07;
+  --ambient-indigo-wash: 0.04;
   --atomix-body-bg: var(--ambient-base);
 }
 
@@ -26,17 +47,17 @@ body {
   background-image:
     radial-gradient(
       ellipse 80% 50% at 20% 0%,
-      rgba(var(--ambient-cyan-rgb), 0.08) 0%,
+      rgba(var(--ambient-cyan-rgb), var(--ambient-cyan-wash)) 0%,
       transparent 50%
     ),
     radial-gradient(
       ellipse 70% 55% at 85% 100%,
-      rgba(var(--ambient-purple-rgb), 0.07) 0%,
+      rgba(var(--ambient-purple-rgb), var(--ambient-purple-wash)) 0%,
       transparent 50%
     ),
     radial-gradient(
       ellipse 45% 35% at 50% 40%,
-      rgba(var(--ambient-indigo-rgb), 0.04) 0%,
+      rgba(var(--ambient-indigo-rgb), var(--ambient-indigo-wash)) 0%,
       transparent 65%
     ),
     linear-gradient(
