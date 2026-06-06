@@ -164,7 +164,7 @@ export const SearchPanel: React.FC<SearchPanelProps> = ({
   }
 
   return (
-    <Card className={className}>
+    <Card className={className} glass>
       <div className="u-flex u-items-center u-gap-2 u-w-100">
           <SearchInput
             ref={inputRef}

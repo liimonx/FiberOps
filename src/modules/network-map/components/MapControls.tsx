@@ -95,7 +95,7 @@ export const MapControls: React.FC<MapControlsProps> = ({
 
   return (
     <div className={className}>
-      <Card>
+      <Card glass>
         <div
           className="u-flex u-flex-column u-gap-1"
           role="toolbar"

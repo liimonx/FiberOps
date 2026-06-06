@@ -3,12 +3,14 @@
 :root {
   color-scheme: dark;
 
-  /* Ambient palette — FiberOps cyan + purple on slate-950 (see _colors.scss) */
-  --ambient-base: #020617;
-  --ambient-base-mid: #0c1428;
-  --ambient-cyan-rgb: 6, 182, 212;
-  --ambient-purple-rgb: 147, 51, 234;
-  --ambient-teal-rgb: 14, 116, 144;
+  /* Ambient palette — FiberOps cyan + purple on rich midnight (see _colors.scss) */
+  --ambient-base: #060914;
+  --ambient-base-mid: #0e1528;
+  --ambient-base-lift: #141b2e;
+  --ambient-cyan-rgb: 34, 211, 238;
+  --ambient-purple-rgb: 168, 85, 247;
+  --ambient-indigo-rgb: 99, 102, 241;
+  --atomix-body-bg: var(--ambient-base);
 }
 
 html {
@@ -18,90 +20,34 @@ html {
 body {
   min-height: 100%;
   margin: 0;
-  background-color: var(--atomix-body-bg, var(--ambient-base));
+  background-color: var(--ambient-base);
 
-  /* Layered depth: corner glows + soft center wash + vertical base gradient */
+  /* Static premium depth: corner washes + center bloom + multi-stop base gradient */
   background-image:
     radial-gradient(
-      ellipse 92% 72% at 0% -8%,
-      rgba(var(--ambient-cyan-rgb), 0.13) 0%,
-      transparent 58%
+      ellipse 80% 50% at 20% 0%,
+      rgba(var(--ambient-cyan-rgb), 0.08) 0%,
+      transparent 50%
     ),
     radial-gradient(
-      ellipse 88% 68% at 100% 108%,
-      rgba(var(--ambient-purple-rgb), 0.1) 0%,
-      transparent 56%
+      ellipse 70% 55% at 85% 100%,
+      rgba(var(--ambient-purple-rgb), 0.07) 0%,
+      transparent 50%
     ),
     radial-gradient(
-      ellipse 55% 42% at 50% 48%,
-      rgba(var(--ambient-teal-rgb), 0.045) 0%,
-      transparent 72%
+      ellipse 45% 35% at 50% 40%,
+      rgba(var(--ambient-indigo-rgb), 0.04) 0%,
+      transparent 65%
     ),
     linear-gradient(
-      168deg,
+      165deg,
       var(--ambient-base) 0%,
-      var(--ambient-base-mid) 45%,
+      var(--ambient-base-mid) 42%,
+      var(--ambient-base-lift) 70%,
       var(--ambient-base) 100%
     );
   background-attachment: fixed;
   background-size: 100% 100%;
-}
-
-/* Liquid floating orbs — brand-tinted, lower chroma than static washes */
-body::before,
-body::after {
-  content: "";
-  position: fixed;
-  border-radius: 50%;
-  filter: blur(140px);
-  z-index: -1;
-  opacity: 0.9;
-  animation: liquid-float 28s infinite ease-in-out alternate;
-  pointer-events: none;
-  will-change: transform;
-}
-
-body::before {
-  width: 48vw;
-  height: 48vh;
-  min-width: 280px;
-  min-height: 280px;
-  background: rgba(var(--ambient-purple-rgb), 0.13);
-  top: -18vh;
-  left: -12vw;
-}
-
-body::after {
-  width: 42vw;
-  height: 55vh;
-  min-width: 240px;
-  min-height: 240px;
-  background: rgba(var(--ambient-cyan-rgb), 0.11);
-  bottom: -18vh;
-  right: -12vw;
-  animation-delay: -14s;
-}
-
-@keyframes liquid-float {
-  0% {
-    transform: translate(0, 0) scale(1);
-  }
-  33% {
-    transform: translate(5vw, -4vh) scale(1.08);
-  }
-  66% {
-    transform: translate(-4vw, 5vh) scale(0.94);
-  }
-  100% {
-    transform: translate(4vw, 3vh) scale(1.04);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  body::before,
-  body::after {
-    animation: none;
-  }
 }
 
 /* Sidebar footer animations */

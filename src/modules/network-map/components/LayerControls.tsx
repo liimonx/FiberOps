@@ -108,7 +108,7 @@ export const LayerControls: React.FC<LayerControlsProps> = ({
   }
 
   return (
-    <Accordion title="" icon={<Icon name="Stack" />} className={className}>
+    <Accordion title="" glass icon={<Icon name="Stack" />} className={className}>
       <Accordion.Header>
         <div className="u-relative u-w-100">
           <div className="u-flex u-items-center u-justify-between u-gap-3">

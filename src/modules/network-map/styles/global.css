@@ -187,33 +187,6 @@
   }
 }
 
-/* Futuristic Map Aesthetics */
-.u-animate-scanline {
-  top: -100%;
-  animation: scanline 8s linear infinite;
-  background: linear-gradient(
-    to bottom,
-    transparent,
-    rgba(var(--atomix-primary-rgb), 0.15) 50%,
-    transparent
-  );
-  filter: blur(2px);
-}
-
-@keyframes scanline {
-  0% { top: -100%; }
-  100% { top: 200%; }
-}
-
-.u-animate-pulse-subtle {
-  animation: pulse-subtle 4s ease-in-out infinite;
-}
-
-@keyframes pulse-subtle {
-  0%, 100% { opacity: 0.05; }
-  50% { opacity: 0.15; }
-}
-
 .u-map-vignette {
   background: radial-gradient(
     circle,

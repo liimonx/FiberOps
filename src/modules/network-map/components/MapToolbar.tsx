@@ -97,7 +97,7 @@ export const MapToolbar: React.FC<MapToolbarProps> = ({
       role="toolbar"
       aria-label="Map tools"
     >
-      <Card>
+      <Card glass>
         <div
           className="u-flex u-flex-column u-gap-1"
           role="group"
