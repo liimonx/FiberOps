@@ -257,7 +257,7 @@ export const InteractiveTooltip: React.FC<InteractiveTooltipProps> = ({
             {content.metadata && Object.keys(content.metadata).length > 0 && (
               <div className="u-border-top u-border-secondary-subtle">
                 <button
-                  className="u-w-100 u-flex u-items-center u-justify-between u-px-4 u-py-2 u-bg-transparent u-border-0 u-text-secondary-emphasis u-text-xs u-font-bold u-text-uppercase u-cursor-pointer hover: u-transition-all"
+                  className="u-w-100 u-flex u-items-center u-justify-between u-px-4 u-py-2 u-bg-transparent u-border-0 u-text-secondary-emphasis u-text-xs u-font-bold u-text-uppercase u-cursor-pointer u-transition-all"
                   onClick={() => setIsExpanded(!isExpanded)}
                 >
                   <span>More Info</span>

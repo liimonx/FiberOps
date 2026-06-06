@@ -139,7 +139,7 @@ export default function IncidentsPage() {
                   boxShadow: "0 0 0 4px rgba(220, 53, 69, 0.2)",
                 }}
               >
-                <Icon name="Warning" size="sm" className="" />
+                <Icon name="Warning" size="sm" className="u-text-white" />
               </div>
             </div>
           </Card>

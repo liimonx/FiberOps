@@ -66,6 +66,8 @@ export const addCustomLayers = (map: mapboxgl.Map) => {
       map.addSource(sourceId, {
         type: "geojson",
         data: { type: "FeatureCollection", features: [] },
+        // Required for setFeatureState hover highlighting (properties.id → feature id)
+        promoteId: "id",
       });
     }
   }

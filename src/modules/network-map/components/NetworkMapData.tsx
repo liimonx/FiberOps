@@ -9,6 +9,7 @@ import {
 } from "../hooks";
 import { useNetworkMapStore } from "../stores/useNetworkMapStore";
 import { ErrorBoundary } from "./ErrorBoundary";
+import { AccessibilityProvider } from "./AccessibilityAnnouncer";
 import { EnhancedLoadingState } from "./EnhancedLoadingState";
 import { NetworkStatus } from "../types";
 import { createLogger } from "@/lib/logger";
@@ -219,7 +220,9 @@ function NetworkStatusIndicators({
 export function NetworkMapDataProvider({ children }: NetworkMapDataProps) {
   return (
     <ErrorBoundary>
-      <NetworkMapDataSync>{children}</NetworkMapDataSync>
+      <AccessibilityProvider>
+        <NetworkMapDataSync>{children}</NetworkMapDataSync>
+      </AccessibilityProvider>
     </ErrorBoundary>
   );
 }

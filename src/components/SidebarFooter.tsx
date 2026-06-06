@@ -65,14 +65,14 @@ export function SidebarFooter() {
       <div className="u-flex u-flex-column u-gap-0.5">
         <Link
           href="/help"
-          className="u-flex u-items-center u-gap-2 u-px-3 u-py-1.5 u-rounded u-text-secondary u-text-xs u-no-underline hover:u-bg-secondary-subtle hover: transition-all"
+          className="u-flex u-items-center u-gap-2 u-px-3 u-py-1.5 u-rounded u-text-secondary u-text-xs u-no-underline u-transition-all hover:u-bg-secondary-subtle"
         >
           <Icon name="Question" size="sm" className="u-text-secondary-emphasis" />
           <span>Help Center</span>
         </Link>
         <Link
           href="/feedback"
-          className="u-flex u-items-center u-gap-2 u-px-3 u-py-1.5 u-rounded u-text-secondary u-text-xs u-no-underline hover:u-bg-secondary-subtle hover: transition-all"
+          className="u-flex u-items-center u-gap-2 u-px-3 u-py-1.5 u-rounded u-text-secondary u-text-xs u-no-underline u-transition-all hover:u-bg-secondary-subtle"
         >
           <Icon name="ChatCircleText" size="sm" className="u-text-secondary-emphasis" />
           <span>Feedback</span>
@@ -81,7 +81,7 @@ export function SidebarFooter() {
           href="https://github.com/shohojdhara/atomix"
           target="_blank"
           rel="noopener noreferrer"
-          className="u-flex u-items-center u-gap-2 u-px-3 u-py-1.5 u-rounded u-text-secondary u-text-xs u-no-underline hover:u-bg-secondary-subtle hover: transition-all"
+          className="u-flex u-items-center u-gap-2 u-px-3 u-py-1.5 u-rounded u-text-secondary u-text-xs u-no-underline u-transition-all hover:u-bg-secondary-subtle"
         >
           <Icon name="GithubLogo" size="sm" className="u-text-secondary-emphasis" />
           <span>GitHub</span>

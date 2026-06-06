@@ -72,9 +72,9 @@ export const SearchResultsList: React.FC<SearchResultsListProps> = ({
                 {result.name}
               </span>
               <span
-                className={`u-text-xs u-opacity-70 ${isHighlighted ? "" : "u-text-secondary-emphasis"}`}
+                className={`u-text-xs u-opacity-70 u-text-truncate ${isHighlighted ? "" : "u-text-secondary-emphasis"}`}
               >
-                {result.type}
+                {result.detail ?? result.type}
               </span>
             </div>
             <Icon

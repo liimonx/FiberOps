@@ -247,6 +247,7 @@ function build3DNodeFeatures(node: NetworkNode): GeoJSON.Feature[] {
 
 export const createNodeFeature = (node: NetworkNode): GeoJSON.Feature => ({
   type: "Feature",
+  id: node.id,
   geometry: {
     type: "Point",
     coordinates: [node.position.lng, node.position.lat],
@@ -277,6 +278,7 @@ export const createConnectionFeature = (
 
   return {
     type: "Feature",
+    id: connection.id,
     geometry: { type: "LineString", coordinates: coords },
     properties: {
       ...connection,

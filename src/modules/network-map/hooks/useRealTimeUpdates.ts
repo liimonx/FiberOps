@@ -72,9 +72,14 @@ export function useRealTimeUpdates(options: UseRealTimeUpdatesOptions = {}) {
 
   // Initialize WebSocket connection
   useEffect(() => {
-    if (!enabled) return;
+    const resolvedUrl = wsUrl ?? process.env.NEXT_PUBLIC_WS_URL;
+    if (!enabled || !resolvedUrl) {
+      setWebSocketConnected(false);
+      setConnectionQuality('disconnected');
+      return;
+    }
 
-    const wsService = getWebSocketService(wsUrl ? { url: wsUrl } : undefined);
+    const wsService = getWebSocketService({ url: resolvedUrl });
     
     // Subscribe to messages
     const unsubscribe = wsService.subscribe('message', handleMessage);

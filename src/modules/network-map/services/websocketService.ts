@@ -34,7 +34,7 @@ export class WebSocketService {
 
   private constructor(config: WebSocketServiceConfig = {}) {
     this.config = {
-      url: config.url || process.env.NEXT_PUBLIC_WS_URL || "ws://localhost:8080/ws",
+      url: config.url || process.env.NEXT_PUBLIC_WS_URL || "",
       reconnectInterval: config.reconnectInterval || 3000,
       maxReconnectAttempts: config.maxReconnectAttempts || 10,
       heartbeatInterval: config.heartbeatInterval || 30000,
@@ -51,6 +51,11 @@ export class WebSocketService {
 
   public connect(): Promise<void> {
     return new Promise((resolve, reject) => {
+      if (!this.config.url) {
+        reject(new Error("WebSocket URL not configured"));
+        return;
+      }
+
       if (this.ws?.readyState === WebSocket.OPEN) {
         resolve();
         return;

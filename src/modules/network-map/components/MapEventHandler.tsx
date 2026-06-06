@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import mapboxgl from "mapbox-gl";
 import { useMapInstance } from "../hooks/useMapInstance";
 import { useNetworkMapStore } from "../stores/useNetworkMapStore";
@@ -12,6 +12,8 @@ import {
   isConnectionLayerId,
   isNodeLayerId,
 } from "../utils/mapStyling/queryLayers";
+import { isOutagesLayerVisible } from "../utils/layerVisibility";
+import { NetworkStatus } from "../types";
 import { createLogger } from "@/lib/logger";
 
 const log = createLogger("MapEventHandler");
@@ -23,6 +25,26 @@ interface MapEventHandlerProps {
   onConnectionHover?: (connectionId: string | null, event: mapboxgl.MapMouseEvent) => void;
   onMapClick?: (event: mapboxgl.MapMouseEvent) => void;
   onMapMove?: (event: mapboxgl.MapboxEvent) => void;
+}
+
+function mapNeedsPulseAnimation(map: mapboxgl.Map): boolean {
+  if (!map.isStyleLoaded()) return false;
+
+  if (
+    safeHasLayer(map, "network-outages-glow") &&
+    isOutagesLayerVisible(useNetworkMapStore.getState().layers)
+  ) {
+    return true;
+  }
+
+  if (!safeHasLayer(map, "network-nodes-glow") || map.getZoom() < 9) {
+    return false;
+  }
+
+  const { nodes } = useNetworkMapStore.getState();
+  return nodes.some(
+    (n) => n.status === NetworkStatus.ERROR || n.status === NetworkStatus.WARNING
+  );
 }
 
 export const MapEventHandler: React.FC<MapEventHandlerProps> = ({
@@ -39,6 +61,39 @@ export const MapEventHandler: React.FC<MapEventHandlerProps> = ({
   const { announce } = useAccessibilityAnnounce();
 
   const map = useMapInstance();
+
+  const activeToolRef = useRef(activeTool);
+  const announceRef = useRef(announce);
+  const callbacksRef = useRef({
+    onNodeClick,
+    onNodeHover,
+    onConnectionClick,
+    onConnectionHover,
+    onMapClick,
+    onMapMove,
+  });
+
+  useEffect(() => {
+    activeToolRef.current = activeTool;
+    announceRef.current = announce;
+    callbacksRef.current = {
+      onNodeClick,
+      onNodeHover,
+      onConnectionClick,
+      onConnectionHover,
+      onMapClick,
+      onMapMove,
+    };
+  }, [
+    activeTool,
+    announce,
+    onNodeClick,
+    onNodeHover,
+    onConnectionClick,
+    onConnectionHover,
+    onMapClick,
+    onMapMove,
+  ]);
 
   // Sync tool manager with store's active tool (store is source of truth for UI)
   useEffect(() => {
@@ -59,46 +114,44 @@ export const MapEventHandler: React.FC<MapEventHandlerProps> = ({
       return tool.cursor ?? "";
     };
 
-
-
-    // Handle map click events
     const handleMapClick = (event: mapboxgl.MapMouseEvent) => {
-      // Check if layers exist before querying
       let features: mapboxgl.MapboxGeoJSONFeature[] = [];
       const queryLayers = getNetworkQueryableLayers(map, safeHasLayer);
       if (queryLayers.length > 0) {
         features = map.queryRenderedFeatures(event.point, { layers: queryLayers });
       }
 
-      // Delegate to ToolManager
       toolManager.handleEvent("onClick", {
         lngLat: event.lngLat,
         point: event.point,
         originalEvent: event.originalEvent,
-        features: features,
+        features,
       });
 
-      // Still fire callbacks for external components if needed
+      const {
+        onNodeClick: onNode,
+        onConnectionClick: onConn,
+        onMapClick: onEmpty,
+      } = callbacksRef.current;
+
       if (features.length > 0) {
         const feature = features[0];
-        const elementId = feature.properties?.id;
+        const elementId = feature.properties?.id as string | undefined;
+        if (!elementId) return;
 
         if (isNodeLayerId(feature.layer?.id)) {
-          onNodeClick?.(elementId as string, event);
+          onNode?.(elementId, event);
         } else if (isConnectionLayerId(feature.layer?.id)) {
-          onConnectionClick?.(elementId as string, event);
+          onConn?.(elementId, event);
         }
       } else {
-        onMapClick?.(event);
+        onEmpty?.(event);
       }
     };
 
-    // Track hovered feature for state management
     let hoveredFeature: { id: string; source: string } | null = null;
 
-    // Handle mouse move for hover effects
     const handleMouseMove = (event: mapboxgl.MapMouseEvent) => {
-      // Check if layers exist before querying
       const layersToQuery = getNetworkQueryableLayers(map, safeHasLayer);
       if (layersToQuery.length === 0) return;
 
@@ -106,7 +159,6 @@ export const MapEventHandler: React.FC<MapEventHandlerProps> = ({
         layers: layersToQuery,
       });
 
-      // Clear previous hover state if different feature or no feature
       if (hoveredFeature) {
         map.setFeatureState(
           { source: hoveredFeature.source, id: hoveredFeature.id },
@@ -114,48 +166,45 @@ export const MapEventHandler: React.FC<MapEventHandlerProps> = ({
         );
       }
 
+      const { onNodeHover: onNode, onConnectionHover: onConn } = callbacksRef.current;
+
       if (features.length > 0) {
         const feature = features[0];
-        const elementId = feature.properties?.id;
+        const elementId = feature.properties?.id as string | undefined;
 
         if (!elementId) {
           hoveredFeature = null;
           setHoveredElement(null);
-          onNodeHover?.(null, event);
-          onConnectionHover?.(null, event);
+          onNode?.(null, event);
+          onConn?.(null, event);
           map.getCanvas().style.cursor = resolveCursor(false);
           return;
         }
 
-        const source = feature.source || "network-nodes";
+        const source = (feature.source as string) || "network-nodes";
         hoveredFeature = { id: elementId, source };
 
-        // Set new hover state
-        map.setFeatureState(
-          { source: source as string, id: elementId as string | number },
-          { hover: true }
-        );
+        map.setFeatureState({ source, id: elementId }, { hover: true });
         map.getCanvas().style.cursor = resolveCursor(true);
 
         if (isNodeLayerId(feature.layer?.id)) {
-          setHoveredElement(elementId as string);
-          onNodeHover?.(elementId as string, event);
-          onConnectionHover?.(null, event);
+          setHoveredElement(elementId);
+          onNode?.(elementId, event);
+          onConn?.(null, event);
         } else if (isConnectionLayerId(feature.layer?.id)) {
-          setHoveredElement(elementId as string);
-          onConnectionHover?.(elementId as string, event);
-          onNodeHover?.(null, event);
+          setHoveredElement(elementId);
+          onConn?.(elementId, event);
+          onNode?.(null, event);
         }
       } else {
         hoveredFeature = null;
         setHoveredElement(null);
-        onNodeHover?.(null, event);
-        onConnectionHover?.(null, event);
+        onNode?.(null, event);
+        onConn?.(null, event);
         map.getCanvas().style.cursor = resolveCursor(false);
       }
     };
 
-    // Handle mouse leave to clear hover state
     const handleMouseLeave = () => {
       if (hoveredFeature) {
         map.setFeatureState(
@@ -165,31 +214,20 @@ export const MapEventHandler: React.FC<MapEventHandlerProps> = ({
         hoveredFeature = null;
       }
       setHoveredElement(null);
-      onNodeHover?.(null, { point: { x: 0, y: 0 }, lngLat: { lng: 0, lat: 0 } } as mapboxgl.MapMouseEvent);
-      onConnectionHover?.(null, { point: { x: 0, y: 0 }, lngLat: { lng: 0, lat: 0 } } as mapboxgl.MapMouseEvent);
+      const noopEvent = {
+        point: { x: 0, y: 0 },
+        lngLat: { lng: 0, lat: 0 },
+      } as mapboxgl.MapMouseEvent;
+      callbacksRef.current.onNodeHover?.(null, noopEvent);
+      callbacksRef.current.onConnectionHover?.(null, noopEvent);
       map.getCanvas().style.cursor = resolveCursor(false);
     };
 
     const handleMapMoveEvent = (event: mapboxgl.MapboxEvent) => {
-      onMapMove?.(event);
+      callbacksRef.current.onMapMove?.(event);
     };
 
-    // Add event listeners
-    map.on("click", handleMapClick);
-    map.on("mousemove", handleMouseMove);
-    map.on("mouseleave", handleMouseLeave);
-    map.on("move", handleMapMoveEvent);
-
-    // Add keyboard navigation support
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (!map) return;
-
-      const baseMoveStep = 50; // pixels to move per key press
-      const zoomStep = 0.5; // zoom level change per key press
-      const fastMultiplier = event.shiftKey ? 3 : 1;
-      const moveStep = baseMoveStep * fastMultiplier;
-
-      // Don't intercept if typing in an input
       const target = event.target as HTMLElement;
       if (
         target.tagName === "INPUT" ||
@@ -198,6 +236,10 @@ export const MapEventHandler: React.FC<MapEventHandlerProps> = ({
       ) {
         return;
       }
+
+      const baseMoveStep = 50;
+      const zoomStep = 0.5;
+      const moveStep = baseMoveStep * (event.shiftKey ? 3 : 1);
 
       switch (event.key) {
         case "ArrowLeft":
@@ -217,30 +259,32 @@ export const MapEventHandler: React.FC<MapEventHandlerProps> = ({
           map.panBy([0, moveStep], { duration: 150, easing: (t) => t * (2 - t) });
           break;
         case "+":
-        case "=":
+        case "=": {
           event.preventDefault();
           const nextZoom = map.getZoom() + zoomStep;
           map.easeTo({ zoom: nextZoom, duration: 200 });
-          announce(`Zoomed in to level ${nextZoom.toFixed(1)}`, "polite");
+          announceRef.current(`Zoomed in to level ${nextZoom.toFixed(1)}`, "polite");
           break;
+        }
         case "-":
-        case "_":
+        case "_": {
           event.preventDefault();
           const prevZoom = map.getZoom() - zoomStep;
           map.easeTo({ zoom: prevZoom, duration: 200 });
-          announce(`Zoomed out to level ${prevZoom.toFixed(1)}`, "polite");
+          announceRef.current(`Zoomed out to level ${prevZoom.toFixed(1)}`, "polite");
           break;
+        }
         case "0":
           event.preventDefault();
           map.resetNorth({ duration: 500 });
-          announce("Map orientation reset to north", "polite");
+          announceRef.current("Map orientation reset to north", "polite");
           break;
         case "Escape":
           toolManager.handleEvent("onKeyDown", event);
-          if (activeTool === "select") {
+          if (activeToolRef.current === "select") {
             setSelectedElement(null);
             setHoveredElement(null);
-            announce("Selection cleared", "polite");
+            announceRef.current("Selection cleared", "polite");
           }
           break;
         default:
@@ -249,43 +293,63 @@ export const MapEventHandler: React.FC<MapEventHandlerProps> = ({
       }
     };
 
-    // Add keyboard event listener to the map container
+    map.on("click", handleMapClick);
+    map.on("mousemove", handleMouseMove);
+    map.on("mouseleave", handleMouseLeave);
+    map.on("move", handleMapMoveEvent);
+
     const mapContainer = map.getContainer();
     mapContainer.addEventListener("keydown", handleKeyDown);
-    mapContainer.tabIndex = 0; // Make map focusable for keyboard navigation
+    mapContainer.tabIndex = 0;
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // ANIMATION LOOP: Real-time map dynamics (Data flow & Status pulse)
-    // ─────────────────────────────────────────────────────────────────────────
-    let animationFrame: number;
+    // Pulse animation — runs only while outages or warning/error nodes need it
+    let animationFrame: number | undefined;
     const startTime = Date.now();
+    let animating = false;
+
+    const stopAnimation = () => {
+      if (animationFrame !== undefined) {
+        cancelAnimationFrame(animationFrame);
+        animationFrame = undefined;
+      }
+      animating = false;
+    };
+
+    const scheduleAnimation = () => {
+      if (animating) return;
+      if (!mapNeedsPulseAnimation(map)) return;
+      animating = true;
+      animationFrame = requestAnimationFrame(animateMap);
+    };
 
     const animateMap = () => {
-      // 1. Critical exit: Map instance doesn't exist or has been removed from DOM
-      if (!map || !map.getContainer()) return;
-      
-      // 2. Skip frame if style is still loading or in transition
+      if (!map.getContainer()) {
+        stopAnimation();
+        return;
+      }
+
       if (!map.isStyleLoaded()) {
         animationFrame = requestAnimationFrame(animateMap);
         return;
       }
-      
+
+      if (!mapNeedsPulseAnimation(map)) {
+        stopAnimation();
+        return;
+      }
+
       const elapsed = Date.now() - startTime;
-      
-      // Data flow animation placeholder (currently omitted to prevent property errors)
-      
+
       try {
-        // 3. Alert Pulse Animation: Safely update opacity of the glow layer
         const outageLayerId = "network-outages-glow";
         if (safeHasLayer(map, outageLayerId)) {
-          const pulse = 0.4 + Math.sin(elapsed / 400) * 0.2; // Pulse between 0.2 and 0.6
+          const pulse = 0.4 + Math.sin(elapsed / 400) * 0.2;
           map.setPaintProperty(outageLayerId, "line-opacity", pulse);
         }
 
         const nodesGlowId = "network-nodes-glow";
         if (safeHasLayer(map, nodesGlowId) && map.getZoom() >= 9) {
           const pulseNodes = 0.28 + Math.sin(elapsed / 400) * 0.1;
-
           map.setPaintProperty(nodesGlowId, "circle-opacity", [
             "case",
             ["boolean", ["feature-state", "hover"], false],
@@ -298,50 +362,40 @@ export const MapEventHandler: React.FC<MapEventHandlerProps> = ({
           ]);
         }
       } catch (error) {
-        // Silently catch errors if style becomes unavailable during execution
-        // This is common during rapid theme switching or hot reloads
         log.debug("Animation frame skipped:", error);
       }
 
       animationFrame = requestAnimationFrame(animateMap);
     };
 
-    // Start animation if map is ready
-    if (map.isStyleLoaded()) {
-      animateMap();
-    } else {
-      map.once('styledata', animateMap);
-    }
+    const onDataOrZoom = () => scheduleAnimation();
+    map.on("sourcedata", onDataOrZoom);
+    map.on("zoomend", onDataOrZoom);
 
-    // Cleanup function
+    const unsubStore = useNetworkMapStore.subscribe((state, prev) => {
+      if (
+        state.layers !== prev.layers ||
+        state.nodes !== prev.nodes ||
+        state.simulatedOutageActive !== prev.simulatedOutageActive
+      ) {
+        scheduleAnimation();
+      }
+    });
+
+    scheduleAnimation();
+
     return () => {
-      if (animationFrame) cancelAnimationFrame(animationFrame);
-      if (map) {
-        map.off("click", handleMapClick);
-        map.off("mousemove", handleMouseMove);
-        map.off("mouseleave", handleMouseLeave);
-        map.off("move", handleMapMoveEvent);
-      }
-
-      if (mapContainer) {
-        mapContainer.removeEventListener("keydown", handleKeyDown);
-      }
+      stopAnimation();
+      unsubStore();
+      map.off("click", handleMapClick);
+      map.off("mousemove", handleMouseMove);
+      map.off("mouseleave", handleMouseLeave);
+      map.off("move", handleMapMoveEvent);
+      map.off("sourcedata", onDataOrZoom);
+      map.off("zoomend", onDataOrZoom);
+      mapContainer.removeEventListener("keydown", handleKeyDown);
     };
-  }, [
-    map,
-    activeTool,
-    setSelectedElement,
-    setHoveredElement,
-    onNodeClick,
-    onNodeHover,
-    onConnectionClick,
-    onConnectionHover,
-    onMapClick,
-    onMapMove,
-    announce,
-  ]);
+  }, [map, setSelectedElement, setHoveredElement]);
 
-  // This component doesn't render anything visible
   return null;
 };
-

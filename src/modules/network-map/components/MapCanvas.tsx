@@ -256,63 +256,74 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({ onMapLoad, onMapError }) =
       mapRef.current = map;
       globalMapInstance = map;
 
+      let hasInitialLoadCompleted = false;
+      let styleRestoreGeneration = 0;
+      let pendingStyleIdleHandler: (() => void) | null = null;
+
+      const cancelPendingStyleRestore = () => {
+        if (pendingStyleIdleHandler) {
+          map.off("idle", pendingStyleIdleHandler);
+          pendingStyleIdleHandler = null;
+        }
+      };
+
+      const restoreNetworkDataAfterStyleChange = () => {
+        if (!mapRef.current) return;
+
+        const currentState = useNetworkMapStore.getState();
+        updateMapData(
+          map,
+          currentState.nodes,
+          currentState.connections,
+          currentState.layers
+        );
+        requestAnimationFrame(() => mapRef.current?.resize());
+        log.info("Network layers restored after style change");
+      };
+
       map.on("load", () => {
         initializeLayers(map);
         setMapLoading(false);
         setIsReady(true);
+        hasInitialLoadCompleted = true;
+        useNetworkMapStore.getState().setMapInstance(map);
+        const center = map.getCenter();
+        setViewport({
+          center: { lat: center.lat, lng: center.lng },
+          zoom: map.getZoom(),
+          bearing: map.getBearing(),
+          pitch: map.getPitch(),
+        });
         requestAnimationFrame(() => map.resize());
         onMapLoad?.(map);
       });
 
-      // Re-initialize layers when style changes (e.g., satellite/dark mode toggle)
+      // Re-initialize layers when basemap changes (satellite toggle, etc.).
+      // Skip the first style.load — the initial "load" handler owns first paint.
       map.on("style.load", () => {
+        if (!hasInitialLoadCompleted) return;
+
+        cancelPendingStyleRestore();
+        const generation = ++styleRestoreGeneration;
+
         log.info("Style changed, re-initializing layers...");
 
         try {
-          // Re-add custom layers and sources
           initializeLayers(map);
-
-          // Wait for the style to be fully loaded before updating data
-          const waitForStyleAndUpdate = () => {
-            if (!mapRef.current || !map.isStyleLoaded()) {
-              // If not ready yet, wait a bit and try again
-              setTimeout(waitForStyleAndUpdate, 50);
-              return;
-            }
-
-            const currentState = useNetworkMapStore.getState();
-            log.info("Restoring data:", {
-              nodes: currentState.nodes.length,
-              connections: currentState.connections.length,
-              layers:
-                currentState.layers.filter((l) => l.visible).length +
-                "/" +
-                currentState.layers.length +
-                " visible",
-            });
-
-            updateMapData(
-              map,
-              currentState.nodes,
-              currentState.connections,
-              currentState.layers
-            );
-
-            // Ensure map resizes properly
-            requestAnimationFrame(() => {
-              if (mapRef.current) {
-                mapRef.current.resize();
-              }
-            });
-
-            log.info("Layers and data restored successfully");
-          };
-
-          // Start the wait loop
-          waitForStyleAndUpdate();
         } catch (error) {
           log.error("Failed to restore layers after style change:", error);
+          return;
         }
+
+        // idle = style sprites/sources/tiles settled (isStyleLoaded polling is unreliable here)
+        const onIdle = () => {
+          if (generation !== styleRestoreGeneration || !mapRef.current) return;
+          cancelPendingStyleRestore();
+          restoreNetworkDataAfterStyleChange();
+        };
+
+        pendingStyleIdleHandler = onIdle;
+        map.once("idle", onIdle);
       });
 
       map.on("error", (e) => {
@@ -321,7 +332,7 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({ onMapLoad, onMapError }) =
         onMapError?.(new Error(error));
       });
 
-      map.on("move", () => {
+      const syncViewportFromMap = () => {
         if (!mapRef.current) return;
         const center = map.getCenter();
         setViewport({
@@ -330,7 +341,12 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({ onMapLoad, onMapError }) =
           bearing: map.getBearing(),
           pitch: map.getPitch(),
         });
-      });
+      };
+
+      // Commit viewport on gesture end — avoids store churn every animation frame
+      map.on("moveend", syncViewportFromMap);
+      map.on("rotateend", syncViewportFromMap);
+      map.on("pitchend", syncViewportFromMap);
 
       map.on("dragstart", () => setDragging(true));
       map.on("dragend", () => setDragging(false));
@@ -338,10 +354,12 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({ onMapLoad, onMapError }) =
       map.on("zoomend", () => setZooming(false));
 
       return () => {
+        cancelPendingStyleRestore();
         if (mapRef.current) {
           mapRef.current.remove();
           mapRef.current = null;
           globalMapInstance = null;
+          useNetworkMapStore.getState().setMapInstance(null);
           setIsReady(false);
         }
       };

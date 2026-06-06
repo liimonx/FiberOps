@@ -91,6 +91,8 @@ export type AssetCategory = "all" | "nodes" | "connections" | "customers";
  */
 export interface CategorizedResult extends SearchResult {
   category: AssetCategory;
+  /** Secondary line in search results (type, endpoints, id). */
+  detail?: string;
 }
 
 // Measurement and tracing types

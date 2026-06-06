@@ -127,7 +127,7 @@ export default function Home() {
                   <div className="u-text-xl u-font-bold">3</div>
                 </div>
               </div>
-              <div className="u-text-xs u-text-danger u-flex u-items-center u-gap-1">
+              <div className="u-text-xs u-text-error u-flex u-items-center u-gap-1">
                 <Icon name="TrendDown" size="sm" />
                 <span>1 resolved since yesterday</span>
               </div>

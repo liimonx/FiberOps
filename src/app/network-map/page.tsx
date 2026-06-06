@@ -31,13 +31,13 @@ import {
   HeatmapLegend,
 } from "@/modules/network-map/components/MeasurementOverlay";
 import { ToolVisualizations } from "@/modules/network-map/components/ToolVisualizations";
+import { getToolManager } from "@/modules/network-map/tools/toolManager";
 
 function NetworkMapContent() {
   const nodes = useNodes();
   const connections = useConnections();
   const selectedNode = useSelectedNode();
   const activeTool = useNetworkMapStore((state) => state.interaction.activeTool);
-  const setActiveTool = useNetworkMapStore((state) => state.setActiveTool);
 
   const selectedElementId = useNetworkMapStore(
     (state) => state.interaction.selectedElementId
@@ -60,7 +60,8 @@ function NetworkMapContent() {
         addToSelectionHistory(id);
       },
       onTracePath: (nodeId: string) => {
-        setActiveTool("trace");
+        getToolManager().setActiveTool("trace");
+        getToolManager().primeTraceSource(nodeId);
         setSelectedElement(nodeId);
         addToSelectionHistory(nodeId);
       },
@@ -73,7 +74,7 @@ function NetworkMapContent() {
         addToSelectionHistory(connectionId);
       },
     }),
-    [setSelectedElement, addToSelectionHistory, setActiveTool]
+    [setSelectedElement, addToSelectionHistory]
   );
 
   const {
@@ -111,24 +112,20 @@ function NetworkMapContent() {
     (nodeId: string) => {
       if (activeTool === "trace" || activeTool === "measure") return;
 
-      setSelectedElement(nodeId);
-      addToSelectionHistory(nodeId);
+      // SelectTool owns selection writes when the select tool is active
+      if (activeTool !== "select") return;
 
       const node = nodes.find((n) => n.id === nodeId);
       if (node) {
         flyToLocation(mapInstance, [node.position.lng, node.position.lat], 15);
       }
     },
-    [activeTool, nodes, setSelectedElement, addToSelectionHistory, mapInstance]
+    [activeTool, nodes, mapInstance]
   );
 
-  const handleConnectionClick = useCallback(
-    (connectionId: string) => {
-      setSelectedElement(connectionId);
-      addToSelectionHistory(connectionId);
-    },
-    [setSelectedElement, addToSelectionHistory]
-  );
+  const handleConnectionClick = useCallback(() => {
+    // Selection is handled by SelectTool; no side effects needed for connections
+  }, []);
 
   return (
     <div className="network-map-page">

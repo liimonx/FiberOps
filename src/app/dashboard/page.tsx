@@ -88,7 +88,7 @@ export default function DashboardPage() {
               <span className="u-text-secondary-emphasis u-text-sm u-font-bold">
                 Total Customers
               </span>
-              <Icon name="Users" className="-emphasis" />
+              <Icon name="Users" className="u-text-secondary-emphasis" />
             </div>
             <div className="u-text-xxl u-font-bold">12,492</div>
             <div className="u-text-xs u-text-success u-mt-2">+124 this month</div>
@@ -104,7 +104,7 @@ export default function DashboardPage() {
               <Icon name="Warning" className="u-text-error" />
             </div>
             <div className="u-text-xxl u-font-bold">3</div>
-            <div className="u-text-xs u-text-danger u-mt-2">-1 since yesterday</div>
+            <div className="u-text-xs u-text-error u-mt-2">-1 since yesterday</div>
           </Card>
         </GridCol>
 

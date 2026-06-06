@@ -128,12 +128,18 @@ export const SearchPanel: React.FC<SearchPanelProps> = ({
     {
       label: "Find Nodes",
       icon: "HardDrives",
-      onClick: () => setQuery("node"),
+      onClick: () => {
+        setSelectedCategory("nodes");
+        setQuery("pop");
+      },
     },
     {
       label: "Find Connections",
       icon: "GitBranch",
-      onClick: () => setQuery("pon"),
+      onClick: () => {
+        setSelectedCategory("connections");
+        setQuery("fiber");
+      },
     },
   ];
 

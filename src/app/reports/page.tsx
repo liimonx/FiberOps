@@ -17,7 +17,7 @@ export default function ReportsPage() {
       <Grid>
         <GridCol xs={12} sm={6} lg={4}>
           <Card className="u-cursor-pointer u-h-100">
-            <Icon name="FilePdf" size="xl" className="u-text-danger u-mb-4" />
+            <Icon name="FilePdf" size="xl" className="u-text-error u-mb-4" />
             <h3 className="u-font-bold u-text-lg u-mb-2">Uptime Summary</h3>
             <p className="u-text-secondary-emphasis u-text-sm">
               Monthly network availability and SLA compliance reports.

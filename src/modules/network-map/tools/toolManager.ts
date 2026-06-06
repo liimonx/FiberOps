@@ -118,6 +118,12 @@ export class TraceTool extends BaseTool {
     this.sourceNode = null;
   }
 
+  /** Prime trace from UI (e.g. tooltip "Trace path") without requiring a map click. */
+  primeSourceNode(nodeId: string): void {
+    this.sourceNode = nodeId;
+    log.info("[Trace] Source node primed:", nodeId);
+  }
+
   onClick(event: MapMouseEvent): void {
     const store = useNetworkMapStore.getState();
 
@@ -304,17 +310,19 @@ export class MeasureTool extends BaseTool {
   }
 
   onKeyDown(event: KeyboardEvent): void {
-    // Press Escape or Backspace to remove last point
-    if (event.key === "Escape" || event.key === "Backspace") {
-      const store = useNetworkMapStore.getState();
-      const measurements = store.measurements;
+    const store = useNetworkMapStore.getState();
+    const { measurements } = store;
 
-      if (measurements.length > 0) {
-        // Remove last measurement (need to implement remove in store)
-        // For now, just clear all
-        store.clearMeasurements();
-        log.info("[Measure] Cleared measurements");
-      }
+    if (event.key === "Backspace" && measurements.length > 0) {
+      event.preventDefault();
+      store.removeLastMeasurement();
+      log.info("[Measure] Removed last point");
+      return;
+    }
+
+    if (event.key === "Escape" && measurements.length > 0) {
+      store.clearMeasurements();
+      log.info("[Measure] Cleared all measurements");
     }
   }
 
@@ -542,6 +550,14 @@ export class ToolManager {
 
   getActiveTool(): MapTool | null {
     return this.activeTool;
+  }
+
+  /** Prime the trace tool with a source node (tooltip / search shortcuts). */
+  primeTraceSource(nodeId: string): void {
+    const trace = this.tools.get("trace");
+    if (trace && "primeSourceNode" in trace) {
+      (trace as TraceTool).primeSourceNode(nodeId);
+    }
   }
 
   handleEvent(eventName: keyof MapTool, event: MapMouseEvent | KeyboardEvent): void {

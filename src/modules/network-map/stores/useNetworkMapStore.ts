@@ -1,4 +1,5 @@
 "use client";
+import type mapboxgl from "mapbox-gl";
 import { LatLng, NetworkStatus } from "../types";
 
 import { create } from 'zustand';
@@ -65,9 +66,14 @@ interface NetworkMapStore {
   searchResults: CategorizedResult[];
   setSearchResults: (results: CategorizedResult[]) => void;
   
+  // Map instance (set by MapCanvas when ready — avoids polling)
+  mapInstance: mapboxgl.Map | null;
+  setMapInstance: (map: mapboxgl.Map | null) => void;
+
   // Tool-specific state
   measurements: MeasurementPoint[];
   addMeasurement: (point: MeasurementPoint) => void;
+  removeLastMeasurement: () => void;
   clearMeasurements: () => void;
   
   tracePath: TracePath | null;
@@ -138,6 +144,7 @@ export const useNetworkMapStore = create<NetworkMapStore>()(
         lastUpdated: null,
         searchQuery: '',
         searchResults: [],
+        mapInstance: null,
         measurements: [],
         tracePath: null,
         heatmapData: null,
@@ -340,11 +347,19 @@ export const useNetworkMapStore = create<NetworkMapStore>()(
         setSearchResults: (searchResults) => 
           set({ searchResults }, false, 'setSearchResults'),
 
+        setMapInstance: (mapInstance) =>
+          set({ mapInstance }, false, 'setMapInstance'),
+
         // Tool-specific actions
         addMeasurement: (measurement) =>
           set((state) => ({
             measurements: [...state.measurements, measurement]
           }), false, 'addMeasurement'),
+
+        removeLastMeasurement: () =>
+          set((state) => ({
+            measurements: state.measurements.slice(0, -1),
+          }), false, 'removeLastMeasurement'),
         
         clearMeasurements: () =>
           set({ measurements: [] }, false, 'clearMeasurements'),
@@ -475,6 +490,7 @@ export const useNetworkMapStore = create<NetworkMapStore>()(
             lastUpdated: null,
             searchQuery: '',
             searchResults: [],
+            mapInstance: null,
             measurements: [],
             tracePath: null,
             heatmapData: null,
