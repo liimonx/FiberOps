@@ -94,11 +94,11 @@ export default function AssetsPage() {
   ];
 
   return (
-    <Container className="u-py-6 u-w-100">
-      <div className="u-flex u-justify-between u-items-center u-mb-6">
+    <Container className="u-page">
+      <div className="u-page-header">
         <div>
-          <h1 className="u-text-xxl u-font-bold u-mb-2">Assets Inventory</h1>
-          <p className="u-text-secondary-emphasis u-text-sm">
+          <h1 className="u-page-title">Assets Inventory</h1>
+          <p className="u-page-subtitle">
             Manage infrastructure assets, connection graphs, and maintenance logs.
           </p>
         </div>
@@ -191,20 +191,14 @@ export default function AssetsPage() {
                         className="u-grid u-gap-2"
                         style={{ gridTemplateColumns: "1fr 1fr" }}
                       >
-                        <div
-                          className="u-bg-dark u-rounded u-border u-border-secondary-subtle u-flex u-items-center u-justify-center"
-                          style={{ height: "100px" }}
-                        >
+                        <div className="u-bg-dark u-rounded u-border u-border-secondary-subtle u-flex u-items-center u-justify-center u-h-25">
                           <Icon
                             name="Image"
                             className="u-text-secondary-emphasis"
                             size="lg"
                           />
                         </div>
-                        <div
-                          className="u-bg-dark u-rounded u-border u-border-secondary-subtle u-flex u-items-center u-justify-center"
-                          style={{ height: "100px" }}
-                        >
+                        <div className="u-bg-dark u-rounded u-border u-border-secondary-subtle u-flex u-items-center u-justify-center u-h-25">
                           <Icon
                             name="Image"
                             className="u-text-secondary-emphasis"
@@ -237,10 +231,7 @@ export default function AssetsPage() {
                     </div>
                   </Tabs.Panel>
                   <Tabs.Panel index={2}>
-                    <div
-                      className="u-bg-dark u-rounded u-border u-border-secondary-subtle u-flex u-items-center u-justify-center"
-                      style={{ height: "250px" }}
-                    >
+                    <div className="u-bg-dark u-rounded u-border u-border-secondary-subtle u-flex u-items-center u-justify-center u-h-62">
                       <span className="u-text-secondary-emphasis u-text-sm u-font-mono">
                         [ Topology Graph Placeholder ]
                       </span>

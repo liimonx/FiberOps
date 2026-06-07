@@ -29,19 +29,19 @@ export function SidebarFooter() {
         {showShortcuts && (
           <div className="u-flex u-flex-column u-gap-1 u-px-3 u-py-2 u-bg-secondary-subtle u-rounded u-animate-slide-down">
             <div className="u-flex u-justify-between u-items-center u-text-xs u-text-secondary-emphasis">
-              <kbd className="u-px-2 u-py-0.5 u-bg-surface u-border u-rounded-sm u-font-mono u-text-xs">
+              <kbd className="u-kbd">
                 ⌘K
               </kbd>
               <span>Quick search</span>
             </div>
             <div className="u-flex u-justify-between u-items-center u-text-xs u-text-secondary-emphasis">
-              <kbd className="u-px-2 u-py-0.5 u-bg-surface u-border u-rounded-sm u-font-mono u-text-xs">
+              <kbd className="u-kbd">
                 ?
               </kbd>
               <span>Show shortcuts</span>
             </div>
             <div className="u-flex u-justify-between u-items-center u-text-xs u-text-secondary-emphasis">
-              <kbd className="u-px-2 u-py-0.5 u-bg-surface u-border u-rounded-sm u-font-mono u-text-xs">
+              <kbd className="u-kbd">
                 Esc
               </kbd>
               <span>Close panel</span>

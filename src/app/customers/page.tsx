@@ -131,14 +131,14 @@ export default function CustomersPage() {
   ];
 
   return (
-    <Container className="u-py-6 u-w-100">
+    <Container className="u-page">
       <Grid className="u-mb-6">
         <GridCol xs={12}>
           <Card appearance="outlined">
-            <div className="u-flex u-justify-between u-items-center u-mb-6">
+            <div className="u-page-header">
               <div>
-                <h1 className="u-text-xxl u-font-bold u-mb-2">Customers</h1>
-                <p className="u-text-secondary-emphasis u-text-sm">
+                <h1 className="u-page-title">Customers</h1>
+                <p className="u-page-subtitle">
                   Manage customer profiles, check signal health, and track incident
                   history.
                 </p>

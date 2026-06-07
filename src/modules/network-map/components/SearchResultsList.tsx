@@ -29,8 +29,7 @@ export const SearchResultsList: React.FC<SearchResultsListProps> = ({
   return (
     <div
       id="search-results"
-      className={`u-overflow-y-auto u-p-2 u-flex u-flex-column u-gap-1 ${className}`}
-      style={{ maxHeight: "300px" }}
+      className={`u-overflow-y-auto u-max-h-75 u-p-2 u-flex u-flex-column u-gap-1 ${className}`}
       role="listbox"
       aria-label="Search results"
     >

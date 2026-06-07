@@ -39,3 +39,88 @@ export type Incident = {
   relatedAssetId?: string;
 };
 
+export type OrganizationSettings = {
+  organizationName: string;
+  supportEmail: string;
+};
+
+export type IntegrationStatus = "connected" | "disconnected" | "error";
+
+export type IntegrationProviderId =
+  | "mapbox"
+  | "slack"
+  | "pagerduty"
+  | "stripe";
+
+export type Integration = {
+  id: IntegrationProviderId;
+  name: string;
+  description: string;
+  status: IntegrationStatus;
+  enabled: boolean;
+  apiKeyMasked?: string;
+};
+
+export type WebhookEvent =
+  | "incident.created"
+  | "incident.resolved"
+  | "outage.detected"
+  | "work_order.updated";
+
+export type OutboundWebhook = {
+  enabled: boolean;
+  url: string;
+  secretMasked?: string;
+  events: WebhookEvent[];
+};
+
+export type IntegrationsSettings = {
+  integrations: Integration[];
+  outboundWebhook: OutboundWebhook;
+};
+
+export type InvoiceDelivery = "email" | "portal";
+
+export type BillingCurrency = "USD" | "EUR" | "GBP" | "CAD";
+
+export type BillingSettings = {
+  legalName: string;
+  billingEmail: string;
+  currency: BillingCurrency;
+  taxId: string;
+  invoiceDelivery: InvoiceDelivery;
+  lastSyncedAt: string | null;
+};
+
+export type StripeConnectionSummary = {
+  status: IntegrationStatus;
+  enabled: boolean;
+  apiKeyMasked?: string;
+};
+
+export type BillingSettingsPayload = {
+  settings: BillingSettings;
+  stripe: StripeConnectionSummary;
+};
+
+export type TeamRole = "admin" | "operator" | "viewer";
+
+export type TeamMember = {
+  id: string;
+  name: string;
+  email: string;
+  role: TeamRole;
+  lastActiveAt: string;
+};
+
+export type TeamInvite = {
+  id: string;
+  email: string;
+  role: TeamRole;
+  invitedAt: string;
+};
+
+export type TeamSettings = {
+  members: TeamMember[];
+  invites: TeamInvite[];
+};

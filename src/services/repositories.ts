@@ -1,4 +1,4 @@
-import type { Asset, Customer, Incident } from "@/types/domain";
+import type { Asset, Customer, Incident, OrganizationSettings } from "@/types/domain";
 
 export type ListResult<T> = { items: T[] };
 
@@ -12,5 +12,10 @@ export interface CustomerRepository {
 
 export interface IncidentRepository {
   list(): Promise<ListResult<Incident>>;
+}
+
+export interface SettingsRepository {
+  getOrganization(): Promise<OrganizationSettings>;
+  updateOrganization(data: OrganizationSettings): Promise<OrganizationSettings>;
 }
 

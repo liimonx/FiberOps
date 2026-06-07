@@ -18,3 +18,9 @@
 
 // 3. Atomix Design System (Core styles)
 @use "@shohojdhara/atomix/scss";
+
+// 4. Glass morphism utilities
+@use "./01-settings/glass";
+
+// 5. FiberOps utility extensions (must load last)
+@use "./99-utilities/utilities.fiberops";

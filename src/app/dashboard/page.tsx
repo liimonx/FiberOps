@@ -68,11 +68,11 @@ export default function DashboardPage() {
   ];
 
   return (
-    <Container className="u-py-6 u-w-100">
-      <div className="u-flex u-justify-between u-items-center u-mb-6">
+    <Container className="u-page">
+      <div className="u-page-header">
         <div>
-          <h1 className="u-text-xxl u-font-bold u-mb-2">Network Dashboard</h1>
-          <p className="u-text-secondary-emphasis u-text-sm">
+          <h1 className="u-page-title">Network Dashboard</h1>
+          <p className="u-page-subtitle">
             Overview of network health, active incidents, and operational metrics.
           </p>
         </div>
@@ -84,7 +84,7 @@ export default function DashboardPage() {
       <Grid className="u-mb-6">
         <GridCol xs={12} sm={6} lg={3}>
           <Card>
-            <div className="u-flex u-justify-between u-items-center u-mb-4">
+            <div className="u-stat-header">
               <span className="u-text-secondary-emphasis u-text-sm u-font-bold">
                 Total Customers
               </span>
@@ -97,7 +97,7 @@ export default function DashboardPage() {
 
         <GridCol xs={12} sm={6} lg={3}>
           <Card>
-            <div className="u-flex u-justify-between u-items-center u-mb-4">
+            <div className="u-stat-header">
               <span className="u-text-secondary-emphasis u-text-sm u-font-bold">
                 Active Incidents
               </span>
@@ -110,7 +110,7 @@ export default function DashboardPage() {
 
         <GridCol xs={12} sm={6} lg={3}>
           <Card>
-            <div className="u-flex u-justify-between u-items-center u-mb-4">
+            <div className="u-stat-header">
               <span className="u-text-secondary-emphasis u-text-sm u-font-bold">
                 Avg. Signal Health
               </span>
@@ -125,7 +125,7 @@ export default function DashboardPage() {
 
         <GridCol xs={12} sm={6} lg={3}>
           <Card>
-            <div className="u-flex u-justify-between u-items-center u-mb-4">
+            <div className="u-stat-header">
               <span className="u-text-secondary-emphasis u-text-sm u-font-bold">
                 Open Work Orders
               </span>
@@ -140,7 +140,7 @@ export default function DashboardPage() {
       <Grid className="u-mb-6">
         <GridCol xs={12} lg={8}>
           <Card className="u-h-100" title="Network Usage Trends">
-            <div className="u-h-100 u-min-h-300 u-flex u-items-center u-justify-center">
+            <div className="u-h-100 u-min-h-75 u-flex u-items-center u-justify-center">
               {isUsageLoading ? (
                 <div className="u-text-secondary-emphasis">Loading Trends...</div>
               ) : (
@@ -187,9 +187,9 @@ export default function DashboardPage() {
                 icon={<Icon name="Warning" />}
               >
                 <div className="u-flex u-justify-between u-items-center u-mb-1">
-                  <span className="u-text-xs u-text-secondary-emphasis">10m ago</span>
+                  <span className="u-meta">10m ago</span>
                 </div>
-                <p className="u-text-sm u-mb-0">
+                <p className="u-body-sm">
                   Loss of signal reported on splitters 01-08 affecting 64 customers.
                 </p>
               </Callout>
@@ -200,9 +200,9 @@ export default function DashboardPage() {
                 icon={<Icon name="CellSignalHigh" />}
               >
                 <div className="u-flex u-justify-between u-items-center u-mb-1">
-                  <span className="u-text-xs u-text-secondary-emphasis">2h ago</span>
+                  <span className="u-meta">2h ago</span>
                 </div>
-                <p className="u-text-sm u-mb-0">
+                <p className="u-body-sm">
                   Node Gamma showing abnormal signal drop on downstream.
                 </p>
               </Callout>
@@ -214,10 +214,7 @@ export default function DashboardPage() {
       <Grid className="u-mb-6">
         <GridCol xs={12} lg={4}>
           <Card title="Customer Segments" className="u-h-100">
-            <div
-              style={{ height: "250px" }}
-              className="u-w-100 u-flex u-items-center u-justify-center"
-            >
+            <div className="u-h-62 u-w-100 u-flex u-items-center u-justify-center">
               <ClientOnly>
                 <DonutChart
                   datasets={[

@@ -102,10 +102,7 @@ export class ErrorBoundary extends Component<Props, State> {
               <Icon name="Warning" size={32} className="u-text-error" />
             </div>
 
-            <h2
-              className="u-m-0 u-text-xl u-font-bold u-text-uppercase u-mb-2"
-              style={{ letterSpacing: "1px" }}
-            >
+            <h2 className="u-m-0 u-text-xl u-font-bold u-text-uppercase-wide u-mb-2">
               System Exception
             </h2>
 

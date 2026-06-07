@@ -12,6 +12,9 @@
 // 3. Spacing
 @forward "./spacing";
 
+// 3b. Extended size tokens
+@forward "./sizes";
+
 // 4. Layout
 @forward "./layout";
 
@@ -30,8 +33,8 @@
 // // 9. Z-Index
 // @forward './z-index';
 
-// // 10. Glass Effects
-// @forward './glass';
+// 10. Glass Effects
+@forward "./glass";
 
 // //11. Section Intro
 @forward "./sectionintro";

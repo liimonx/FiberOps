@@ -4,11 +4,11 @@ import { Card, Container, Button, Grid, GridCol, Icon } from "@shohojdhara/atomi
 
 export default function ReportsPage() {
   return (
-    <Container className="u-py-6 u-w-100">
-      <div className="u-flex u-justify-between u-items-center u-mb-6">
+    <Container className="u-page">
+      <div className="u-page-header">
         <div>
-          <h1 className="u-text-xxl u-font-bold u-mb-2">Reports & Analytics</h1>
-          <p className="u-text-secondary-emphasis u-text-sm">
+          <h1 className="u-page-title">Reports & Analytics</h1>
+          <p className="u-page-subtitle">
             Generate insights on network performance, billing, and incidents.
           </p>
         </div>

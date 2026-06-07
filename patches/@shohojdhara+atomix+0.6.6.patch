@@ -1,0 +1,92 @@
+diff --git a/node_modules/@shohojdhara/atomix/dist/index.d.ts b/node_modules/@shohojdhara/atomix/dist/index.d.ts
+index d67c6f0..32a1801 100644
+--- a/node_modules/@shohojdhara/atomix/dist/index.d.ts
++++ b/node_modules/@shohojdhara/atomix/dist/index.d.ts
+@@ -2205,7 +2205,7 @@ interface SpinnerProps extends BaseComponentProps {
+     /**
+      * ARIA description
+      */
+-    'aria-describe'?: string;
++    'aria-describedby'?: string;
+     /**
+      * ARIA role for the spinner
+      * @default 'status'
+diff --git a/node_modules/@shohojdhara/atomix/dist/index.esm.js b/node_modules/@shohojdhara/atomix/dist/index.esm.js
+index 2c79fa4..522ffe4 100644
+--- a/node_modules/@shohojdhara/atomix/dist/index.esm.js
++++ b/node_modules/@shohojdhara/atomix/dist/index.esm.js
+@@ -5633,7 +5633,7 @@ function useSpinner(initialProps) {
+ 
+ Breadcrumb.displayName = "Breadcrumb", Breadcrumb.Item = BreadcrumbItem;
+ 
+-const Spinner =  memo( forwardRef((({size: size = "md", variant: variant = "primary", fullscreen: fullscreen = !1, className: className = "", style: style, glass: glass, "aria-label": ariaLabel, role: role = "status", "aria-live": ariaLive = "polite", "aria-describe": ariaDescribe, ...rest}, ref) => {
++const Spinner =  memo( forwardRef((({size: size = "md", variant: variant = "primary", fullscreen: fullscreen = !1, className: className = "", style: style, glass: glass, "aria-label": ariaLabel, role: role = "status", "aria-live": ariaLive = "polite", "aria-describedby": ariaDescribedBy, ...rest}, ref) => {
+     const {generateSpinnerClass: generateSpinnerClass} = useSpinner({
+         size: size,
+         variant: variant,
+@@ -5650,7 +5650,7 @@ const Spinner =  memo( forwardRef((({size: size = "md", variant: variant = "prim
+         role: role,
+         "aria-label": ariaLabel || "Loading",
+         "aria-live": ariaLive,
+-        "aria-describe": ariaDescribe,
++        "aria-describedby": ariaDescribedBy,
+         ...rest,
+         children: jsx("span", {
+             className: SPINNER.VISUALLY_HIDDEN,
+diff --git a/node_modules/@shohojdhara/atomix/dist/index.js b/node_modules/@shohojdhara/atomix/dist/index.js
+index b316cbe..5a7ab00 100644
+--- a/node_modules/@shohojdhara/atomix/dist/index.js
++++ b/node_modules/@shohojdhara/atomix/dist/index.js
+@@ -5665,7 +5665,7 @@ function useSpinner(initialProps) {
+ 
+ Breadcrumb.displayName = "Breadcrumb", Breadcrumb.Item = BreadcrumbItem;
+ 
+-const Spinner =  React.memo( React.forwardRef((({size: size = "md", variant: variant = "primary", fullscreen: fullscreen = !1, className: className = "", style: style, glass: glass, "aria-label": ariaLabel, role: role = "status", "aria-live": ariaLive = "polite", "aria-describe": ariaDescribe, ...rest}, ref) => {
++const Spinner =  React.memo( React.forwardRef((({size: size = "md", variant: variant = "primary", fullscreen: fullscreen = !1, className: className = "", style: style, glass: glass, "aria-label": ariaLabel, role: role = "status", "aria-live": ariaLive = "polite", "aria-describedby": ariaDescribedBy, ...rest}, ref) => {
+     const {generateSpinnerClass: generateSpinnerClass} = useSpinner({
+         size: size,
+         variant: variant,
+@@ -5682,7 +5682,7 @@ const Spinner =  React.memo( React.forwardRef((({size: size = "md", variant: var
+         role: role,
+         "aria-label": ariaLabel || "Loading",
+         "aria-live": ariaLive,
+-        "aria-describe": ariaDescribe,
++        "aria-describedby": ariaDescribedBy,
+         ...rest,
+         children: jsxRuntime.jsx("span", {
+             className: SPINNER.VISUALLY_HIDDEN,
+diff --git a/node_modules/@shohojdhara/atomix/src/components/Spinner/Spinner.tsx b/node_modules/@shohojdhara/atomix/src/components/Spinner/Spinner.tsx
+index b143b9c..650b010 100644
+--- a/node_modules/@shohojdhara/atomix/src/components/Spinner/Spinner.tsx
++++ b/node_modules/@shohojdhara/atomix/src/components/Spinner/Spinner.tsx
+@@ -17,7 +17,7 @@ export const Spinner = memo(
+         'aria-label': ariaLabel,
+         role = 'status',
+         'aria-live': ariaLive = 'polite',
+-        'aria-describe': ariaDescribe,
++        'aria-describedby': ariaDescribedBy,
+         ...rest
+       },
+       ref
+@@ -43,7 +43,7 @@ export const Spinner = memo(
+           role={role}
+           aria-label={ariaLabel || 'Loading'}
+           aria-live={ariaLive}
+-          aria-describe={ariaDescribe}
++          aria-describedby={ariaDescribedBy}
+           {...rest}
+         >
+           <span className={SPINNER.VISUALLY_HIDDEN}>{ariaLabel || 'Loading content...'}</span>
+diff --git a/node_modules/@shohojdhara/atomix/src/lib/types/components.ts b/node_modules/@shohojdhara/atomix/src/lib/types/components.ts
+index 8a5c110..bcbad50 100644
+--- a/node_modules/@shohojdhara/atomix/src/lib/types/components.ts
++++ b/node_modules/@shohojdhara/atomix/src/lib/types/components.ts
+@@ -1246,7 +1246,7 @@ export interface SpinnerProps extends BaseComponentProps {
+   /**
+    * ARIA description
+    */
+-  'aria-describe'?: string;
++  'aria-describedby'?: string;
+ 
+   /**
+    * ARIA role for the spinner

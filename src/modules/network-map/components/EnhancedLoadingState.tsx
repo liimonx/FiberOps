@@ -61,9 +61,9 @@ export function EnhancedLoadingState({
             </span>
             <span className="u-font-mono">{Math.round(progress)}%</span>
           </div>
-          <div className="u-w-100 u-h-1 u-bg-white-opacity-10 u-rounded-pill u-overflow-hidden">
+          <div className="u-progress-track">
             <div
-              className="u-h-100 u-bg-primary u-transition-all u-duration-500"
+              className="u-progress-fill"
               style={{ width: `${progress}%` }}
             />
           </div>
@@ -74,7 +74,7 @@ export function EnhancedLoadingState({
 
   if (variant === "overlay") {
     return (
-      <div className="u-absolute u-inset-0 u-flex u-items-center u-justify-center u-z-modal u-bg-black-opacity-20 u-backdrop-blur-sm">
+      <div className="u-overlay-scrim">
         <Card className="u-p-8 u-shadow-xl">
           {content}
         </Card>
@@ -98,9 +98,9 @@ export function EnhancedLoadingState({
             )}
           </div>
           {showProgress && progress !== undefined && (
-            <div className="u-w-64 u-h-1 u-bg-white-opacity-10 u-rounded-pill u-overflow-hidden">
+            <div className="u-progress-track u-w-64">
               <div
-                className="u-h-100 u-bg-primary u-transition-all u-duration-500"
+                className="u-progress-fill"
                 style={{ width: `${progress}%` }}
               />
             </div>

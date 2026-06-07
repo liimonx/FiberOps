@@ -38,7 +38,7 @@ export const AccessibilityProvider: React.FC<{ children: React.ReactNode }> = ({
       <div
         aria-live="polite"
         aria-atomic="true"
-        className="sr-only"
+        className="u-sr-only"
       >
         {announcements
           .filter(a => a.priority === 'polite')
@@ -49,7 +49,7 @@ export const AccessibilityProvider: React.FC<{ children: React.ReactNode }> = ({
       <div
         aria-live="assertive"
         aria-atomic="true"
-        className="sr-only"
+        className="u-sr-only"
       >
         {announcements
           .filter(a => a.priority === 'assertive')

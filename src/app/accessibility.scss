@@ -54,7 +54,8 @@
 }
 
 // Screen reader only utility
-.sr-only {
+.sr-only,
+.u-sr-only {
   position: absolute;
   width: 1px;
   height: 1px;
@@ -91,7 +92,8 @@ input[type="radio"] {
   }
 }
 
-.u-loading {
+.u-loading,
+.u-skeleton-shimmer {
   background: linear-gradient(
     90deg,
     rgba(255, 255, 255, 0.05) 25%,
@@ -111,7 +113,8 @@ input[type="radio"] {
 }
 
 // Drop zone highlight
-.drop-zone-active {
+.drop-zone-active,
+.u-drop-zone-active {
   border: 2px dashed var(--atomix-primary, #6366f1) !important;
   background: rgba(99, 102, 241, 0.1) !important;
 }

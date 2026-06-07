@@ -4,11 +4,11 @@ import { Card, Container, Button } from "@shohojdhara/atomix";
 
 export default function PlanningPage() {
   return (
-    <Container className="u-py-6 u-w-100">
-      <div className="u-flex u-justify-between u-items-center u-mb-6">
+    <Container className="u-page">
+      <div className="u-page-header">
         <div>
-          <h1 className="u-text-xxl u-font-bold u-mb-2">Network Planning</h1>
-          <p className="u-text-secondary-emphasis u-text-sm">
+          <h1 className="u-page-title">Network Planning</h1>
+          <p className="u-page-subtitle">
             Future network expansion, capacity forecasting, and budget modeling.
           </p>
         </div>

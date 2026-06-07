@@ -127,7 +127,7 @@ export const MapControls: React.FC<MapControlsProps> = ({
           )}
 
           {(showBasemapToggle || showBuildingsToggle) && showZoom && (
-            <div className="u-border-top u-border-solid u-border-secondary-subtle u-opacity-20 u-my-1" />
+            <div className="u-divider-subtle" />
           )}
 
           {(showBasemapToggle || showBuildingsToggle) && (
@@ -166,7 +166,7 @@ export const MapControls: React.FC<MapControlsProps> = ({
           )}
 
           {showCompass && (showZoom || showBasemapToggle || showBuildingsToggle) && (
-            <div className="u-border-top u-border-solid u-border-secondary-subtle u-opacity-20 u-my-1" />
+            <div className="u-divider-subtle" />
           )}
 
           {showCompass && (

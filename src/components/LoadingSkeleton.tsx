@@ -10,75 +10,41 @@ interface SkeletonProps {
 export function LoadingSkeleton({ type = "card", count = 1 }: SkeletonProps) {
   if (type === "page") {
     return (
-      <div className="u-py-6 u-w-100">
-        {/* Header skeleton */}
+      <div className="u-page">
         <div className="u-mb-6">
-          <div
-            className="u-bg-secondary-subtle u-rounded u-mb-2"
-            style={{ height: "32px", width: "40%" }}
-          />
-          <div
-            className="u-bg-secondary-subtle u-rounded"
-            style={{ height: "16px", width: "60%" }}
-          />
+          <div className="u-skeleton u-h-10 u-w-50 u-mb-2" />
+          <div className="u-skeleton u-h-5 u-w-75" />
         </div>
 
-        {/* Stats cards skeleton */}
         <Grid className="u-mb-6">
           {[1, 2, 3, 4].map((i) => (
             <GridCol xs={12} sm={6} lg={3} key={i}>
               <Card>
                 <div className="u-flex u-items-center u-gap-3 u-mb-3">
-                  <div
-                    className="u-bg-secondary-subtle u-rounded"
-                    style={{ width: "48px", height: "48px" }}
-                  />
+                  <div className="u-skeleton u-w-12 u-h-12" />
                   <div className="u-flex-grow-1">
-                    <div
-                      className="u-bg-secondary-subtle u-rounded u-mb-2"
-                      style={{ height: "12px", width: "60%" }}
-                    />
-                    <div
-                      className="u-bg-secondary-subtle u-rounded"
-                      style={{ height: "24px", width: "40%" }}
-                    />
+                    <div className="u-skeleton u-h-3 u-w-75 u-mb-2" />
+                    <div className="u-skeleton u-h-8 u-w-50" />
                   </div>
                 </div>
-                <div
-                  className="u-bg-secondary-subtle u-rounded"
-                  style={{ height: "12px", width: "50%" }}
-                />
+                <div className="u-skeleton u-h-3 u-w-50" />
               </Card>
             </GridCol>
           ))}
         </Grid>
 
-        {/* Content skeleton */}
         <Grid>
           <GridCol xs={12} lg={8}>
             <Card>
-              <div
-                className="u-bg-secondary-subtle u-rounded u-mb-4"
-                style={{ height: "24px", width: "30%" }}
-              />
-              <div
-                className="u-bg-secondary-subtle u-rounded"
-                style={{ height: "300px" }}
-              />
+              <div className="u-skeleton u-h-8 u-w-25 u-mb-4" />
+              <div className="u-skeleton u-h-75" />
             </Card>
           </GridCol>
           <GridCol xs={12} lg={4}>
             <Card>
-              <div
-                className="u-bg-secondary-subtle u-rounded u-mb-4"
-                style={{ height: "24px", width: "40%" }}
-              />
+              <div className="u-skeleton u-h-8 u-w-50 u-mb-4" />
               {[1, 2, 3].map((i) => (
-                <div
-                  key={i}
-                  className="u-bg-secondary-subtle u-rounded u-mb-3"
-                  style={{ height: "80px" }}
-                />
+                <div key={i} className="u-skeleton u-h-20 u-mb-3" />
               ))}
             </Card>
           </GridCol>
@@ -95,45 +61,23 @@ export function LoadingSkeleton({ type = "card", count = 1 }: SkeletonProps) {
             key={i}
             className="u-flex u-items-center u-gap-4 u-py-3 u-border-bottom u-border-secondary-subtle"
           >
-            <div
-              className="u-bg-secondary-subtle u-rounded"
-              style={{ height: "16px", width: "20%" }}
-            />
-            <div
-              className="u-bg-secondary-subtle u-rounded"
-              style={{ height: "16px", width: "30%" }}
-            />
-            <div
-              className="u-bg-secondary-subtle u-rounded"
-              style={{ height: "16px", width: "15%" }}
-            />
-            <div
-              className="u-bg-secondary-subtle u-rounded"
-              style={{ height: "16px", width: "25%" }}
-            />
+            <div className="u-skeleton u-h-4 u-w-25" />
+            <div className="u-skeleton u-h-4 u-w-50" />
+            <div className="u-skeleton u-h-4 u-w-25" />
+            <div className="u-skeleton u-h-4 u-w-50" />
           </div>
         ))}
       </div>
     );
   }
 
-  // Default card skeletons
   return (
     <>
       {Array.from({ length: count }).map((_, i) => (
         <Card key={i} className="u-mb-3">
-          <div
-            className="u-bg-secondary-subtle u-rounded u-mb-2"
-            style={{ height: "16px", width: "60%" }}
-          />
-          <div
-            className="u-bg-secondary-subtle u-rounded u-mb-2"
-            style={{ height: "12px", width: "80%" }}
-          />
-          <div
-            className="u-bg-secondary-subtle u-rounded"
-            style={{ height: "12px", width: "40%" }}
-          />
+          <div className="u-skeleton u-h-4 u-w-75 u-mb-2" />
+          <div className="u-skeleton u-h-3 u-w-100 u-mb-2" />
+          <div className="u-skeleton u-h-3 u-w-50" />
         </Card>
       ))}
     </>

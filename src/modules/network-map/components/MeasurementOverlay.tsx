@@ -55,7 +55,7 @@ export function MeasurementOverlay({ onClose }: MeasurementOverlayProps) {
           </div>
         </div>
 
-        <div className="u-overflow-y-auto u-mb-4" style={{ maxHeight: "200px" }}>
+        <div className="u-overflow-y-auto u-max-h-50 u-mb-4">
           <table className="u-w-100 u-text-xs">
             <thead className="u-border-bottom u-border-secondary-subtle">
               <tr>
@@ -156,7 +156,7 @@ export function TracePathOverlay() {
           ))}
         </div>
 
-        <div className="u-overflow-y-auto" style={{ maxHeight: "200px" }}>
+        <div className="u-overflow-y-auto u-max-h-50">
           <div className="u-text-xs u-font-bold u-text-secondary-emphasis u-text-uppercase u-mb-2 u-ms-1">
             Route Path
           </div>

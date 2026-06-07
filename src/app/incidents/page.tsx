@@ -103,11 +103,11 @@ export default function IncidentsPage() {
   ];
 
   return (
-    <Container className="u-py-6 u-w-100">
-      <div className="u-flex u-justify-between u-items-center u-mb-6">
+    <Container className="u-page">
+      <div className="u-page-header">
         <div>
-          <h1 className="u-text-xxl u-font-bold u-mb-2">Incident Management</h1>
-          <p className="u-text-secondary-emphasis u-text-sm">
+          <h1 className="u-page-title">Incident Management</h1>
+          <p className="u-page-subtitle">
             Track active outages, dispatch technicians, and document resolutions.
           </p>
         </div>
@@ -120,10 +120,7 @@ export default function IncidentsPage() {
         <GridCol xs={12} lg={4}>
           <Card className="u-h-100 u-flex u-flex-column">
             <h2 className="u-text-lg u-font-bold u-mb-4">Live Network Map</h2>
-            <div
-              className="u-bg-dark u-rounded u-border u-border-secondary-subtle u-flex-grow-1 u-flex u-items-center u-justify-center u-relative"
-              style={{ minHeight: "300px" }}
-            >
+            <div className="u-bg-dark u-rounded u-border u-border-secondary-subtle u-flex-grow-1 u-flex u-items-center u-justify-center u-relative u-min-h-75">
               <span className="u-text-secondary-emphasis u-text-sm u-font-mono">
                 [ Mapbox GL Canvas ]
               </span>

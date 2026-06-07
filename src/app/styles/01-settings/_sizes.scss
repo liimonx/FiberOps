@@ -1,0 +1,35 @@
+/**
+ * FiberOps Size Token Extensions
+ * =============================================================================
+ * Supplemental height, max-height, min-height, and max-width scales used by
+ * FiberOps utilities. Values align with common layout heights in the app.
+ *
+ * @see src/app/styles/99-utilities/_utilities.fiberops.scss
+ */
+
+$fiberops-heights: (
+  14: 3.5rem,
+  20: 5rem,
+  25: 6.25rem,
+  62: 15.625rem,
+  75: 18.75rem,
+) !default;
+
+$fiberops-max-heights: (
+  40: 10rem,
+  50: 12.5rem,
+  75: 18.75rem,
+  90: 22.5rem,
+) !default;
+
+$fiberops-min-heights: (
+  75: 18.75rem,
+  100: 25rem,
+  300: 18.75rem,
+) !default;
+
+$fiberops-max-widths: (
+  sm: 24rem,
+  md: 28rem,
+  lg: 32rem,
+) !default;

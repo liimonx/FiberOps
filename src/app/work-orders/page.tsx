@@ -139,10 +139,10 @@ export default function WorkOrdersPage() {
 
   return (
     <Container className="u-py-4 u-w-100" type="fluid">
-      <div className="u-flex u-justify-between u-items-center u-mb-6">
+      <div className="u-page-header">
         <div>
-          <h1 className="u-text-xxl u-font-bold u-mb-2">Work Orders</h1>
-          <p className="u-text-secondary-emphasis u-text-sm">
+          <h1 className="u-page-title">Work Orders</h1>
+          <p className="u-page-subtitle">
             Drag-and-drop Kanban board for managing field operations.
           </p>
         </div>
@@ -176,10 +176,7 @@ export default function WorkOrdersPage() {
                 <Badge variant="secondary" label={String(tasks.length)} />
               </div>
 
-              <div
-                className="u-flex u-flex-column u-h-100"
-                style={{ minHeight: "400px" }}
-              >
+              <div className="u-flex u-flex-column u-h-100 u-min-h-100">
                 {tasks.length === 0 ? (
                   <div className="u-text-center u-py-8 u-text-secondary-emphasis u-text-sm">
                     Drop tasks here

@@ -2,7 +2,12 @@ import type {
   AssetRepository,
   CustomerRepository,
   IncidentRepository,
+  SettingsRepository,
 } from "@/services/repositories";
+import {
+  getOrganizationSettings,
+  setOrganizationSettings,
+} from "@/mocks/settingsData";
 import { mockAssets, mockCustomers, mockIncidents } from "./mockData";
 import { createLogger } from "@/lib/logger";
 
@@ -26,6 +31,17 @@ export const mockIncidentRepository: IncidentRepository = {
   list: async () => {
     log.info('IncidentRepository.list() called, returning', mockIncidents.length, 'incidents');
     return { items: mockIncidents };
+  },
+};
+
+export const mockSettingsRepository: SettingsRepository = {
+  getOrganization: async () => {
+    log.info("SettingsRepository.getOrganization() called");
+    return getOrganizationSettings();
+  },
+  updateOrganization: async (data) => {
+    log.info("SettingsRepository.updateOrganization() called");
+    return setOrganizationSettings(data);
   },
 };
 

@@ -114,7 +114,7 @@ export const MapToolbar: React.FC<MapToolbarProps> = ({
                     {tool.description}
                   </span>
                   {tool.shortcut && (
-                    <kbd className="u-mt-1 u-self-start u-px-2 u-py-0 u-bg-secondary-subtle u-rounded-sm u-text-xs u-font-mono">
+                    <kbd className="u-kbd u-mt-1 u-self-start">
                       {tool.shortcut}
                     </kbd>
                   )}
