@@ -1,12 +1,22 @@
 "use client";
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { services } from '@/services/serviceLocator';
+import type { Asset, Customer, Incident } from '@/types/domain';
 import { 
   transformAssetToNode, 
   transformCustomerToNode, 
   generateTopology 
 } from '../utils/dataTransformation';
+
+async function fetchList<T>(path: string): Promise<T[]> {
+  const res = await fetch(path);
+  if (!res.ok) {
+    throw new Error(`Failed to fetch ${path}`);
+  }
+
+  const body = (await res.json()) as { items: T[] };
+  return body.items;
+}
 
 // Query keys for better organization and cache management
 export const networkQueryKeys = {
@@ -40,10 +50,7 @@ export const networkQueryKeys = {
 export function useAssets() {
   return useQuery({
     queryKey: networkQueryKeys.assets.list(),
-    queryFn: async () => {
-      const result = await services.assets.list();
-      return result.items;
-    },
+    queryFn: () => fetchList<Asset>('/api/assets'),
     staleTime: 60_000,
     gcTime: 10 * 60_000,
     refetchOnWindowFocus: false,
@@ -54,10 +61,7 @@ export function useAssets() {
 export function useCustomers() {
   return useQuery({
     queryKey: networkQueryKeys.customers.list(),
-    queryFn: async () => {
-      const result = await services.customers.list();
-      return result.items;
-    },
+    queryFn: () => fetchList<Customer>('/api/customers'),
     staleTime: 5 * 60_000,
     gcTime: 20 * 60_000,
   });
@@ -67,10 +71,7 @@ export function useCustomers() {
 export function useIncidents() {
   return useQuery({
     queryKey: networkQueryKeys.incidents.list(),
-    queryFn: async () => {
-      const result = await services.incidents.list();
-      return result.items;
-    },
+    queryFn: () => fetchList<Incident>('/api/incidents'),
     staleTime: 15_000,
     gcTime: 5 * 60_000,
     refetchInterval: 30_000,
@@ -82,8 +83,8 @@ export function useActiveIncidents() {
   return useQuery({
     queryKey: networkQueryKeys.incidents.active(),
     queryFn: async () => {
-      const result = await services.incidents.list();
-      return result.items.filter(inc => inc.status !== 'resolved');
+      const items = await fetchList<Incident>('/api/incidents');
+      return items.filter((inc) => inc.status !== 'resolved');
     },
     staleTime: 10_000,
     refetchInterval: 15_000,

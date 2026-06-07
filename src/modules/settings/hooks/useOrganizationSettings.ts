@@ -3,6 +3,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { OrganizationSettings } from "@/types/domain";
 import type { OrganizationSettingsFormValues } from "@/modules/settings/schemas/organizationSettings.schema";
+import { parseSettingsError } from "@/modules/settings/lib/parseSettingsError";
 
 export const organizationSettingsQueryKey = ["settings", "organization"] as const;
 
@@ -24,7 +25,7 @@ async function patchOrganizationSettings(
   });
 
   if (!res.ok) {
-    throw new Error("Failed to update organization settings");
+    await parseSettingsError(res, "Failed to update organization settings");
   }
 
   return res.json();

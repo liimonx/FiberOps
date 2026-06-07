@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
   Card,
   Container,
@@ -8,56 +8,35 @@ import {
   GridCol,
   Badge,
   Button,
+  Callout,
   Icon,
   DataTable,
   DataTableColumn,
   Input,
   Tabs,
 } from "@shohojdhara/atomix";
-
-const mockAssets = [
-  {
-    id: "AST-001",
-    type: "Node",
-    location: "Sector 7G",
-    status: "Active",
-    lastMaintenance: "2026-03-15",
-  },
-  {
-    id: "AST-002",
-    type: "Splitter",
-    location: "Oak Street",
-    status: "Warning",
-    lastMaintenance: "2025-11-20",
-  },
-  {
-    id: "AST-003",
-    type: "ONT",
-    location: "123 Main St",
-    status: "Active",
-    lastMaintenance: "2026-04-01",
-  },
-  {
-    id: "AST-004",
-    type: "Distribution Hub",
-    location: "Downtown",
-    status: "Critical",
-    lastMaintenance: "2024-08-10",
-  },
-];
+import { useAssets } from "@/modules/network-map/hooks/useNetworkData";
+import {
+  mapAssetToTableRow,
+  type AssetTableRow,
+} from "@/lib/operationsViewMappers";
 
 export default function AssetsPage() {
+  const { data: assets, isLoading, isError, refetch } = useAssets();
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedAsset, setSelectedAsset] = useState<(typeof mockAssets)[0] | null>(
-    mockAssets[0]
-  );
+  const [selectedAsset, setSelectedAsset] = useState<AssetTableRow | null>(null);
   const [activeTab, setActiveTab] = useState(0);
 
-  const filteredAssets = mockAssets.filter(
-    (a) =>
-      a.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      a.type.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      a.location.toLowerCase().includes(searchTerm.toLowerCase())
+  const tableRows = useMemo(
+    () => (assets ?? []).map(mapAssetToTableRow),
+    [assets]
+  );
+
+  const filteredAssets = tableRows.filter(
+    (asset) =>
+      asset.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      asset.type.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      asset.location.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const columns: DataTableColumn[] = [
@@ -92,6 +71,30 @@ export default function AssetsPage() {
       ),
     },
   ];
+
+  if (isLoading) {
+    return (
+      <Container className="u-page" aria-busy="true">
+        <div className="u-skeleton u-h-10 u-mb-6" style={{ width: "14rem" }} />
+        <div className="u-skeleton u-h-64" />
+      </Container>
+    );
+  }
+
+  if (isError) {
+    return (
+      <Container className="u-page">
+        <Callout variant="error" title="Failed to load assets">
+          <p className="u-text-sm u-mb-3">
+            The assets inventory could not be loaded. Please try again.
+          </p>
+          <Button variant="outline-secondary" size="sm" onClick={() => refetch()}>
+            Retry
+          </Button>
+        </Callout>
+      </Container>
+    );
+  }
 
   return (
     <Container className="u-page">
@@ -181,7 +184,7 @@ export default function AssetsPage() {
                             Coordinates
                           </span>
                           <span className="u-font-mono u-text-sm">
-                            40.7128° N, 74.0060° W
+                            {selectedAsset.coordinates}
                           </span>
                         </div>
                       </div>

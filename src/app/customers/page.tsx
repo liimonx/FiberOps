@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
   Card,
   Container,
@@ -8,59 +8,37 @@ import {
   DataTableColumn,
   Badge,
   Button,
+  Callout,
   Input,
   Icon,
   Grid,
   GridCol,
 } from "@shohojdhara/atomix";
-
-// Mock Data
-const mockCustomers = [
-  {
-    id: "CUST-8012",
-    name: "Acme Corp",
-    type: "Enterprise",
-    signalHealth: 98,
-    connectionPath: "Node Alpha -> Splitter 12 -> ONT-55",
-    billingStatus: "paid",
-    incidentHistory: 0,
-  },
-  {
-    id: "CUST-8013",
-    name: "Globex Inc",
-    type: "Business",
-    signalHealth: 75,
-    connectionPath: "Node Beta -> Splitter 08 -> ONT-21",
-    billingStatus: "overdue",
-    incidentHistory: 2,
-  },
-  {
-    id: "CUST-8014",
-    name: "Soylent Corp",
-    type: "Enterprise",
-    signalHealth: 99,
-    connectionPath: "Node Gamma -> Splitter 04 -> ONT-11",
-    billingStatus: "paid",
-    incidentHistory: 1,
-  },
-  {
-    id: "CUST-8015",
-    name: "Initech",
-    type: "Business",
-    signalHealth: 45,
-    connectionPath: "Node Delta -> Splitter 02 -> ONT-03",
-    billingStatus: "unpaid",
-    incidentHistory: 5,
-  },
-];
+import {
+  useCustomers,
+  useIncidents,
+} from "@/modules/network-map/hooks/useNetworkData";
+import { mapCustomerToTableRow } from "@/lib/operationsViewMappers";
 
 export default function CustomersPage() {
+  const { data: customers, isLoading, isError, refetch } = useCustomers();
+  const { data: incidents } = useIncidents();
   const [searchTerm, setSearchTerm] = useState("");
 
-  const filteredCustomers = mockCustomers.filter(
-    (c) =>
-      c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      c.id.toLowerCase().includes(searchTerm.toLowerCase())
+  const tableRows = useMemo(() => {
+    return (customers ?? []).map((customer) => {
+      const incidentHistory = (incidents ?? []).filter((incident) =>
+        incident.title.toLowerCase().includes(customer.name.split(" ")[0]?.toLowerCase() ?? "")
+      ).length;
+
+      return mapCustomerToTableRow(customer, incidentHistory);
+    });
+  }, [customers, incidents]);
+
+  const filteredCustomers = tableRows.filter(
+    (customer) =>
+      customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      customer.id.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const columns: DataTableColumn[] = [
@@ -129,6 +107,30 @@ export default function CustomersPage() {
       ),
     },
   ];
+
+  if (isLoading) {
+    return (
+      <Container className="u-page" aria-busy="true">
+        <div className="u-skeleton u-h-10 u-mb-6" style={{ width: "10rem" }} />
+        <div className="u-skeleton u-h-64" />
+      </Container>
+    );
+  }
+
+  if (isError) {
+    return (
+      <Container className="u-page">
+        <Callout variant="error" title="Failed to load customers">
+          <p className="u-text-sm u-mb-3">
+            Customer profiles could not be loaded. Please try again.
+          </p>
+          <Button variant="outline-secondary" size="sm" onClick={() => refetch()}>
+            Retry
+          </Button>
+        </Callout>
+      </Container>
+    );
+  }
 
   return (
     <Container className="u-page">

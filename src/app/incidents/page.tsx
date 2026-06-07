@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState, type ChangeEvent } from "react";
 import {
   Card,
   Container,
@@ -8,55 +8,31 @@ import {
   GridCol,
   Badge,
   Button,
+  Callout,
   Icon,
   DataTable,
   DataTableColumn,
   Select,
   Textarea,
 } from "@shohojdhara/atomix";
+import { useIncidents } from "@/modules/network-map/hooks/useNetworkData";
+import { mapIncidentToTableRow } from "@/lib/operationsViewMappers";
 
-const mockIncidents = [
-  {
-    id: "INC-1042",
-    title: "Node Alpha Outage",
-    severity: "Critical",
-    status: "Investigating",
-    technician: "John Doe",
-    time: "10m ago",
-  },
-  {
-    id: "INC-1041",
-    title: "High Attenuation on Splitter 08",
-    severity: "Warning",
-    status: "Assigned",
-    technician: "Jane Smith",
-    time: "2h ago",
-  },
-  {
-    id: "INC-1040",
-    title: "Customer ONT Offline",
-    severity: "Low",
-    status: "Resolved",
-    technician: "Bob Lee",
-    time: "1d ago",
-  },
-  {
-    id: "INC-1039",
-    title: "Fiber Cut Reported",
-    severity: "Critical",
-    status: "In Progress",
-    technician: "Sarah Connor",
-    time: "1d ago",
-  },
-];
+type SeverityFilter = "All" | "Critical" | "Warning" | "Low";
 
 export default function IncidentsPage() {
-  const [severityFilter, setSeverityFilter] = useState("All");
+  const { data: incidents, isLoading, isError, refetch } = useIncidents();
+  const [severityFilter, setSeverityFilter] = useState<SeverityFilter>("All");
+
+  const tableRows = useMemo(
+    () => (incidents ?? []).map(mapIncidentToTableRow),
+    [incidents]
+  );
 
   const filteredIncidents =
     severityFilter === "All"
-      ? mockIncidents
-      : mockIncidents.filter((inc) => inc.severity === severityFilter);
+      ? tableRows
+      : tableRows.filter((incident) => incident.severity === severityFilter);
 
   const columns: DataTableColumn[] = [
     {
@@ -102,6 +78,30 @@ export default function IncidentsPage() {
     },
   ];
 
+  if (isLoading) {
+    return (
+      <Container className="u-page" aria-busy="true">
+        <div className="u-skeleton u-h-10 u-mb-6" style={{ width: "14rem" }} />
+        <div className="u-skeleton u-h-64" />
+      </Container>
+    );
+  }
+
+  if (isError) {
+    return (
+      <Container className="u-page">
+        <Callout variant="error" title="Failed to load incidents">
+          <p className="u-text-sm u-mb-3">
+            The incident log could not be loaded. Please try again.
+          </p>
+          <Button variant="outline-secondary" size="sm" onClick={() => refetch()}>
+            Retry
+          </Button>
+        </Callout>
+      </Container>
+    );
+  }
+
   return (
     <Container className="u-page">
       <div className="u-page-header">
@@ -125,7 +125,6 @@ export default function IncidentsPage() {
                 [ Mapbox GL Canvas ]
               </span>
 
-              {/* Mock Map Pinpoint */}
               <div
                 className="u-absolute u-bg-error u-rounded-circle u-flex u-items-center u-justify-center"
                 style={{
@@ -149,7 +148,9 @@ export default function IncidentsPage() {
               <div className="u-w-25">
                 <Select
                   value={severityFilter}
-                  onChange={(val) => setSeverityFilter(String(val))}
+                  onChange={(event: ChangeEvent<HTMLSelectElement>) =>
+                    setSeverityFilter(event.target.value as SeverityFilter)
+                  }
                   options={[
                     { label: "All Severities", value: "All" },
                     { label: "Critical", value: "Critical" },
