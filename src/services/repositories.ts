@@ -2,8 +2,16 @@ import type { Asset, Customer, Incident, OrganizationSettings } from "@/types/do
 
 export type ListResult<T> = { items: T[] };
 
+export type CreateAssetInput = {
+  name: string;
+  kind: Asset["kind"];
+  status: Asset["status"];
+  location: Asset["location"];
+};
+
 export interface AssetRepository {
   list(): Promise<ListResult<Asset>>;
+  create(data: CreateAssetInput): Promise<Asset>;
 }
 
 export interface CustomerRepository {

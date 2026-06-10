@@ -14,15 +14,21 @@ import {
   getIncidents,
   updateIncident,
 } from "@/mocks/incidentsData";
-import { mockAssets, mockCustomers } from "./mockData";
+import { createAsset, getAssets } from "@/mocks/assetsData";
+import { mockCustomers } from "./mockData";
 import { createLogger } from "@/lib/logger";
 
 const log = createLogger("Mock");
 
 export const mockAssetRepository: AssetRepository = {
   list: async () => {
-    log.info('AssetRepository.list() called, returning', mockAssets.length, 'assets');
-    return { items: mockAssets };
+    const items = getAssets();
+    log.info("AssetRepository.list() called, returning", items.length, "assets");
+    return { items };
+  },
+  create: async (data) => {
+    log.info("AssetRepository.create() called");
+    return createAsset(data);
   },
 };
 

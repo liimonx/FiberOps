@@ -823,6 +823,25 @@ $fiberops-max-widths: sizes.$fiberops-max-widths;
   background-color: var(--atomix-primary-bg-subtle);
 }
 
+.u-assets-modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--atomix-spacing-4, 0.75rem);
+  width: 100%;
+}
+
+.u-assets-form-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--atomix-spacing-2, 0.375rem);
+}
+
+.u-assets-coords-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--atomix-spacing-3, 0.5rem);
+}
+
 .u-customers-modal-form {
   display: flex;
   flex-direction: column;

@@ -20,12 +20,14 @@ import {
   mapAssetToTableRow,
   type AssetTableRow,
 } from "@/lib/operationsViewMappers";
+import { RegisterAssetModal } from "@/modules/assets/components/RegisterAssetModal";
 
 export default function AssetsPage() {
   const { data: assets, isLoading, isError, refetch } = useAssets();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedAsset, setSelectedAsset] = useState<AssetTableRow | null>(null);
   const [activeTab, setActiveTab] = useState(0);
+  const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
 
   const tableRows = useMemo(
     () => (assets ?? []).map(mapAssetToTableRow),
@@ -105,7 +107,11 @@ export default function AssetsPage() {
             Manage infrastructure assets, connection graphs, and maintenance logs.
           </p>
         </div>
-        <Button variant="primary" iconName="Plus">
+        <Button
+          variant="primary"
+          iconName="Plus"
+          onClick={() => setIsRegisterModalOpen(true)}
+        >
           Register Asset
         </Button>
       </div>
@@ -246,6 +252,15 @@ export default function AssetsPage() {
           </GridCol>
         )}
       </Grid>
+
+      <RegisterAssetModal
+        open={isRegisterModalOpen}
+        onClose={() => setIsRegisterModalOpen(false)}
+        onCreated={(asset) => {
+          setSelectedAsset(mapAssetToTableRow(asset));
+          setActiveTab(0);
+        }}
+      />
     </Container>
   );
 }

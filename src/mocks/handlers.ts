@@ -1,5 +1,5 @@
 import { bypass, delay, http, HttpResponse, ws } from "msw";
-import { assets } from "@/mocks/data";
+import { createAsset, getAssets } from "@/mocks/assetsData";
 import {
   createCustomer,
   getCustomerById,
@@ -22,6 +22,7 @@ import {
   createCustomerSchema,
   updateCustomerSchema,
 } from "@/modules/customers/schemas/customer.schema";
+import { createAssetSchema } from "@/modules/assets/schemas/asset.schema";
 import {
   getOrganizationSettings,
   setOrganizationSettings,
@@ -88,7 +89,8 @@ export const handlers = [
 
     // Simulate random node updates every 10 seconds
     const interval = setInterval(() => {
-      const randomNode = assets[Math.floor(Math.random() * assets.length)];
+      const assetList = getAssets();
+      const randomNode = assetList[Math.floor(Math.random() * assetList.length)];
       if (!randomNode) return;
 
       const statuses = ["active", "degraded", "down", "maintenance"];
@@ -130,7 +132,22 @@ export const handlers = [
 
   http.get("/api/assets", async () => {
     await delay(350);
-    return HttpResponse.json({ items: assets });
+    return HttpResponse.json({ items: getAssets() });
+  }),
+
+  http.post("/api/assets", async ({ request }) => {
+    await delay(400);
+    const body = await request.json();
+    const parsed = createAssetSchema.safeParse(body);
+
+    if (!parsed.success) {
+      return HttpResponse.json(
+        { error: "Validation failed", issues: parsed.error.flatten() },
+        { status: 400 }
+      );
+    }
+
+    return HttpResponse.json(createAsset(parsed.data), { status: 201 });
   }),
 
   http.get("/api/customers", async () => {
