@@ -15,6 +15,8 @@ The purpose of FiberOps is to provide an enterprise-grade GIS dashboard for:
 
 This frontend is built with a **frontend-first architecture** using mocked data via MSW and modular API adapters, ready to be connected to a production backend.
 
+**Backend implementers:** see [docs/backend/README.md](./docs/backend/README.md) for the full API contract, domain models, WebSocket protocol, database schema, and frontend integration guide.
+
 ## 🛠️ Technology Stack
 
 - **Framework:** Next.js 16 (App Router)
