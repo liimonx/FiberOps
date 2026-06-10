@@ -116,7 +116,10 @@ describe('dataTransformation', () => {
         name: 'John Doe',
         plan: 'Basic',
         status: 'online',
-        location: { lat: 30, lng: 40 }
+        billingStatus: 'paid',
+        location: { lat: 30, lng: 40 },
+        createdAt: '2024-01-01T00:00:00.000Z',
+        updatedAt: '2024-01-01T00:00:00.000Z',
       };
 
       const result = transformCustomerToNode(customer);
@@ -140,7 +143,10 @@ describe('dataTransformation', () => {
         id: 'cust-no-loc',
         name: 'No Location',
         plan: 'Basic',
-        status: 'online'
+        status: 'online',
+        billingStatus: 'paid',
+        createdAt: '2024-01-01T00:00:00.000Z',
+        updatedAt: '2024-01-01T00:00:00.000Z',
       };
 
       const result = transformCustomerToNode(customer);
@@ -205,7 +211,16 @@ describe('dataTransformation', () => {
         { id: 'onu-near', kind: 'onu', name: 'ONU Near', status: 'active', location: { lat: 1, lng: 1 } }
       ];
       const customers: Customer[] = [
-        { id: 'cust-1', name: 'Cust 1', plan: 'Basic', status: 'online', location: { lat: 1.1, lng: 1.1 } }
+        {
+          id: 'cust-1',
+          name: 'Cust 1',
+          plan: 'Basic',
+          status: 'online',
+          billingStatus: 'paid',
+          location: { lat: 1.1, lng: 1.1 },
+          createdAt: '2024-01-01T00:00:00.000Z',
+          updatedAt: '2024-01-01T00:00:00.000Z',
+        },
       ];
 
       const connections = generateTopology(onus, customers);

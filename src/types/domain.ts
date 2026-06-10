@@ -12,6 +12,7 @@ export type IncidentSeverity = "low" | "medium" | "high" | "critical";
 export type IncidentStatus = "new" | "investigating" | "assigned" | "resolved";
 
 export type CustomerStatus = "online" | "offline" | "unstable";
+export type BillingStatus = "paid" | "overdue" | "unpaid";
 
 export type LatLng = { lat: number; lng: number };
 
@@ -28,7 +29,13 @@ export type Customer = {
   name: string;
   plan: string;
   status: CustomerStatus;
+  billingStatus: BillingStatus;
+  relatedOnuId?: string;
+  email?: string;
+  notes?: string;
   location?: { lat: number; lng: number };
+  createdAt: string;
+  updatedAt: string;
 };
 
 export type Incident = {
@@ -37,6 +44,12 @@ export type Incident = {
   severity: IncidentSeverity;
   status: IncidentStatus;
   relatedAssetId?: string;
+  technician?: string;
+  notes?: string;
+  resolutionNotes?: string;
+  createdAt: string;
+  updatedAt: string;
+  resolvedAt?: string;
 };
 
 export type OrganizationSettings = {

@@ -16,6 +16,7 @@ import {
   DonutChart,
 } from "@shohojdhara/atomix";
 import { ClientOnly } from "@/components/ClientOnly";
+import { useActiveIncidents } from "@/modules/network-map/hooks/useNetworkData";
 
 const recentWorkOrders = [
   { id: "WO-991", title: "Splice Repair", status: "In Progress", technician: "John Doe" },
@@ -37,6 +38,9 @@ const customerSegments = [
 ];
 
 export default function DashboardPage() {
+  const { data: activeIncidents } = useActiveIncidents();
+  const activeIncidentCount = activeIncidents?.length ?? 0;
+
   const { data: usageData, isLoading: isUsageLoading } = useQuery({
     queryKey: ["network-trends"],
     queryFn: async () => {
@@ -103,8 +107,8 @@ export default function DashboardPage() {
               </span>
               <Icon name="Warning" className="u-text-error" />
             </div>
-            <div className="u-text-xxl u-font-bold">3</div>
-            <div className="u-text-xs u-text-error u-mt-2">-1 since yesterday</div>
+            <div className="u-text-xxl u-font-bold">{activeIncidentCount}</div>
+            <div className="u-text-xs u-text-error u-mt-2">Live from incident log</div>
           </Card>
         </GridCol>
 

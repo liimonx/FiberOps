@@ -218,6 +218,8 @@ function generateAssets(): Asset[] {
 
 function generateCustomers(count: number): Customer[] {
   const customers: Customer[] = [];
+  const billingOptions = ["paid", "paid", "paid", "overdue", "unpaid"] as const;
+  const now = new Date().toISOString();
   for (let i = 0; i < count; i++) {
     const region = pick(REGIONS);
     const name = `${pick(CUSTOMER_FIRST)} ${pick(CUSTOMER_SUFFIX)}`;
@@ -226,7 +228,10 @@ function generateCustomers(count: number): Customer[] {
       name,
       plan: pick(PLANS),
       status: weightedCustomerStatus(),
+      billingStatus: pick(billingOptions),
       location: jitterLatLng(region.center, 0.025),
+      createdAt: now,
+      updatedAt: now,
     });
   }
   return customers;
@@ -286,12 +291,17 @@ function generateIncidents(assets: Asset[], count: number): Incident[] {
   for (let i = 0; i < count; i++) {
     const asset = pick(pool);
     const severity = severityFromRoll();
+    const createdAt = new Date(
+      Date.now() - Math.floor(rng() * 14 * 24 * 60 * 60 * 1000)
+    ).toISOString();
     incidents.push({
       id: `inc-${String(i + 1).padStart(4, "0")}`,
       title: titleForIncident(severity, asset),
       severity,
       status: pick(INCIDENT_STATUS),
       relatedAssetId: asset.id,
+      createdAt,
+      updatedAt: createdAt,
     });
   }
   return incidents;

@@ -2,6 +2,7 @@ import type {
   Asset,
   AssetKind,
   AssetStatus,
+  BillingStatus,
   Customer,
   CustomerStatus,
   Incident,
@@ -61,7 +62,7 @@ function stableIndex(seed: string, modulo: number): number {
   return hash;
 }
 
-function formatCoordinates(location: { lat: number; lng: number }): string {
+export function formatCoordinates(location: { lat: number; lng: number }): string {
   const latSuffix = location.lat >= 0 ? "N" : "S";
   const lngSuffix = location.lng >= 0 ? "E" : "W";
   return `${Math.abs(location.lat).toFixed(4)}° ${latSuffix}, ${Math.abs(location.lng).toFixed(4)}° ${lngSuffix}`;
@@ -100,9 +101,8 @@ function mapSignalHealth(status: CustomerStatus, customerId: string): number {
   }
 }
 
-function mapBillingStatus(customerId: string): CustomerTableRow["billingStatus"] {
-  const options: CustomerTableRow["billingStatus"][] = ["paid", "paid", "paid", "overdue", "unpaid"];
-  return options[stableIndex(customerId, options.length)] ?? "paid";
+function mapBillingStatus(billingStatus: BillingStatus): CustomerTableRow["billingStatus"] {
+  return billingStatus;
 }
 
 function mapIncidentSeverity(severity: IncidentSeverity): IncidentTableRow["severity"] {
@@ -130,9 +130,15 @@ function mapIncidentStatus(status: IncidentStatus): IncidentTableRow["status"] {
   }
 }
 
-function formatRelativeTime(seed: string): string {
-  const options = ["10m ago", "2h ago", "6h ago", "1d ago", "2d ago"];
-  return options[stableIndex(seed, options.length)] ?? "1d ago";
+export function formatRelativeTimeFromIso(iso: string): string {
+  const diffMs = Date.now() - new Date(iso).getTime();
+  const minutes = Math.floor(diffMs / 60_000);
+  if (minutes < 1) return "Just now";
+  if (minutes < 60) return `${minutes}m ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.floor(hours / 24);
+  return `${days}d ago`;
 }
 
 function pseudoMaintenanceDate(seed: string): string {
@@ -155,15 +161,28 @@ export function mapAssetToTableRow(asset: Asset): AssetTableRow {
 
 export function mapCustomerToTableRow(
   customer: Customer,
-  incidentHistory = 0
+  options: {
+    incidentHistory?: number;
+    connectionPath?: string;
+    relatedOnu?: Asset | null;
+  } = {}
 ): CustomerTableRow {
+  const { incidentHistory = 0, connectionPath, relatedOnu } = options;
+  const signalHealth = relatedOnu
+    ? relatedOnu.status === "active"
+      ? mapSignalHealth(customer.status, customer.id)
+      : relatedOnu.status === "degraded" || relatedOnu.status === "maintenance"
+        ? 55 + stableIndex(customer.id, 20)
+        : 10 + stableIndex(customer.id, 25)
+    : mapSignalHealth(customer.status, customer.id);
+
   return {
     id: customer.id,
     name: customer.name,
     type: mapCustomerType(customer.plan),
-    signalHealth: mapSignalHealth(customer.status, customer.id),
-    connectionPath: `${customer.plan} • ${customer.id}`,
-    billingStatus: mapBillingStatus(customer.id),
+    signalHealth,
+    connectionPath: connectionPath ?? `${customer.plan} • ${customer.id}`,
+    billingStatus: mapBillingStatus(customer.billingStatus),
     incidentHistory,
   };
 }
@@ -174,7 +193,10 @@ export function mapIncidentToTableRow(incident: Incident): IncidentTableRow {
     title: incident.title,
     severity: mapIncidentSeverity(incident.severity),
     status: mapIncidentStatus(incident.status),
-    technician: technicians[stableIndex(incident.id, technicians.length)] ?? technicians[0],
-    time: formatRelativeTime(incident.id),
+    technician:
+      incident.technician ??
+      technicians[stableIndex(incident.id, technicians.length)] ??
+      technicians[0],
+    time: formatRelativeTimeFromIso(incident.createdAt),
   };
 }

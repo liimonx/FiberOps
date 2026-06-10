@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo } from "react";
+import { Suspense, useCallback, useMemo } from "react";
 import { Icon } from "@shohojdhara/atomix";
 import {
   NetworkMapDataProvider,
@@ -32,6 +32,7 @@ import {
 } from "@/modules/network-map/components/MeasurementOverlay";
 import { ToolVisualizations } from "@/modules/network-map/components/ToolVisualizations";
 import { getToolManager } from "@/modules/network-map/tools/toolManager";
+import { useMapCustomerDeepLink } from "@/modules/network-map/hooks/useMapCustomerDeepLink";
 
 function NetworkMapContent() {
   const nodes = useNodes();
@@ -48,6 +49,7 @@ function NetworkMapContent() {
   );
 
   const mapInstance = useMapInstance();
+  useMapCustomerDeepLink({ nodes, mapInstance });
   const selectedConnection = useConnectionById(selectedNode ? null : selectedElementId);
 
   const showHoverTooltip =
@@ -315,7 +317,9 @@ function ZoomLevelIndicator() {
 export default function NetworkMapPage() {
   return (
     <NetworkMapDataProvider>
-      <NetworkMapContent />
+      <Suspense fallback={null}>
+        <NetworkMapContent />
+      </Suspense>
     </NetworkMapDataProvider>
   );
 }

@@ -2,6 +2,10 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import type { Asset, Customer, Incident } from '@/types/domain';
+import { useCustomers } from "@/modules/customers/hooks/useCustomersData";
+import {
+  useIncidents,
+} from "@/modules/incidents/hooks/useIncidentsData";
 import { 
   transformAssetToNode, 
   transformCustomerToNode, 
@@ -28,11 +32,13 @@ export const networkQueryKeys = {
   customers: {
     all: ['network', 'customers'] as const,
     list: () => [...networkQueryKeys.customers.all, 'list'] as const,
+    detail: (id: string) => [...networkQueryKeys.customers.all, 'detail', id] as const,
   },
   incidents: {
     all: ['network', 'incidents'] as const,
     list: () => [...networkQueryKeys.incidents.all, 'list'] as const,
     active: () => [...networkQueryKeys.incidents.all, 'active'] as const,
+    detail: (id: string) => [...networkQueryKeys.incidents.all, 'detail', id] as const,
   },
   nodes: {
     all: ['network', 'nodes'] as const,
@@ -57,26 +63,8 @@ export function useAssets() {
   });
 }
 
-// Hook: Fetch all customers
-export function useCustomers() {
-  return useQuery({
-    queryKey: networkQueryKeys.customers.list(),
-    queryFn: () => fetchList<Customer>('/api/customers'),
-    staleTime: 5 * 60_000,
-    gcTime: 20 * 60_000,
-  });
-}
-
-// Hook: Fetch all incidents
-export function useIncidents() {
-  return useQuery({
-    queryKey: networkQueryKeys.incidents.list(),
-    queryFn: () => fetchList<Incident>('/api/incidents'),
-    staleTime: 15_000,
-    gcTime: 5 * 60_000,
-    refetchInterval: 30_000,
-  });
-}
+export { useCustomers } from "@/modules/customers/hooks/useCustomersData";
+export { useIncidents } from "@/modules/incidents/hooks/useIncidentsData";
 
 // Hook: Fetch active incidents only
 export function useActiveIncidents() {
@@ -134,20 +122,7 @@ export function useUpdateAssetStatus() {
   });
 }
 
-// Mutation: Resolve incident
-export function useResolveIncident() {
-  const queryClient = useQueryClient();
-  
-  return useMutation({
-    mutationFn: async (incidentId: string) => {
-      await new Promise(resolve => setTimeout(resolve, 500));
-      return incidentId;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: networkQueryKeys.incidents.all });
-    },
-  });
-}
+export { useResolveIncident } from "@/modules/incidents/hooks/useIncidentsData";
 
 // Hook: Specific node details (uses cached data where possible)
 export function useNodeDetails(nodeId: string | null) {

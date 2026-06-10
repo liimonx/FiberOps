@@ -8,7 +8,13 @@ import {
   getOrganizationSettings,
   setOrganizationSettings,
 } from "@/mocks/settingsData";
-import { mockAssets, mockCustomers, mockIncidents } from "./mockData";
+import {
+  createIncident,
+  getIncidentById,
+  getIncidents,
+  updateIncident,
+} from "@/mocks/incidentsData";
+import { mockAssets, mockCustomers } from "./mockData";
 import { createLogger } from "@/lib/logger";
 
 const log = createLogger("Mock");
@@ -29,8 +35,21 @@ export const mockCustomerRepository: CustomerRepository = {
 
 export const mockIncidentRepository: IncidentRepository = {
   list: async () => {
-    log.info('IncidentRepository.list() called, returning', mockIncidents.length, 'incidents');
-    return { items: mockIncidents };
+    const items = getIncidents();
+    log.info("IncidentRepository.list() called, returning", items.length, "incidents");
+    return { items };
+  },
+  getById: async (id) => {
+    log.info("IncidentRepository.getById() called", id);
+    return getIncidentById(id) ?? null;
+  },
+  create: async (data) => {
+    log.info("IncidentRepository.create() called");
+    return createIncident(data);
+  },
+  update: async (id, data) => {
+    log.info("IncidentRepository.update() called", id);
+    return updateIncident(id, data);
   },
 };
 

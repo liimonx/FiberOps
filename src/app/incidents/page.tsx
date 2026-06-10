@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, type ChangeEvent } from "react";
+import { useCallback, useMemo, useState, type ChangeEvent } from "react";
 import {
   Card,
   Container,
@@ -13,26 +13,72 @@ import {
   DataTable,
   DataTableColumn,
   Select,
-  Textarea,
+  Input,
 } from "@shohojdhara/atomix";
-import { useIncidents } from "@/modules/network-map/hooks/useNetworkData";
-import { mapIncidentToTableRow } from "@/lib/operationsViewMappers";
+import {
+  useAssets,
+  useIncidents,
+} from "@/modules/network-map/hooks/useNetworkData";
+import {
+  mapIncidentToTableRow,
+  type IncidentTableRow,
+} from "@/lib/operationsViewMappers";
+import { IncidentMapPreview } from "@/modules/incidents/components/IncidentMapPreview";
+import { ReportIncidentModal } from "@/modules/incidents/components/ReportIncidentModal";
+import { IncidentDetailPanel } from "@/modules/incidents/components/IncidentDetailPanel";
 
 type SeverityFilter = "All" | "Critical" | "Warning" | "Low";
 
 export default function IncidentsPage() {
   const { data: incidents, isLoading, isError, refetch } = useIncidents();
+  const { data: assets } = useAssets();
   const [severityFilter, setSeverityFilter] = useState<SeverityFilter>("All");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedIncidentId, setSelectedIncidentId] = useState<string | null>(null);
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
 
   const tableRows = useMemo(
     () => (incidents ?? []).map(mapIncidentToTableRow),
     [incidents]
   );
 
-  const filteredIncidents =
-    severityFilter === "All"
-      ? tableRows
-      : tableRows.filter((incident) => incident.severity === severityFilter);
+  const stats = useMemo(() => {
+    const all = incidents ?? [];
+    return {
+      total: all.length,
+      active: all.filter((incident) => incident.status !== "resolved").length,
+      critical: all.filter(
+        (incident) =>
+          incident.severity === "critical" && incident.status !== "resolved"
+      ).length,
+    };
+  }, [incidents]);
+
+  const filteredIncidents = tableRows.filter((incident) => {
+    const matchesSeverity =
+      severityFilter === "All" || incident.severity === severityFilter;
+    const query = searchTerm.toLowerCase();
+    const matchesSearch =
+      incident.id.toLowerCase().includes(query) ||
+      incident.title.toLowerCase().includes(query) ||
+      incident.technician.toLowerCase().includes(query);
+
+    return matchesSeverity && matchesSearch;
+  });
+
+  const selectedIncident = useMemo(
+    () => (incidents ?? []).find((incident) => incident.id === selectedIncidentId) ?? null,
+    [incidents, selectedIncidentId]
+  );
+
+  const selectedAsset = useMemo(() => {
+    if (!selectedIncident?.relatedAssetId) return null;
+    return (assets ?? []).find((asset) => asset.id === selectedIncident.relatedAssetId) ?? null;
+  }, [assets, selectedIncident]);
+
+  const handleSelectIncident = useCallback((id: string) => {
+    setSelectedIncidentId(id);
+  }, []);
 
   const columns: DataTableColumn[] = [
     {
@@ -74,7 +120,15 @@ export default function IncidentsPage() {
     {
       key: "actions",
       title: "",
-      render: () => <Button variant="secondary" size="sm" iconName="ArrowRight" />,
+      render: (_, row: IncidentTableRow) => (
+        <Button
+          variant={row.id === selectedIncidentId ? "primary" : "outline-secondary"}
+          size="sm"
+          onClick={() => handleSelectIncident(row.id)}
+        >
+          View
+        </Button>
+      ),
     },
   ];
 
@@ -111,42 +165,80 @@ export default function IncidentsPage() {
             Track active outages, dispatch technicians, and document resolutions.
           </p>
         </div>
-        <Button variant="error" iconName="Warning">
+        <Button
+          variant="error"
+          iconName="Warning"
+          onClick={() => setIsReportModalOpen(true)}
+        >
           Report Incident
         </Button>
       </div>
 
       <Grid className="u-mb-6">
         <GridCol xs={12} lg={4}>
-          <Card className="u-h-100 u-flex u-flex-column">
-            <h2 className="u-text-lg u-font-bold u-mb-4">Live Network Map</h2>
-            <div className="u-bg-dark u-rounded u-border u-border-secondary-subtle u-flex-grow-1 u-flex u-items-center u-justify-center u-relative u-min-h-75">
-              <span className="u-text-secondary-emphasis u-text-sm u-font-mono">
-                [ Mapbox GL Canvas ]
+          <Card appearance="outlined" className="u-h-100 u-flex u-flex-column">
+            <div className="u-incidents-map-header">
+              <h2 className="u-text-lg u-font-bold u-mb-0">Live Network Map</h2>
+              <span className="u-incidents-live-pill">
+                <span className="u-incidents-live-dot" aria-hidden="true" />
+                Live
               </span>
-
-              <div
-                className="u-absolute u-bg-error u-rounded-circle u-flex u-items-center u-justify-center"
-                style={{
-                  width: "24px",
-                  height: "24px",
-                  top: "40%",
-                  left: "60%",
-                  boxShadow: "0 0 0 4px rgba(220, 53, 69, 0.2)",
-                }}
-              >
-                <Icon name="Warning" size="sm" className="u-text-white" />
-              </div>
             </div>
+            <IncidentMapPreview
+              incidents={incidents ?? []}
+              assets={assets ?? []}
+              selectedId={selectedIncidentId}
+              onSelect={handleSelectIncident}
+            />
           </Card>
         </GridCol>
 
         <GridCol xs={12} lg={8}>
-          <Card>
-            <div className="u-flex u-justify-between u-items-center u-mb-4">
-              <h2 className="u-text-lg u-font-bold">Incident Log</h2>
-              <div className="u-w-25">
+          <Card appearance="outlined">
+            <div className="u-incidents-stats">
+              <span className="u-incidents-stat">
+                <Icon name="ListBullets" size="sm" />
+                {stats.total} total
+              </span>
+              <span className="u-incidents-stat u-incidents-stat--active">
+                <Icon name="Pulse" size="sm" />
+                {stats.active} active
+              </span>
+              <span className="u-incidents-stat u-incidents-stat--critical">
+                <Icon name="Warning" size="sm" />
+                {stats.critical} critical
+              </span>
+            </div>
+
+            <div className="u-incidents-log-header">
+              <div>
+                <h2 className="u-text-lg u-font-bold u-mb-1">Incident Log</h2>
+                <p className="u-meta u-mb-0">
+                  {filteredIncidents.length} of {stats.total} incidents shown
+                </p>
+              </div>
+            </div>
+
+            <div className="u-incidents-filters">
+              <div className="u-incidents-filters-search">
+                <label className="u-incidents-filter-label" htmlFor="incident-log-search">
+                  Search
+                </label>
+                <Input
+                  id="incident-log-search"
+                  placeholder="Ticket ID, description, or technician..."
+                  value={searchTerm}
+                  onChange={(event) => setSearchTerm(event.target.value)}
+                  prefixIcon={<Icon name="MagnifyingGlass" />}
+                  fullWidth
+                />
+              </div>
+              <div className="u-incidents-filters-severity">
+                <label className="u-incidents-filter-label" htmlFor="incident-severity-filter">
+                  Severity
+                </label>
                 <Select
+                  id="incident-severity-filter"
                   value={severityFilter}
                   onChange={(event: ChangeEvent<HTMLSelectElement>) =>
                     setSeverityFilter(event.target.value as SeverityFilter)
@@ -162,28 +254,51 @@ export default function IncidentsPage() {
             </div>
 
             <div className="u-overflow-x-auto u-mb-6">
-              <DataTable columns={columns} data={filteredIncidents} rowKey="id" />
+              <DataTable
+                columns={columns}
+                data={filteredIncidents}
+                rowKey="id"
+                striped
+                selectionMode="single"
+                selectedRowIds={selectedIncidentId ? [selectedIncidentId] : []}
+                onRowClick={(row: IncidentTableRow) => handleSelectIncident(row.id)}
+                onSelectionChange={(_, selectedIds) => {
+                  const nextId = selectedIds[0];
+                  setSelectedIncidentId(
+                    typeof nextId === "string" ? nextId : nextId != null ? String(nextId) : null
+                  );
+                }}
+                emptyMessage="No incidents match your filters."
+              />
             </div>
 
-            <div className="u-border-top u-border-secondary-subtle u-pt-6">
-              <h3 className="u-text-base u-font-bold u-mb-4">
-                Resolution Notes (Selected Incident)
-              </h3>
-              <div className="u-mb-4">
-                <Textarea
-                  placeholder="Enter detailed resolution steps or current investigation notes..."
-                  rows={4}
-                  fullWidth
-                />
+            {selectedIncident ? (
+              <IncidentDetailPanel
+                key={`${selectedIncident.id}-${selectedIncident.updatedAt}`}
+                incident={selectedIncident}
+                relatedAsset={selectedAsset}
+                onClose={() => setSelectedIncidentId(null)}
+              />
+            ) : (
+              <div className="u-border-top u-border-secondary-subtle u-pt-6">
+                <div className="u-incidents-empty">
+                  <Icon name="ClipboardText" size="lg" className="u-text-secondary-emphasis" />
+                  <p className="u-text-sm u-text-secondary-emphasis u-mb-0">
+                    Select an incident to view its timeline, related asset, and resolution notes.
+                  </p>
+                </div>
               </div>
-              <div className="u-flex u-justify-end u-gap-4">
-                <Button variant="outline-secondary">Save Draft</Button>
-                <Button variant="primary">Submit & Resolve</Button>
-              </div>
-            </div>
+            )}
           </Card>
         </GridCol>
       </Grid>
+
+      <ReportIncidentModal
+        open={isReportModalOpen}
+        assets={assets ?? []}
+        onClose={() => setIsReportModalOpen(false)}
+        onCreated={(incidentId) => setSelectedIncidentId(incidentId)}
+      />
     </Container>
   );
 }

@@ -1,5 +1,27 @@
-import { delay, http, HttpResponse, ws } from "msw";
-import { assets, customers, incidents } from "@/mocks/data";
+import { bypass, delay, http, HttpResponse, ws } from "msw";
+import { assets } from "@/mocks/data";
+import {
+  createCustomer,
+  getCustomerById,
+  getCustomers,
+  updateCustomer,
+} from "@/mocks/customersData";
+import {
+  createIncident,
+  getIncidentById,
+  getIncidents,
+  resolveIncident,
+  updateIncident,
+} from "@/mocks/incidentsData";
+import {
+  createIncidentSchema,
+  resolveIncidentSchema,
+  updateIncidentSchema,
+} from "@/modules/incidents/schemas/incident.schema";
+import {
+  createCustomerSchema,
+  updateCustomerSchema,
+} from "@/modules/customers/schemas/customer.schema";
 import {
   getOrganizationSettings,
   setOrganizationSettings,
@@ -90,9 +112,20 @@ export const handlers = [
     });
   }),
 
-  // Bypass Mapbox telemetry requests to avoid console errors
-  http.post("https://events.mapbox.com/events/v2", () => {
-    return new HttpResponse(null, { status: 204 });
+  // Mapbox styles/tiles/fonts must bypass MSW's service-worker passthrough path,
+  // which can throw "TypeError: Failed to fetch" for cross-origin requests.
+  http.all(/https:\/\/([a-z0-9-]+\.)*mapbox\.com(\/|$)/i, async ({ request }) => {
+    const url = new URL(request.url);
+
+    if (
+      request.method === "POST" &&
+      (url.hostname === "events.mapbox.com" ||
+        url.pathname.startsWith("/map-sessions/"))
+    ) {
+      return new HttpResponse(null, { status: 204 });
+    }
+
+    return fetch(bypass(request));
   }),
 
   http.get("/api/assets", async () => {
@@ -102,12 +135,143 @@ export const handlers = [
 
   http.get("/api/customers", async () => {
     await delay(350);
-    return HttpResponse.json({ items: customers });
+    return HttpResponse.json({ items: getCustomers() });
+  }),
+
+  http.get("/api/customers/:id", async ({ params }) => {
+    await delay(300);
+    const customer = getCustomerById(params.id as string);
+
+    if (!customer) {
+      return HttpResponse.json({ error: "Customer not found" }, { status: 404 });
+    }
+
+    return HttpResponse.json(customer);
+  }),
+
+  http.post("/api/customers", async ({ request }) => {
+    await delay(400);
+    const body = await request.json();
+    const parsed = createCustomerSchema.safeParse(body);
+
+    if (!parsed.success) {
+      return HttpResponse.json(
+        { error: "Validation failed", issues: parsed.error.flatten() },
+        { status: 400 }
+      );
+    }
+
+    const { email, relatedOnuId, location, ...rest } = parsed.data;
+    return HttpResponse.json(
+      createCustomer({
+        ...rest,
+        email: email || undefined,
+        relatedOnuId: relatedOnuId || undefined,
+        location,
+      }),
+      { status: 201 }
+    );
+  }),
+
+  http.patch("/api/customers/:id", async ({ request, params }) => {
+    await delay(400);
+    const id = params.id as string;
+    const body = await request.json();
+    const parsed = updateCustomerSchema.safeParse(body);
+
+    if (!parsed.success) {
+      return HttpResponse.json(
+        { error: "Validation failed", issues: parsed.error.flatten() },
+        { status: 400 }
+      );
+    }
+
+    try {
+      const { email, relatedOnuId, ...rest } = parsed.data;
+      return HttpResponse.json(
+        updateCustomer(id, {
+          ...rest,
+          email: email === "" ? undefined : email,
+          relatedOnuId: relatedOnuId || undefined,
+        })
+      );
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Failed to update customer";
+      return HttpResponse.json({ error: message }, { status: 404 });
+    }
   }),
 
   http.get("/api/incidents", async () => {
     await delay(450);
-    return HttpResponse.json({ items: incidents });
+    return HttpResponse.json({ items: getIncidents() });
+  }),
+
+  http.get("/api/incidents/:id", async ({ params }) => {
+    await delay(300);
+    const incident = getIncidentById(params.id as string);
+
+    if (!incident) {
+      return HttpResponse.json({ error: "Incident not found" }, { status: 404 });
+    }
+
+    return HttpResponse.json(incident);
+  }),
+
+  http.post("/api/incidents", async ({ request }) => {
+    await delay(400);
+    const body = await request.json();
+    const parsed = createIncidentSchema.safeParse(body);
+
+    if (!parsed.success) {
+      return HttpResponse.json(
+        { error: "Validation failed", issues: parsed.error.flatten() },
+        { status: 400 }
+      );
+    }
+
+    return HttpResponse.json(createIncident(parsed.data), { status: 201 });
+  }),
+
+  http.patch("/api/incidents/:id", async ({ request, params }) => {
+    await delay(400);
+    const id = params.id as string;
+    const body = (await request.json()) as {
+      status?: string;
+      notes?: string;
+      technician?: string;
+      resolutionNotes?: string;
+    };
+
+    const resolveParsed = resolveIncidentSchema.safeParse(body);
+    if (resolveParsed.success && body.status === "resolved") {
+      try {
+        return HttpResponse.json(
+          resolveIncident(id, resolveParsed.data.resolutionNotes)
+        );
+      } catch (error) {
+        const message =
+          error instanceof Error ? error.message : "Failed to resolve incident";
+        return HttpResponse.json({ error: message }, { status: 404 });
+      }
+    }
+
+    const parsed = updateIncidentSchema.safeParse(body);
+
+    if (!parsed.success) {
+      return HttpResponse.json(
+        { error: "Validation failed", issues: parsed.error.flatten() },
+        { status: 400 }
+      );
+    }
+
+    try {
+      return HttpResponse.json(updateIncident(id, parsed.data));
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Failed to update incident";
+      return HttpResponse.json({ error: message }, { status: 404 });
+    }
   }),
 
   http.get("/api/settings/organization", async () => {
@@ -298,6 +462,14 @@ export const handlers = [
       { label: "23:59", value: 600 + Math.random() * 60 },
     ];
     return HttpResponse.json(baseTrends);
+  }),
+
+  // Fallback for API routes added in the UI before a dedicated mock exists
+  http.all("/api/*", ({ request }) => {
+    return HttpResponse.json(
+      { error: `No mock handler for ${request.method} ${new URL(request.url).pathname}` },
+      { status: 404 }
+    );
   }),
 ];
 
