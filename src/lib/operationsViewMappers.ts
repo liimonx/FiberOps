@@ -8,7 +8,13 @@ import type {
   Incident,
   IncidentSeverity,
   IncidentStatus,
+  PlanningProposal,
+  ProposalStatus,
 } from "@/types/domain";
+import {
+  statusLabels as proposalStatusLabels,
+  typeLabels as proposalTypeLabels,
+} from "@/modules/planning/schemas/proposal.schema";
 
 export type AssetTableRow = {
   id: string;
@@ -36,6 +42,17 @@ export type IncidentTableRow = {
   status: "Investigating" | "Assigned" | "Resolved" | "In Progress";
   technician: string;
   time: string;
+};
+
+export type ProposalTableRow = {
+  id: string;
+  title: string;
+  type: string;
+  status: string;
+  targetArea: string;
+  newCustomers: number;
+  budget: string;
+  owner: string;
 };
 
 const assetKindLabels: Record<AssetKind, string> = {
@@ -198,5 +215,30 @@ export function mapIncidentToTableRow(incident: Incident): IncidentTableRow {
       technicians[stableIndex(incident.id, technicians.length)] ??
       technicians[0],
     time: formatRelativeTimeFromIso(incident.createdAt),
+  };
+}
+
+function formatBudgetUsd(amount: number): string {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits: 0,
+  }).format(amount);
+}
+
+function mapProposalStatus(status: ProposalStatus): string {
+  return proposalStatusLabels[status];
+}
+
+export function mapProposalToTableRow(proposal: PlanningProposal): ProposalTableRow {
+  return {
+    id: proposal.id,
+    title: proposal.title,
+    type: proposalTypeLabels[proposal.type],
+    status: mapProposalStatus(proposal.status),
+    targetArea: proposal.targetArea,
+    newCustomers: proposal.estimatedNewCustomers,
+    budget: formatBudgetUsd(proposal.estimatedBudgetUsd),
+    owner: proposal.owner,
   };
 }

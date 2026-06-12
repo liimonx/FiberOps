@@ -71,10 +71,18 @@ export interface NetworkMapLayer {
   id: string;
   name: string;
   visible: boolean;
-  type: "nodes" | "connections" | "outages" | "coverage" | "customers";
+  type: "nodes" | "connections" | "outages" | "coverage" | "customers" | "planning";
 }
 
-export type ToolType = "select" | "trace" | "measure" | "heatmap" | "impairment";
+export type ToolType =
+  | "select"
+  | "trace"
+  | "measure"
+  | "heatmap"
+  | "impairment"
+  | "plan";
+
+export type PlanDrawMode = "area" | "route";
 
 export interface SearchResult {
   id: string;

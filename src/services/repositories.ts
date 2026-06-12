@@ -1,4 +1,10 @@
-import type { Asset, Customer, Incident, OrganizationSettings } from "@/types/domain";
+import type {
+  Asset,
+  Customer,
+  Incident,
+  OrganizationSettings,
+  PlanningProposal,
+} from "@/types/domain";
 
 export type ListResult<T> = { items: T[] };
 
@@ -42,5 +48,33 @@ export interface IncidentRepository {
 export interface SettingsRepository {
   getOrganization(): Promise<OrganizationSettings>;
   updateOrganization(data: OrganizationSettings): Promise<OrganizationSettings>;
+}
+
+export type CreatePlanningProposalInput = {
+  title: string;
+  description?: string;
+  type: PlanningProposal["type"];
+  targetArea: string;
+  relatedAssetId?: string;
+  estimatedNewCustomers: number;
+  currentUtilizationPercent?: number;
+  projectedUtilizationPercent: number;
+  estimatedBudgetUsd: number;
+  budgetLineItems?: PlanningProposal["budgetLineItems"];
+  owner: string;
+  targetStartDate?: string;
+  targetCompletionDate?: string;
+  notes?: string;
+};
+
+export type UpdatePlanningProposalInput = Partial<
+  Omit<PlanningProposal, "id" | "createdAt" | "updatedAt">
+>;
+
+export interface PlanningProposalRepository {
+  list(): Promise<ListResult<PlanningProposal>>;
+  getById(id: string): Promise<PlanningProposal | null>;
+  create(data: CreatePlanningProposalInput): Promise<PlanningProposal>;
+  update(id: string, data: UpdatePlanningProposalInput): Promise<PlanningProposal>;
 }
 

@@ -51,3 +51,7 @@ export function isOutagesLayerVisible(layers: NetworkMapLayer[]): boolean {
 export function isCoverageLayerVisible(layers: NetworkMapLayer[]): boolean {
   return layers.some((l) => l.id === "coverage" && l.visible);
 }
+
+export function isPlanningLayerVisible(layers: NetworkMapLayer[]): boolean {
+  return layers.some((l) => l.id === "planning-proposals" && l.visible);
+}

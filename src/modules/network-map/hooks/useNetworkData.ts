@@ -50,6 +50,11 @@ export const networkQueryKeys = {
     list: () => [...networkQueryKeys.connections.all, 'list'] as const,
     byNodeId: (nodeId: string) => [...networkQueryKeys.connections.all, 'byNode', nodeId] as const,
   },
+  proposals: {
+    all: ['network', 'proposals'] as const,
+    list: () => [...networkQueryKeys.proposals.all, 'list'] as const,
+    detail: (id: string) => [...networkQueryKeys.proposals.all, 'detail', id] as const,
+  },
 };
 
 // Hook: Fetch all assets

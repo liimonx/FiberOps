@@ -186,6 +186,13 @@ Backend does not need to know these; useful for integration testing.
 
 Network map supports customer deep links via query params handled in `useMapCustomerDeepLink.ts`. Customer ids in URLs must match API ids.
 
+Planning proposals use `useMapPlanningDeepLink.ts`:
+
+- View: `/network-map?proposal=<proposalId>`
+- Edit geometry: `/network-map?proposal=<proposalId>&edit=1`
+
+Helpers live in `src/modules/planning/lib/planningMapNavigation.ts`. The plan draw tool saves geometry via `PATCH /api/planning/proposals/:id`.
+
 ## Troubleshooting
 
 | Symptom | Likely cause |

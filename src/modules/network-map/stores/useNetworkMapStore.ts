@@ -9,6 +9,7 @@ import {
   ViewportState, 
   NetworkMapLayer, 
   ToolType, 
+  PlanDrawMode,
   MapInteractionState, 
   NetworkNode, 
   NetworkConnection,
@@ -17,6 +18,12 @@ import {
   TracePath,
   CategorizedResult
 } from '../types';
+import type {
+  LatLng as DomainLatLng,
+  PlanningAreaGeometry,
+  PlanningProposal,
+  PlanningRouteGeometry,
+} from '@/types/domain';
 import { DEFAULT_LAYERS, MAPBOX_CONFIG } from '../constants';
 
 interface NetworkMapStore {
@@ -90,6 +97,28 @@ interface NetworkMapStore {
   simulateImpairmentOutage: (affectedNodes: string[], affectedConnections: string[]) => void;
   restoreImpairmentServices: () => void;
 
+  // Planning overlays
+  planningOverlays: PlanningProposal[];
+  setPlanningOverlays: (proposals: PlanningProposal[]) => void;
+  activePlanningProposalId: string | null;
+  setActivePlanningProposalId: (id: string | null) => void;
+  planDrawMode: PlanDrawMode;
+  setPlanDrawMode: (mode: PlanDrawMode) => void;
+  planDraftAreas: PlanningAreaGeometry[];
+  planDraftRoutes: PlanningRouteGeometry[];
+  planPendingArea: { center: DomainLatLng; radiusMeters: number } | null;
+  planRouteWaypoints: DomainLatLng[];
+  setPlanPendingArea: (
+    area: { center: DomainLatLng; radiusMeters: number } | null
+  ) => void;
+  addPlanRouteWaypoint: (point: DomainLatLng) => void;
+  removeLastPlanRouteWaypoint: () => void;
+  clearPlanRouteWaypoints: () => void;
+  commitPlanPendingArea: () => void;
+  commitPlanRoute: () => void;
+  setPlanDraftFromProposal: (proposal: PlanningProposal) => void;
+  clearPlanDraft: () => void;
+
   // Selection history for undo/redo
   selectionHistory: string[];
   addToSelectionHistory: (elementId: string) => void;
@@ -151,6 +180,13 @@ export const useNetworkMapStore = create<NetworkMapStore>()(
         impairmentArea: null,
         simulatedOutageActive: false,
         originalStatuses: {},
+        planningOverlays: [],
+        activePlanningProposalId: null,
+        planDrawMode: "area",
+        planDraftAreas: [],
+        planDraftRoutes: [],
+        planPendingArea: null,
+        planRouteWaypoints: [],
         selectionHistory: [],
         isWebSocketConnected: false,
         connectionQuality: 'disconnected',
@@ -420,6 +456,85 @@ export const useNetworkMapStore = create<NetworkMapStore>()(
             };
           }, false, 'simulateImpairmentOutage'),
 
+        setPlanningOverlays: (planningOverlays) =>
+          set({ planningOverlays }, false, "setPlanningOverlays"),
+
+        setActivePlanningProposalId: (activePlanningProposalId) =>
+          set({ activePlanningProposalId }, false, "setActivePlanningProposalId"),
+
+        setPlanDrawMode: (planDrawMode) =>
+          set({ planDrawMode }, false, "setPlanDrawMode"),
+
+        setPlanPendingArea: (planPendingArea) =>
+          set({ planPendingArea }, false, "setPlanPendingArea"),
+
+        addPlanRouteWaypoint: (point) =>
+          set(
+            (state) => ({
+              planRouteWaypoints: [...state.planRouteWaypoints, point],
+            }),
+            false,
+            "addPlanRouteWaypoint"
+          ),
+
+        removeLastPlanRouteWaypoint: () =>
+          set(
+            (state) => ({
+              planRouteWaypoints: state.planRouteWaypoints.slice(0, -1),
+            }),
+            false,
+            "removeLastPlanRouteWaypoint"
+          ),
+
+        clearPlanRouteWaypoints: () =>
+          set({ planRouteWaypoints: [] }, false, "clearPlanRouteWaypoints"),
+
+        commitPlanPendingArea: () =>
+          set((state) => {
+            if (!state.planPendingArea) return state;
+            return {
+              planDraftAreas: [
+                ...state.planDraftAreas,
+                {
+                  type: "circle" as const,
+                  center: state.planPendingArea.center,
+                  radiusMeters: state.planPendingArea.radiusMeters,
+                },
+              ],
+              planPendingArea: null,
+            };
+          }, false, "commitPlanPendingArea"),
+
+        commitPlanRoute: () =>
+          set((state) => {
+            if (state.planRouteWaypoints.length < 2) return state;
+            return {
+              planDraftRoutes: [
+                ...state.planDraftRoutes,
+                { waypoints: [...state.planRouteWaypoints] },
+              ],
+              planRouteWaypoints: [],
+            };
+          }, false, "commitPlanRoute"),
+
+        setPlanDraftFromProposal: (proposal) =>
+          set({
+            planDraftAreas: [...proposal.areas],
+            planDraftRoutes: [...proposal.routes],
+            planPendingArea: null,
+            planRouteWaypoints: [],
+            activePlanningProposalId: proposal.id,
+          }, false, "setPlanDraftFromProposal"),
+
+        clearPlanDraft: () =>
+          set({
+            planDraftAreas: [],
+            planDraftRoutes: [],
+            planPendingArea: null,
+            planRouteWaypoints: [],
+            activePlanningProposalId: null,
+          }, false, "clearPlanDraft"),
+
         restoreImpairmentServices: () =>
           set((state) => {
             if (!state.simulatedOutageActive) return state;
@@ -501,7 +616,14 @@ export const useNetworkMapStore = create<NetworkMapStore>()(
         fps: 60,
         impairmentArea: null,
         simulatedOutageActive: false,
-        originalStatuses: {}
+        originalStatuses: {},
+        planningOverlays: [],
+        activePlanningProposalId: null,
+        planDrawMode: "area",
+        planDraftAreas: [],
+        planDraftRoutes: [],
+        planPendingArea: null,
+        planRouteWaypoints: [],
           }, false, 'reset')
       }),
       {

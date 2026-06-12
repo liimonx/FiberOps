@@ -458,6 +458,48 @@ export class HeatmapTool extends BaseTool {
   }
 }
 
+// Plan Tool - Draw proposed expansion areas and routes
+export class PlanTool extends BaseTool {
+  public readonly id = "plan";
+  public readonly name = "Plan Route / Area";
+  public readonly icon = "Calendar";
+  public readonly description = "Draw proposed expansion areas and fiber routes";
+  public cursor = "crosshair";
+
+  onClick(event: MapMouseEvent): void {
+    const store = useNetworkMapStore.getState();
+
+    if (store.planDrawMode === "area") {
+      const currentRadius = store.planPendingArea?.radiusMeters ?? 500;
+      store.setPlanPendingArea({
+        center: event.lngLat,
+        radiusMeters: currentRadius,
+      });
+      log.info("[PlanTool] Set area center:", event.lngLat);
+      return;
+    }
+
+    store.addPlanRouteWaypoint(event.lngLat);
+    log.info("[PlanTool] Added route waypoint:", event.lngLat);
+  }
+
+  onKeyDown(event: KeyboardEvent): void {
+    const store = useNetworkMapStore.getState();
+
+    if (store.planDrawMode !== "route") return;
+
+    if (event.key === "Backspace" && store.planRouteWaypoints.length > 0) {
+      event.preventDefault();
+      store.removeLastPlanRouteWaypoint();
+      return;
+    }
+
+    if (event.key === "Escape") {
+      store.clearPlanRouteWaypoints();
+    }
+  }
+}
+
 // Impairment Tool - Outage simulation and impact analysis
 export class ImpairmentTool extends BaseTool {
   public readonly id = "impairment";
@@ -502,6 +544,7 @@ export class ToolManager {
     this.registerTool(new MeasureTool());
     this.registerTool(new HeatmapTool());
     this.registerTool(new ImpairmentTool());
+    this.registerTool(new PlanTool());
   }
 
   registerTool(tool: MapTool): void {

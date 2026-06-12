@@ -24,6 +24,8 @@ export { LayerControls } from './LayerControls';
 export { InspectorPanel } from './InspectorPanel';
 
 export { ImpairmentAreaPanel } from './ImpairmentAreaPanel';
+export { PlanningDrawPanel } from './PlanningDrawPanel';
+export { PlanningVisualization } from './PlanningVisualization';
 
 export { 
   ResponsiveContainer, 

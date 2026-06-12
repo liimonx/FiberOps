@@ -59,6 +59,12 @@ export const DEFAULT_LAYERS: NetworkMapLayer[] = [
   { id: "customer-connections", name: "Drop Cables", visible: true, type: "connections" },
   { id: "outages", name: "Active Outages", visible: true, type: "outages" },
   { id: "coverage", name: "Service Coverage", visible: true, type: "coverage" },
+  {
+    id: "planning-proposals",
+    name: "Proposed Expansion",
+    visible: true,
+    type: "planning",
+  },
 ];
 
 // Animation constants

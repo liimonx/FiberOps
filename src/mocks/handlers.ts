@@ -14,10 +14,20 @@ import {
   updateIncident,
 } from "@/mocks/incidentsData";
 import {
+  createPlanningProposal,
+  getPlanningProposalById,
+  getPlanningProposals,
+  updatePlanningProposal,
+} from "@/mocks/planningProposalsData";
+import {
   createIncidentSchema,
   resolveIncidentSchema,
   updateIncidentSchema,
 } from "@/modules/incidents/schemas/incident.schema";
+import {
+  createProposalSchema,
+  updateProposalSchema,
+} from "@/modules/planning/schemas/proposal.schema";
 import {
   createCustomerSchema,
   updateCustomerSchema,
@@ -287,6 +297,66 @@ export const handlers = [
     } catch (error) {
       const message =
         error instanceof Error ? error.message : "Failed to update incident";
+      return HttpResponse.json({ error: message }, { status: 404 });
+    }
+  }),
+
+  http.get("/api/planning/proposals", async () => {
+    await delay(350);
+    return HttpResponse.json({ items: getPlanningProposals() });
+  }),
+
+  http.get("/api/planning/proposals/:id", async ({ params }) => {
+    await delay(300);
+    const proposal = getPlanningProposalById(params.id as string);
+
+    if (!proposal) {
+      return HttpResponse.json(
+        { error: "Planning proposal not found" },
+        { status: 404 }
+      );
+    }
+
+    return HttpResponse.json(proposal);
+  }),
+
+  http.post("/api/planning/proposals", async ({ request }) => {
+    await delay(400);
+    const body = await request.json();
+    const parsed = createProposalSchema.safeParse(body);
+
+    if (!parsed.success) {
+      return HttpResponse.json(
+        { error: "Validation failed", issues: parsed.error.flatten() },
+        { status: 400 }
+      );
+    }
+
+    return HttpResponse.json(createPlanningProposal(parsed.data), {
+      status: 201,
+    });
+  }),
+
+  http.patch("/api/planning/proposals/:id", async ({ request, params }) => {
+    await delay(400);
+    const id = params.id as string;
+    const body = await request.json();
+    const parsed = updateProposalSchema.safeParse(body);
+
+    if (!parsed.success) {
+      return HttpResponse.json(
+        { error: "Validation failed", issues: parsed.error.flatten() },
+        { status: 400 }
+      );
+    }
+
+    try {
+      return HttpResponse.json(updatePlanningProposal(id, parsed.data));
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Failed to update planning proposal";
       return HttpResponse.json({ error: message }, { status: 404 });
     }
   }),

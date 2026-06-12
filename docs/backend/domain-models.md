@@ -130,6 +130,53 @@ new → investigating → assigned → resolved
 
 ---
 
+### PlanningProposal
+
+Network expansion proposal with forecast, budget, and map geometry.
+
+```typescript
+type PlanningProposal = {
+  id: string;
+  title: string;
+  description?: string;
+  type: ProposalType;
+  status: ProposalStatus;
+  targetArea: string;
+  relatedAssetId?: string;
+  estimatedNewCustomers: number;
+  currentUtilizationPercent?: number;
+  projectedUtilizationPercent: number;
+  estimatedBudgetUsd: number;
+  budgetLineItems: BudgetLineItem[];
+  areas: PlanningAreaGeometry[];
+  routes: PlanningRouteGeometry[];
+  owner: string;
+  targetStartDate?: string;
+  targetCompletionDate?: string;
+  notes?: string;
+  createdAt: string;
+  updatedAt: string;
+};
+```
+
+**ProposalType:** `fiber_expansion` | `splitter_upgrade` | `pop_build` | `capacity_upgrade` | `new_market`
+
+**ProposalStatus:** `draft` | `review` | `approved` | `in_progress` | `completed` | `cancelled`
+
+**Geometry types:**
+
+- `PlanningAreaGeometry`: circle (`center`, `radiusMeters`) or polygon (`coordinates[]`)
+- `PlanningRouteGeometry`: `waypoints: LatLng[]` (min 2 points)
+
+**Relationships:**
+
+- `relatedAssetId` → `Asset.id` (optional anchor for capacity context)
+- Map overlays are stored separately from live plant; never merge into operational topology tables
+
+**Status workflow (UI):** `draft` → `review` → `approved` → `in_progress` → `completed`
+
+---
+
 ## Settings entities
 
 ### OrganizationSettings

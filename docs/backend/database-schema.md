@@ -216,6 +216,45 @@ CREATE TABLE billing_settings (
 );
 ```
 
+## Planning proposals
+
+```sql
+CREATE TYPE proposal_status AS ENUM (
+  'draft', 'review', 'approved', 'in_progress', 'completed', 'cancelled'
+);
+
+CREATE TYPE proposal_type AS ENUM (
+  'fiber_expansion', 'splitter_upgrade', 'pop_build', 'capacity_upgrade', 'new_market'
+);
+
+CREATE TABLE planning_proposals (
+  id                        TEXT NOT NULL,
+  organization_id           UUID NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
+  title                     TEXT NOT NULL,
+  description               TEXT,
+  type                      proposal_type NOT NULL,
+  status                    proposal_status NOT NULL DEFAULT 'draft',
+  target_area               TEXT NOT NULL,
+  related_asset_id          TEXT,
+  estimated_new_customers   INTEGER NOT NULL DEFAULT 0,
+  current_utilization_pct   DOUBLE PRECISION,
+  projected_utilization_pct DOUBLE PRECISION NOT NULL,
+  estimated_budget_usd      NUMERIC(14, 2) NOT NULL DEFAULT 0,
+  budget_line_items         JSONB NOT NULL DEFAULT '[]',
+  areas                     JSONB NOT NULL DEFAULT '[]',
+  routes                    JSONB NOT NULL DEFAULT '[]',
+  owner                     TEXT NOT NULL,
+  target_start_date         DATE,
+  target_completion_date    DATE,
+  notes                     TEXT,
+  created_at                TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at                TIMESTAMPTZ NOT NULL DEFAULT now(),
+  PRIMARY KEY (organization_id, id)
+);
+```
+
+`areas`, `routes`, and `budget_line_items` mirror the frontend JSON shapes in `PlanningProposal`.
+
 ## Work orders (planned)
 
 ```sql

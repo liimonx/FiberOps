@@ -209,6 +209,95 @@ On resolve: set `resolvedAt`, update `updatedAt`
 
 ---
 
+## Planning proposals
+
+Network expansion planning at `/planning`. Geometry (areas, routes) is edited on the Network Map via the plan draw tool and saved with `PATCH`.
+
+### List proposals
+
+```
+GET /api/planning/proposals
+```
+
+**Response 200:** `{ "items": PlanningProposal[] }`
+
+**Mock delay:** ~350 ms
+
+### Get proposal
+
+```
+GET /api/planning/proposals/:id
+```
+
+**Response 200:** `PlanningProposal`  
+**Response 404:** `{ "error": "Planning proposal not found" }`
+
+### Create proposal
+
+```
+POST /api/planning/proposals
+```
+
+**Request body:**
+
+```json
+{
+  "title": "Gulshan North Fiber Expansion",
+  "type": "fiber_expansion",
+  "targetArea": "Gulshan North",
+  "relatedAssetId": "pop-gulshan-01",
+  "estimatedNewCustomers": 240,
+  "currentUtilizationPercent": 78,
+  "projectedUtilizationPercent": 62,
+  "estimatedBudgetUsd": 185000,
+  "budgetLineItems": [{ "category": "Fiber cable", "amountUsd": 95000 }],
+  "owner": "Jordan Lee",
+  "targetStartDate": "2026-07-01",
+  "targetCompletionDate": "2026-10-31",
+  "description": "Optional summary",
+  "notes": "Optional notes"
+}
+```
+
+| Field | Validation |
+|-------|------------|
+| `title` | trim, min 3 chars |
+| `type` | `fiber_expansion` \| `splitter_upgrade` \| `pop_build` \| `capacity_upgrade` \| `new_market` |
+| `targetArea` | trim, min 2 chars |
+| `projectedUtilizationPercent` | 0–100 |
+| `estimatedBudgetUsd` | ≥ 0 |
+| `owner` | trim, min 2 chars |
+
+**Response 201:** created `PlanningProposal` with `status: "draft"`, empty `areas` and `routes`
+
+### Update proposal
+
+```
+PATCH /api/planning/proposals/:id
+```
+
+**Request body** (all fields optional):
+
+```json
+{
+  "status": "approved",
+  "areas": [
+    { "type": "circle", "center": { "lat": 23.79, "lng": 90.41 }, "radiusMeters": 800 }
+  ],
+  "routes": [
+    { "waypoints": [{ "lat": 23.79, "lng": 90.41 }, { "lat": 23.80, "lng": 90.42 }] }
+  ],
+  "budgetLineItems": [{ "category": "Labor", "amountUsd": 52000 }]
+}
+```
+
+**Response 200:** updated `PlanningProposal`  
+**Response 404:** `{ "error": "Planning proposal not found" }`
+
+**Map deep links:** `/network-map?proposal=<id>` (view), `/network-map?proposal=<id>&edit=1` (draw)
+
+---
+
 ## Settings — Organization
 
 ### Get organization settings

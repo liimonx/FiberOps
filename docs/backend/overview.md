@@ -141,9 +141,22 @@ DELETE /api/assets/:id
 
 Dashboard combines derived data from assets, incidents, and `/api/stats/usage`. A consolidated `GET /api/stats/dashboard` endpoint would reduce client-side aggregation.
 
-### Reports & planning
+### Reports
 
-Pages exist as stubs. Define reporting APIs when product requirements are finalized.
+The `/reports` page remains a stub. Define reporting APIs when product requirements are finalized.
+
+### Planning (implemented in MSW)
+
+Network Planning at `/planning` is implemented against the mock API:
+
+```
+GET    /api/planning/proposals
+GET    /api/planning/proposals/:id
+POST   /api/planning/proposals
+PATCH  /api/planning/proposals/:id
+```
+
+Map integration uses `/network-map?proposal=<id>` (view) and `&edit=1` (draw tool). See [api-reference.md](./api-reference.md#planning-proposals).
 
 ## Environment variables (backend)
 

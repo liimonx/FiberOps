@@ -33,6 +33,12 @@ import {
 import { ToolVisualizations } from "@/modules/network-map/components/ToolVisualizations";
 import { getToolManager } from "@/modules/network-map/tools/toolManager";
 import { useMapCustomerDeepLink } from "@/modules/network-map/hooks/useMapCustomerDeepLink";
+import {
+  useMapPlanningDeepLink,
+  usePlanningOverlaysSync,
+} from "@/modules/network-map/hooks/useMapPlanningDeepLink";
+import { PlanningVisualization } from "@/modules/network-map/components/PlanningVisualization";
+import { PlanningDrawPanel } from "@/modules/network-map/components/PlanningDrawPanel";
 
 function NetworkMapContent() {
   const nodes = useNodes();
@@ -50,6 +56,8 @@ function NetworkMapContent() {
 
   const mapInstance = useMapInstance();
   useMapCustomerDeepLink({ nodes, mapInstance });
+  useMapPlanningDeepLink({ mapInstance });
+  usePlanningOverlaysSync();
   const selectedConnection = useConnectionById(selectedNode ? null : selectedElementId);
 
   const showHoverTooltip =
@@ -112,7 +120,7 @@ function NetworkMapContent() {
 
   const handleNodeClick = useCallback(
     (nodeId: string) => {
-      if (activeTool === "trace" || activeTool === "measure") return;
+      if (activeTool === "trace" || activeTool === "measure" || activeTool === "plan") return;
 
       // SelectTool owns selection writes when the select tool is active
       if (activeTool !== "select") return;
@@ -177,10 +185,16 @@ function NetworkMapContent() {
           {activeTool === "trace" && <TracePathOverlay />}
           {activeTool === "heatmap" && <HeatmapLegend />}
           {activeTool === "impairment" && <ImpairmentAreaPanel />}
+          {activeTool === "plan" && <PlanningDrawPanel />}
         </div>
       </div>
 
-      {mapInstance && <ToolVisualizations mapInstance={mapInstance} />}
+      {mapInstance && (
+        <>
+          <ToolVisualizations mapInstance={mapInstance} />
+          <PlanningVisualization mapInstance={mapInstance} />
+        </>
+      )}
 
       {showHoverTooltip && tooltip.content && (
         <InteractiveTooltip

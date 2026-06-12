@@ -107,4 +107,13 @@ export const LAYER_CONFIGS: LayerConfigMeta[] = [
     description: "Regional network availability",
     color: "#10b981",
   },
+  {
+    id: "planning-proposals",
+    name: "Proposed Expansion",
+    visible: true,
+    type: "planning",
+    icon: "Calendar",
+    description: "Planned expansion areas and fiber routes",
+    color: "#a78bfa",
+  },
 ];

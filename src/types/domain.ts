@@ -137,3 +137,53 @@ export type TeamSettings = {
   members: TeamMember[];
   invites: TeamInvite[];
 };
+
+export type ProposalStatus =
+  | "draft"
+  | "review"
+  | "approved"
+  | "in_progress"
+  | "completed"
+  | "cancelled";
+
+export type ProposalType =
+  | "fiber_expansion"
+  | "splitter_upgrade"
+  | "pop_build"
+  | "capacity_upgrade"
+  | "new_market";
+
+export type PlanningAreaGeometry =
+  | { type: "circle"; center: LatLng; radiusMeters: number }
+  | { type: "polygon"; coordinates: LatLng[] };
+
+export type PlanningRouteGeometry = { waypoints: LatLng[] };
+
+export type BudgetLineItem = {
+  category: string;
+  amountUsd: number;
+  notes?: string;
+};
+
+export type PlanningProposal = {
+  id: string;
+  title: string;
+  description?: string;
+  type: ProposalType;
+  status: ProposalStatus;
+  targetArea: string;
+  relatedAssetId?: string;
+  estimatedNewCustomers: number;
+  currentUtilizationPercent?: number;
+  projectedUtilizationPercent: number;
+  estimatedBudgetUsd: number;
+  budgetLineItems: BudgetLineItem[];
+  areas: PlanningAreaGeometry[];
+  routes: PlanningRouteGeometry[];
+  owner: string;
+  targetStartDate?: string;
+  targetCompletionDate?: string;
+  notes?: string;
+  createdAt: string;
+  updatedAt: string;
+};

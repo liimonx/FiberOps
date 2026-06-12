@@ -45,6 +45,13 @@ export const MAP_TOOLS: MapToolConfig[] = [
       "Define a blast radius to simulate outages and perform impact analysis.",
     shortcut: "I",
   },
+  {
+    id: "plan",
+    icon: "Calendar",
+    label: "Plan Route / Area",
+    description: "Draw proposed expansion areas and fiber routes.",
+    shortcut: "P",
+  },
 ];
 
 export const MAP_TOOL_SHORTCUTS: Record<string, ToolType> = Object.fromEntries(
