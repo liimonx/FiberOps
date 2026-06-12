@@ -639,8 +639,43 @@ $fiberops-max-widths: sizes.$fiberops-max-widths;
 
 // ── Customers page polish ─────────────────────────────────────────────────────
 
+.u-customers-page {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+  width: 100%;
+
+  > .u-page-header {
+    flex-shrink: 0;
+  }
+
+  @media (min-width: 992px) {
+    padding-block: 0;
+  }
+
+  @media (max-width: 991px) {
+    display: block;
+    height: auto;
+    overflow: visible;
+
+    > .u-page-header {
+      flex-shrink: initial;
+    }
+  }
+}
+
 .u-customers-layout {
   align-items: stretch;
+  flex: 1;
+  min-height: 0;
+
+  @media (min-width: 992px) {
+    flex-wrap: nowrap;
+    margin-bottom: 0 !important;
+  }
 }
 
 .u-customers-profile-col,
@@ -648,6 +683,57 @@ $fiberops-max-widths: sizes.$fiberops-max-widths;
   display: flex;
   flex-direction: column;
   min-width: 0;
+  min-height: 0;
+}
+
+.u-customers-directory-card {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  height: 100%;
+
+  .c-card__body {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+  }
+
+  .u-customers-stats,
+  .u-customers-log-header,
+  .u-customers-filters {
+    flex-shrink: 0;
+  }
+}
+
+.u-customers-profile-col {
+  .c-card {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    height: 100%;
+  }
+
+  .c-card__body {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+  }
+}
+
+.u-customers-table-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+
+  .c-data-table-container {
+    margin-bottom: 0;
+  }
 }
 
 .u-customers-profile-panel {

@@ -235,7 +235,7 @@ export default function CustomersPage() {
   }
 
   return (
-    <Container className="u-page">
+    <Container className="u-page u-customers-page">
       <div className="u-page-header">
         <div>
           <h1 className="u-page-title">Customers</h1>
@@ -254,7 +254,7 @@ export default function CustomersPage() {
 
       <Grid className="u-mb-6 u-customers-layout">
         <GridCol xs={12} lg={7} className="u-customers-directory-col">
-          <Card appearance="outlined">
+          <Card appearance="outlined" className="u-h-100 u-customers-directory-card">
             <div className="u-customers-stats">
               <span className="u-customers-stat">
                 <Icon name="Users" size="sm" />
@@ -335,12 +335,13 @@ export default function CustomersPage() {
               </div>
             </div>
 
-            <div className="u-overflow-x-auto">
+            <div className="u-customers-table-scroll">
               <DataTable
                 columns={columns}
                 data={filteredCustomers}
                 rowKey="id"
                 striped
+                stickyHeader
                 selectionMode="single"
                 selectedRowIds={selectedCustomerId ? [selectedCustomerId] : []}
                 onRowClick={(row: CustomerTableRow) => handleSelectCustomer(row.id)}
