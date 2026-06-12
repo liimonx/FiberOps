@@ -55,6 +55,11 @@ export const networkQueryKeys = {
     list: () => [...networkQueryKeys.proposals.all, 'list'] as const,
     detail: (id: string) => [...networkQueryKeys.proposals.all, 'detail', id] as const,
   },
+  workOrders: {
+    all: ['network', 'workOrders'] as const,
+    list: () => [...networkQueryKeys.workOrders.all, 'list'] as const,
+    detail: (id: string) => [...networkQueryKeys.workOrders.all, 'detail', id] as const,
+  },
 };
 
 // Hook: Fetch all assets
@@ -70,6 +75,7 @@ export function useAssets() {
 
 export { useCustomers } from "@/modules/customers/hooks/useCustomersData";
 export { useIncidents } from "@/modules/incidents/hooks/useIncidentsData";
+export { useWorkOrders } from "@/modules/work-orders/hooks/useWorkOrdersData";
 
 // Hook: Fetch active incidents only
 export function useActiveIncidents() {

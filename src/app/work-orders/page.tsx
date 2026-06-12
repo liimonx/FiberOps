@@ -1,141 +1,202 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import {
+  Badge,
+  Button,
+  Callout,
   Card,
   Container,
   Grid,
   GridCol,
-  Badge,
-  Button,
-  Avatar,
-  Icon,
 } from "@shohojdhara/atomix";
+import {
+  useAssets,
+  useIncidents,
+} from "@/modules/network-map/hooks/useNetworkData";
+import {
+  useUpdateWorkOrder,
+  useWorkOrders,
+} from "@/modules/work-orders/hooks/useWorkOrdersData";
+import { useTeamSettings } from "@/modules/settings/hooks/useTeamSettings";
+import { WorkOrderKanbanBoard } from "@/modules/work-orders/components/WorkOrderKanbanBoard";
+import { WorkOrderTable } from "@/modules/work-orders/components/WorkOrderTable";
+import { WorkOrderDetailPanel } from "@/modules/work-orders/components/WorkOrderDetailPanel";
+import { CreateWorkOrderModal } from "@/modules/work-orders/components/CreateWorkOrderModal";
+import {
+  WorkOrderFilters,
+  type WorkOrderFilterState,
+} from "@/modules/work-orders/components/WorkOrderFilters";
+import { useWorkOrderDeepLink } from "@/modules/work-orders/hooks/useWorkOrderDeepLink";
+import {
+  getHighPriorityOpenWorkOrderCount,
+  getOpenWorkOrderCount,
+  mapWorkOrderToTableRow,
+} from "@/lib/operationsViewMappers";
+import type { WorkOrderStatus } from "@/types/domain";
 
-type Task = {
-  id: string;
-  title: string;
-  priority: string;
-  type: string;
+type ViewMode = "kanban" | "table";
+
+const defaultFilters: WorkOrderFilterState = {
+  search: "",
+  status: "All",
+  priority: "All",
+  workType: "All",
+  assigneeId: "All",
 };
 
-type KanbanData = Record<string, Task[]>;
+function WorkOrdersPageContent() {
+  const { data: orders, isLoading, isError, refetch } = useWorkOrders();
+  const { data: assets } = useAssets();
+  const { data: incidents } = useIncidents();
+  const { data: teamSettings } = useTeamSettings();
+  const { mutateAsync: updateWorkOrder, isPending: isUpdating } = useUpdateWorkOrder();
 
-const initialKanbanData: KanbanData = {
-  New: [{ id: "WO-995", title: "Site Survey - Oak St", priority: "Low", type: "Survey" }],
-  Assigned: [
-    { id: "WO-994", title: "Signal Auditing", priority: "Medium", type: "Audit" },
-  ],
-  "In Progress": [
-    { id: "WO-991", title: "Splice Repair", priority: "Critical", type: "Repair" },
-  ],
-  Review: [
-    { id: "WO-989", title: "Node Beta Upgrades", priority: "High", type: "Upgrade" },
-  ],
-  Done: [
-    { id: "WO-980", title: "Drop Cable Install", priority: "Medium", type: "Install" },
-    { id: "WO-979", title: "Customer Router Setup", priority: "Low", type: "Setup" },
-  ],
-};
+  const [viewMode, setViewMode] = useState<ViewMode>("kanban");
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [filters, setFilters] = useState<WorkOrderFilterState>(defaultFilters);
+  const [showFilters, setShowFilters] = useState(false);
+  const [statusError, setStatusError] = useState<string | null>(null);
 
-export default function WorkOrdersPage() {
-  const [kanbanData, setKanbanData] = useState<KanbanData>(initialKanbanData);
-  const [draggedTask, setDraggedTask] = useState<{
-    task: Task;
-    sourceColumn: string;
-  } | null>(null);
-  const [dragOverColumn, setDragOverColumn] = useState<string | null>(null);
+  const handleSelect = useCallback((id: string) => {
+    setSelectedId(id);
+  }, []);
 
-  const handleDragStart = (task: Task, sourceColumn: string) => {
-    setDraggedTask({ task, sourceColumn });
-  };
+  const { incidentId: defaultIncidentId } = useWorkOrderDeepLink({
+    onSelect: handleSelect,
+  });
 
-  const handleDragOver = (e: React.DragEvent, column: string) => {
-    e.preventDefault();
-    setDragOverColumn(column);
-  };
-
-  const handleDragLeave = () => {
-    setDragOverColumn(null);
-  };
-
-  const handleDrop = (e: React.DragEvent, targetColumn: string) => {
-    e.preventDefault();
-
-    if (!draggedTask) return;
-
-    const { task, sourceColumn } = draggedTask;
-
-    // Don't do anything if dropping in the same column
-    if (sourceColumn === targetColumn) {
-      setDraggedTask(null);
-      setDragOverColumn(null);
-      return;
+  useEffect(() => {
+    if (defaultIncidentId) {
+      setIsCreateModalOpen(true);
     }
+  }, [defaultIncidentId]);
 
-    // Remove from source column
-    const updatedData = { ...kanbanData };
-    updatedData[sourceColumn] = updatedData[sourceColumn].filter((t) => t.id !== task.id);
+  const orderList = orders ?? [];
+  const assetList = assets ?? [];
+  const incidentList = incidents ?? [];
+  const teamMembers = teamSettings?.members ?? [];
 
-    // Add to target column
-    updatedData[targetColumn] = [...updatedData[targetColumn], task];
+  const memberNameById = useMemo(() => {
+    const map = new Map<string, string>();
+    teamMembers.forEach((member) => map.set(member.id, member.name));
+    return map;
+  }, [teamMembers]);
 
-    setKanbanData(updatedData);
-    setDraggedTask(null);
-    setDragOverColumn(null);
+  const filteredOrders = useMemo(() => {
+    const query = filters.search.toLowerCase();
+
+    return orderList.filter((order) => {
+      const assigneeName = order.assigneeId
+        ? memberNameById.get(order.assigneeId) ?? ""
+        : "";
+
+      const matchesSearch =
+        order.id.toLowerCase().includes(query) ||
+        order.title.toLowerCase().includes(query) ||
+        assigneeName.toLowerCase().includes(query);
+
+      const matchesStatus =
+        filters.status === "All" || order.status === filters.status;
+      const matchesPriority =
+        filters.priority === "All" || order.priority === filters.priority;
+      const matchesType =
+        filters.workType === "All" || order.workType === filters.workType;
+      const matchesAssignee =
+        filters.assigneeId === "All" ||
+        (filters.assigneeId === "unassigned"
+          ? !order.assigneeId
+          : order.assigneeId === filters.assigneeId);
+
+      return (
+        matchesSearch &&
+        matchesStatus &&
+        matchesPriority &&
+        matchesType &&
+        matchesAssignee
+      );
+    });
+  }, [orderList, filters, memberNameById]);
+
+  const tableRows = useMemo(
+    () =>
+      filteredOrders.map((order) =>
+        mapWorkOrderToTableRow(order, order.assigneeId ? memberNameById.get(order.assigneeId) : undefined)
+      ),
+    [filteredOrders, memberNameById]
+  );
+
+  const stats = useMemo(() => {
+    const open = getOpenWorkOrderCount(orderList);
+    return {
+      open,
+      highPriority: getHighPriorityOpenWorkOrderCount(orderList),
+      unassigned: orderList.filter(
+        (order) => order.status !== "done" && !order.assigneeId
+      ).length,
+      inReview: orderList.filter((order) => order.status === "review").length,
+    };
+  }, [orderList]);
+
+  const selectedOrder = useMemo(
+    () => orderList.find((order) => order.id === selectedId) ?? null,
+    [orderList, selectedId]
+  );
+
+  const selectedIncident = useMemo(() => {
+    if (!selectedOrder?.relatedIncidentId) return null;
+    return incidentList.find((inc) => inc.id === selectedOrder.relatedIncidentId) ?? null;
+  }, [incidentList, selectedOrder]);
+
+  const selectedAsset = useMemo(() => {
+    if (!selectedOrder?.relatedAssetId) return null;
+    return assetList.find((asset) => asset.id === selectedOrder.relatedAssetId) ?? null;
+  }, [assetList, selectedOrder]);
+
+  const handleStatusChange = async (orderId: string, status: WorkOrderStatus) => {
+    setStatusError(null);
+    try {
+      await updateWorkOrder({ id: orderId, data: { status } });
+    } catch (error) {
+      setStatusError(
+        error instanceof Error ? error.message : "Failed to update work order status."
+      );
+    }
   };
 
-  const handleDragEnd = () => {
-    setDraggedTask(null);
-    setDragOverColumn(null);
-  };
-
-  const getPriorityBadgeVariant = (
-    priority: string
-  ): "error" | "warning" | "success" | "secondary" => {
-    if (priority === "Critical") return "error";
-    if (priority === "High") return "warning";
-    if (priority === "Medium") return "success";
-    return "secondary";
-  };
-
-  const renderCard = (task: Task) => {
-    const badgeVariant = getPriorityBadgeVariant(task.priority);
-
+  if (isLoading) {
     return (
-      <div
-        key={task.id}
-        className="u-mb-3 u-cursor-pointer u-transition-all u-duration-200"
-        draggable
-        onDragStart={() =>
-          handleDragStart(
-            task,
-            Object.keys(kanbanData).find((col) =>
-              kanbanData[col].some((t) => t.id === task.id)
-            ) || ""
-          )
-        }
-        onDragEnd={handleDragEnd}
-        role="article"
-        aria-grabbed={draggedTask?.task.id === task.id}
-        tabIndex={0}
-      >
-        <Card className="u-border u-border-secondary-subtle u-h-100">
-        <div className="u-flex u-justify-between u-items-start u-mb-2">
-          <Badge variant={badgeVariant} label={task.priority} />
-          <Icon name="DotsThree" className="u-text-secondary-emphasis" />
+      <Container className="u-py-4 u-w-100" type="fluid">
+        <div className="u-page-header u-mb-6">
+          <div>
+            <h1 className="u-page-title">Work Orders</h1>
+            <p className="u-page-subtitle">Loading work orders...</p>
+          </div>
         </div>
-        <h4 className="u-text-base u-font-bold u-mb-1">{task.title}</h4>
-        <div className="u-flex u-justify-between u-items-center u-mt-4">
-          <span className="u-font-mono u-text-xs u-text-secondary-emphasis">
-            {task.id}
-          </span>
-          <Avatar initials={task.type} size="sm" />
-        </div>
-        </Card>
-      </div>
+        <Grid>
+          {Array.from({ length: 5 }).map((_, index) => (
+            <GridCol xs={12} sm={6} lg={2} key={index}>
+              <div className="u-bg-dark u-p-3 u-rounded u-h-50 u-border u-border-secondary-subtle" />
+            </GridCol>
+          ))}
+        </Grid>
+      </Container>
     );
-  };
+  }
+
+  if (isError) {
+    return (
+      <Container className="u-py-4 u-w-100" type="fluid">
+        <Callout variant="error" title="Failed to load work orders">
+          <p className="u-text-sm u-mb-3">Could not fetch work order data.</p>
+          <Button variant="primary" size="sm" onClick={() => refetch()}>
+            Retry
+          </Button>
+        </Callout>
+      </Container>
+    );
+  }
 
   return (
     <Container className="u-py-4 u-w-100" type="fluid">
@@ -146,49 +207,140 @@ export default function WorkOrdersPage() {
             Drag-and-drop Kanban board for managing field operations.
           </p>
         </div>
-        <div className="u-flex u-gap-4">
-          <Button variant="outline-secondary" iconName="Funnel">
+        <div className="u-flex u-gap-4 u-flex-wrap">
+          <div className="u-flex u-gap-2">
+            <Button
+              variant={viewMode === "kanban" ? "primary" : "outline-secondary"}
+              size="sm"
+              onClick={() => setViewMode("kanban")}
+            >
+              Kanban
+            </Button>
+            <Button
+              variant={viewMode === "table" ? "primary" : "outline-secondary"}
+              size="sm"
+              onClick={() => setViewMode("table")}
+            >
+              Table
+            </Button>
+          </div>
+          <Button
+            variant="outline-secondary"
+            iconName="Funnel"
+            onClick={() => setShowFilters((value) => !value)}
+          >
             Filter
           </Button>
-          <Button variant="primary" iconName="Plus">
+          <Button
+            variant="primary"
+            iconName="Plus"
+            onClick={() => setIsCreateModalOpen(true)}
+          >
             New Order
           </Button>
         </div>
       </div>
 
       <Grid className="u-mb-6">
-        {Object.entries(kanbanData).map(([column, tasks]) => (
-          <GridCol xs={12} sm={6} lg={2} key={column} className="u-flex-grow-1">
-            <div
-              className={`u-bg-dark u-p-3 u-rounded u-h-100 u-border u-transition-all u-duration-200 ${
-                dragOverColumn === column
-                  ? "u-border-primary u-bg-primary-subtle"
-                  : "u-border-secondary-subtle"
-              }`}
-              onDragOver={(e) => handleDragOver(e, column)}
-              onDragLeave={handleDragLeave}
-              onDrop={(e) => handleDrop(e, column)}
-              role="list"
-              aria-label={`${column} work orders`}
-            >
-              <div className="u-flex u-justify-between u-items-center u-mb-4">
-                <h3 className="u-font-bold u-text-base">{column}</h3>
-                <Badge variant="secondary" label={String(tasks.length)} />
-              </div>
-
-              <div className="u-flex u-flex-column u-h-100 u-min-h-100">
-                {tasks.length === 0 ? (
-                  <div className="u-text-center u-py-8 u-text-secondary-emphasis u-text-sm">
-                    Drop tasks here
-                  </div>
-                ) : (
-                  tasks.map(renderCard)
-                )}
-              </div>
+        <GridCol xs={12} sm={6} lg={3}>
+          <Card>
+            <div className="u-text-xs u-text-secondary-emphasis u-mb-1">Open</div>
+            <div className="u-text-xl u-font-bold">{stats.open}</div>
+          </Card>
+        </GridCol>
+        <GridCol xs={12} sm={6} lg={3}>
+          <Card>
+            <div className="u-text-xs u-text-secondary-emphasis u-mb-1">
+              High priority
             </div>
-          </GridCol>
-        ))}
+            <div className="u-text-xl u-font-bold u-text-warning">
+              {stats.highPriority}
+            </div>
+          </Card>
+        </GridCol>
+        <GridCol xs={12} sm={6} lg={3}>
+          <Card>
+            <div className="u-text-xs u-text-secondary-emphasis u-mb-1">
+              Unassigned
+            </div>
+            <div className="u-text-xl u-font-bold">{stats.unassigned}</div>
+          </Card>
+        </GridCol>
+        <GridCol xs={12} sm={6} lg={3}>
+          <Card>
+            <div className="u-text-xs u-text-secondary-emphasis u-mb-1">
+              In review
+            </div>
+            <div className="u-text-xl u-font-bold">{stats.inReview}</div>
+          </Card>
+        </GridCol>
       </Grid>
+
+      <Card className="u-mb-6">
+        {showFilters && (
+          <WorkOrderFilters
+            filters={filters}
+            assigneeOptions={teamMembers.map((member) => ({
+              id: member.id,
+              name: member.name,
+            }))}
+            onChange={setFilters}
+          />
+        )}
+
+        {statusError && (
+          <Callout variant="error" title="Status update failed" className="u-mb-4">
+            <p className="u-text-sm u-mb-0">{statusError}</p>
+          </Callout>
+        )}
+
+        {viewMode === "kanban" ? (
+          <WorkOrderKanbanBoard
+            orders={filteredOrders}
+            selectedId={selectedId}
+            onSelect={handleSelect}
+            onStatusChange={handleStatusChange}
+            isUpdating={isUpdating}
+          />
+        ) : (
+          <WorkOrderTable
+            rows={tableRows}
+            selectedId={selectedId}
+            onSelect={handleSelect}
+          />
+        )}
+
+      </Card>
+
+      <WorkOrderDetailPanel
+        open={Boolean(selectedOrder)}
+        order={selectedOrder}
+        relatedIncident={selectedIncident}
+        relatedAsset={selectedAsset}
+        teamMembers={teamMembers}
+        onClose={() => setSelectedId(null)}
+      />
+
+      <CreateWorkOrderModal
+        open={isCreateModalOpen}
+        teamMembers={teamMembers}
+        incidents={incidentList}
+        assets={assetList}
+        defaultIncidentId={defaultIncidentId ?? undefined}
+        onClose={() => setIsCreateModalOpen(false)}
+        onCreated={(id) => {
+          setSelectedId(id);
+          setViewMode("kanban");
+        }}
+      />
     </Container>
+  );
+}
+
+export default function WorkOrdersPage() {
+  return (
+    <Suspense fallback={null}>
+      <WorkOrdersPageContent />
+    </Suspense>
   );
 }

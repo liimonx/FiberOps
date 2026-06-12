@@ -112,18 +112,6 @@ When incidents are created/resolved or outages detected, POST signed payloads to
 
 These UI modules exist but have **no backend endpoints** yet. Plan them as separate epics:
 
-### Work orders
-
-Kanban board at `/work-orders` with columns: New, Assigned, In Progress, Review, Done. Suggested future API:
-
-```
-GET    /api/work-orders
-POST   /api/work-orders
-PATCH  /api/work-orders/:id
-```
-
-Suggested entity: `{ id, title, priority, type, status, assigneeId?, relatedIncidentId?, relatedAssetId?, createdAt, updatedAt }`.
-
 ### Assets (write operations)
 
 Frontend only reads assets. Future needs:
@@ -141,9 +129,20 @@ DELETE /api/assets/:id
 
 Dashboard combines derived data from assets, incidents, and `/api/stats/usage`. A consolidated `GET /api/stats/dashboard` endpoint would reduce client-side aggregation.
 
-### Reports
+### Reports (implemented in MSW)
 
-The `/reports` page remains a stub. Define reporting APIs when product requirements are finalized.
+Reports & Analytics at `/reports` aggregates uptime, incident analytics, and exportable reports:
+
+```
+GET  /api/reports/summary
+GET  /api/reports/incidents/analytics?period=30d
+GET  /api/reports/uptime?period=6m
+GET  /api/reports/history
+POST /api/reports/generate
+GET  /api/reports/:id/download
+```
+
+See [api-reference.md](./api-reference.md#reports).
 
 ### Planning (implemented in MSW)
 

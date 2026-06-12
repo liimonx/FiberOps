@@ -135,9 +135,22 @@ Use this checklist against staging:
 - [ ] Integration PATCH preserves existing credentials when fields omitted
 - [ ] Billing sync updates `lastSyncedAt`
 
+### Work orders
+
+- [ ] List, get, create, patch match Zod schemas in `workOrder.schema.ts`
+- [ ] Kanban PATCH accepts all `WorkOrderStatus` values
+- [ ] List supports frontend poll (30 s interval)
+
 ### Stats
 
 - [ ] `GET /api/stats/usage` returns array of `{ label, value }` (13 points)
+
+### Reports
+
+- [ ] `GET /api/reports/summary` returns `ReportsSummary`
+- [ ] Incident analytics and uptime endpoints accept `period` query param
+- [ ] `POST /api/reports/generate` validates against `report.schema.ts` and returns `{ report, download }`
+- [ ] `GET /api/reports/:id/download` returns `ReportDownloadPayload` for history re-downloads
 
 ### WebSocket
 
@@ -178,6 +191,8 @@ TanStack Query keys are centralized in `networkQueryKeys` (`useNetworkData.ts`):
 | `['network', 'customers', 'list']` | Customer create/update |
 | `['network', 'customers', 'detail', id]` | Customer update |
 | `['network', 'incidents', 'list']` | Incident create/update/resolve |
+| `['network', 'workOrders', 'list']` | Work order create/update (Kanban drag) |
+| `['network', 'workOrders', 'detail', id]` | Work order update |
 | `['network', 'assets', 'list']` | Asset status update (future) |
 
 Backend does not need to know these; useful for integration testing.
@@ -192,6 +207,13 @@ Planning proposals use `useMapPlanningDeepLink.ts`:
 - Edit geometry: `/network-map?proposal=<proposalId>&edit=1`
 
 Helpers live in `src/modules/planning/lib/planningMapNavigation.ts`. The plan draw tool saves geometry via `PATCH /api/planning/proposals/:id`.
+
+Work orders use `useWorkOrderDeepLink.ts`:
+
+- Select work order: `/work-orders?selected=<workOrderId>`
+- Prefill create from incident: `/work-orders?incidentId=<incidentId>`
+
+Incidents support `/incidents?selected=<incidentId>` for cross-links from work order detail.
 
 ## Troubleshooting
 
@@ -211,6 +233,8 @@ Helpers live in `src/modules/planning/lib/planningMapNavigation.ts`. The plan dr
 | MSW handlers | `src/mocks/handlers.ts` |
 | Customer API hooks | `src/modules/customers/hooks/useCustomersData.ts` |
 | Incident API hooks | `src/modules/incidents/hooks/useIncidentsData.ts` |
+| Work order API hooks | `src/modules/work-orders/hooks/useWorkOrdersData.ts` |
+| Reports API hooks | `src/modules/reports/hooks/useReportsData.ts` |
 | Network/asset hooks | `src/modules/network-map/hooks/useNetworkData.ts` |
 | Settings hooks | `src/modules/settings/hooks/*.ts` |
 | Topology transform | `src/modules/network-map/utils/dataTransformation.ts` |

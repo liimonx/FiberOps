@@ -3,6 +3,11 @@
 import Link from "next/link";
 import { Card, Button, Icon, Grid, GridCol } from "@shohojdhara/atomix";
 import type { PhosphorIconsType } from "@shohojdhara/atomix";
+import { useWorkOrders } from "@/modules/network-map/hooks/useNetworkData";
+import {
+  getHighPriorityOpenWorkOrderCount,
+  getOpenWorkOrderCount,
+} from "@/lib/operationsViewMappers";
 
 const quickActions: {
   title: string;
@@ -77,6 +82,11 @@ const recentActivity = [
 ];
 
 export default function Home() {
+  const { data: workOrders } = useWorkOrders();
+  const orderList = workOrders ?? [];
+  const openWorkOrderCount = getOpenWorkOrderCount(orderList);
+  const highPriorityCount = getHighPriorityOpenWorkOrderCount(orderList);
+
   return (
     <div className="u-py-6 u-w-100">
       <div className="u-mb-8">
@@ -163,10 +173,12 @@ export default function Home() {
                   <div className="u-text-xs u-text-secondary-emphasis">
                     Open work orders
                   </div>
-                  <div className="u-text-xl u-font-bold">28</div>
+                  <div className="u-text-xl u-font-bold">{openWorkOrderCount}</div>
                 </div>
               </div>
-              <div className="u-text-xs u-text-warning">5 marked high priority</div>
+              <div className="u-text-xs u-text-warning">
+                {highPriorityCount} marked high priority
+              </div>
             </Card>
           </GridCol>
         </Grid>

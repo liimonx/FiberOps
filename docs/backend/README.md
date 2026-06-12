@@ -34,7 +34,7 @@ Use these docs to scaffold one or more backend services (monolith or microservic
 | Incidents | Full CRUD + resolve flow | `incident_alert` (planned) | List polled every 30s |
 | Settings | Organization, integrations, billing, team | — | Multi-tenant by org recommended |
 | Stats | `GET /api/stats/usage` | — | Dashboard chart data |
-| Work orders | **Not implemented** | — | UI uses local state; see [Overview](./overview.md#planned-modules) |
+| Work orders | Full CRUD (list, get, create, patch) | — | Kanban + table at `/work-orders`; list polled every 30s |
 | Network topology | **Derived client-side** | Partial | Backend may expose explicit graph API later |
 
 ## Source files in this repo

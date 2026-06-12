@@ -69,7 +69,7 @@ export const InteractiveTooltip: React.FC<InteractiveTooltipProps> = ({
         height: window.innerHeight,
       };
 
-      const adjusted = { ...position };
+      const adjusted = { x: position.x, y: position.y };
 
       // Adjust X if out of bounds
       if (rect.right > viewport.width) {
@@ -85,9 +85,11 @@ export const InteractiveTooltip: React.FC<InteractiveTooltipProps> = ({
         adjusted.y = offset;
       }
 
-      setAdjustedPosition(adjusted);
+      setAdjustedPosition((prev) =>
+        prev.x === adjusted.x && prev.y === adjusted.y ? prev : adjusted
+      );
     }
-  }, [position, visible, offset]);
+  }, [position.x, position.y, visible, offset]);
 
   const getAnchorStyles = useCallback(() => {
     const base: React.CSSProperties = {

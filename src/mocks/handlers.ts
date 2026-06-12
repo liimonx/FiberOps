@@ -20,6 +20,21 @@ import {
   updatePlanningProposal,
 } from "@/mocks/planningProposalsData";
 import {
+  createWorkOrder,
+  getWorkOrderById,
+  getWorkOrders,
+  updateWorkOrder,
+} from "@/mocks/workOrdersData";
+import {
+  generateReport,
+  getIncidentAnalytics,
+  getReportDownloadById,
+  getReportHistory,
+  getReportsSummary,
+  getUptimeSummary,
+} from "@/mocks/reportsData";
+import { generateReportSchema } from "@/modules/reports/schemas/report.schema";
+import {
   createIncidentSchema,
   resolveIncidentSchema,
   updateIncidentSchema,
@@ -28,6 +43,10 @@ import {
   createProposalSchema,
   updateProposalSchema,
 } from "@/modules/planning/schemas/proposal.schema";
+import {
+  createWorkOrderSchema,
+  updateWorkOrderSchema,
+} from "@/modules/work-orders/schemas/workOrder.schema";
 import {
   createCustomerSchema,
   updateCustomerSchema,
@@ -301,6 +320,59 @@ export const handlers = [
     }
   }),
 
+  http.get("/api/work-orders", async () => {
+    await delay(400);
+    return HttpResponse.json({ items: getWorkOrders() });
+  }),
+
+  http.get("/api/work-orders/:id", async ({ params }) => {
+    await delay(300);
+    const order = getWorkOrderById(params.id as string);
+
+    if (!order) {
+      return HttpResponse.json({ error: "Work order not found" }, { status: 404 });
+    }
+
+    return HttpResponse.json(order);
+  }),
+
+  http.post("/api/work-orders", async ({ request }) => {
+    await delay(400);
+    const body = await request.json();
+    const parsed = createWorkOrderSchema.safeParse(body);
+
+    if (!parsed.success) {
+      return HttpResponse.json(
+        { error: "Validation failed", issues: parsed.error.flatten() },
+        { status: 400 }
+      );
+    }
+
+    return HttpResponse.json(createWorkOrder(parsed.data), { status: 201 });
+  }),
+
+  http.patch("/api/work-orders/:id", async ({ request, params }) => {
+    await delay(400);
+    const id = params.id as string;
+    const body = await request.json();
+    const parsed = updateWorkOrderSchema.safeParse(body);
+
+    if (!parsed.success) {
+      return HttpResponse.json(
+        { error: "Validation failed", issues: parsed.error.flatten() },
+        { status: 400 }
+      );
+    }
+
+    try {
+      return HttpResponse.json(updateWorkOrder(id, parsed.data));
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Failed to update work order";
+      return HttpResponse.json({ error: message }, { status: 404 });
+    }
+  }),
+
   http.get("/api/planning/proposals", async () => {
     await delay(350);
     return HttpResponse.json({ items: getPlanningProposals() });
@@ -527,6 +599,56 @@ export const handlers = [
 
       return HttpResponse.json({ error: message }, { status: 400 });
     }
+  }),
+
+  http.get("/api/reports/summary", async () => {
+    await delay(300);
+    return HttpResponse.json(getReportsSummary());
+  }),
+
+  http.get("/api/reports/incidents/analytics", async ({ request }) => {
+    await delay(300);
+    const period = new URL(request.url).searchParams.get("period") ?? "30d";
+    return HttpResponse.json(getIncidentAnalytics(period));
+  }),
+
+  http.get("/api/reports/uptime", async ({ request }) => {
+    await delay(300);
+    const period = new URL(request.url).searchParams.get("period") ?? "6m";
+    return HttpResponse.json(getUptimeSummary(period));
+  }),
+
+  http.get("/api/reports/history", async () => {
+    await delay(250);
+    return HttpResponse.json({ items: getReportHistory() });
+  }),
+
+  http.get("/api/reports/:id/download", async ({ params }) => {
+    await delay(200);
+    const reportId = params.id as string;
+    const download = getReportDownloadById(reportId);
+
+    if (!download) {
+      return HttpResponse.json({ error: "Report not found" }, { status: 404 });
+    }
+
+    return HttpResponse.json(download);
+  }),
+
+  http.post("/api/reports/generate", async ({ request }) => {
+    await delay(450);
+    const body = await request.json();
+    const parsed = generateReportSchema.safeParse(body);
+
+    if (!parsed.success) {
+      return HttpResponse.json(
+        { error: "Validation failed", issues: parsed.error.flatten() },
+        { status: 400 }
+      );
+    }
+
+    const result = generateReport(parsed.data);
+    return HttpResponse.json(result);
   }),
 
   // Network usage statistics for the dashboard charts

@@ -248,9 +248,14 @@ export const useNetworkMapStore = create<NetworkMapStore>()(
           }), false, 'setSelectedElement'),
 
         setHoveredElement: (elementId) =>
-          set((state) => ({
-            interaction: { ...state.interaction, hoveredElementId: elementId }
-          }), false, 'setHoveredElement'),
+          set((state) => {
+            if (state.interaction.hoveredElementId === elementId) {
+              return state;
+            }
+            return {
+              interaction: { ...state.interaction, hoveredElementId: elementId },
+            };
+          }, false, 'setHoveredElement'),
 
         setDragging: (dragging) =>
           set((state) => ({

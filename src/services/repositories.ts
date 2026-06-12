@@ -1,10 +1,17 @@
 import type {
   Asset,
   Customer,
+  GeneratedReport,
   Incident,
+  IncidentAnalytics,
   OrganizationSettings,
   PlanningProposal,
+  ReportDownloadPayload,
+  ReportsSummary,
+  UptimeSummary,
+  WorkOrder,
 } from "@/types/domain";
+import type { GenerateReportFormValues } from "@/modules/reports/schemas/report.schema";
 
 export type ListResult<T> = { items: T[] };
 
@@ -76,5 +83,37 @@ export interface PlanningProposalRepository {
   getById(id: string): Promise<PlanningProposal | null>;
   create(data: CreatePlanningProposalInput): Promise<PlanningProposal>;
   update(id: string, data: UpdatePlanningProposalInput): Promise<PlanningProposal>;
+}
+
+export type CreateWorkOrderInput = {
+  title: string;
+  priority: WorkOrder["priority"];
+  workType: WorkOrder["workType"];
+  assigneeId?: string;
+  relatedIncidentId?: string;
+  relatedAssetId?: string;
+  notes?: string;
+};
+
+export type UpdateWorkOrderInput = Partial<
+  Omit<WorkOrder, "id" | "createdAt" | "updatedAt">
+>;
+
+export interface WorkOrderRepository {
+  list(): Promise<ListResult<WorkOrder>>;
+  getById(id: string): Promise<WorkOrder | null>;
+  create(data: CreateWorkOrderInput): Promise<WorkOrder>;
+  update(id: string, data: UpdateWorkOrderInput): Promise<WorkOrder>;
+}
+
+export interface ReportsRepository {
+  getSummary(): Promise<ReportsSummary>;
+  getIncidentAnalytics(period: string): Promise<IncidentAnalytics>;
+  getUptimeSummary(period: string): Promise<UptimeSummary>;
+  listHistory(): Promise<ListResult<GeneratedReport>>;
+  generate(
+    data: GenerateReportFormValues
+  ): Promise<{ report: GeneratedReport; download: ReportDownloadPayload }>;
+  getDownload(id: string): Promise<ReportDownloadPayload>;
 }
 

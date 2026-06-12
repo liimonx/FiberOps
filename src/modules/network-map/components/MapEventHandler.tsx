@@ -150,6 +150,34 @@ export const MapEventHandler: React.FC<MapEventHandlerProps> = ({
     };
 
     let hoveredFeature: { id: string; source: string } | null = null;
+    let hoveredElementId: string | null = null;
+    let hoveredKind: "node" | "connection" | null = null;
+
+    const clearHoverState = (event: mapboxgl.MapMouseEvent) => {
+      if (hoveredFeature) {
+        map.setFeatureState(
+          { source: hoveredFeature.source, id: hoveredFeature.id },
+          { hover: false }
+        );
+        hoveredFeature = null;
+      }
+
+      const { onNodeHover: onNode, onConnectionHover: onConn } = callbacksRef.current;
+      const hadHover = hoveredElementId !== null || hoveredKind !== null;
+
+      hoveredElementId = null;
+      hoveredKind = null;
+
+      if (!hadHover) {
+        map.getCanvas().style.cursor = resolveCursor(false);
+        return;
+      }
+
+      setHoveredElement(null);
+      onNode?.(null, event);
+      onConn?.(null, event);
+      map.getCanvas().style.cursor = resolveCursor(false);
+    };
 
     const handleMouseMove = (event: mapboxgl.MapMouseEvent) => {
       const layersToQuery = getNetworkQueryableLayers(map, safeHasLayer);
@@ -159,13 +187,6 @@ export const MapEventHandler: React.FC<MapEventHandlerProps> = ({
         layers: layersToQuery,
       });
 
-      if (hoveredFeature) {
-        map.setFeatureState(
-          { source: hoveredFeature.source, id: hoveredFeature.id },
-          { hover: false }
-        );
-      }
-
       const { onNodeHover: onNode, onConnectionHover: onConn } = callbacksRef.current;
 
       if (features.length > 0) {
@@ -173,54 +194,63 @@ export const MapEventHandler: React.FC<MapEventHandlerProps> = ({
         const elementId = feature.properties?.id as string | undefined;
 
         if (!elementId) {
-          hoveredFeature = null;
-          setHoveredElement(null);
-          onNode?.(null, event);
-          onConn?.(null, event);
-          map.getCanvas().style.cursor = resolveCursor(false);
+          clearHoverState(event);
           return;
         }
 
         const source = (feature.source as string) || "network-nodes";
-        hoveredFeature = { id: elementId, source };
+        const isNode = isNodeLayerId(feature.layer?.id);
+        const isConnection = isConnectionLayerId(feature.layer?.id);
+        const nextKind = isNode ? "node" : isConnection ? "connection" : null;
 
-        map.setFeatureState({ source, id: elementId }, { hover: true });
+        if (
+          hoveredFeature?.id !== elementId ||
+          hoveredFeature?.source !== source
+        ) {
+          if (hoveredFeature) {
+            map.setFeatureState(
+              { source: hoveredFeature.source, id: hoveredFeature.id },
+              { hover: false }
+            );
+          }
+          hoveredFeature = { id: elementId, source };
+          map.setFeatureState({ source, id: elementId }, { hover: true });
+        }
+
         map.getCanvas().style.cursor = resolveCursor(true);
 
-        if (isNodeLayerId(feature.layer?.id)) {
-          setHoveredElement(elementId);
-          onNode?.(elementId, event);
-          onConn?.(null, event);
-        } else if (isConnectionLayerId(feature.layer?.id)) {
-          setHoveredElement(elementId);
-          onConn?.(elementId, event);
-          onNode?.(null, event);
+        if (isNode) {
+          if (hoveredElementId !== elementId || hoveredKind !== "node") {
+            hoveredElementId = elementId;
+            hoveredKind = "node";
+            setHoveredElement(elementId);
+            onNode?.(elementId, event);
+            onConn?.(null, event);
+          } else {
+            onNode?.(elementId, event);
+          }
+        } else if (isConnection) {
+          if (hoveredElementId !== elementId || hoveredKind !== "connection") {
+            hoveredElementId = elementId;
+            hoveredKind = "connection";
+            setHoveredElement(elementId);
+            onConn?.(elementId, event);
+            onNode?.(null, event);
+          } else {
+            onConn?.(elementId, event);
+          }
         }
       } else {
-        hoveredFeature = null;
-        setHoveredElement(null);
-        onNode?.(null, event);
-        onConn?.(null, event);
-        map.getCanvas().style.cursor = resolveCursor(false);
+        clearHoverState(event);
       }
     };
 
     const handleMouseLeave = () => {
-      if (hoveredFeature) {
-        map.setFeatureState(
-          { source: hoveredFeature.source, id: hoveredFeature.id },
-          { hover: false }
-        );
-        hoveredFeature = null;
-      }
-      setHoveredElement(null);
       const noopEvent = {
         point: { x: 0, y: 0 },
         lngLat: { lng: 0, lat: 0 },
       } as mapboxgl.MapMouseEvent;
-      callbacksRef.current.onNodeHover?.(null, noopEvent);
-      callbacksRef.current.onConnectionHover?.(null, noopEvent);
-      map.getCanvas().style.cursor = resolveCursor(false);
+      clearHoverState(noopEvent);
     };
 
     const handleMapMoveEvent = (event: mapboxgl.MapboxEvent) => {

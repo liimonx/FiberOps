@@ -209,6 +209,91 @@ On resolve: set `resolvedAt`, update `updatedAt`
 
 ---
 
+## Work orders
+
+Field operations Kanban at `/work-orders`. Supports Kanban drag-and-drop status updates and a table view toggle.
+
+### List work orders
+
+```
+GET /api/work-orders
+```
+
+**Response 200:** `{ "items": WorkOrder[] }`
+
+**Mock delay:** ~400 ms
+
+**Frontend behavior:** refetch interval 30 s; used by dashboard and home KPIs.
+
+### Get work order
+
+```
+GET /api/work-orders/:id
+```
+
+**Response 200:** `WorkOrder`  
+**Response 404:** `{ "error": "Work order not found" }`
+
+### Create work order
+
+```
+POST /api/work-orders
+```
+
+**Request body:**
+
+```json
+{
+  "title": "Splice Repair",
+  "priority": "critical",
+  "workType": "repair",
+  "assigneeId": "usr-002",
+  "relatedIncidentId": "inc-001",
+  "relatedAssetId": "pole-main-st-01",
+  "notes": "Emergency field dispatch."
+}
+```
+
+| Field | Validation |
+|-------|------------|
+| `title` | trim, min 3 chars |
+| `priority` | `low` \| `medium` \| `high` \| `critical` |
+| `workType` | `survey` \| `audit` \| `repair` \| `upgrade` \| `install` \| `setup` |
+| `assigneeId` | optional team member id |
+| `relatedIncidentId` | optional |
+| `relatedAssetId` | optional |
+| `notes` | optional |
+
+**Response 201:** created `WorkOrder` with `status: "new"`, timestamps
+
+**Side effect (recommended):** emit outbound webhook `work_order.updated`
+
+### Update work order
+
+```
+PATCH /api/work-orders/:id
+```
+
+**Request body (all fields optional):**
+
+```json
+{
+  "status": "in_progress",
+  "assigneeId": "usr-002",
+  "notes": "Field team on site.",
+  "priority": "high"
+}
+```
+
+Kanban drag-and-drop sends `{ "status": "<column>" }` where status is one of: `new`, `assigned`, `in_progress`, `review`, `done`.
+
+**Response 200:** updated `WorkOrder`  
+**Response 404:** `{ "error": "Work order not found" }`
+
+**Side effect (recommended):** webhook `work_order.updated` on any PATCH
+
+---
+
 ## Planning proposals
 
 Network expansion planning at `/planning`. Geometry (areas, routes) is edited on the Network Map via the plan draw tool and saved with `PATCH`.
@@ -573,6 +658,91 @@ GET /api/stats/usage
 
 ---
 
+## Reports
+
+### Summary KPIs
+
+```
+GET /api/reports/summary
+```
+
+**Response 200:** `ReportsSummary` — network uptime, SLA compliance, asset counts, open incidents, MTTR, and reports generated this month.
+
+**Mock delay:** ~300 ms
+
+### Incident analytics
+
+```
+GET /api/reports/incidents/analytics?period=30d
+```
+
+**Query:** `period` — `7d` | `30d` | `90d` | `6m` | `12m` (default `30d`)
+
+**Response 200:** `IncidentAnalytics` — severity/status breakdown, resolution trend, MTTR.
+
+### Uptime summary
+
+```
+GET /api/reports/uptime?period=6m
+```
+
+**Query:** `period` — same values as incident analytics (default `6m`)
+
+**Response 200:** `UptimeSummary` — monthly uptime series, SLA target, outage events.
+
+### Report history
+
+```
+GET /api/reports/history
+```
+
+**Response 200:** `{ "items": GeneratedReport[] }`
+
+### Generate report
+
+```
+POST /api/reports/generate
+```
+
+**Request body:**
+
+```json
+{
+  "type": "uptime_summary",
+  "format": "pdf",
+  "period": "30d"
+}
+```
+
+`type`: `uptime_summary` | `asset_inventory` | `incident_analytics`  
+`format`: `pdf` | `csv`
+
+**Response 200:**
+
+```json
+{
+  "report": { "id": "rpt-003", "type": "asset_inventory", "..." : "..." },
+  "download": {
+    "filename": "asset-inventory-2026-06-12.csv",
+    "mimeType": "text/csv;charset=utf-8",
+    "content": "..."
+  }
+}
+```
+
+The frontend triggers a browser download from `download`. PDF uptime reports are delivered as print-ready HTML.
+
+### Download existing report
+
+```
+GET /api/reports/:id/download
+```
+
+**Response 200:** `ReportDownloadPayload`  
+**Response 404:** `{ "error": "Report not found" }`
+
+---
+
 ## Endpoint index
 
 | Method | Path | Auth (prod) | Status |
@@ -599,6 +769,12 @@ GET /api/stats/usage
 | POST | `/api/settings/team/invites` | admin | Implemented |
 | DELETE | `/api/settings/team/invites/:id` | admin | Implemented |
 | GET | `/api/stats/usage` | viewer+ | Implemented |
+| GET | `/api/reports/summary` | viewer+ | Implemented |
+| GET | `/api/reports/incidents/analytics` | viewer+ | Implemented |
+| GET | `/api/reports/uptime` | viewer+ | Implemented |
+| GET | `/api/reports/history` | viewer+ | Implemented |
+| POST | `/api/reports/generate` | operator+ | Implemented |
+| GET | `/api/reports/:id/download` | viewer+ | Implemented |
 
 ---
 

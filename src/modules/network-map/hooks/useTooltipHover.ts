@@ -52,16 +52,26 @@ export function useTooltipHover(options: UseTooltipHoverOptions = {}) {
       pendingShowRef.current = { content, x, y };
 
       if (showDelay <= 0) {
-        setTooltip({ content, x, y, visible: true });
+        setTooltip((prev) => {
+          if (prev.visible && prev.x === x && prev.y === y) {
+            return prev;
+          }
+          return { content, x, y, visible: true };
+        });
         return;
       }
 
-      setTooltip((prev) => ({
-        content,
-        x,
-        y,
-        visible: prev.visible,
-      }));
+      setTooltip((prev) => {
+        if (prev.x === x && prev.y === y) {
+          return prev;
+        }
+        return {
+          content,
+          x,
+          y,
+          visible: prev.visible,
+        };
+      });
 
       timeoutRef.current = setTimeout(() => {
         const pending = pendingShowRef.current;
@@ -83,7 +93,7 @@ export function useTooltipHover(options: UseTooltipHoverOptions = {}) {
       if (immediate) {
         clearPendingTimeout();
         hoverRef.current = false;
-        setTooltip((prev) => ({ ...prev, visible: false }));
+        setTooltip((prev) => (prev.visible ? { ...prev, visible: false } : prev));
         return;
       }
 
@@ -91,7 +101,7 @@ export function useTooltipHover(options: UseTooltipHoverOptions = {}) {
         clearPendingTimeout();
         timeoutRef.current = setTimeout(() => {
           if (!hoverRef.current) {
-            setTooltip((prev) => ({ ...prev, visible: false }));
+            setTooltip((prev) => (prev.visible ? { ...prev, visible: false } : prev));
           }
         }, delay);
       }
@@ -110,7 +120,7 @@ export function useTooltipHover(options: UseTooltipHoverOptions = {}) {
     if (autoHide) {
       timeoutRef.current = setTimeout(() => {
         if (!hoverRef.current) {
-          setTooltip((prev) => ({ ...prev, visible: false }));
+          setTooltip((prev) => (prev.visible ? { ...prev, visible: false } : prev));
         }
       }, delay);
     }

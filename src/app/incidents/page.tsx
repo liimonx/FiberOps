@@ -1,6 +1,7 @@
 "use client";
 
-import { useCallback, useMemo, useState, type ChangeEvent } from "react";
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState, type ChangeEvent } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   Card,
   Container,
@@ -29,13 +30,29 @@ import { IncidentDetailPanel } from "@/modules/incidents/components/IncidentDeta
 
 type SeverityFilter = "All" | "Critical" | "Warning" | "Low";
 
-export default function IncidentsPage() {
+function IncidentsPageContent() {
   const { data: incidents, isLoading, isError, refetch } = useIncidents();
   const { data: assets } = useAssets();
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const handledDeepLinkRef = useRef<string | null>(null);
   const [severityFilter, setSeverityFilter] = useState<SeverityFilter>("All");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedIncidentId, setSelectedIncidentId] = useState<string | null>(null);
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+
+  useEffect(() => {
+    const selected = searchParams.get("selected");
+    if (!selected || handledDeepLinkRef.current === selected) return;
+
+    handledDeepLinkRef.current = selected;
+    setSelectedIncidentId(selected);
+
+    const nextParams = new URLSearchParams(searchParams.toString());
+    nextParams.delete("selected");
+    const query = nextParams.toString();
+    router.replace(query ? `/incidents?${query}` : "/incidents", { scroll: false });
+  }, [searchParams, router]);
 
   const tableRows = useMemo(
     () => (incidents ?? []).map(mapIncidentToTableRow),
@@ -253,7 +270,7 @@ export default function IncidentsPage() {
               </div>
             </div>
 
-            <div className="u-overflow-x-auto u-mb-6">
+            <div className="u-overflow-x-auto">
               <DataTable
                 columns={columns}
                 data={filteredIncidents}
@@ -271,27 +288,16 @@ export default function IncidentsPage() {
                 emptyMessage="No incidents match your filters."
               />
             </div>
-
-            {selectedIncident ? (
-              <IncidentDetailPanel
-                key={`${selectedIncident.id}-${selectedIncident.updatedAt}`}
-                incident={selectedIncident}
-                relatedAsset={selectedAsset}
-                onClose={() => setSelectedIncidentId(null)}
-              />
-            ) : (
-              <div className="u-border-top u-border-secondary-subtle u-pt-6">
-                <div className="u-incidents-empty">
-                  <Icon name="ClipboardText" size="lg" className="u-text-secondary-emphasis" />
-                  <p className="u-text-sm u-text-secondary-emphasis u-mb-0">
-                    Select an incident to view its timeline, related asset, and resolution notes.
-                  </p>
-                </div>
-              </div>
-            )}
           </Card>
         </GridCol>
       </Grid>
+
+      <IncidentDetailPanel
+        open={Boolean(selectedIncident)}
+        incident={selectedIncident}
+        relatedAsset={selectedAsset}
+        onClose={() => setSelectedIncidentId(null)}
+      />
 
       <ReportIncidentModal
         open={isReportModalOpen}
@@ -300,5 +306,13 @@ export default function IncidentsPage() {
         onCreated={(incidentId) => setSelectedIncidentId(incidentId)}
       />
     </Container>
+  );
+}
+
+export default function IncidentsPage() {
+  return (
+    <Suspense fallback={null}>
+      <IncidentsPageContent />
+    </Suspense>
   );
 }

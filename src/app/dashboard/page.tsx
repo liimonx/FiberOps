@@ -1,5 +1,7 @@
 "use client";
 
+import { useMemo } from "react";
+import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import {
   Card,
@@ -16,19 +18,16 @@ import {
   DonutChart,
 } from "@shohojdhara/atomix";
 import { ClientOnly } from "@/components/ClientOnly";
-import { useActiveIncidents } from "@/modules/network-map/hooks/useNetworkData";
-
-const recentWorkOrders = [
-  { id: "WO-991", title: "Splice Repair", status: "In Progress", technician: "John Doe" },
-  { id: "WO-992", title: "New ONT Install", status: "Pending", technician: "Jane Smith" },
-  {
-    id: "WO-993",
-    title: "Drop Cable Replacement",
-    status: "Completed",
-    technician: "Bob Lee",
-  },
-  { id: "WO-994", title: "Signal Auditing", status: "Pending", technician: "Unassigned" },
-];
+import {
+  useActiveIncidents,
+  useWorkOrders,
+} from "@/modules/network-map/hooks/useNetworkData";
+import { useTeamSettings } from "@/modules/settings/hooks/useTeamSettings";
+import {
+  getHighPriorityOpenWorkOrderCount,
+  getOpenWorkOrderCount,
+  mapWorkOrderToTableRow,
+} from "@/lib/operationsViewMappers";
 
 const customerSegments = [
   { label: "Residential", value: 8400, color: "var(--atomix-primary)" },
@@ -38,8 +37,42 @@ const customerSegments = [
 ];
 
 export default function DashboardPage() {
+  const router = useRouter();
   const { data: activeIncidents } = useActiveIncidents();
+  const { data: workOrders } = useWorkOrders();
+  const { data: teamSettings } = useTeamSettings();
   const activeIncidentCount = activeIncidents?.length ?? 0;
+
+  const orderList = workOrders ?? [];
+  const memberNameById = useMemo(() => {
+    const map = new Map<string, string>();
+    (teamSettings?.members ?? []).forEach((member) => map.set(member.id, member.name));
+    return map;
+  }, [teamSettings?.members]);
+
+  const openWorkOrderCount = getOpenWorkOrderCount(orderList);
+  const highPriorityCount = getHighPriorityOpenWorkOrderCount(orderList);
+
+  const recentWorkOrders = useMemo(() => {
+    return [...orderList]
+      .filter((order) => order.status !== "done")
+      .sort(
+        (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+      )
+      .slice(0, 4)
+      .map((order) => {
+        const row = mapWorkOrderToTableRow(
+          order,
+          order.assigneeId ? memberNameById.get(order.assigneeId) : undefined
+        );
+        return {
+          id: row.id,
+          title: row.title,
+          status: row.status,
+          technician: row.assignee,
+        };
+      });
+  }, [orderList, memberNameById]);
 
   const { data: usageData, isLoading: isUsageLoading } = useQuery({
     queryKey: ["network-trends"],
@@ -135,8 +168,10 @@ export default function DashboardPage() {
               </span>
               <Icon name="Clipboard" className="u-text-warning-emphasis" />
             </div>
-            <div className="u-text-xxl u-font-bold">28</div>
-            <div className="u-text-xs u-text-warning u-mt-2">5 high priority</div>
+            <div className="u-text-xxl u-font-bold">{openWorkOrderCount}</div>
+            <div className="u-text-xs u-text-warning u-mt-2">
+              {highPriorityCount} high priority
+            </div>
           </Card>
         </GridCol>
       </Grid>
@@ -236,7 +271,14 @@ export default function DashboardPage() {
         </GridCol>
         <GridCol xs={12} lg={8}>
           <Card title="Recent Work Orders" className="u-overflow-x-auto u-h-100">
-            <DataTable columns={workOrderColumns} data={recentWorkOrders} rowKey="id" />
+            <DataTable
+              columns={workOrderColumns}
+              data={recentWorkOrders}
+              rowKey="id"
+              onRowClick={(row) =>
+                router.push(`/work-orders?selected=${row.id}`)
+              }
+            />
           </Card>
         </GridCol>
       </Grid>

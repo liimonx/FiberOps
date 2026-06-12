@@ -1,12 +1,13 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import {
   Badge,
   Button,
   Callout,
   Icon,
+  Modal,
   Tabs,
   Textarea,
 } from "@shohojdhara/atomix";
@@ -27,7 +28,8 @@ import { ProposalForecastChart } from "@/modules/planning/components/ProposalFor
 import { ProposalBudgetTable } from "@/modules/planning/components/ProposalBudgetTable";
 
 type ProposalDetailPanelProps = {
-  proposal: PlanningProposal;
+  open: boolean;
+  proposal: PlanningProposal | null;
   relatedAsset: Asset | null;
   onClose: () => void;
 };
@@ -59,12 +61,13 @@ const nextStatusAction: Partial<
 };
 
 export function ProposalDetailPanel({
+  open,
   proposal,
   relatedAsset,
   onClose,
 }: ProposalDetailPanelProps) {
   const [activeTab, setActiveTab] = useState(0);
-  const [notes, setNotes] = useState(() => proposal.notes ?? "");
+  const [notes, setNotes] = useState("");
   const [feedback, setFeedback] = useState<{
     type: "success" | "error";
     message: string;
@@ -77,13 +80,22 @@ export function ProposalDetailPanel({
     error: saveError,
   } = useUpdatePlanningProposal();
 
-  const tableRow = mapProposalToTableRow(proposal);
-  const timeline = buildProposalTimeline(proposal);
+  useEffect(() => {
+    if (!proposal || !open) return;
+    setActiveTab(0);
+    setNotes(proposal.notes ?? "");
+    setFeedback(null);
+  }, [proposal, open]);
+
   const capacity = useMemo(
-    () => computeCapacityContext(proposal, relatedAsset),
+    () => (proposal ? computeCapacityContext(proposal, relatedAsset) : null),
     [proposal, relatedAsset]
   );
 
+  if (!proposal || !capacity) return null;
+
+  const tableRow = mapProposalToTableRow(proposal);
+  const timeline = buildProposalTimeline(proposal);
   const statusAction = nextStatusAction[proposal.status];
 
   const handleStatusAdvance = async () => {
@@ -109,185 +121,200 @@ export function ProposalDetailPanel({
   };
 
   return (
-    <div className="u-border-top u-border-secondary-subtle u-pt-6">
-      <div className="u-flex u-justify-between u-items-start u-mb-4">
+    <Modal
+      isOpen={open}
+      onClose={onClose}
+      title={proposal.id}
+      subtitle={`Created ${formatRelativeTimeFromIso(proposal.createdAt)}`}
+      size="lg"
+      closeButton
+      backdrop
+      keyboard
+      footer={
+        <div className="u-flex u-justify-end u-gap-3 u-w-100">
+          <Button variant="outline-secondary" type="button" onClick={onClose}>
+            Close
+          </Button>
+          {statusAction && (
+            <Button
+              variant="primary"
+              type="button"
+              onClick={handleStatusAdvance}
+              disabled={isSaving}
+            >
+              {isSaving ? "Updating..." : statusAction.label}
+            </Button>
+          )}
+        </div>
+      }
+    >
+      <div className="u-flex u-flex-column u-gap-4">
         <div>
-          <div className="u-flex u-items-center u-gap-2 u-mb-2">
-            <h3 className="u-text-base u-font-bold u-mb-0">{proposal.id}</h3>
-            <span className="u-meta">
-              Created {formatRelativeTimeFromIso(proposal.createdAt)}
-            </span>
-          </div>
-          <p className="u-text-sm u-text-secondary-emphasis u-mb-3">
-            {proposal.title}
-          </p>
+          <p className="u-text-base u-font-bold u-mb-3">{proposal.title}</p>
           <div className="u-flex u-gap-2 u-flex-wrap">
             <Badge variant={statusBadgeVariant(proposal.status)} label={tableRow.status} />
             <Badge variant="secondary" label={tableRow.type} />
             <Badge variant="secondary" label={proposal.owner} />
           </div>
         </div>
-        <Button variant="secondary" size="sm" iconName="X" onClick={onClose} />
-      </div>
 
-      <Tabs activeIndex={activeTab} onTabChange={setActiveTab}>
-        <Tabs.List className="u-mb-4">
-          <Tabs.Trigger index={0}>Overview</Tabs.Trigger>
-          <Tabs.Trigger index={1}>Forecast & Capacity</Tabs.Trigger>
-          <Tabs.Trigger index={2}>Budget</Tabs.Trigger>
-          <Tabs.Trigger index={3}>Map</Tabs.Trigger>
-        </Tabs.List>
-        <Tabs.Panels>
-          <Tabs.Panel index={0}>
-            <div className="u-incidents-timeline u-mb-4">
-              {timeline.map((event) => (
-                <div key={event.id} className="u-incidents-timeline-item">
-                  <div className="u-font-bold u-text-sm">{event.label}</div>
-                  <div className="u-text-secondary-emphasis u-text-xs">
-                    {new Date(event.timestamp).toLocaleString()}
-                    {event.actor ? ` • ${event.actor}` : ""}
-                  </div>
-                </div>
-              ))}
-            </div>
+        {feedback && activeTab === 0 && (
+          <Callout
+            variant={feedback.type === "success" ? "success" : "error"}
+            title={feedback.type === "success" ? "Saved" : "Error"}
+          >
+            <p className="u-text-sm u-mb-0">{feedback.message}</p>
+          </Callout>
+        )}
 
-            <div className="u-p-4 u-bg-dark u-rounded u-border u-border-secondary-subtle u-mb-4">
-              <div className="u-incidents-asset-grid">
-                <div className="u-incidents-asset-row">
-                  <span className="u-text-secondary-emphasis u-text-sm">Target area</span>
-                  <span className="u-text-sm u-text-end">{proposal.targetArea}</span>
-                </div>
-                <div className="u-incidents-asset-row">
-                  <span className="u-text-secondary-emphasis u-text-sm">Type</span>
-                  <span className="u-text-sm u-text-end">{typeLabels[proposal.type]}</span>
-                </div>
-                {relatedAsset && (
-                  <div className="u-incidents-asset-row">
-                    <span className="u-text-secondary-emphasis u-text-sm">Related asset</span>
-                    <span className="u-font-mono u-text-sm u-text-end">{relatedAsset.name}</span>
+        <Tabs activeIndex={activeTab} onTabChange={setActiveTab}>
+          <Tabs.List className="u-mb-4">
+            <Tabs.Trigger index={0}>Overview</Tabs.Trigger>
+            <Tabs.Trigger index={1}>Forecast & Capacity</Tabs.Trigger>
+            <Tabs.Trigger index={2}>Budget</Tabs.Trigger>
+            <Tabs.Trigger index={3}>Map</Tabs.Trigger>
+          </Tabs.List>
+          <Tabs.Panels>
+            <Tabs.Panel index={0}>
+              <div className="u-incidents-timeline u-mb-4">
+                {timeline.map((event) => (
+                  <div key={event.id} className="u-incidents-timeline-item">
+                    <div className="u-font-bold u-text-sm">{event.label}</div>
+                    <div className="u-text-secondary-emphasis u-text-xs">
+                      {new Date(event.timestamp).toLocaleString()}
+                      {event.actor ? ` • ${event.actor}` : ""}
+                    </div>
                   </div>
-                )}
-                {proposal.targetStartDate && (
-                  <div className="u-incidents-asset-row">
-                    <span className="u-text-secondary-emphasis u-text-sm">Target start</span>
-                    <span className="u-text-sm u-text-end">{proposal.targetStartDate}</span>
-                  </div>
-                )}
-                {proposal.targetCompletionDate && (
-                  <div className="u-incidents-asset-row">
-                    <span className="u-text-secondary-emphasis u-text-sm">Target completion</span>
-                    <span className="u-text-sm u-text-end">{proposal.targetCompletionDate}</span>
-                  </div>
-                )}
+                ))}
               </div>
-            </div>
 
-            {proposal.description && (
-              <p className="u-text-sm u-text-secondary-emphasis u-mb-4">
-                {proposal.description}
-              </p>
-            )}
+              <div className="u-p-4 u-bg-dark u-rounded u-border u-border-secondary-subtle u-mb-4">
+                <div className="u-incidents-asset-grid">
+                  <div className="u-incidents-asset-row">
+                    <span className="u-text-secondary-emphasis u-text-sm">Target area</span>
+                    <span className="u-text-sm u-text-end">{proposal.targetArea}</span>
+                  </div>
+                  <div className="u-incidents-asset-row">
+                    <span className="u-text-secondary-emphasis u-text-sm">Type</span>
+                    <span className="u-text-sm u-text-end">{typeLabels[proposal.type]}</span>
+                  </div>
+                  {relatedAsset && (
+                    <div className="u-incidents-asset-row">
+                      <span className="u-text-secondary-emphasis u-text-sm">Related asset</span>
+                      <span className="u-font-mono u-text-sm u-text-end">{relatedAsset.name}</span>
+                    </div>
+                  )}
+                  {proposal.targetStartDate && (
+                    <div className="u-incidents-asset-row">
+                      <span className="u-text-secondary-emphasis u-text-sm">Target start</span>
+                      <span className="u-text-sm u-text-end">{proposal.targetStartDate}</span>
+                    </div>
+                  )}
+                  {proposal.targetCompletionDate && (
+                    <div className="u-incidents-asset-row">
+                      <span className="u-text-secondary-emphasis u-text-sm">Target completion</span>
+                      <span className="u-text-sm u-text-end">
+                        {proposal.targetCompletionDate}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
 
-            <div className="u-mb-4">
-              <label className="u-form-label" htmlFor="proposal-detail-notes">
-                Notes
-              </label>
-              <Textarea
-                id="proposal-detail-notes"
-                rows={3}
-                fullWidth
-                value={notes}
-                onChange={(event) => setNotes(event.target.value)}
-                disabled={isSaving}
-              />
-            </div>
-
-            {(isSaveError || feedback) && (
-              <Callout
-                variant={feedback?.type === "success" || !isSaveError ? "success" : "error"}
-                title={feedback?.type === "success" ? "Saved" : "Action failed"}
-                className="u-mb-4"
-              >
-                <p className="u-text-sm u-mb-0">
-                  {feedback?.message ??
-                    (saveError instanceof Error ? saveError.message : "Please try again.")}
+              {proposal.description && (
+                <p className="u-text-sm u-text-secondary-emphasis u-mb-4">
+                  {proposal.description}
                 </p>
-              </Callout>
-            )}
+              )}
 
-            <div className="u-flex u-justify-end u-gap-4 u-flex-wrap">
-              {statusAction && (
-                <Button
-                  variant="primary"
-                  onClick={handleStatusAdvance}
+              <div className="u-mb-4">
+                <label className="u-form-label" htmlFor="proposal-detail-notes">
+                  Notes
+                </label>
+                <Textarea
+                  id="proposal-detail-notes"
+                  rows={3}
+                  fullWidth
+                  value={notes}
+                  onChange={(event) => setNotes(event.target.value)}
                   disabled={isSaving}
-                >
-                  {isSaving ? "Updating..." : statusAction.label}
-                </Button>
-              )}
-              <Button
-                variant="outline-secondary"
-                onClick={handleSaveNotes}
-                disabled={isSaving || notes === (proposal.notes ?? "")}
-              >
-                {isSaving ? "Saving..." : "Save Notes"}
-              </Button>
-            </div>
-          </Tabs.Panel>
-
-          <Tabs.Panel index={1}>
-            <ProposalForecastChart capacity={capacity} />
-          </Tabs.Panel>
-
-          <Tabs.Panel index={2}>
-            <ProposalBudgetTable
-              lineItems={proposal.budgetLineItems}
-              totalUsd={proposal.estimatedBudgetUsd}
-            />
-          </Tabs.Panel>
-
-          <Tabs.Panel index={3}>
-            <div className="u-p-4 u-bg-dark u-rounded u-border u-border-secondary-subtle u-mb-4">
-              <div className="u-flex u-gap-4 u-mb-4">
-                <div>
-                  <div className="u-text-2xl u-font-bold">{proposal.areas.length}</div>
-                  <div className="u-text-sm u-text-secondary-emphasis">Expansion areas</div>
-                </div>
-                <div>
-                  <div className="u-text-2xl u-font-bold">{proposal.routes.length}</div>
-                  <div className="u-text-sm u-text-secondary-emphasis">Proposed routes</div>
-                </div>
+                />
               </div>
 
-              {proposal.areas.length === 0 && proposal.routes.length === 0 ? (
-                <div className="u-incidents-empty">
-                  <Icon name="MapPin" size="lg" className="u-text-secondary-emphasis" />
-                  <p className="u-text-sm u-text-secondary-emphasis u-mb-0">
-                    No map geometry defined yet. Use Edit on Map to draw expansion areas and routes.
+              {isSaveError && (
+                <Callout variant="error" title="Action failed" className="u-mb-4">
+                  <p className="u-text-sm u-mb-0">
+                    {saveError instanceof Error ? saveError.message : "Please try again."}
                   </p>
-                </div>
-              ) : (
-                <p className="u-text-sm u-text-secondary-emphasis u-mb-0">
-                  Geometry is ready to view on the Network Map.
-                </p>
+                </Callout>
               )}
-            </div>
 
-            <div className="u-flex u-gap-3 u-flex-wrap">
-              <Link href={getPlanningMapUrl(proposal.id)}>
-                <Button variant="outline-secondary" iconName="MapTrifold">
-                  View on Map
+              <div className="u-flex u-justify-end">
+                <Button
+                  variant="outline-secondary"
+                  onClick={handleSaveNotes}
+                  disabled={isSaving || notes === (proposal.notes ?? "")}
+                >
+                  {isSaving ? "Saving..." : "Save Notes"}
                 </Button>
-              </Link>
-              <Link href={getPlanningMapUrl(proposal.id, { edit: true })}>
-                <Button variant="primary" iconName="PencilSimple">
-                  Edit on Map
-                </Button>
-              </Link>
-            </div>
-          </Tabs.Panel>
-        </Tabs.Panels>
-      </Tabs>
-    </div>
+              </div>
+            </Tabs.Panel>
+
+            <Tabs.Panel index={1}>
+              <ProposalForecastChart capacity={capacity} />
+            </Tabs.Panel>
+
+            <Tabs.Panel index={2}>
+              <ProposalBudgetTable
+                lineItems={proposal.budgetLineItems}
+                totalUsd={proposal.estimatedBudgetUsd}
+              />
+            </Tabs.Panel>
+
+            <Tabs.Panel index={3}>
+              <div className="u-p-4 u-bg-dark u-rounded u-border u-border-secondary-subtle u-mb-4">
+                <div className="u-flex u-gap-4 u-mb-4">
+                  <div>
+                    <div className="u-text-2xl u-font-bold">{proposal.areas.length}</div>
+                    <div className="u-text-sm u-text-secondary-emphasis">Expansion areas</div>
+                  </div>
+                  <div>
+                    <div className="u-text-2xl u-font-bold">{proposal.routes.length}</div>
+                    <div className="u-text-sm u-text-secondary-emphasis">Proposed routes</div>
+                  </div>
+                </div>
+
+                {proposal.areas.length === 0 && proposal.routes.length === 0 ? (
+                  <div className="u-incidents-empty">
+                    <Icon name="MapPin" size="lg" className="u-text-secondary-emphasis" />
+                    <p className="u-text-sm u-text-secondary-emphasis u-mb-0">
+                      No map geometry defined yet. Use Edit on Map to draw expansion areas and
+                      routes.
+                    </p>
+                  </div>
+                ) : (
+                  <p className="u-text-sm u-text-secondary-emphasis u-mb-0">
+                    Geometry is ready to view on the Network Map.
+                  </p>
+                )}
+              </div>
+
+              <div className="u-flex u-gap-3 u-flex-wrap">
+                <Link href={getPlanningMapUrl(proposal.id)}>
+                  <Button variant="outline-secondary" iconName="MapTrifold">
+                    View on Map
+                  </Button>
+                </Link>
+                <Link href={getPlanningMapUrl(proposal.id, { edit: true })}>
+                  <Button variant="primary" iconName="PencilSimple">
+                    Edit on Map
+                  </Button>
+                </Link>
+              </div>
+            </Tabs.Panel>
+          </Tabs.Panels>
+        </Tabs>
+      </div>
+    </Modal>
   );
 }

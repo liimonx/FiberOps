@@ -10,7 +10,15 @@ import type {
   IncidentStatus,
   PlanningProposal,
   ProposalStatus,
+  WorkOrder,
+  WorkOrderPriority,
+  WorkOrderStatus,
 } from "@/types/domain";
+import {
+  priorityLabels,
+  statusLabels as workOrderStatusLabels,
+  workTypeLabels,
+} from "@/modules/work-orders/schemas/workOrder.schema";
 import {
   statusLabels as proposalStatusLabels,
   typeLabels as proposalTypeLabels,
@@ -53,6 +61,16 @@ export type ProposalTableRow = {
   newCustomers: number;
   budget: string;
   owner: string;
+};
+
+export type WorkOrderTableRow = {
+  id: string;
+  title: string;
+  priority: string;
+  type: string;
+  status: string;
+  assignee: string;
+  updated: string;
 };
 
 const assetKindLabels: Record<AssetKind, string> = {
@@ -241,4 +259,39 @@ export function mapProposalToTableRow(proposal: PlanningProposal): ProposalTable
     budget: formatBudgetUsd(proposal.estimatedBudgetUsd),
     owner: proposal.owner,
   };
+}
+
+function mapWorkOrderPriority(priority: WorkOrderPriority): string {
+  return priorityLabels[priority];
+}
+
+function mapWorkOrderStatus(status: WorkOrderStatus): string {
+  return workOrderStatusLabels[status];
+}
+
+export function mapWorkOrderToTableRow(
+  order: WorkOrder,
+  assigneeName?: string
+): WorkOrderTableRow {
+  return {
+    id: order.id,
+    title: order.title,
+    priority: mapWorkOrderPriority(order.priority),
+    type: workTypeLabels[order.workType],
+    status: mapWorkOrderStatus(order.status),
+    assignee: assigneeName ?? "Unassigned",
+    updated: formatRelativeTimeFromIso(order.updatedAt),
+  };
+}
+
+export function getOpenWorkOrderCount(orders: WorkOrder[]): number {
+  return orders.filter((order) => order.status !== "done").length;
+}
+
+export function getHighPriorityOpenWorkOrderCount(orders: WorkOrder[]): number {
+  return orders.filter(
+    (order) =>
+      order.status !== "done" &&
+      (order.priority === "high" || order.priority === "critical")
+  ).length;
 }

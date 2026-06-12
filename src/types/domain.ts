@@ -52,6 +52,37 @@ export type Incident = {
   resolvedAt?: string;
 };
 
+export type WorkOrderStatus =
+  | "new"
+  | "assigned"
+  | "in_progress"
+  | "review"
+  | "done";
+
+export type WorkOrderPriority = "low" | "medium" | "high" | "critical";
+
+export type WorkOrderType =
+  | "survey"
+  | "audit"
+  | "repair"
+  | "upgrade"
+  | "install"
+  | "setup";
+
+export type WorkOrder = {
+  id: string;
+  title: string;
+  priority: WorkOrderPriority;
+  workType: WorkOrderType;
+  status: WorkOrderStatus;
+  assigneeId?: string;
+  relatedIncidentId?: string;
+  relatedAssetId?: string;
+  notes?: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
 export type OrganizationSettings = {
   organizationName: string;
   supportEmail: string;
@@ -186,4 +217,74 @@ export type PlanningProposal = {
   notes?: string;
   createdAt: string;
   updatedAt: string;
+};
+
+export type ReportType =
+  | "uptime_summary"
+  | "asset_inventory"
+  | "incident_analytics";
+
+export type ReportFormat = "pdf" | "csv";
+
+export type ReportStatus = "ready" | "generating" | "failed";
+
+export type ReportPeriod = "7d" | "30d" | "90d" | "6m" | "12m";
+
+export type GeneratedReport = {
+  id: string;
+  type: ReportType;
+  format: ReportFormat;
+  title: string;
+  status: ReportStatus;
+  period: ReportPeriod;
+  generatedAt: string;
+  generatedBy: string;
+  fileSizeBytes: number;
+};
+
+export type ReportsSummary = {
+  networkUptimePercent: number;
+  slaTargetPercent: number;
+  slaCompliant: boolean;
+  totalAssets: number;
+  degradedAssets: number;
+  openIncidents: number;
+  avgResolutionHours: number;
+  reportsGeneratedThisMonth: number;
+};
+
+export type ChartDataPoint = {
+  label: string;
+  value: number;
+  color?: string;
+};
+
+export type UptimeOutageEvent = {
+  date: string;
+  durationMinutes: number;
+  affectedCustomers: number;
+  cause: string;
+};
+
+export type UptimeSummary = {
+  monthlyUptime: ChartDataPoint[];
+  slaTarget: number;
+  currentMonthUptime: number;
+  outageEvents: UptimeOutageEvent[];
+};
+
+export type IncidentAnalytics = {
+  bySeverity: ChartDataPoint[];
+  byStatus: ChartDataPoint[];
+  resolutionTrend: ChartDataPoint[];
+  avgResolutionBySeverity: ChartDataPoint[];
+  mttrHours: number;
+  totalIncidents: number;
+  resolvedIncidents: number;
+};
+
+export type ReportDownloadPayload = {
+  filename: string;
+  mimeType: string;
+  content: string;
 };

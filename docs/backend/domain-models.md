@@ -130,6 +130,53 @@ new → investigating → assigned → resolved
 
 ---
 
+### WorkOrder
+
+Field task tracked through a Kanban workflow.
+
+```typescript
+type WorkOrder = {
+  id: string;
+  title: string;
+  priority: WorkOrderPriority;
+  workType: WorkOrderType;
+  status: WorkOrderStatus;
+  assigneeId?: string;
+  relatedIncidentId?: string;
+  relatedAssetId?: string;
+  notes?: string;
+  createdAt: string;
+  updatedAt: string;
+};
+```
+
+**WorkOrderPriority:** `low` | `medium` | `high` | `critical`
+
+**WorkOrderType:** `survey` | `audit` | `repair` | `upgrade` | `install` | `setup`
+
+**WorkOrderStatus:** `new` | `assigned` | `in_progress` | `review` | `done`
+
+**Status workflow (Kanban columns):**
+
+```
+new → assigned → in_progress → review → done
+```
+
+**Relationships:**
+
+- `assigneeId` → `TeamMember.id`
+- `relatedIncidentId` → `Incident.id`
+- `relatedAssetId` → `Asset.id`
+
+**Business rules:**
+
+- `POST /api/work-orders` → initial status `new`
+- Assigning an assignee from `new` may auto-advance to `assigned` (frontend behavior)
+- Open work orders: `status !== "done"`
+- `updatedAt` must change on every PATCH
+
+---
+
 ### PlanningProposal
 
 Network expansion proposal with forecast, budget, and map geometry.
@@ -289,6 +336,39 @@ type TeamSettings = {
 | `admin` | Full access including settings and billing |
 | `operator` | Operations: incidents, customers, work orders |
 | `viewer` | Read-only dashboards and reports |
+
+### Reports & analytics
+
+```typescript
+type ReportType = "uptime_summary" | "asset_inventory" | "incident_analytics";
+type ReportFormat = "pdf" | "csv";
+type ReportPeriod = "7d" | "30d" | "90d" | "6m" | "12m";
+
+type GeneratedReport = {
+  id: string;
+  type: ReportType;
+  format: ReportFormat;
+  title: string;
+  status: "ready" | "generating" | "failed";
+  period: ReportPeriod;
+  generatedAt: string;
+  generatedBy: string;
+  fileSizeBytes: number;
+};
+
+type ReportsSummary = {
+  networkUptimePercent: number;
+  slaTargetPercent: number;
+  slaCompliant: boolean;
+  totalAssets: number;
+  degradedAssets: number;
+  openIncidents: number;
+  avgResolutionHours: number;
+  reportsGeneratedThisMonth: number;
+};
+```
+
+Analytics payloads (`IncidentAnalytics`, `UptimeSummary`) are derived from live assets and incidents in MSW. Exports are generated server-side in the mock and downloaded client-side.
 
 ---
 

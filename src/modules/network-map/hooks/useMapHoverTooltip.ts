@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import mapboxgl from "mapbox-gl";
 import { NetworkNode, NetworkConnection } from "../types";
 import { useTooltipHover } from "./useTooltipHover";
@@ -46,14 +46,21 @@ export function useMapHoverTooltip({
   });
 
   const clearHoverTarget = useCallback(() => {
-    setHoverTarget({ node: null, connection: null });
+    setHoverTarget((prev) =>
+      prev.node || prev.connection ? { node: null, connection: null } : prev
+    );
   }, []);
+
+  useEffect(() => {
+    if (!enabled) {
+      hideTooltip(true);
+      clearHoverTarget();
+    }
+  }, [enabled, hideTooltip, clearHoverTarget]);
 
   const handleNodeHover = useCallback(
     (nodeId: string | null, event: mapboxgl.MapMouseEvent) => {
       if (!enabled) {
-        hideTooltip(true);
-        clearHoverTarget();
         return;
       }
 
@@ -76,8 +83,6 @@ export function useMapHoverTooltip({
   const handleConnectionHover = useCallback(
     (connectionId: string | null, event: mapboxgl.MapMouseEvent) => {
       if (!enabled) {
-        hideTooltip(true);
-        clearHoverTarget();
         return;
       }
 

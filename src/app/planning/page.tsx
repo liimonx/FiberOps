@@ -282,7 +282,7 @@ export default function PlanningPage() {
           </div>
         </div>
 
-        <div className="u-overflow-x-auto u-mb-6">
+        <div className="u-overflow-x-auto">
           <DataTable
             columns={columns}
             data={filteredProposals}
@@ -300,25 +300,14 @@ export default function PlanningPage() {
             emptyMessage="No proposals match your filters."
           />
         </div>
-
-        {selectedProposal ? (
-          <ProposalDetailPanel
-            key={`${selectedProposal.id}-${selectedProposal.updatedAt}`}
-            proposal={selectedProposal}
-            relatedAsset={selectedAsset}
-            onClose={() => setSelectedProposalId(null)}
-          />
-        ) : (
-          <div className="u-border-top u-border-secondary-subtle u-pt-6">
-            <div className="u-incidents-empty">
-              <Icon name="Calendar" size="lg" className="u-text-secondary-emphasis" />
-              <p className="u-text-sm u-text-secondary-emphasis u-mb-0">
-                Select a proposal to view forecast, budget, and map geometry.
-              </p>
-            </div>
-          </div>
-        )}
       </Card>
+
+      <ProposalDetailPanel
+        open={Boolean(selectedProposal)}
+        proposal={selectedProposal}
+        relatedAsset={selectedAsset}
+        onClose={() => setSelectedProposalId(null)}
+      />
 
       <CreateProposalModal
         open={isCreateModalOpen}

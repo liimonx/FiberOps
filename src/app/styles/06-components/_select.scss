@@ -11,55 +11,55 @@
 @use "../01-settings/tokens" as tok;
 @use "../01-settings/select" as sl;
 
-// =============================================================================
-// Additive Polish
-// =============================================================================
-.c-select {
-  // Trigger — transitions for border + shadow
-  &__trigger,
-  &__control {
-    transition:
-      border-color tok.$transition-duration tok.$easing,
-      box-shadow tok.$transition-duration tok.$easing,
-      background-color 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+// // =============================================================================
+// // Additive Polish
+// // =============================================================================
+// .c-select {
+//   // Trigger — transitions for border + shadow
+//   &__trigger,
+//   &__control {
+//     transition:
+//       border-color tok.$transition-duration tok.$easing,
+//       box-shadow tok.$transition-duration tok.$easing,
+//       background-color 0.3s cubic-bezier(0.23, 1, 0.32, 1);
 
-    &:focus,
-    &.is-open,
-    &:focus-within {
-      border-color: var(--atomix-primary);
-      box-shadow: tok.$input-focus-ring;
-    }
-  }
+//     &:focus,
+//     &.is-open,
+//     &:focus-within {
+//       border-color: var(--atomix-primary);
+//       box-shadow: tok.$input-focus-ring;
+//     }
+//   }
 
-  // Panel — open animation
-  &__panel,
-  &__menu {
-    animation: select-open 0.2s cubic-bezier(0.16, 1, 0.3, 1) both;
-  }
+//   // Panel — open animation
+//   &__panel,
+//   &__menu {
+//     animation: select-open 0.2s cubic-bezier(0.16, 1, 0.3, 1) both;
+//   }
 
-  // Item
-  &__item,
-  &__option {
-    border-radius: 0.5rem;
-    transition:
-      background-color 0.3s cubic-bezier(0.23, 1, 0.32, 1),
-      color 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+//   // Item
+//   &__item,
+//   &__option {
+//     border-radius: 0.5rem;
+//     transition:
+//       background-color 0.3s cubic-bezier(0.23, 1, 0.32, 1),
+//       color 0.3s cubic-bezier(0.23, 1, 0.32, 1);
 
-    &.is-selected {
-      color: var(--atomix-brand-text-emphasis);
-      background-color: var(--atomix-brand-bg-subtle);
-      font-weight: 600;
-    }
-  }
-}
+//     &.is-selected {
+//       color: var(--atomix-brand-text-emphasis);
+//       background-color: var(--atomix-brand-bg-subtle);
+//       font-weight: 600;
+//     }
+//   }
+// }
 
-@keyframes select-open {
-  from {
-    opacity: 0;
-    transform: translateY(-6px) scale(0.97);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
+// @keyframes select-open {
+//   from {
+//     opacity: 0;
+//     transform: translateY(-6px) scale(0.97);
+//   }
+//   to {
+//     opacity: 1;
+//     transform: translateY(0) scale(1);
+//   }
+// }
