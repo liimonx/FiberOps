@@ -6,6 +6,7 @@ import "mapbox-gl/dist/mapbox-gl.css";
 import Link from "next/link";
 import { Button, Icon } from "@shohojdhara/atomix";
 import { MAPBOX_CONFIG } from "@/modules/network-map/constants";
+import { customerStatusColors } from "@/lib/themeColors";
 import type { Customer } from "@/types/domain";
 
 type CustomerMapPreviewProps = {
@@ -21,11 +22,7 @@ type CustomerMarker = {
   status: Customer["status"];
 };
 
-const statusColors: Record<Customer["status"], string> = {
-  online: "#22c55e",
-  unstable: "#f59e0b",
-  offline: "#ef4444",
-};
+const statusColors = customerStatusColors;
 
 export function CustomerMapPreview({
   customers,
@@ -95,17 +92,17 @@ export function CustomerMapPreview({
         const isSelected = markerData.customerId === selectedId;
         const element = document.createElement("button");
         element.type = "button";
-        element.className = `u-customers-map-marker${isSelected ? " u-customers-map-marker--selected" : ""}`;
+        element.className = `u-map-marker${isSelected ? " u-map-marker--selected" : ""}`;
         element.setAttribute("aria-label", `Select customer ${markerData.customerId}`);
         element.style.width = isSelected ? "28px" : "22px";
         element.style.height = isSelected ? "28px" : "22px";
         element.style.borderRadius = "50%";
         element.style.border = isSelected
-          ? "3px solid #ffffff"
+          ? "3px solid var(--atomix-white, #ffffff)"
           : "2px solid rgba(255,255,255,0.8)";
         element.style.background = statusColors[markerData.status];
         element.style.boxShadow = isSelected
-          ? "0 0 0 4px rgba(34, 197, 94, 0.35)"
+          ? "0 0 0 4px rgba(var(--atomix-success-rgb, 25, 135, 84), 0.35)"
           : "0 0 0 2px rgba(0, 0, 0, 0.2)";
 
         element.addEventListener("click", (event) => {
@@ -130,7 +127,7 @@ export function CustomerMapPreview({
 
   if (mapError) {
     return (
-      <div className="u-customers-map-shell u-flex u-flex-column u-p-4">
+      <div className="u-map-preview-shell u-flex u-flex-column u-p-4">
         <p className="u-text-sm u-text-secondary-emphasis u-mb-3">{mapError}</p>
         <ul className="u-text-sm u-mb-4 u-flex-grow-1">
           {markers.map((marker) => (
@@ -159,9 +156,9 @@ export function CustomerMapPreview({
   }
 
   return (
-    <div className="u-customers-map-shell">
-      <div ref={mapContainer} className="u-w-100 u-h-100" role="application" />
-      <div className="u-customers-map-badge">
+    <div className="u-map-preview-shell">
+      <div ref={mapContainer} className="u-map-preview-canvas" role="application" />
+      <div className="u-map-preview-badge">
         <Icon name="Users" size="sm" className="u-text-primary" />
         <span>
           {markers.length} {markers.length === 1 ? "customer" : "customers"} on map

@@ -6,6 +6,7 @@ import "mapbox-gl/dist/mapbox-gl.css";
 import Link from "next/link";
 import { Button, Icon } from "@shohojdhara/atomix";
 import { MAPBOX_CONFIG } from "@/modules/network-map/constants";
+import { incidentSeverityColors } from "@/lib/themeColors";
 import type { Asset, Incident } from "@/types/domain";
 
 type IncidentMapPreviewProps = {
@@ -22,12 +23,7 @@ type IncidentMarker = {
   severity: Incident["severity"];
 };
 
-const severityColors: Record<Incident["severity"], string> = {
-  critical: "#ef4444",
-  high: "#f97316",
-  medium: "#f59e0b",
-  low: "#6b7280",
-};
+const severityColors = incidentSeverityColors;
 
 export function IncidentMapPreview({
   incidents,
@@ -142,17 +138,17 @@ export function IncidentMapPreview({
         const isSelected = markerData.incidentId === selectedId;
         const element = document.createElement("button");
         element.type = "button";
-        element.className = `u-incidents-map-marker${isSelected ? " u-incidents-map-marker--selected" : ""}`;
+        element.className = `u-map-marker${isSelected ? " u-map-marker--selected" : ""}`;
         element.setAttribute("aria-label", `Select incident ${markerData.incidentId}`);
         element.style.width = isSelected ? "28px" : "22px";
         element.style.height = isSelected ? "28px" : "22px";
         element.style.borderRadius = "50%";
         element.style.border = isSelected
-          ? "3px solid #ffffff"
+          ? "3px solid var(--atomix-white, #ffffff)"
           : "2px solid rgba(255,255,255,0.8)";
         element.style.background = severityColors[markerData.severity];
         element.style.boxShadow = isSelected
-          ? "0 0 0 4px rgba(239, 68, 68, 0.35)"
+          ? "0 0 0 4px rgba(var(--atomix-error-rgb, 220, 53, 69), 0.35)"
           : "0 0 0 2px rgba(0, 0, 0, 0.2)";
 
         element.addEventListener("click", (event) => {
@@ -177,7 +173,7 @@ export function IncidentMapPreview({
 
   if (mapError) {
     return (
-      <div className="u-incidents-map-shell u-flex u-flex-column u-p-4">
+      <div className="u-map-preview-shell u-flex u-flex-column u-p-4">
         <p className="u-text-sm u-text-secondary-emphasis u-mb-3">{mapError}</p>
         <ul className="u-text-sm u-mb-4 u-flex-grow-1">
           {markers.map((marker) => (
@@ -206,14 +202,14 @@ export function IncidentMapPreview({
   }
 
   return (
-    <div className="u-incidents-map-shell">
+    <div className="u-map-preview-shell">
       <div
         ref={mapContainer}
-        className="u-incidents-map-canvas"
+        className="u-map-preview-canvas"
         style={{ position: "absolute", inset: 0 }}
         role="application"
       />
-      <div className="u-incidents-map-badge">
+      <div className="u-map-preview-badge">
         <Icon name="Warning" size="sm" className="u-text-error" />
         <span>
           {markers.length} active {markers.length === 1 ? "pinpoint" : "pinpoints"}

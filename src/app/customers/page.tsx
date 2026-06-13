@@ -235,7 +235,7 @@ export default function CustomersPage() {
   }
 
   return (
-    <Container className="u-page u-customers-page">
+    <Container className="u-page u-split-page">
       <div className="u-page-header">
         <div>
           <h1 className="u-page-title">Customers</h1>
@@ -252,29 +252,29 @@ export default function CustomersPage() {
         </Button>
       </div>
 
-      <Grid className="u-mb-6 u-customers-layout">
-        <GridCol xs={12} lg={7} className="u-customers-directory-col">
-          <Card appearance="outlined" className="u-h-100 u-customers-directory-card">
-            <div className="u-customers-stats">
-              <span className="u-customers-stat">
+      <Grid className="u-mb-6 u-split-layout">
+        <GridCol xs={12} lg={7} className="u-split-layout__main">
+          <Card appearance="outlined" className="u-h-100 u-split-layout__card">
+            <div className="u-stat-pills">
+              <span className="u-stat-pill">
                 <Icon name="Users" size="sm" />
                 {stats.total} total
               </span>
-              <span className="u-customers-stat u-customers-stat--online">
+              <span className="u-stat-pill u-stat-pill--success">
                 <Icon name="CheckCircle" size="sm" />
                 {stats.online} online
               </span>
-              <span className="u-customers-stat u-customers-stat--degraded">
+              <span className="u-stat-pill u-stat-pill--warning">
                 <Icon name="Pulse" size="sm" />
                 {stats.degraded} degraded
               </span>
-              <span className="u-customers-stat u-customers-stat--overdue">
+              <span className="u-stat-pill u-stat-pill--error">
                 <Icon name="CreditCard" size="sm" />
                 {stats.overdue} overdue
               </span>
             </div>
 
-            <div className="u-customers-log-header">
+            <div className="u-log-header">
               <div>
                 <h2 className="u-text-lg u-font-bold u-mb-1">Customer Directory</h2>
                 <p className="u-meta u-mb-0">
@@ -283,9 +283,9 @@ export default function CustomersPage() {
               </div>
             </div>
 
-            <div className="u-customers-filters">
-              <div className="u-customers-filters-search">
-                <label className="u-customers-filter-label" htmlFor="customer-search">
+            <div className="u-filter-bar u-filter-bar--3col">
+              <div className="u-filter-bar__search">
+                <label className="u-filter-bar__label" htmlFor="customer-search">
                   Search
                 </label>
                 <Input
@@ -297,8 +297,8 @@ export default function CustomersPage() {
                   fullWidth
                 />
               </div>
-              <div className="u-customers-filters-status">
-                <label className="u-customers-filter-label" htmlFor="customer-status-filter">
+              <div className="u-filter-bar__field">
+                <label className="u-filter-bar__label" htmlFor="customer-status-filter">
                   Status
                 </label>
                 <Select
@@ -315,8 +315,8 @@ export default function CustomersPage() {
                   ]}
                 />
               </div>
-              <div className="u-customers-filters-billing">
-                <label className="u-customers-filter-label" htmlFor="customer-billing-filter">
+              <div className="u-filter-bar__field">
+                <label className="u-filter-bar__label" htmlFor="customer-billing-filter">
                   Billing
                 </label>
                 <Select
@@ -335,7 +335,7 @@ export default function CustomersPage() {
               </div>
             </div>
 
-            <div className="u-customers-table-scroll">
+            <div className="u-table-scroll">
               <DataTable
                 columns={columns}
                 data={filteredCustomers}
@@ -357,7 +357,7 @@ export default function CustomersPage() {
           </Card>
         </GridCol>
 
-        <GridCol xs={12} lg={5} className="u-customers-profile-col">
+        <GridCol xs={12} lg={5} className="u-split-layout__side">
           <Card appearance="outlined" className="u-h-100">
             {selectedCustomer ? (
               <CustomerDetailPanel
@@ -370,7 +370,7 @@ export default function CustomersPage() {
                 onClose={() => setSelectedCustomerId(null)}
               />
             ) : (
-              <div className="u-customers-empty u-h-100">
+              <div className="u-empty-state-panel u-h-100">
                 <Icon name="Users" size="lg" className="u-text-secondary-emphasis" />
                 <p className="u-text-sm u-text-secondary-emphasis u-mb-0">
                   Select a customer from the directory to view their profile, connection

@@ -129,10 +129,10 @@ export function CreateWorkOrderModal({
     >
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="u-incidents-modal-form"
+        className="u-modal-form"
         noValidate
       >
-        <div className="u-incidents-form-field">
+        <div className="u-form-field">
           <label className="u-form-label" htmlFor="work-order-title">
             Title
           </label>
@@ -147,7 +147,7 @@ export function CreateWorkOrderModal({
           )}
         </div>
 
-        <div className="u-incidents-form-field">
+        <div className="u-form-field">
           <label className="u-form-label" htmlFor="work-order-priority">
             Priority
           </label>
@@ -170,7 +170,7 @@ export function CreateWorkOrderModal({
           />
         </div>
 
-        <div className="u-incidents-form-field">
+        <div className="u-form-field">
           <label className="u-form-label" htmlFor="work-order-type">
             Work type
           </label>
@@ -193,7 +193,7 @@ export function CreateWorkOrderModal({
           />
         </div>
 
-        <div className="u-incidents-form-field">
+        <div className="u-form-field">
           <label className="u-form-label" htmlFor="work-order-assignee">
             Assignee
             <span className="u-text-secondary-emphasis u-font-normal"> (optional)</span>
@@ -220,7 +220,7 @@ export function CreateWorkOrderModal({
           />
         </div>
 
-        <div className="u-incidents-form-field">
+        <div className="u-form-field">
           <label className="u-form-label" htmlFor="work-order-incident">
             Related incident
             <span className="u-text-secondary-emphasis u-font-normal"> (optional)</span>
@@ -247,7 +247,7 @@ export function CreateWorkOrderModal({
           />
         </div>
 
-        <div className="u-incidents-form-field">
+        <div className="u-form-field">
           <label className="u-form-label" htmlFor="work-order-asset">
             Related asset
             <span className="u-text-secondary-emphasis u-font-normal"> (optional)</span>
@@ -274,7 +274,7 @@ export function CreateWorkOrderModal({
           />
         </div>
 
-        <div className="u-incidents-form-field">
+        <div className="u-form-field">
           <label className="u-form-label" htmlFor="work-order-notes">
             Notes
             <span className="u-text-secondary-emphasis u-font-normal"> (optional)</span>

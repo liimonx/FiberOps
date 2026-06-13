@@ -103,10 +103,10 @@ export function RegisterAssetModal({
     >
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="u-assets-modal-form"
+        className="u-modal-form"
         noValidate
       >
-        <div className="u-assets-form-field">
+        <div className="u-form-field">
           <label className="u-form-label" htmlFor="asset-name">
             Asset Name
           </label>
@@ -119,7 +119,7 @@ export function RegisterAssetModal({
           {errors.name && <p className="u-form-error">{errors.name.message}</p>}
         </div>
 
-        <div className="u-assets-form-field">
+        <div className="u-form-field">
           <label className="u-form-label" htmlFor="asset-kind">
             Asset Type
           </label>
@@ -142,7 +142,7 @@ export function RegisterAssetModal({
           />
         </div>
 
-        <div className="u-assets-form-field">
+        <div className="u-form-field">
           <label className="u-form-label" htmlFor="asset-status">
             Initial Status
           </label>
@@ -165,9 +165,9 @@ export function RegisterAssetModal({
           />
         </div>
 
-        <div className="u-assets-form-field">
+        <div className="u-form-field">
           <span className="u-form-label">Coordinates</span>
-          <div className="u-assets-coords-grid">
+          <div className="u-coords-grid">
             <div>
               <label className="u-text-sm u-text-secondary-emphasis" htmlFor="asset-lat">
                 Latitude

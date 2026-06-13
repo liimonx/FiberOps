@@ -176,9 +176,9 @@ export function ProposalDetailPanel({
           </Tabs.List>
           <Tabs.Panels>
             <Tabs.Panel index={0}>
-              <div className="u-incidents-timeline u-mb-4">
+              <div className="u-timeline u-mb-4">
                 {timeline.map((event) => (
-                  <div key={event.id} className="u-incidents-timeline-item">
+                  <div key={event.id} className="u-timeline__item">
                     <div className="u-font-bold u-text-sm">{event.label}</div>
                     <div className="u-text-secondary-emphasis u-text-xs">
                       {new Date(event.timestamp).toLocaleString()}
@@ -189,29 +189,29 @@ export function ProposalDetailPanel({
               </div>
 
               <div className="u-p-4 u-bg-dark u-rounded u-border u-border-secondary-subtle u-mb-4">
-                <div className="u-incidents-asset-grid">
-                  <div className="u-incidents-asset-row">
+                <div className="u-detail-grid">
+                  <div className="u-detail-row">
                     <span className="u-text-secondary-emphasis u-text-sm">Target area</span>
                     <span className="u-text-sm u-text-end">{proposal.targetArea}</span>
                   </div>
-                  <div className="u-incidents-asset-row">
+                  <div className="u-detail-row">
                     <span className="u-text-secondary-emphasis u-text-sm">Type</span>
                     <span className="u-text-sm u-text-end">{typeLabels[proposal.type]}</span>
                   </div>
                   {relatedAsset && (
-                    <div className="u-incidents-asset-row">
+                    <div className="u-detail-row">
                       <span className="u-text-secondary-emphasis u-text-sm">Related asset</span>
                       <span className="u-font-mono u-text-sm u-text-end">{relatedAsset.name}</span>
                     </div>
                   )}
                   {proposal.targetStartDate && (
-                    <div className="u-incidents-asset-row">
+                    <div className="u-detail-row">
                       <span className="u-text-secondary-emphasis u-text-sm">Target start</span>
                       <span className="u-text-sm u-text-end">{proposal.targetStartDate}</span>
                     </div>
                   )}
                   {proposal.targetCompletionDate && (
-                    <div className="u-incidents-asset-row">
+                    <div className="u-detail-row">
                       <span className="u-text-secondary-emphasis u-text-sm">Target completion</span>
                       <span className="u-text-sm u-text-end">
                         {proposal.targetCompletionDate}
@@ -285,7 +285,7 @@ export function ProposalDetailPanel({
                 </div>
 
                 {proposal.areas.length === 0 && proposal.routes.length === 0 ? (
-                  <div className="u-incidents-empty">
+                  <div className="u-empty-state-panel">
                     <Icon name="MapPin" size="lg" className="u-text-secondary-emphasis" />
                     <p className="u-text-sm u-text-secondary-emphasis u-mb-0">
                       No map geometry defined yet. Use Edit on Map to draw expansion areas and

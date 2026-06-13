@@ -73,24 +73,6 @@
   filter: drop-shadow(0 0 6px var(--atomix-primary));
 }
 
-/* Tooltip styling - Enhanced with Glassmorphism */
-.network-tooltip {
-  position: absolute;
-  background: var(--glass-background-dark);
-  backdrop-filter: var(--glass-backdrop-blur);
-  -webkit-backdrop-filter: var(--glass-backdrop-blur);
-  border: 1px solid var(--glass-border-dark);
-  border-radius: var(--atomix-border-radius-lg);
-  padding: var(--atomix-spacing-4);
-  color: var(--atomix-primary-text-dark);
-  font-size: var(--atomix-font-size-sm);
-  max-width: 300px;
-  pointer-events: none;
-  box-shadow: var(--atomix-shadow-lg);
-  z-index: var(--atomix-z-tooltip);
-  transition: opacity 0.2s var(--atomix-transition-easing);
-}
-
 /* Loading states */
 .network-loading {
   position: absolute;

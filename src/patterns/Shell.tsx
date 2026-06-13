@@ -45,7 +45,6 @@ export function Shell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className={styles.root}>
-      {/* Mobile Header */}
       <header className={styles.mobileHeader}>
         <Button
           variant="secondary"
@@ -59,7 +58,6 @@ export function Shell({ children }: { children: React.ReactNode }) {
         </div>
       </header>
 
-      {/* Sidebar Overlay for Mobile */}
       {sidebarOpen && (
         <div
           className={styles.overlay}
@@ -69,8 +67,10 @@ export function Shell({ children }: { children: React.ReactNode }) {
       )}
 
       <div className={styles.body}>
-        {/* Sidebar Navigation */}
-        <aside className={`${styles.sidebar} ${sidebarOpen ? styles.sidebarOpen : ""}`}>
+        <aside
+          className={`${styles.sidebar} ${sidebarOpen ? styles.sidebarOpen : ""}`}
+          aria-label="Main navigation"
+        >
           <div className={styles.sidebarHeader}>
             <div className={styles.brand}>BCN FiberOps</div>
             <Badge variant="info" label="Mocked" />
@@ -96,7 +96,6 @@ export function Shell({ children }: { children: React.ReactNode }) {
           <SidebarFooter />
         </aside>
 
-        {/* Main Content Area */}
         <main className={styles.main} id="main-content" tabIndex={-1}>
           {children}
         </main>

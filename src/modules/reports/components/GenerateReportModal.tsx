@@ -102,7 +102,7 @@ export function GenerateReportModal({
         </div>
       }
     >
-      <form className="u-incidents-modal-form" onSubmit={handleSubmit(onSubmit)} noValidate>
+      <form className="u-modal-form" onSubmit={handleSubmit(onSubmit)} noValidate>
         <input type="hidden" {...register("type")} />
         {isError && (
           <Callout variant="error" title="Generation failed">
@@ -112,8 +112,8 @@ export function GenerateReportModal({
           </Callout>
         )}
 
-        <div className="u-incidents-form-field">
-          <label className="u-incidents-filter-label" htmlFor="report-period">
+        <div className="u-form-field">
+          <label className="u-filter-bar__label" htmlFor="report-period">
             Time period
           </label>
           <Controller
@@ -135,8 +135,8 @@ export function GenerateReportModal({
           />
         </div>
 
-        <div className="u-incidents-form-field">
-          <label className="u-incidents-filter-label" htmlFor="report-format">
+        <div className="u-form-field">
+          <label className="u-filter-bar__label" htmlFor="report-format">
             Export format
           </label>
           <Controller

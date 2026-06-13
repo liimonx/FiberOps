@@ -206,7 +206,7 @@ export function WorkOrderDetailPanel({
           <Tabs.Panels>
             <Tabs.Panel index={0}>
               <div className="u-flex u-flex-column u-gap-4">
-                <div className="u-incidents-form-field">
+                <div className="u-form-field">
                   <label className="u-form-label" htmlFor="work-order-detail-assignee">
                     Assignee
                   </label>
@@ -242,7 +242,7 @@ export function WorkOrderDetailPanel({
                     </span>
                   </div>
                 ) : (
-                  <div className="u-incidents-empty">
+                  <div className="u-empty-state-panel">
                     <Icon name="Warning" size="lg" className="u-text-secondary-emphasis" />
                     <p className="u-text-sm u-text-secondary-emphasis u-mb-0">
                       No related incident linked.
@@ -261,16 +261,16 @@ export function WorkOrderDetailPanel({
                         View on map
                       </Link>
                     </div>
-                    <div className="u-incidents-asset-grid">
-                      <div className="u-incidents-asset-row">
+                    <div className="u-detail-grid">
+                      <div className="u-detail-row">
                         <span className="u-text-secondary-emphasis u-text-sm">Asset ID</span>
                         <span className="u-font-mono u-text-sm">{relatedAsset.id}</span>
                       </div>
-                      <div className="u-incidents-asset-row">
+                      <div className="u-detail-row">
                         <span className="u-text-secondary-emphasis u-text-sm">Name</span>
                         <span className="u-text-sm u-text-end">{relatedAsset.name}</span>
                       </div>
-                      <div className="u-incidents-asset-row">
+                      <div className="u-detail-row">
                         <span className="u-text-secondary-emphasis u-text-sm">Coordinates</span>
                         <span className="u-font-mono u-text-sm u-text-end">
                           {formatCoordinates(relatedAsset.location)}
@@ -279,7 +279,7 @@ export function WorkOrderDetailPanel({
                     </div>
                   </div>
                 ) : (
-                  <div className="u-incidents-empty">
+                  <div className="u-empty-state-panel">
                     <Icon name="HardDrive" size="lg" className="u-text-secondary-emphasis" />
                     <p className="u-text-sm u-text-secondary-emphasis u-mb-0">
                       No related asset linked.
@@ -290,9 +290,9 @@ export function WorkOrderDetailPanel({
             </Tabs.Panel>
 
             <Tabs.Panel index={1}>
-              <div className="u-incidents-timeline">
+              <div className="u-timeline">
                 {timeline.map((event) => (
-                  <div key={event.id} className="u-incidents-timeline-item">
+                  <div key={event.id} className="u-timeline__item">
                     <div className="u-font-bold u-text-sm">{event.label}</div>
                     <div className="u-text-secondary-emphasis u-text-xs">
                       {new Date(event.timestamp).toLocaleString()}

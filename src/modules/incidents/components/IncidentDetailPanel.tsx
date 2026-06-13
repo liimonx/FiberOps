@@ -149,9 +149,9 @@ export function IncidentDetailPanel({
           </Tabs.List>
           <Tabs.Panels>
             <Tabs.Panel index={0}>
-              <div className="u-incidents-timeline">
+              <div className="u-timeline">
                 {timeline.map((event) => (
-                  <div key={event.id} className="u-incidents-timeline-item">
+                  <div key={event.id} className="u-timeline__item">
                     <div className="u-font-bold u-text-sm">{event.label}</div>
                     <div className="u-text-secondary-emphasis u-text-xs">
                       {new Date(event.timestamp).toLocaleString()}
@@ -165,16 +165,16 @@ export function IncidentDetailPanel({
             <Tabs.Panel index={1}>
               {relatedAsset ? (
                 <div className="u-p-4 u-bg-dark u-rounded u-border u-border-secondary-subtle">
-                  <div className="u-incidents-asset-grid">
-                    <div className="u-incidents-asset-row">
+                  <div className="u-detail-grid">
+                    <div className="u-detail-row">
                       <span className="u-text-secondary-emphasis u-text-sm">Asset ID</span>
                       <span className="u-font-mono u-text-sm">{relatedAsset.id}</span>
                     </div>
-                    <div className="u-incidents-asset-row">
+                    <div className="u-detail-row">
                       <span className="u-text-secondary-emphasis u-text-sm">Name</span>
                       <span className="u-text-sm u-text-end">{relatedAsset.name}</span>
                     </div>
-                    <div className="u-incidents-asset-row">
+                    <div className="u-detail-row">
                       <span className="u-text-secondary-emphasis u-text-sm">Coordinates</span>
                       <span className="u-font-mono u-text-sm u-text-end">
                         {formatCoordinates(relatedAsset.location)}
@@ -183,7 +183,7 @@ export function IncidentDetailPanel({
                   </div>
                 </div>
               ) : (
-                <div className="u-incidents-empty">
+                <div className="u-empty-state-panel">
                   <Icon name="HardDrive" size="lg" className="u-text-secondary-emphasis" />
                   <p className="u-text-sm u-text-secondary-emphasis u-mb-0">
                     No related asset linked to this incident.

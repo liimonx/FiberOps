@@ -303,27 +303,9 @@ function ZoomLevelIndicator() {
   const zoom = useNetworkMapStore((state) => state.viewport.zoom);
 
   return (
-    <div className="zoom-indicator">
+    <div className="u-flex u-items-center u-gap-1 u-px-2 u-py-1 u-rounded u-border u-text-xs u-font-medium u-text-secondary-emphasis u-bg-primary-bg-subtle u-pointer-events-auto">
       <Icon name="MagnifyingGlassPlus" size={12} />
       <span>{zoom.toFixed(1)}</span>
-
-      <style jsx>{`
-        .zoom-indicator {
-          display: flex;
-          align-items: center;
-          gap: 4px;
-          padding: 4px 10px;
-          background: rgba(17, 24, 39, 0.8);
-          backdrop-filter: blur(4px);
-          border-radius: 12px;
-          border: 1px solid var(--color-gray-700);
-          color: var(--color-gray-400);
-          font-size: 11px;
-          font-weight: 500;
-          pointer-events: auto;
-          user-select: none;
-        }
-      `}</style>
     </div>
   );
 }

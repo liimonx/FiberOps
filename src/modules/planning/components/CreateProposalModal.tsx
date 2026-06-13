@@ -137,7 +137,7 @@ export function CreateProposalModal({
         className="u-form-column"
         noValidate
       >
-        <div className="u-incidents-form-field">
+        <div className="u-form-field">
           <label className="u-form-label" htmlFor="proposal-title">
             Title
           </label>
@@ -150,7 +150,7 @@ export function CreateProposalModal({
           {errors.title && <p className="u-form-error">{errors.title.message}</p>}
         </div>
 
-        <div className="u-incidents-form-field">
+        <div className="u-form-field">
           <label className="u-form-label" htmlFor="proposal-description">
             Description
           </label>
@@ -163,7 +163,7 @@ export function CreateProposalModal({
           />
         </div>
 
-        <div className="u-incidents-form-field">
+        <div className="u-form-field">
           <label className="u-form-label" htmlFor="proposal-type">
             Proposal type
           </label>
@@ -186,7 +186,7 @@ export function CreateProposalModal({
           />
         </div>
 
-        <div className="u-incidents-form-field">
+        <div className="u-form-field">
           <label className="u-form-label" htmlFor="proposal-target-area">
             Target area
           </label>
@@ -201,7 +201,7 @@ export function CreateProposalModal({
           )}
         </div>
 
-        <div className="u-incidents-form-field">
+        <div className="u-form-field">
           <label className="u-form-label" htmlFor="proposal-asset">
             Related asset
             <span className="u-text-secondary-emphasis u-font-normal"> (optional)</span>
@@ -228,7 +228,7 @@ export function CreateProposalModal({
           />
         </div>
 
-        <div className="u-incidents-form-field">
+        <div className="u-form-field">
           <label className="u-form-label" htmlFor="proposal-customers">
             Estimated new customers
           </label>
@@ -245,7 +245,7 @@ export function CreateProposalModal({
         </div>
 
         <div className="u-flex u-gap-4">
-          <div className="u-incidents-form-field u-flex-1">
+          <div className="u-form-field u-flex-1">
             <label className="u-form-label" htmlFor="proposal-current-util">
               Current utilization %
             </label>
@@ -258,7 +258,7 @@ export function CreateProposalModal({
               {...register("currentUtilizationPercent", { valueAsNumber: true })}
             />
           </div>
-          <div className="u-incidents-form-field u-flex-1">
+          <div className="u-form-field u-flex-1">
             <label className="u-form-label" htmlFor="proposal-projected-util">
               Projected utilization %
             </label>
@@ -278,7 +278,7 @@ export function CreateProposalModal({
           </div>
         </div>
 
-        <div className="u-incidents-form-field">
+        <div className="u-form-field">
           <label className="u-form-label" htmlFor="proposal-budget">
             Estimated budget (USD)
           </label>
@@ -294,7 +294,7 @@ export function CreateProposalModal({
           )}
         </div>
 
-        <div className="u-incidents-form-field">
+        <div className="u-form-field">
           <label className="u-form-label" htmlFor="proposal-owner">
             Owner
           </label>
@@ -315,13 +315,13 @@ export function CreateProposalModal({
         </div>
 
         <div className="u-flex u-gap-4">
-          <div className="u-incidents-form-field u-flex-1">
+          <div className="u-form-field u-flex-1">
             <label className="u-form-label" htmlFor="proposal-start">
               Target start date
             </label>
             <Input id="proposal-start" type="date" fullWidth {...register("targetStartDate")} />
           </div>
-          <div className="u-incidents-form-field u-flex-1">
+          <div className="u-form-field u-flex-1">
             <label className="u-form-label" htmlFor="proposal-end">
               Target completion date
             </label>
@@ -334,7 +334,7 @@ export function CreateProposalModal({
           </div>
         </div>
 
-        <div className="u-incidents-form-field">
+        <div className="u-form-field">
           <label className="u-form-label" htmlFor="proposal-notes">
             Notes
           </label>

@@ -219,7 +219,7 @@ export default function PlanningPage() {
       </Grid>
 
       <Card appearance="outlined">
-        <div className="u-incidents-log-header">
+        <div className="u-log-header">
           <div>
             <h2 className="u-text-lg u-font-bold u-mb-1">Expansion Proposals</h2>
             <p className="u-meta u-mb-0">
@@ -228,9 +228,9 @@ export default function PlanningPage() {
           </div>
         </div>
 
-        <div className="u-incidents-filters">
-          <div className="u-incidents-filters-search">
-            <label className="u-incidents-filter-label" htmlFor="planning-search">
+        <div className="u-filter-bar u-filter-bar--3col">
+          <div className="u-filter-bar__search">
+            <label className="u-filter-bar__label" htmlFor="planning-search">
               Search
             </label>
             <Input
@@ -242,8 +242,8 @@ export default function PlanningPage() {
               fullWidth
             />
           </div>
-          <div className="u-incidents-filters-severity">
-            <label className="u-incidents-filter-label" htmlFor="planning-status-filter">
+          <div className="u-filter-bar__field">
+            <label className="u-filter-bar__label" htmlFor="planning-status-filter">
               Status
             </label>
             <Select
@@ -261,8 +261,8 @@ export default function PlanningPage() {
               ]}
             />
           </div>
-          <div className="u-incidents-filters-severity">
-            <label className="u-incidents-filter-label" htmlFor="planning-type-filter">
+          <div className="u-filter-bar__field">
+            <label className="u-filter-bar__label" htmlFor="planning-type-filter">
               Type
             </label>
             <Select

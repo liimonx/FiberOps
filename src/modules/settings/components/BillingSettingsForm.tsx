@@ -2,9 +2,10 @@
 
 import Link from "next/link";
 import { useEffect } from "react";
-import { useForm } from "react-hook-form";
+import type { ChangeEvent } from "react";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Badge, Button, Callout, Card, Icon, Input } from "@shohojdhara/atomix";
+import { Badge, Button, Callout, Card, Icon, Input, Select } from "@shohojdhara/atomix";
 import {
   billingCurrencies,
   billingSettingsSchema,
@@ -71,6 +72,7 @@ export function BillingSettingsForm() {
     register,
     handleSubmit,
     reset,
+    control,
     formState: { errors, isDirty, isValid },
   } = useForm<BillingSettingsFormValues>({
     resolver: zodResolver(billingSettingsSchema),
@@ -281,13 +283,23 @@ export function BillingSettingsForm() {
           <label htmlFor="currency" className="u-form-label">
             Default currency
           </label>
-          <select id="currency" className="u-form-select" {...register("currency")}>
-            {billingCurrencies.map((currency) => (
-              <option key={currency} value={currency}>
-                {currencyLabels[currency]}
-              </option>
-            ))}
-          </select>
+          <Controller
+            name="currency"
+            control={control}
+            render={({ field }) => (
+              <Select
+                id="currency"
+                value={field.value}
+                onChange={(event: ChangeEvent<HTMLSelectElement>) =>
+                  field.onChange(event.target.value)
+                }
+                options={billingCurrencies.map((currency) => ({
+                  label: currencyLabels[currency],
+                  value: currency,
+                }))}
+              />
+            )}
+          />
           {errors.currency && (
             <p className="u-form-error">{errors.currency.message}</p>
           )}

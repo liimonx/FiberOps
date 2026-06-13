@@ -75,7 +75,7 @@ export function CustomerDetailPanel({
     <div
       className={
         layout === "sidebar"
-          ? "u-customers-profile-panel"
+          ? "u-profile-panel"
           : "u-border-top u-border-secondary-subtle u-pt-6"
       }
     >
@@ -127,22 +127,22 @@ export function CustomerDetailPanel({
         <Tabs.Panels>
           <Tabs.Panel index={0}>
             <div className="u-p-4 u-bg-dark u-rounded u-border u-border-secondary-subtle">
-              <div className="u-customers-detail-grid">
-                <div className="u-customers-detail-row">
+              <div className="u-detail-grid">
+                <div className="u-detail-row">
                   <span className="u-text-secondary-emphasis u-text-sm">Email</span>
                   <span className="u-text-sm u-text-end">
                     {customer.email ?? "—"}
                   </span>
                 </div>
-                <div className="u-customers-detail-row">
+                <div className="u-detail-row">
                   <span className="u-text-secondary-emphasis u-text-sm">Plan</span>
                   <span className="u-text-sm u-text-end">{customer.plan}</span>
                 </div>
-                <div className="u-customers-detail-row">
+                <div className="u-detail-row">
                   <span className="u-text-secondary-emphasis u-text-sm">Type</span>
                   <span className="u-text-sm u-text-end">{tableRow.type}</span>
                 </div>
-                <div className="u-customers-detail-row">
+                <div className="u-detail-row">
                   <span className="u-text-secondary-emphasis u-text-sm">Location</span>
                   <span className="u-font-mono u-text-sm u-text-end">
                     {customer.location
@@ -150,7 +150,7 @@ export function CustomerDetailPanel({
                       : "—"}
                   </span>
                 </div>
-                <div className="u-customers-detail-row">
+                <div className="u-detail-row">
                   <span className="u-text-secondary-emphasis u-text-sm">Last Updated</span>
                   <span className="u-text-sm u-text-end">
                     {formatRelativeTimeFromIso(customer.updatedAt)}
@@ -159,8 +159,8 @@ export function CustomerDetailPanel({
               </div>
             </div>
 
-            <div className="u-customers-edit-fields u-mt-4">
-              <div className="u-customers-form-field">
+            <div className="u-edit-fields-grid u-mt-4">
+              <div className="u-form-field">
                 <label className="u-form-label" htmlFor="customer-status">
                   Service Status
                 </label>
@@ -177,7 +177,7 @@ export function CustomerDetailPanel({
                   ]}
                 />
               </div>
-              <div className="u-customers-form-field">
+              <div className="u-form-field">
                 <label className="u-form-label" htmlFor="customer-billing">
                   Billing Status
                 </label>
@@ -235,16 +235,16 @@ export function CustomerDetailPanel({
             </p>
             {relatedOnu ? (
               <div className="u-p-4 u-bg-dark u-rounded u-border u-border-secondary-subtle">
-                <div className="u-customers-detail-grid">
-                  <div className="u-customers-detail-row">
+                <div className="u-detail-grid">
+                  <div className="u-detail-row">
                     <span className="u-text-secondary-emphasis u-text-sm">ONU ID</span>
                     <span className="u-font-mono u-text-sm">{relatedOnu.id}</span>
                   </div>
-                  <div className="u-customers-detail-row">
+                  <div className="u-detail-row">
                     <span className="u-text-secondary-emphasis u-text-sm">Name</span>
                     <span className="u-text-sm u-text-end">{relatedOnu.name}</span>
                   </div>
-                  <div className="u-customers-detail-row">
+                  <div className="u-detail-row">
                     <span className="u-text-secondary-emphasis u-text-sm">Status</span>
                     <Badge
                       variant={
@@ -257,7 +257,7 @@ export function CustomerDetailPanel({
                       label={relatedOnu.status}
                     />
                   </div>
-                  <div className="u-customers-detail-row">
+                  <div className="u-detail-row">
                     <span className="u-text-secondary-emphasis u-text-sm">Coordinates</span>
                     <span className="u-font-mono u-text-sm u-text-end">
                       {formatCoordinates(relatedOnu.location)}
@@ -266,7 +266,7 @@ export function CustomerDetailPanel({
                 </div>
               </div>
             ) : (
-              <div className="u-customers-empty">
+              <div className="u-empty-state-panel">
                 <Icon name="HardDrive" size="lg" className="u-text-secondary-emphasis" />
                 <p className="u-text-sm u-text-secondary-emphasis u-mb-0">
                   No ONU linked to this customer.
@@ -305,7 +305,7 @@ export function CustomerDetailPanel({
                 })}
               </div>
             ) : (
-              <div className="u-customers-empty">
+              <div className="u-empty-state-panel">
                 <Icon name="ClipboardText" size="lg" className="u-text-secondary-emphasis" />
                 <p className="u-text-sm u-text-secondary-emphasis u-mb-0">
                   No incidents linked to this customer&apos;s ONU.

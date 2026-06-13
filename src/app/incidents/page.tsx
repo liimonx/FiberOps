@@ -194,10 +194,10 @@ function IncidentsPageContent() {
       <Grid className="u-mb-6">
         <GridCol xs={12} lg={4}>
           <Card appearance="outlined" className="u-h-100 u-flex u-flex-column">
-            <div className="u-incidents-map-header">
+            <div className="u-map-preview-header">
               <h2 className="u-text-lg u-font-bold u-mb-0">Live Network Map</h2>
-              <span className="u-incidents-live-pill">
-                <span className="u-incidents-live-dot" aria-hidden="true" />
+              <span className="u-live-pill u-live-pill--error">
+                <span className="u-live-pill__dot" aria-hidden="true" />
                 Live
               </span>
             </div>
@@ -212,22 +212,22 @@ function IncidentsPageContent() {
 
         <GridCol xs={12} lg={8}>
           <Card appearance="outlined">
-            <div className="u-incidents-stats">
-              <span className="u-incidents-stat">
+            <div className="u-stat-pills">
+              <span className="u-stat-pill">
                 <Icon name="ListBullets" size="sm" />
                 {stats.total} total
               </span>
-              <span className="u-incidents-stat u-incidents-stat--active">
+              <span className="u-stat-pill u-stat-pill--warning">
                 <Icon name="Pulse" size="sm" />
                 {stats.active} active
               </span>
-              <span className="u-incidents-stat u-incidents-stat--critical">
+              <span className="u-stat-pill u-stat-pill--error">
                 <Icon name="Warning" size="sm" />
                 {stats.critical} critical
               </span>
             </div>
 
-            <div className="u-incidents-log-header">
+            <div className="u-log-header">
               <div>
                 <h2 className="u-text-lg u-font-bold u-mb-1">Incident Log</h2>
                 <p className="u-meta u-mb-0">
@@ -236,9 +236,9 @@ function IncidentsPageContent() {
               </div>
             </div>
 
-            <div className="u-incidents-filters">
-              <div className="u-incidents-filters-search">
-                <label className="u-incidents-filter-label" htmlFor="incident-log-search">
+            <div className="u-filter-bar">
+              <div className="u-filter-bar__search">
+                <label className="u-filter-bar__label" htmlFor="incident-log-search">
                   Search
                 </label>
                 <Input
@@ -250,8 +250,8 @@ function IncidentsPageContent() {
                   fullWidth
                 />
               </div>
-              <div className="u-incidents-filters-severity">
-                <label className="u-incidents-filter-label" htmlFor="incident-severity-filter">
+              <div className="u-filter-bar__field">
+                <label className="u-filter-bar__label" htmlFor="incident-severity-filter">
                   Severity
                 </label>
                 <Select

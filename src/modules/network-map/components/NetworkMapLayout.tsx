@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import { Card } from "@shohojdhara/atomix";
 
 interface NetworkMapLayoutProps {
   mapComponent: React.ReactNode;
@@ -53,9 +52,7 @@ export const NetworkMapLayout: React.FC<NetworkMapLayoutProps> = ({
           className="u-absolute u-top-4 u-start-4 u-w-80 u-pointer-events-auto"
           aria-label="Search"
         >
-          <Card className="u-p-0 u-shadow-xl">
-            {searchPanel}
-          </Card>
+          {searchPanel}
         </nav>
 
         {/* Top right - Toolbar */}
@@ -71,9 +68,7 @@ export const NetworkMapLayout: React.FC<NetworkMapLayoutProps> = ({
           className="u-absolute u-bottom-4 u-start-4 u-pointer-events-auto u-w-80"
           aria-label="Layer controls"
         >
-          <Card className="u-p-0 u-shadow-xl">
-            {layerControls}
-          </Card>
+          {layerControls}
         </aside>
 
         {/* Right side - Inspector panel */}

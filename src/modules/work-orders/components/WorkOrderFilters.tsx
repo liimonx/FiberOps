@@ -36,7 +36,7 @@ export function WorkOrderFilters({
   };
 
   return (
-    <div className="u-incidents-filters u-mb-4">
+    <div className="u-filter-bar u-mb-4">
       <Input
         placeholder="Search by ID, title, or assignee..."
         value={filters.search}

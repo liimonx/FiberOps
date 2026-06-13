@@ -115,10 +115,10 @@ export function AddCustomerModal({
     >
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="u-customers-modal-form"
+        className="u-modal-form"
         noValidate
       >
-        <div className="u-customers-form-field">
+        <div className="u-form-field">
           <label className="u-form-label" htmlFor="customer-name">
             Customer Name
           </label>
@@ -131,7 +131,7 @@ export function AddCustomerModal({
           {errors.name && <p className="u-form-error">{errors.name.message}</p>}
         </div>
 
-        <div className="u-customers-form-field">
+        <div className="u-form-field">
           <label className="u-form-label" htmlFor="customer-plan">
             Service Plan
           </label>
@@ -154,7 +154,7 @@ export function AddCustomerModal({
           />
         </div>
 
-        <div className="u-customers-form-field">
+        <div className="u-form-field">
           <label className="u-form-label" htmlFor="customer-status-create">
             Initial Status
           </label>
@@ -178,7 +178,7 @@ export function AddCustomerModal({
           />
         </div>
 
-        <div className="u-customers-form-field">
+        <div className="u-form-field">
           <label className="u-form-label" htmlFor="customer-email">
             Email
             <span className="u-text-secondary-emphasis u-font-normal"> (optional)</span>
@@ -193,7 +193,7 @@ export function AddCustomerModal({
           {errors.email && <p className="u-form-error">{errors.email.message}</p>}
         </div>
 
-        <div className="u-customers-form-field">
+        <div className="u-form-field">
           <label className="u-form-label" htmlFor="customer-onu">
             Linked ONU
             <span className="u-text-secondary-emphasis u-font-normal"> (optional)</span>

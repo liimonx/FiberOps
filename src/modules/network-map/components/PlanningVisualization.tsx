@@ -10,6 +10,7 @@ import {
   routesToGeoJSON,
 } from "../utils/planningGeoUtils";
 import { createImpairmentCircleGeoJSON } from "../utils/impairmentUtils";
+import { getThemeColors } from "@/lib/themeColors";
 
 type PlanningVisualizationProps = {
   mapInstance: mapboxgl.Map | null;
@@ -75,6 +76,8 @@ function syncPlanningLayers(
 ) {
   if (!map.isStyleLoaded()) return;
 
+  const colors = getThemeColors();
+
   if (!visible) {
     removePlanningLayers(map);
     return;
@@ -114,29 +117,29 @@ function syncPlanningLayers(
   };
 
   ensureLayer(AREAS_FILL_LAYER_ID, "fill", AREAS_SOURCE_ID, {
-    "fill-color": "#10b981",
+    "fill-color": colors.success,
     "fill-opacity": 0.12,
   });
   ensureLayer(AREAS_LINE_LAYER_ID, "line", AREAS_SOURCE_ID, {
-    "line-color": "#10b981",
+    "line-color": colors.success,
     "line-width": 2,
     "line-dasharray": ["literal", [4, 3]],
   });
   ensureLayer(ROUTES_LAYER_ID, "line", ROUTES_SOURCE_ID, {
-    "line-color": "#a78bfa",
+    "line-color": colors.secondary,
     "line-width": 3,
     "line-dasharray": ["literal", [4, 3]],
   });
   ensureLayer(DRAFT_AREAS_FILL_LAYER_ID, "fill", DRAFT_AREAS_SOURCE_ID, {
-    "fill-color": "#34d399",
+    "fill-color": colors.primary,
     "fill-opacity": 0.2,
   });
   ensureLayer(DRAFT_AREAS_LINE_LAYER_ID, "line", DRAFT_AREAS_SOURCE_ID, {
-    "line-color": "#34d399",
+    "line-color": colors.primary,
     "line-width": 2,
   });
   ensureLayer(DRAFT_ROUTES_LAYER_ID, "line", DRAFT_ROUTES_SOURCE_ID, {
-    "line-color": "#f59e0b",
+    "line-color": colors.warning,
     "line-width": 3,
   });
 
@@ -150,7 +153,7 @@ function syncPlanningLayers(
         source: DRAFT_PENDING_SOURCE_ID,
         filter: ["==", ["get", "role"], "blast"],
         paint: {
-          "fill-color": "#f59e0b",
+          "fill-color": colors.warning,
           "fill-opacity": 0.22,
         },
       });
@@ -162,7 +165,7 @@ function syncPlanningLayers(
         source: DRAFT_PENDING_SOURCE_ID,
         filter: ["==", ["get", "role"], "blast"],
         paint: {
-          "line-color": "#f59e0b",
+          "line-color": colors.warning,
           "line-width": 2,
           "line-dasharray": ["literal", [2, 2]],
         },

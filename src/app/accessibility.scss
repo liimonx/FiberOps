@@ -67,18 +67,21 @@
   border-width: 0;
 }
 
-// Better hover states for interactive elements
-button,
-a,
-[role="button"],
+// Better hover states for interactive elements (exclude Atomix components)
+a:not(.c-btn):not([class*="c-nav"]),
+[role="button"]:not(.c-btn),
 input[type="checkbox"],
 input[type="radio"] {
   &:hover {
     cursor: pointer;
   }
+}
 
-  &:active {
-    transform: scale(0.98);
+button:not(.c-btn),
+a.c-btn,
+[role="button"].c-btn {
+  &:hover {
+    cursor: pointer;
   }
 }
 

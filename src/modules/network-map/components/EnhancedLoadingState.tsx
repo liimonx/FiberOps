@@ -74,7 +74,7 @@ export function EnhancedLoadingState({
 
   if (variant === "overlay") {
     return (
-      <div className="u-overlay-scrim">
+      <div className="u-overlay-center u-bg-black-opacity-50">
         <Card className="u-p-8 u-shadow-xl">
           {content}
         </Card>
