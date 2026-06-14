@@ -221,12 +221,50 @@
   flex-direction: column;
   gap: var(--atomix-spacing-4, 0.75rem);
   width: 100%;
+
+  .c-select,
+  select,
+  .c-datepicker {
+    width: 100%;
+  }
+
+  .c-select__trigger,
+  .c-select__control {
+    transition:
+      border-color var(--atomix-transition-base, 0.2s ease),
+      box-shadow var(--atomix-transition-base, 0.2s ease);
+
+    &:hover:not(:disabled) {
+      border-color: var(--atomix-primary-border-subtle);
+    }
+  }
+}
+
+.u-form-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--atomix-spacing-4, 0.75rem);
+}
+
+.u-form-section__title {
+  font-size: var(--atomix-font-size-xs, 0.75rem);
+  font-weight: var(--atomix-font-weight-bold, 700);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--atomix-secondary-text-emphasis);
+  margin: 0;
+  padding-bottom: var(--atomix-spacing-2, 0.375rem);
+  border-bottom: 1px solid var(--atomix-border-color);
 }
 
 .u-form-field {
   display: flex;
   flex-direction: column;
   gap: var(--atomix-spacing-2, 0.375rem);
+
+  .u-form-label {
+    margin-bottom: 0;
+  }
 }
 
 .u-coords-grid {

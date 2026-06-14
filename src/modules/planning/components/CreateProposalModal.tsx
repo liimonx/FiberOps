@@ -6,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Button,
   Callout,
+  DatePicker,
   Input,
   Modal,
   Select,
@@ -33,6 +34,21 @@ const ownerOptions = [
   "Alex Morgan",
 ];
 
+function toDateValue(iso?: string): Date | null {
+  if (!iso) return null;
+  const [year, month, day] = iso.split("-").map(Number);
+  if (!year || !month || !day) return null;
+  return new Date(year, month - 1, day);
+}
+
+function toIsoDate(date: Date | null): string {
+  if (!date) return "";
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
 export function CreateProposalModal({
   open,
   assets,
@@ -52,6 +68,7 @@ export function CreateProposalModal({
     handleSubmit,
     reset,
     control,
+    watch,
     formState: { errors, isValid },
   } = useForm<CreateProposalFormValues>({
     resolver: zodResolver(createProposalSchema),
@@ -71,6 +88,8 @@ export function CreateProposalModal({
       notes: "",
     },
   });
+
+  const targetStartDate = watch("targetStartDate");
 
   useEffect(() => {
     if (open) {
@@ -134,209 +153,269 @@ export function CreateProposalModal({
     >
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="u-form-column"
+        className="u-modal-form"
         noValidate
       >
-        <div className="u-form-field">
-          <label className="u-form-label" htmlFor="proposal-title">
-            Title
-          </label>
-          <Input
-            id="proposal-title"
-            placeholder="e.g. Gulshan North Fiber Expansion"
-            fullWidth
-            {...register("title")}
-          />
-          {errors.title && <p className="u-form-error">{errors.title.message}</p>}
-        </div>
+        <section className="u-form-section">
+          <p className="u-form-section__title">Overview</p>
 
-        <div className="u-form-field">
-          <label className="u-form-label" htmlFor="proposal-description">
-            Description
-          </label>
-          <Textarea
-            id="proposal-description"
-            placeholder="Brief summary of the expansion plan..."
-            rows={3}
-            fullWidth
-            {...register("description")}
-          />
-        </div>
-
-        <div className="u-form-field">
-          <label className="u-form-label" htmlFor="proposal-type">
-            Proposal type
-          </label>
-          <Controller
-            name="type"
-            control={control}
-            render={({ field }) => (
-              <Select
-                id="proposal-type"
-                value={field.value}
-                onChange={(event: ChangeEvent<HTMLSelectElement>) =>
-                  field.onChange(event.target.value)
-                }
-                options={Object.entries(typeLabels).map(([value, label]) => ({
-                  label,
-                  value,
-                }))}
-              />
-            )}
-          />
-        </div>
-
-        <div className="u-form-field">
-          <label className="u-form-label" htmlFor="proposal-target-area">
-            Target area
-          </label>
-          <Input
-            id="proposal-target-area"
-            placeholder="e.g. Gulshan North"
-            fullWidth
-            {...register("targetArea")}
-          />
-          {errors.targetArea && (
-            <p className="u-form-error">{errors.targetArea.message}</p>
-          )}
-        </div>
-
-        <div className="u-form-field">
-          <label className="u-form-label" htmlFor="proposal-asset">
-            Related asset
-            <span className="u-text-secondary-emphasis u-font-normal"> (optional)</span>
-          </label>
-          <Controller
-            name="relatedAssetId"
-            control={control}
-            render={({ field }) => (
-              <Select
-                id="proposal-asset"
-                value={field.value ?? ""}
-                onChange={(event: ChangeEvent<HTMLSelectElement>) =>
-                  field.onChange(event.target.value)
-                }
-                options={[
-                  { label: "None", value: "" },
-                  ...assets.map((asset) => ({
-                    label: `${asset.name} (${asset.id})`,
-                    value: asset.id,
-                  })),
-                ]}
-              />
-            )}
-          />
-        </div>
-
-        <div className="u-form-field">
-          <label className="u-form-label" htmlFor="proposal-customers">
-            Estimated new customers
-          </label>
-          <Input
-            id="proposal-customers"
-            type="number"
-            min={0}
-            fullWidth
-            {...register("estimatedNewCustomers", { valueAsNumber: true })}
-          />
-          {errors.estimatedNewCustomers && (
-            <p className="u-form-error">{errors.estimatedNewCustomers.message}</p>
-          )}
-        </div>
-
-        <div className="u-flex u-gap-4">
-          <div className="u-form-field u-flex-1">
-            <label className="u-form-label" htmlFor="proposal-current-util">
-              Current utilization %
+          <div className="u-form-field">
+            <label className="u-form-label" htmlFor="proposal-title">
+              Title
             </label>
             <Input
-              id="proposal-current-util"
-              type="number"
-              min={0}
-              max={100}
+              id="proposal-title"
+              placeholder="e.g. Gulshan North Fiber Expansion"
               fullWidth
-              {...register("currentUtilizationPercent", { valueAsNumber: true })}
+              {...register("title")}
+            />
+            {errors.title && (
+              <p className="u-form-error">{errors.title.message}</p>
+            )}
+          </div>
+
+          <div className="u-form-field">
+            <label className="u-form-label" htmlFor="proposal-description">
+              Description
+            </label>
+            <Textarea
+              id="proposal-description"
+              placeholder="Brief summary of the expansion plan..."
+              rows={3}
+              fullWidth
+              {...register("description")}
             />
           </div>
-          <div className="u-form-field u-flex-1">
-            <label className="u-form-label" htmlFor="proposal-projected-util">
-              Projected utilization %
+        </section>
+
+        <section className="u-form-section">
+          <p className="u-form-section__title">Scope</p>
+
+          <div className="u-edit-fields-grid">
+            <div className="u-form-field">
+              <label className="u-form-label" htmlFor="proposal-type">
+                Proposal type
+              </label>
+              <Controller
+                name="type"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    id="proposal-type"
+                    value={field.value}
+                    onChange={(event: ChangeEvent<HTMLSelectElement>) =>
+                      field.onChange(event.target.value)
+                    }
+                    options={Object.entries(typeLabels).map(([value, label]) => ({
+                      label,
+                      value,
+                    }))}
+                  />
+                )}
+              />
+            </div>
+
+            <div className="u-form-field">
+              <label className="u-form-label" htmlFor="proposal-target-area">
+                Target area
+              </label>
+              <Input
+                id="proposal-target-area"
+                placeholder="e.g. Gulshan North"
+                fullWidth
+                {...register("targetArea")}
+              />
+              {errors.targetArea && (
+                <p className="u-form-error">{errors.targetArea.message}</p>
+              )}
+            </div>
+          </div>
+
+          <div className="u-form-field">
+            <label className="u-form-label" htmlFor="proposal-asset">
+              Related asset
+              <span className="u-text-secondary-emphasis u-font-normal">
+                {" "}
+                (optional)
+              </span>
+            </label>
+            <Controller
+              name="relatedAssetId"
+              control={control}
+              render={({ field }) => (
+                <Select
+                  id="proposal-asset"
+                  value={field.value ?? ""}
+                  placeholder="None"
+                  onChange={(event: ChangeEvent<HTMLSelectElement>) =>
+                    field.onChange(event.target.value)
+                  }
+                  options={[
+                    { label: "None", value: "" },
+                    ...assets.map((asset) => ({
+                      label: `${asset.name} (${asset.id})`,
+                      value: asset.id,
+                    })),
+                  ]}
+                />
+              )}
+            />
+          </div>
+        </section>
+
+        <section className="u-form-section">
+          <p className="u-form-section__title">Forecast & budget</p>
+
+          <div className="u-form-field">
+            <label className="u-form-label" htmlFor="proposal-customers">
+              Estimated new customers
             </label>
             <Input
-              id="proposal-projected-util"
+              id="proposal-customers"
               type="number"
               min={0}
-              max={100}
               fullWidth
-              {...register("projectedUtilizationPercent", { valueAsNumber: true })}
+              {...register("estimatedNewCustomers", { valueAsNumber: true })}
             />
-            {errors.projectedUtilizationPercent && (
+            {errors.estimatedNewCustomers && (
               <p className="u-form-error">
-                {errors.projectedUtilizationPercent.message}
+                {errors.estimatedNewCustomers.message}
               </p>
             )}
           </div>
-        </div>
 
-        <div className="u-form-field">
-          <label className="u-form-label" htmlFor="proposal-budget">
-            Estimated budget (USD)
-          </label>
-          <Input
-            id="proposal-budget"
-            type="number"
-            min={0}
-            fullWidth
-            {...register("estimatedBudgetUsd", { valueAsNumber: true })}
-          />
-          {errors.estimatedBudgetUsd && (
-            <p className="u-form-error">{errors.estimatedBudgetUsd.message}</p>
-          )}
-        </div>
-
-        <div className="u-form-field">
-          <label className="u-form-label" htmlFor="proposal-owner">
-            Owner
-          </label>
-          <Controller
-            name="owner"
-            control={control}
-            render={({ field }) => (
-              <Select
-                id="proposal-owner"
-                value={field.value}
-                onChange={(event: ChangeEvent<HTMLSelectElement>) =>
-                  field.onChange(event.target.value)
-                }
-                options={ownerOptions.map((name) => ({ label: name, value: name }))}
+          <div className="u-edit-fields-grid">
+            <div className="u-form-field">
+              <label className="u-form-label" htmlFor="proposal-current-util">
+                Current utilization %
+              </label>
+              <Input
+                id="proposal-current-util"
+                type="number"
+                min={0}
+                max={100}
+                placeholder="e.g. 72"
+                fullWidth
+                {...register("currentUtilizationPercent", {
+                  valueAsNumber: true,
+                })}
               />
-            )}
-          />
-        </div>
-
-        <div className="u-flex u-gap-4">
-          <div className="u-form-field u-flex-1">
-            <label className="u-form-label" htmlFor="proposal-start">
-              Target start date
-            </label>
-            <Input id="proposal-start" type="date" fullWidth {...register("targetStartDate")} />
+            </div>
+            <div className="u-form-field">
+              <label className="u-form-label" htmlFor="proposal-projected-util">
+                Projected utilization %
+              </label>
+              <Input
+                id="proposal-projected-util"
+                type="number"
+                min={0}
+                max={100}
+                fullWidth
+                {...register("projectedUtilizationPercent", {
+                  valueAsNumber: true,
+                })}
+              />
+              {errors.projectedUtilizationPercent && (
+                <p className="u-form-error">
+                  {errors.projectedUtilizationPercent.message}
+                </p>
+              )}
+            </div>
           </div>
-          <div className="u-form-field u-flex-1">
-            <label className="u-form-label" htmlFor="proposal-end">
-              Target completion date
+
+          <div className="u-form-field">
+            <label className="u-form-label" htmlFor="proposal-budget">
+              Estimated budget (USD)
             </label>
             <Input
-              id="proposal-end"
-              type="date"
+              id="proposal-budget"
+              type="number"
+              min={0}
               fullWidth
-              {...register("targetCompletionDate")}
+              {...register("estimatedBudgetUsd", { valueAsNumber: true })}
+            />
+            {errors.estimatedBudgetUsd && (
+              <p className="u-form-error">{errors.estimatedBudgetUsd.message}</p>
+            )}
+          </div>
+        </section>
+
+        <section className="u-form-section">
+          <p className="u-form-section__title">Timeline & ownership</p>
+
+          <div className="u-form-field">
+            <label className="u-form-label" htmlFor="proposal-owner">
+              Owner
+            </label>
+            <Controller
+              name="owner"
+              control={control}
+              render={({ field }) => (
+                <Select
+                  id="proposal-owner"
+                  value={field.value}
+                  onChange={(event: ChangeEvent<HTMLSelectElement>) =>
+                    field.onChange(event.target.value)
+                  }
+                  options={ownerOptions.map((name) => ({
+                    label: name,
+                    value: name,
+                  }))}
+                />
+              )}
             />
           </div>
-        </div>
+
+          <div className="u-edit-fields-grid">
+            <div className="u-form-field">
+              <label className="u-form-label" htmlFor="proposal-start">
+                Target start date
+              </label>
+              <Controller
+                name="targetStartDate"
+                control={control}
+                render={({ field }) => (
+                  <DatePicker
+                    id="proposal-start"
+                    value={toDateValue(field.value)}
+                    onChange={(date) => field.onChange(toIsoDate(date))}
+                    placeholder="Select start date"
+                    format="MMM d, yyyy"
+                    clearable
+                  />
+                )}
+              />
+            </div>
+            <div className="u-form-field">
+              <label className="u-form-label" htmlFor="proposal-end">
+                Target completion date
+              </label>
+              <Controller
+                name="targetCompletionDate"
+                control={control}
+                render={({ field }) => (
+                  <DatePicker
+                    id="proposal-end"
+                    value={toDateValue(field.value)}
+                    onChange={(date) => field.onChange(toIsoDate(date))}
+                    placeholder="Select completion date"
+                    format="MMM d, yyyy"
+                    minDate={toDateValue(targetStartDate) ?? undefined}
+                    clearable
+                  />
+                )}
+              />
+            </div>
+          </div>
+        </section>
 
         <div className="u-form-field">
           <label className="u-form-label" htmlFor="proposal-notes">
             Notes
+            <span className="u-text-secondary-emphasis u-font-normal">
+              {" "}
+              (optional)
+            </span>
           </label>
           <Textarea
             id="proposal-notes"

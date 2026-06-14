@@ -21,6 +21,24 @@
     padding-bottom: 0.75rem;
   }
 
+  // Body — scroll long forms without clipping fields
+  &__body {
+    max-height: min(28rem, calc(100vh - 14rem));
+    overflow-y: auto;
+    padding-right: 0.125rem;
+  }
+
+  // Close — visible against dark modal surfaces
+  &__close {
+    color: var(--atomix-secondary-text-emphasis);
+    opacity: 1;
+    transition: color 0.15s ease;
+
+    &:hover {
+      color: var(--atomix-body-color);
+    }
+  }
+
   // Footer — clear border above actions
   &__footer {
     border-top: 1px solid var(--atomix-border-color);
