@@ -5,7 +5,7 @@ import { NetworkStatus, NetworkNodeType, NetworkMapLayer } from "./types";
 export const MAPBOX_CONFIG = {
   ACCESS_TOKEN: process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN || "",
   STYLE: "mapbox://styles/mapbox/dark-v11",
-  DEFAULT_CENTER: [90.4125, 23.8103] as [number, number], // Dhaka, Bangladesh [lng, lat]
+  DEFAULT_CENTER: [89.6174234, 24.5339807] as [number, number], // Brothers Communication Network area [lng, lat]
   DEFAULT_ZOOM: 15,
   DEFAULT_PITCH: 60,
   DEFAULT_BEARING: -20,

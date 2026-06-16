@@ -12,154 +12,119 @@ type SeedCustomer = Omit<Customer, "createdAt" | "updatedAt"> & {
   updatedAt?: string;
 };
 
-const seedCustomers: SeedCustomer[] = [
-  {
-    id: "cust-001",
-    name: "Rahman Residence",
-    plan: "Fiber 100Mbps",
-    status: "online",
-    billingStatus: "paid",
-    relatedOnuId: "onu-cust-001",
-    email: "rahman@example.com",
-    location: { lat: 23.7948, lng: 90.4088 },
-    createdAt: daysAgo(180),
-    updatedAt: daysAgo(2),
-  },
-  {
-    id: "cust-002",
-    name: "Karim Tower",
-    plan: "Fiber 200Mbps",
-    status: "online",
-    billingStatus: "paid",
-    relatedOnuId: "onu-cust-002",
-    email: "admin@karimtower.com",
-    location: { lat: 23.7952, lng: 90.4092 },
-    createdAt: daysAgo(120),
-    updatedAt: daysAgo(5),
-  },
-  {
-    id: "cust-003",
-    name: "Ahmed Plaza",
-    plan: "Fiber 50Mbps",
-    status: "offline",
-    billingStatus: "overdue",
-    relatedOnuId: "onu-cust-003",
-    email: "contact@ahmedplaza.bd",
-    location: { lat: 23.7958, lng: 90.4098 },
-    createdAt: daysAgo(90),
-    updatedAt: daysAgo(1),
-  },
-  {
-    id: "cust-004",
-    name: "Hossain Enterprise",
-    plan: "Fiber 500Mbps",
-    status: "online",
-    billingStatus: "paid",
-    email: "billing@hossainent.com",
-    location: { lat: 23.7932, lng: 90.4075 },
-    createdAt: daysAgo(200),
-    updatedAt: daysAgo(10),
-  },
-  {
-    id: "cust-005",
-    name: "Fatema Medical Center",
-    plan: "Fiber 1Gbps",
-    status: "unstable",
-    billingStatus: "paid",
-    email: "it@fatemamedical.com",
-    location: { lat: 23.7940, lng: 90.4082 },
-    createdAt: daysAgo(150),
-    updatedAt: daysAgo(3),
-  },
-  {
-    id: "cust-006",
-    name: "Islam Apartment",
-    plan: "Fiber 50Mbps",
-    status: "online",
-    billingStatus: "paid",
-    email: "manager@islamapt.com",
-    location: { lat: 23.7943, lng: 90.4070 },
-    createdAt: daysAgo(60),
-    updatedAt: daysAgo(7),
-  },
-  {
-    id: "cust-007",
-    name: "Chowdhury Villa",
-    plan: "Fiber 100Mbps",
-    status: "online",
-    billingStatus: "paid",
-    email: "chowdhury@example.com",
-    location: { lat: 23.7955, lng: 90.4085 },
-    createdAt: daysAgo(45),
-    updatedAt: daysAgo(14),
-  },
-  {
-    id: "cust-008",
-    name: "Begum House",
-    plan: "Fiber 200Mbps",
-    status: "online",
-    billingStatus: "unpaid",
-    email: "begum@example.com",
-    location: { lat: 23.7938, lng: 90.4095 },
-    createdAt: daysAgo(30),
-    updatedAt: daysAgo(4),
-  },
-  {
-    id: "cust-009",
-    name: "Gulshan Tech Park",
-    plan: "Fiber 1Gbps",
-    status: "online",
-    billingStatus: "paid",
-    email: "ops@gulshantech.bd",
-    location: { lat: 23.7928, lng: 90.4080 },
-    createdAt: daysAgo(365),
-    updatedAt: daysAgo(1),
-  },
-  {
-    id: "cust-010",
-    name: "Banani Shopping Complex",
-    plan: "Fiber 500Mbps",
-    status: "online",
-    billingStatus: "paid",
-    email: "admin@bananishop.bd",
-    location: { lat: 23.7945, lng: 90.4075 },
-    createdAt: daysAgo(220),
-    updatedAt: daysAgo(6),
-  },
-  {
-    id: "cust-011",
-    name: "Dhaka Cafe & Restaurant",
-    plan: "Fiber 100Mbps",
-    status: "unstable",
-    billingStatus: "overdue",
-    email: "owner@dhakacafe.bd",
-    location: { lat: 23.7950, lng: 90.4078 },
-    createdAt: daysAgo(75),
-    updatedAt: daysAgo(2),
-  },
-  {
-    id: "cust-012",
-    name: "Gulshan International School",
-    plan: "Fiber 500Mbps",
-    status: "online",
-    billingStatus: "paid",
-    email: "it@gulshanschool.edu.bd",
-    location: { lat: 23.7935, lng: 90.4090 },
-    createdAt: daysAgo(400),
-    updatedAt: daysAgo(20),
-  },
-  {
-    id: "cust-013",
-    name: "Banani Library",
-    plan: "Fiber 200Mbps",
-    status: "online",
-    billingStatus: "paid",
-    email: "info@bananilibrary.bd",
-    location: { lat: 23.7942, lng: 90.4068 },
-    createdAt: daysAgo(100),
-    updatedAt: daysAgo(8),
-  },
-];
+const DEMO_CENTER = { lat: 24.5339807, lng: 89.6174234 } as const;
+const POP_A_CENTER = { lat: DEMO_CENTER.lat + 0.004, lng: DEMO_CENTER.lng - 0.006 } as const;
+const POP_B_CENTER = { lat: DEMO_CENTER.lat - 0.004, lng: DEMO_CENTER.lng + 0.006 } as const;
+
+function hashStringToUint32(input: string): number {
+  // FNV-1a 32-bit
+  let hash = 0x811c9dc5;
+  for (let i = 0; i < input.length; i++) {
+    hash ^= input.charCodeAt(i);
+    hash = Math.imul(hash, 0x01000193);
+  }
+  return hash >>> 0;
+}
+
+function mulberry32(seed: number) {
+  let t = seed >>> 0;
+  return () => {
+    t += 0x6d2b79f5;
+    let x = t;
+    x = Math.imul(x ^ (x >>> 15), x | 1);
+    x ^= x + Math.imul(x ^ (x >>> 7), x | 61);
+    return ((x ^ (x >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+function clamp(n: number, min: number, max: number) {
+  return Math.min(max, Math.max(min, n));
+}
+
+function randomChoice<T>(rng: () => number, options: readonly T[]): T {
+  return options[Math.floor(rng() * options.length)]!;
+}
+
+function randomLatLngWithinMeters(
+  rng: () => number,
+  center: { lat: number; lng: number },
+  radiusMeters: number
+) {
+  // Uniformly distributed within a circle (sqrt for radius)
+  const r = Math.sqrt(rng()) * radiusMeters;
+  const theta = rng() * Math.PI * 2;
+  const dx = r * Math.cos(theta);
+  const dy = r * Math.sin(theta);
+
+  // Convert meters → degrees
+  const metersPerDegLat = 111_320;
+  const metersPerDegLng = metersPerDegLat * Math.cos((center.lat * Math.PI) / 180);
+
+  const lat = center.lat + dy / metersPerDegLat;
+  const lng = center.lng + dx / Math.max(1e-9, metersPerDegLng);
+  return { lat, lng };
+}
+
+function generateDemoCustomers(): SeedCustomer[] {
+  const seed = hashStringToUint32("fiberops-demo-brothers-2026-06");
+  const rng = mulberry32(seed);
+
+  const plans = [
+    "Fiber 50Mbps",
+    "Fiber 100Mbps",
+    "Fiber 200Mbps",
+    "Fiber 500Mbps",
+    "Fiber 1Gbps",
+  ] as const;
+
+  const makeStatus = (): CustomerStatus => {
+    const x = rng();
+    if (x < 0.08) return "offline";
+    if (x < 0.20) return "unstable";
+    return "online";
+  };
+
+  const makeBilling = (status: CustomerStatus): BillingStatus => {
+    const x = rng();
+    if (status === "offline" && x < 0.6) return "overdue";
+    if (x < 0.08) return "overdue";
+    if (x < 0.16) return "unpaid";
+    return "paid";
+  };
+
+  const customersOut: SeedCustomer[] = [];
+  const total = 300;
+  const perPop = total / 2;
+  const radiusMeters = 1800;
+
+  for (let i = 1; i <= total; i++) {
+    const id = `cust-${String(i).padStart(3, "0")}`;
+    const popCenter = i <= perPop ? POP_A_CENTER : POP_B_CENTER;
+    const location = randomLatLngWithinMeters(rng, popCenter, radiusMeters);
+
+    const status = makeStatus();
+    const billingStatus = makeBilling(status);
+    const plan = randomChoice(rng, plans);
+
+    const createdDays = Math.floor(clamp(rng() * 420, 5, 420));
+    const updatedDays = Math.floor(clamp(rng() * 30, 0, 30));
+
+    customersOut.push({
+      id,
+      name: `Demo User ${String(i).padStart(3, "0")}`,
+      plan,
+      status,
+      billingStatus,
+      location,
+      createdAt: daysAgo(createdDays),
+      updatedAt: daysAgo(updatedDays),
+    });
+  }
+
+  return customersOut;
+}
+
+const seedCustomers: SeedCustomer[] = generateDemoCustomers();
 
 function normalizeCustomer(seed: SeedCustomer): Customer {
   const now = new Date().toISOString();
