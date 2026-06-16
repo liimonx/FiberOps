@@ -3,6 +3,7 @@ import type {
   Customer,
   CustomerStatus,
 } from "@/types/domain";
+import { clientsSheetRows } from "@/mocks/clientsSheetData";
 
 const daysAgo = (days: number) =>
   new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString();
@@ -41,10 +42,6 @@ function clamp(n: number, min: number, max: number) {
   return Math.min(max, Math.max(min, n));
 }
 
-function randomChoice<T>(rng: () => number, options: readonly T[]): T {
-  return options[Math.floor(rng() * options.length)]!;
-}
-
 function randomLatLngWithinMeters(
   rng: () => number,
   center: { lat: number; lng: number },
@@ -65,66 +62,71 @@ function randomLatLngWithinMeters(
   return { lat, lng };
 }
 
-function generateDemoCustomers(): SeedCustomer[] {
-  const seed = hashStringToUint32("fiberops-demo-brothers-2026-06");
-  const rng = mulberry32(seed);
+function normalizeSheetStatus(status: string | null | undefined): CustomerStatus {
+  const s = (status ?? "").toLowerCase();
+  if (s === "active") return "online";
+  if (s === "locked") return "offline";
+  return "unstable";
+}
 
-  const plans = [
-    "Fiber 50Mbps",
-    "Fiber 100Mbps",
-    "Fiber 200Mbps",
-    "Fiber 500Mbps",
-    "Fiber 1Gbps",
-  ] as const;
+function normalizeSheetBilling(status: string | null | undefined): BillingStatus {
+  const s = (status ?? "").toLowerCase();
+  if (s === "active") return "paid";
+  if (s === "locked") return "overdue";
+  return "unpaid";
+}
 
-  const makeStatus = (): CustomerStatus => {
-    const x = rng();
-    if (x < 0.08) return "offline";
-    if (x < 0.20) return "unstable";
-    return "online";
-  };
+function stableRngForCustomer(customerId: string): () => number {
+  return mulberry32(hashStringToUint32(`clients.xlsx:${customerId}`));
+}
 
-  const makeBilling = (status: CustomerStatus): BillingStatus => {
-    const x = rng();
-    if (status === "offline" && x < 0.6) return "overdue";
-    if (x < 0.08) return "overdue";
-    if (x < 0.16) return "unpaid";
-    return "paid";
-  };
+function popCenterForName(popName: string | null | undefined) {
+  // If POP names map to real POP assets, customers cluster around those assets.
+  // Fallback to 2-way split so we still render if POP is missing.
+  const key = (popName ?? "").trim();
+  if (!key) return POP_A_CENTER;
+  const h = hashStringToUint32(`clients.xlsx:pop:${key.toLowerCase()}`);
+  return h % 2 === 0 ? POP_A_CENTER : POP_B_CENTER;
+}
 
-  const customersOut: SeedCustomer[] = [];
-  const total = 300;
-  const perPop = total / 2;
+function createNotes(row: (typeof clientsSheetRows)[number]): string {
+  const parts: string[] = [];
+  if (row.pppoe) parts.push(`PPPoE: ${row.pppoe}`);
+  if (row.package) parts.push(`Package: ${row.package}`);
+  if (row.bill != null) parts.push(`Bill: ${row.bill}`);
+  if (row.pop) parts.push(`POP: ${row.pop}`);
+  if (row.billingNumber) parts.push(`Billing Number: ${row.billingNumber}`);
+  if (row.validity) parts.push(`Validity: ${row.validity}`);
+  if (row.status) parts.push(`Status: ${row.status}`);
+  return parts.join(" | ");
+}
+
+function generateCustomersFromSheet(): SeedCustomer[] {
   const radiusMeters = 1800;
 
-  for (let i = 1; i <= total; i++) {
-    const id = `cust-${String(i).padStart(3, "0")}`;
-    const popCenter = i <= perPop ? POP_A_CENTER : POP_B_CENTER;
-    const location = randomLatLngWithinMeters(rng, popCenter, radiusMeters);
-
-    const status = makeStatus();
-    const billingStatus = makeBilling(status);
-    const plan = randomChoice(rng, plans);
-
+  return clientsSheetRows.map((row) => {
+    const rng = stableRngForCustomer(row.customerId);
+    const center = popCenterForName(row.pop);
+    const location = randomLatLngWithinMeters(rng, center, radiusMeters);
     const createdDays = Math.floor(clamp(rng() * 420, 5, 420));
     const updatedDays = Math.floor(clamp(rng() * 30, 0, 30));
 
-    customersOut.push({
-      id,
-      name: `Demo User ${String(i).padStart(3, "0")}`,
-      plan,
-      status,
-      billingStatus,
+    return {
+      id: `cust-${row.customerId}`,
+      name: row.name ?? `Client ${row.customerId}`,
+      plan: row.package ?? "Package-1",
+      status: normalizeSheetStatus(row.status),
+      billingStatus: normalizeSheetBilling(row.status),
+      email: undefined,
       location,
+      notes: createNotes(row),
       createdAt: daysAgo(createdDays),
       updatedAt: daysAgo(updatedDays),
-    });
-  }
-
-  return customersOut;
+    };
+  });
 }
 
-const seedCustomers: SeedCustomer[] = generateDemoCustomers();
+const seedCustomers: SeedCustomer[] = generateCustomersFromSheet();
 
 function normalizeCustomer(seed: SeedCustomer): Customer {
   const now = new Date().toISOString();
