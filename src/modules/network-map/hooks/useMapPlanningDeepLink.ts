@@ -45,6 +45,7 @@ export function useMapPlanningDeepLink({
     (state) => state.setActivePlanningProposalId
   );
   const setActiveTool = useNetworkMapStore((state) => state.setActiveTool);
+  const boundsFitRef = useRef<string | null>(null);
 
   useEffect(() => {
     if (!proposalId || !proposal) return;
@@ -61,28 +62,40 @@ export function useMapPlanningDeepLink({
       setActiveTool("plan");
       getToolManager().setActiveTool("plan");
     }
-
-    if (mapInstance) {
-      const points = collectLatLngPoints([proposal], [], [], null, []);
-      if (points.length > 0) {
-        const bounds = new mapboxgl.LngLatBounds();
-        for (const point of points) {
-          bounds.extend([point.lng, point.lat]);
-        }
-        fitMapBounds(mapInstance, bounds, 80);
-      }
-    }
   }, [
     proposalId,
     proposal,
     editMode,
-    mapInstance,
     setPlanningOverlays,
     setLayerVisibility,
     setPlanDraftFromProposal,
     setActivePlanningProposalId,
     setActiveTool,
   ]);
+
+  useEffect(() => {
+    if (!mapInstance || !proposal) return;
+
+    const fitKey = `${proposal.id}:${editMode}`;
+    if (boundsFitRef.current === fitKey) return;
+    boundsFitRef.current = fitKey;
+
+    const points = collectLatLngPoints(
+      [proposal],
+      editMode ? proposal.areas : [],
+      editMode ? proposal.routes : [],
+      null,
+      []
+    );
+
+    if (points.length === 0) return;
+
+    const bounds = new mapboxgl.LngLatBounds();
+    for (const point of points) {
+      bounds.extend([point.lng, point.lat]);
+    }
+    fitMapBounds(mapInstance, bounds, 80);
+  }, [mapInstance, proposal, editMode]);
 }
 
 /** Loads all proposals onto the map when the planning layer is visible (no deep link). */

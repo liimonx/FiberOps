@@ -109,6 +109,49 @@ export function proposalsToPlanningGeoJSON(
   };
 }
 
+export function routeWaypointsToGeoJSON(
+  waypoints: LatLng[],
+  idPrefix: string
+): GeoJSON.FeatureCollection {
+  const features: GeoJSON.Feature[] = waypoints.map((point, index) => ({
+    type: "Feature",
+    properties: {
+      id: `${idPrefix}-wp-${index}`,
+      kind: "planning-route-waypoint",
+      index: index + 1,
+    },
+    geometry: {
+      type: "Point",
+      coordinates: [point.lng, point.lat],
+    },
+  }));
+
+  if (waypoints.length >= 2) {
+    features.push({
+      type: "Feature",
+      properties: { id: `${idPrefix}-line`, kind: "planning-route-draft" },
+      geometry: {
+        type: "LineString",
+        coordinates: waypoints.map((p) => [p.lng, p.lat] as [number, number]),
+      },
+    });
+  }
+
+  return { type: "FeatureCollection", features };
+}
+
+export function isPlanGeometryDirty(
+  draftAreas: PlanningAreaGeometry[],
+  draftRoutes: PlanningRouteGeometry[],
+  savedAreas: PlanningAreaGeometry[],
+  savedRoutes: PlanningRouteGeometry[]
+): boolean {
+  return (
+    JSON.stringify({ areas: draftAreas, routes: draftRoutes }) !==
+    JSON.stringify({ areas: savedAreas, routes: savedRoutes })
+  );
+}
+
 export function collectLatLngPoints(
   proposals: PlanningProposal[],
   draftAreas: PlanningAreaGeometry[],

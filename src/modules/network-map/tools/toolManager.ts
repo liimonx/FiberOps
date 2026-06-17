@@ -466,7 +466,29 @@ export class PlanTool extends BaseTool {
   public readonly description = "Draw proposed expansion areas and fiber routes";
   public cursor = "crosshair";
 
+  activate(): void {
+    super.activate();
+    const store = useNetworkMapStore.getState();
+    if (store.activePlanningProposalId) {
+      store.setLayerVisibility("planning-proposals", true);
+    }
+  }
+
+  deactivate(): void {
+    super.deactivate();
+    useNetworkMapStore.getState().clearPlanPendingDraw();
+  }
+
+  private canDraw(): boolean {
+    return Boolean(useNetworkMapStore.getState().activePlanningProposalId);
+  }
+
   onClick(event: MapMouseEvent): void {
+    if (!this.canDraw()) {
+      log.warn("[PlanTool] Ignoring click — no active planning proposal");
+      return;
+    }
+
     const store = useNetworkMapStore.getState();
 
     if (store.planDrawMode === "area") {
@@ -485,12 +507,25 @@ export class PlanTool extends BaseTool {
 
   onKeyDown(event: KeyboardEvent): void {
     const store = useNetworkMapStore.getState();
+    if (!this.canDraw()) return;
 
-    if (store.planDrawMode !== "route") return;
+    if (store.planDrawMode === "area") {
+      if (event.key === "Enter" && store.planPendingArea) {
+        event.preventDefault();
+        store.commitPlanPendingArea();
+      }
+      return;
+    }
 
     if (event.key === "Backspace" && store.planRouteWaypoints.length > 0) {
       event.preventDefault();
       store.removeLastPlanRouteWaypoint();
+      return;
+    }
+
+    if (event.key === "Enter" && store.planRouteWaypoints.length >= 2) {
+      event.preventDefault();
+      store.commitPlanRoute();
       return;
     }
 

@@ -116,6 +116,8 @@ interface NetworkMapStore {
   clearPlanRouteWaypoints: () => void;
   commitPlanPendingArea: () => void;
   commitPlanRoute: () => void;
+  clearPlanPendingDraw: () => void;
+  discardPlanDraftChanges: () => void;
   setPlanDraftFromProposal: (proposal: PlanningProposal) => void;
   clearPlanDraft: () => void;
 
@@ -238,9 +240,17 @@ export const useNetworkMapStore = create<NetworkMapStore>()(
 
         // Interaction actions
         setActiveTool: (tool) =>
-          set((state) => ({
-            interaction: { ...state.interaction, activeTool: tool }
-          }), false, 'setActiveTool'),
+          set((state) => {
+            const leavingPlan =
+              state.interaction.activeTool === "plan" && tool !== "plan";
+
+            return {
+              interaction: { ...state.interaction, activeTool: tool },
+              ...(leavingPlan
+                ? { planPendingArea: null, planRouteWaypoints: [] }
+                : {}),
+            };
+          }, false, 'setActiveTool'),
 
         setSelectedElement: (elementId) =>
           set((state) => ({
@@ -521,6 +531,34 @@ export const useNetworkMapStore = create<NetworkMapStore>()(
               planRouteWaypoints: [],
             };
           }, false, "commitPlanRoute"),
+
+        clearPlanPendingDraw: () =>
+          set(
+            { planPendingArea: null, planRouteWaypoints: [] },
+            false,
+            "clearPlanPendingDraw"
+          ),
+
+        discardPlanDraftChanges: () =>
+          set((state) => {
+            const proposal = state.planningOverlays.find(
+              (item) => item.id === state.activePlanningProposalId
+            );
+            if (!proposal) {
+              return {
+                planDraftAreas: [],
+                planDraftRoutes: [],
+                planPendingArea: null,
+                planRouteWaypoints: [],
+              };
+            }
+            return {
+              planDraftAreas: [...proposal.areas],
+              planDraftRoutes: [...proposal.routes],
+              planPendingArea: null,
+              planRouteWaypoints: [],
+            };
+          }, false, "discardPlanDraftChanges"),
 
         setPlanDraftFromProposal: (proposal) =>
           set({

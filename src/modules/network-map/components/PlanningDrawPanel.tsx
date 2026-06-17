@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Button, Callout, Card, Icon } from "@shohojdhara/atomix";
 import { useNetworkMapStore } from "../stores/useNetworkMapStore";
 import { useUpdatePlanningProposal } from "@/modules/planning/hooks/usePlanningProposalsData";
+import { isPlanGeometryDirty } from "../utils/planningGeoUtils";
 import type { PlanDrawMode } from "../types";
 
 export function PlanningDrawPanel() {
@@ -19,6 +20,9 @@ export function PlanningDrawPanel() {
   const clearPlanRouteWaypoints = useNetworkMapStore(
     (state) => state.clearPlanRouteWaypoints
   );
+  const clearPlanPendingDraw = useNetworkMapStore(
+    (state) => state.clearPlanPendingDraw
+  );
   const commitPlanPendingArea = useNetworkMapStore(
     (state) => state.commitPlanPendingArea
   );
@@ -28,37 +32,69 @@ export function PlanningDrawPanel() {
   const activePlanningProposalId = useNetworkMapStore(
     (state) => state.activePlanningProposalId
   );
+  const planningOverlays = useNetworkMapStore((state) => state.planningOverlays);
   const setPlanningOverlays = useNetworkMapStore(
     (state) => state.setPlanningOverlays
+  );
+  const discardPlanDraftChanges = useNetworkMapStore(
+    (state) => state.discardPlanDraftChanges
   );
 
   const { mutateAsync: updateProposal, isPending, isError, error } =
     useUpdatePlanningProposal();
 
   const [feedback, setFeedback] = useState<string | null>(null);
+  const [saveError, setSaveError] = useState<string | null>(null);
+
+  const activeProposal = useMemo(
+    () => planningOverlays.find((item) => item.id === activePlanningProposalId),
+    [planningOverlays, activePlanningProposalId]
+  );
+
+  const hasUnsavedDraft = useMemo(() => {
+    if (!activeProposal) return false;
+    return isPlanGeometryDirty(
+      planDraftAreas,
+      planDraftRoutes,
+      activeProposal.areas,
+      activeProposal.routes
+    );
+  }, [activeProposal, planDraftAreas, planDraftRoutes]);
+
+  const hasPendingDraw =
+    planPendingArea !== null || planRouteWaypoints.length > 0;
 
   const handleModeChange = (mode: PlanDrawMode) => {
+    if (hasPendingDraw) {
+      clearPlanPendingDraw();
+    }
     setPlanDrawMode(mode);
-    setPlanPendingArea(null);
-    clearPlanRouteWaypoints();
   };
 
   const handleSave = async () => {
     if (!activePlanningProposalId) {
-      setFeedback("No active proposal. Open a proposal in edit mode first.");
+      setSaveError("No active proposal. Open a proposal in edit mode first.");
       return;
     }
 
     setFeedback(null);
-    const updated = await updateProposal({
-      id: activePlanningProposalId,
-      data: {
-        areas: planDraftAreas,
-        routes: planDraftRoutes,
-      },
-    });
-    setPlanningOverlays([updated]);
-    setFeedback("Geometry saved to proposal.");
+    setSaveError(null);
+
+    try {
+      const updated = await updateProposal({
+        id: activePlanningProposalId,
+        data: {
+          areas: planDraftAreas,
+          routes: planDraftRoutes,
+        },
+      });
+      setPlanningOverlays([updated]);
+      setFeedback("Geometry saved to proposal.");
+    } catch (err) {
+      setSaveError(
+        err instanceof Error ? err.message : "Failed to save geometry."
+      );
+    }
   };
 
   return (
@@ -82,6 +118,13 @@ export function PlanningDrawPanel() {
         </p>
       ) : (
         <>
+          {activeProposal && (
+            <p className="u-text-xs u-text-secondary-emphasis u-mb-3 u-m-0">
+              Editing: <strong>{activeProposal.title}</strong>
+              {hasUnsavedDraft ? " (unsaved changes)" : ""}
+            </p>
+          )}
+
           <div className="u-flex u-gap-2 u-mb-4">
             <Button
               variant={planDrawMode === "area" ? "primary" : "outline-secondary"}
@@ -102,7 +145,8 @@ export function PlanningDrawPanel() {
           {planDrawMode === "area" ? (
             <div className="u-mb-4">
               <p className="u-text-xs u-text-secondary-emphasis u-mb-2">
-                Click the map to place an expansion area center.
+                Click the map to place an expansion area center. Press Enter to add
+                the area.
               </p>
               {planPendingArea && (
                 <>
@@ -137,6 +181,7 @@ export function PlanningDrawPanel() {
             <div className="u-mb-4">
               <p className="u-text-xs u-text-secondary-emphasis u-mb-2">
                 Click to add route waypoints ({planRouteWaypoints.length} placed).
+                Press Enter to finish the route.
               </p>
               <div className="u-flex u-gap-2 u-flex-wrap">
                 <Button
@@ -146,6 +191,14 @@ export function PlanningDrawPanel() {
                   disabled={planRouteWaypoints.length === 0}
                 >
                   Undo Waypoint
+                </Button>
+                <Button
+                  variant="outline-secondary"
+                  size="sm"
+                  onClick={clearPlanRouteWaypoints}
+                  disabled={planRouteWaypoints.length === 0}
+                >
+                  Clear Route
                 </Button>
                 <Button
                   variant="outline-secondary"
@@ -163,10 +216,11 @@ export function PlanningDrawPanel() {
             Draft: {planDraftAreas.length} area(s), {planDraftRoutes.length} route(s)
           </p>
 
-          {isError && (
+          {(isError || saveError) && (
             <Callout variant="error" title="Save failed" className="u-mb-3">
               <p className="u-text-sm u-mb-0">
-                {error instanceof Error ? error.message : "Please try again."}
+                {saveError ??
+                  (error instanceof Error ? error.message : "Please try again.")}
               </p>
             </Callout>
           )}
@@ -177,14 +231,24 @@ export function PlanningDrawPanel() {
             </Callout>
           )}
 
-          <Button
-            variant="primary"
-            className="u-w-100"
-            onClick={handleSave}
-            disabled={isPending}
-          >
-            {isPending ? "Saving..." : "Save to Proposal"}
-          </Button>
+          <div className="u-flex u-gap-2">
+            <Button
+              variant="primary"
+              className="u-flex-1"
+              onClick={handleSave}
+              disabled={isPending || !hasUnsavedDraft}
+            >
+              {isPending ? "Saving..." : "Save to Proposal"}
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={discardPlanDraftChanges}
+              disabled={!hasUnsavedDraft && !hasPendingDraw}
+            >
+              Discard
+            </Button>
+          </div>
         </>
       )}
     </Card>
