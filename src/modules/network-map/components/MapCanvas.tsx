@@ -14,7 +14,7 @@ import { MAPBOX_CONFIG } from "../constants";
 import { createLogger } from "@/lib/logger";
 
 const log = createLogger("MapCanvas");
-import { EnhancedLoadingState } from "./EnhancedLoadingState";
+import { MapLoader } from "./loading";
 import {
   addCustomLayers,
   updateLayerVisibility,
@@ -436,9 +436,7 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({ onMapLoad, onMapError }) =
         aria-label="Network Map"
         tabIndex={0}
       />
-      {mapLoading && (
-        <EnhancedLoadingState message="Initializing Neural Map..." variant="overlay" />
-      )}
+      {mapLoading && <MapLoader />}
     </div>
   );
 };

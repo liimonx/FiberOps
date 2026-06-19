@@ -356,3 +356,81 @@ $fiberops-max-widths: sizes.$fiberops-max-widths;
   pointer-events: none !important;
   background: rgba(var(--ambient-purple-rgb, 168, 85, 247), 0.1) !important;
 }
+
+// ── Network map loader (HUD chip) ─────────────────────────────────────────────
+
+.map-loader-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: var(--atomix-z-modal, 1040);
+  pointer-events: none;
+}
+
+.map-loader-overlay__backdrop {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at center,
+    transparent 35%,
+    rgba(0, 0, 0, 0.35) 100%
+  );
+  pointer-events: none;
+}
+
+.map-loader {
+  position: relative;
+  width: auto;
+  max-width: min(22rem, calc(100vw - 2rem));
+  padding: var(--atomix-spacing-4, 0.75rem) var(--atomix-spacing-5, 1rem);
+  animation: map-loader-enter 0.45s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.map-loader::before,
+.map-loader::after {
+  content: "";
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-color: rgba(var(--atomix-primary-rgb), 0.45);
+  border-style: solid;
+  pointer-events: none;
+}
+
+.map-loader::before {
+  top: 6px;
+  left: 6px;
+  border-width: 1px 0 0 1px;
+}
+
+.map-loader::after {
+  bottom: 6px;
+  right: 6px;
+  border-width: 0 1px 1px 0;
+}
+
+.map-loader .u-text-sm {
+  font-size: var(--atomix-font-size-xs, 0.75rem);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--atomix-primary-text-emphasis, var(--atomix-primary));
+}
+
+.map-loader .u-text-xs {
+  font-size: 0.6875rem;
+  letter-spacing: 0.02em;
+}
+
+@keyframes map-loader-enter {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.97);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}

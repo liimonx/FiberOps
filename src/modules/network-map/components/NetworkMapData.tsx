@@ -10,7 +10,7 @@ import {
 import { useNetworkMapStore } from "../stores/useNetworkMapStore";
 import { ErrorBoundary } from "./ErrorBoundary";
 import { AccessibilityProvider } from "./AccessibilityAnnouncer";
-import { EnhancedLoadingState } from "./EnhancedLoadingState";
+import { LoadingIndicator } from "./loading";
 import { NetworkStatus } from "../types";
 import { createLogger } from "@/lib/logger";
 
@@ -94,7 +94,7 @@ function NetworkMapDataSync({ children }: NetworkMapDataProps) {
   if (isLoading && nodes.length === 0) {
     return (
       <div className="u-w-100 u-h-100 u-flex u-items-center u-justify-center u-bg-dark">
-        <EnhancedLoadingState message="Connecting to Fiber Mesh..." />
+        <LoadingIndicator message="Connecting to Fiber Mesh..." />
       </div>
     );
   }

@@ -3,7 +3,8 @@ import type {
   Customer,
   CustomerStatus,
 } from "@/types/domain";
-import { clientsSheetRows } from "@/mocks/clientsSheetData";
+import { buildSheetNetworkSeed } from "@/mocks/sheetNetworkGenerator";
+import type { ClientSheetRow } from "@/mocks/clientsSheetData";
 
 const daysAgo = (days: number) =>
   new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString();
@@ -13,12 +14,7 @@ type SeedCustomer = Omit<Customer, "createdAt" | "updatedAt"> & {
   updatedAt?: string;
 };
 
-const DEMO_CENTER = { lat: 24.5339807, lng: 89.6174234 } as const;
-const POP_A_CENTER = { lat: DEMO_CENTER.lat + 0.004, lng: DEMO_CENTER.lng - 0.006 } as const;
-const POP_B_CENTER = { lat: DEMO_CENTER.lat - 0.004, lng: DEMO_CENTER.lng + 0.006 } as const;
-
 function hashStringToUint32(input: string): number {
-  // FNV-1a 32-bit
   let hash = 0x811c9dc5;
   for (let i = 0; i < input.length; i++) {
     hash ^= input.charCodeAt(i);
@@ -42,26 +38,6 @@ function clamp(n: number, min: number, max: number) {
   return Math.min(max, Math.max(min, n));
 }
 
-function randomLatLngWithinMeters(
-  rng: () => number,
-  center: { lat: number; lng: number },
-  radiusMeters: number
-) {
-  // Uniformly distributed within a circle (sqrt for radius)
-  const r = Math.sqrt(rng()) * radiusMeters;
-  const theta = rng() * Math.PI * 2;
-  const dx = r * Math.cos(theta);
-  const dy = r * Math.sin(theta);
-
-  // Convert meters → degrees
-  const metersPerDegLat = 111_320;
-  const metersPerDegLng = metersPerDegLat * Math.cos((center.lat * Math.PI) / 180);
-
-  const lat = center.lat + dy / metersPerDegLat;
-  const lng = center.lng + dx / Math.max(1e-9, metersPerDegLng);
-  return { lat, lng };
-}
-
 function normalizeSheetStatus(status: string | null | undefined): CustomerStatus {
   const s = (status ?? "").toLowerCase();
   if (s === "active") return "online";
@@ -80,16 +56,7 @@ function stableRngForCustomer(customerId: string): () => number {
   return mulberry32(hashStringToUint32(`clients.xlsx:${customerId}`));
 }
 
-function popCenterForName(popName: string | null | undefined) {
-  // If POP names map to real POP assets, customers cluster around those assets.
-  // Fallback to 2-way split so we still render if POP is missing.
-  const key = (popName ?? "").trim();
-  if (!key) return POP_A_CENTER;
-  const h = hashStringToUint32(`clients.xlsx:pop:${key.toLowerCase()}`);
-  return h % 2 === 0 ? POP_A_CENTER : POP_B_CENTER;
-}
-
-function createNotes(row: (typeof clientsSheetRows)[number]): string {
+function createNotes(row: ClientSheetRow): string {
   const parts: string[] = [];
   if (row.pppoe) parts.push(`PPPoE: ${row.pppoe}`);
   if (row.package) parts.push(`Package: ${row.package}`);
@@ -102,22 +69,21 @@ function createNotes(row: (typeof clientsSheetRows)[number]): string {
 }
 
 function generateCustomersFromSheet(): SeedCustomer[] {
-  const radiusMeters = 1800;
+  const { customerPlacements } = buildSheetNetworkSeed();
 
-  return clientsSheetRows.map((row) => {
+  return customerPlacements.map(({ row, customerId, location, relatedOnuId }) => {
     const rng = stableRngForCustomer(row.customerId);
-    const center = popCenterForName(row.pop);
-    const location = randomLatLngWithinMeters(rng, center, radiusMeters);
     const createdDays = Math.floor(clamp(rng() * 420, 5, 420));
     const updatedDays = Math.floor(clamp(rng() * 30, 0, 30));
 
     return {
-      id: `cust-${row.customerId}`,
+      id: customerId,
       name: row.name ?? `Client ${row.customerId}`,
       plan: row.package ?? "Package-1",
       status: normalizeSheetStatus(row.status),
       billingStatus: normalizeSheetBilling(row.status),
       email: undefined,
+      relatedOnuId,
       location,
       notes: createNotes(row),
       createdAt: daysAgo(createdDays),

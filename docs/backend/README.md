@@ -8,6 +8,7 @@ Use these docs to scaffold one or more backend services (monolith or microservic
 
 | Document | Purpose |
 |----------|---------|
+| [Guideline](./guideline.md) | **End-to-end workflow** for building backend features (mirrors frontend E2E pattern) |
 | [Overview](./overview.md) | System context, service boundaries, tech recommendations |
 | [Domain Models](./domain-models.md) | Entities, enums, relationships, business rules |
 | [API Reference](./api-reference.md) | REST endpoints, request/response shapes, validation |

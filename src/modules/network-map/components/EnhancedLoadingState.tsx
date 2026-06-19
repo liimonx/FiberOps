@@ -1,7 +1,8 @@
 "use client";
 
 import React from "react";
-import { Icon, Card } from "@shohojdhara/atomix";
+import { Spinner, Card } from "@shohojdhara/atomix";
+import { LoadingIndicator } from "./loading/LoadingIndicator";
 
 interface EnhancedLoadingStateProps {
   message?: string;
@@ -24,59 +25,36 @@ export function EnhancedLoadingState({
   progress,
   className = "",
 }: EnhancedLoadingStateProps) {
-  const spinnerSizes = {
-    sm: 24,
-    md: 32,
-    lg: 48,
-  };
-
-  const content = (
-    <div className="u-flex u-flex-column u-items-center u-gap-3">
-      {showSpinner && (
-        <Icon name="SpinnerGap" size={spinnerSizes[size]} className=" u-animate-spin" />
-      )}
-
-      <div className="u-text-center">
-        <span
-          className={`u-text-${size === "sm" ? "xs" : size === "lg" ? "base" : "sm"} u-font-bold `}
-        >
-          {message}
-          <span className="u-animate-pulse">...</span>
-        </span>
-
-        {subMessage && (
-          <p className="u-text-xs u-text-secondary-emphasis u-mt-1 u-opacity-70">
-            {subMessage}
-          </p>
-        )}
+  const progressBar = showProgress && progress !== undefined && (
+    <div className="u-w-100 u-mt-4">
+      <div className="u-flex u-justify-between u-text-xs u-text-secondary-emphasis u-mb-2">
+        <span className="u-font-bold u-text-uppercase">Progress</span>
+        <span className="u-font-mono">{Math.round(progress)}%</span>
       </div>
-
-      {showProgress && progress !== undefined && (
-        <div className="u-w-100 u-mt-4">
-          <div className="u-flex u-justify-between u-text-xs u-text-secondary-emphasis u-mb-2">
-            <span
-              className="u-font-bold u-text-uppercase"
-            >
-              Progress
-            </span>
-            <span className="u-font-mono">{Math.round(progress)}%</span>
-          </div>
-          <div className="u-progress-track">
-            <div
-              className="u-progress-fill"
-              style={{ width: `${progress}%` }}
-            />
-          </div>
-        </div>
-      )}
+      <div className="u-progress-track">
+        <div
+          className="u-progress-fill"
+          style={{ width: `${progress}%` }}
+        />
+      </div>
     </div>
   );
 
   if (variant === "overlay") {
     return (
-      <div className="u-overlay-center u-bg-black-opacity-50">
+      <div
+        className="u-overlay-center u-bg-black-opacity-50"
+        aria-busy="true"
+        aria-label={message}
+      >
         <Card className="u-p-8 u-shadow-xl">
-          {content}
+          <LoadingIndicator
+            message={message}
+            subMessage={subMessage}
+            size={size}
+            aria-label={message}
+          />
+          {progressBar}
         </Card>
       </div>
     );
@@ -84,17 +62,21 @@ export function EnhancedLoadingState({
 
   if (variant === "fullscreen") {
     return (
-      <div className="u-fixed u-inset-0 u-flex u-items-center u-justify-center u-bg-dark u-z-modal">
+      <div
+        className="u-fixed u-inset-0 u-flex u-items-center u-justify-center u-bg-dark u-z-modal"
+        aria-busy="true"
+        aria-label={message}
+      >
         <div className="u-flex u-flex-column u-items-center u-gap-6">
-          <Icon name="SpinnerGap" size={64} className=" u-animate-spin" />
+          <Spinner size="lg" variant="primary" aria-label={message} />
           <div className="u-text-center">
-            <h2
-              className="u-m-0 u-text-xxl u-font-bold u-text-uppercase"
-            >
+            <h2 className="u-m-0 u-text-xxl u-font-bold u-text-uppercase">
               {message}
             </h2>
             {subMessage && (
-              <p className="u-mt-2 u-text-sm u-text-secondary-emphasis">{subMessage}</p>
+              <p className="u-mt-2 u-mb-0 u-text-sm u-text-secondary-emphasis">
+                {subMessage}
+              </p>
             )}
           </div>
           {showProgress && progress !== undefined && (
@@ -110,12 +92,33 @@ export function EnhancedLoadingState({
     );
   }
 
+  if (variant === "minimal" || !showSpinner) {
+    return (
+      <div
+        className={`u-flex u-items-center u-justify-center u-p-2 ${className}`}
+        role="status"
+        aria-live="polite"
+        aria-busy="true"
+      >
+        <span className="u-text-sm u-font-bold">{message}</span>
+      </div>
+    );
+  }
+
   return (
     <div
-      className={`u-flex u-items-center u-justify-center ${variant === "inline" ? "u-p-4" : "u-p-2"} ${className}`}
-      role="status"
+      className={`u-flex u-items-center u-justify-center u-p-4 ${className}`}
+      aria-busy="true"
     >
-      {content}
+      <div className="u-flex u-flex-column u-items-center">
+        <LoadingIndicator
+          message={message}
+          subMessage={subMessage}
+          size={size}
+          aria-label={message}
+        />
+        {progressBar}
+      </div>
     </div>
   );
 }

@@ -108,10 +108,10 @@ export const LayerControls: React.FC<LayerControlsProps> = ({
   }
 
   return (
-    <Accordion title="" glass icon={<Icon name="Stack" />} className={className}>
-      <Accordion.Header>
-        <div className="u-relative u-w-100">
-          <div className="u-flex u-items-center u-justify-between u-gap-3">
+    <div className={`u-relative ${className}`.trim()}>
+      <Accordion title="" glass icon={<Icon name="Stack" />}>
+        <Accordion.Header>
+          <div className={`u-w-100 ${isMobile ? "u-pe-8" : ""}`.trim()}>
             <div className="u-flex u-items-center u-gap-3">
               <div className="u-rounded-circle u-bg-primary u-text-white u-shadow-lg u-p-2">
                 <Icon name="Stack" size={20} weight="bold" />
@@ -123,19 +123,8 @@ export const LayerControls: React.FC<LayerControlsProps> = ({
                 </span>
               </div>
             </div>
-            {isMobile && (
-              <Button
-                variant="secondary"
-                size="sm"
-                iconName="X"
-                iconOnly
-                onClick={() => setExpanded(false)}
-                aria-label="Collapse layer controls"
-              />
-            )}
           </div>
-        </div>
-      </Accordion.Header>
+        </Accordion.Header>
 
       <Accordion.Body className="u-border-primary-subtle u-shadow-lg">
         <div
@@ -241,6 +230,18 @@ export const LayerControls: React.FC<LayerControlsProps> = ({
           </Button>
         </div>
       </Accordion.Body>
-    </Accordion>
+      </Accordion>
+      {isMobile && (
+        <Button
+          variant="secondary"
+          size="sm"
+          iconName="X"
+          iconOnly
+          onClick={() => setExpanded(false)}
+          aria-label="Collapse layer controls"
+          className="u-absolute u-top-3 u-end-9 u-z-1"
+        />
+      )}
+    </div>
   );
 };

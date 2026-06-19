@@ -63,6 +63,17 @@ export {
 } from './ToolVisualizations';
 
 
+export {
+  LoadingIndicator,
+  MapLoader,
+} from './loading';
+export type {
+  LoadingIndicatorProps,
+  LoadingIndicatorSize,
+  LoadingIndicatorLayout,
+  MapLoaderProps,
+} from './loading';
+
 export { 
   EnhancedLoadingState,
   AnimatedSkeletonLoader

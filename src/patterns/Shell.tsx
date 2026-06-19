@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import styles from "./Shell.module.css";
 import {
   Badge,
@@ -11,40 +11,70 @@ import {
   SideMenu,
   SideMenuItem,
   SideMenuList,
-  PhosphorIconsType,
 } from "@shohojdhara/atomix";
 import { SidebarFooter } from "@/components/SidebarFooter";
+import { usePersistedBoolean } from "@/hooks/usePersistedBoolean";
+import { sidebarNav } from "@/lib/navigation";
 
-interface NavItem {
-  href: string;
-  label: string;
-  icon: PhosphorIconsType;
+const SIDEBAR_COLLAPSED_KEY = "fiberops:sidebar-collapsed";
+const DESKTOP_BREAKPOINT = 1025;
+
+function isEditableTarget(target: EventTarget | null): boolean {
+  if (!(target instanceof HTMLElement)) {
+    return false;
+  }
+
+  const tagName = target.tagName;
+  return (
+    tagName === "INPUT" ||
+    tagName === "TEXTAREA" ||
+    tagName === "SELECT" ||
+    target.isContentEditable
+  );
 }
-
-const nav: NavItem[] = [
-  { href: "/", label: "Home", icon: "House" },
-  { href: "/dashboard", label: "Dashboard", icon: "SquaresFour" },
-  { href: "/network-map", label: "Network Map", icon: "MapPin" },
-  { href: "/assets", label: "Assets", icon: "Package" },
-  { href: "/customers", label: "Customers", icon: "Users" },
-  { href: "/incidents", label: "Incidents", icon: "Warning" },
-  { href: "/work-orders", label: "Work Orders", icon: "Clipboard" },
-  { href: "/planning", label: "Planning", icon: "Calendar" },
-  { href: "/reports", label: "Reports", icon: "ChartBar" },
-  { href: "/settings", label: "Settings", icon: "Gear" },
-];
 
 export function Shell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const {
+    value: sidebarCollapsed,
+    toggle: toggleSidebarCollapsed,
+    hydrated,
+  } = usePersistedBoolean(SIDEBAR_COLLAPSED_KEY, false);
 
   const isActive = (href: string) => {
     if (href === "/") return pathname === "/";
     return pathname.startsWith(href);
   };
 
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (!(event.metaKey || event.ctrlKey) || event.key.toLowerCase() !== "b") {
+        return;
+      }
+
+      if (window.innerWidth < DESKTOP_BREAKPOINT || isEditableTarget(event.target)) {
+        return;
+      }
+
+      event.preventDefault();
+      toggleSidebarCollapsed();
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [toggleSidebarCollapsed]);
+
+  const rootClassName = [
+    styles.root,
+    sidebarCollapsed ? styles.sidebarCollapsed : "",
+    hydrated ? "" : styles.noTransition,
+  ]
+    .filter(Boolean)
+    .join(" ");
+
   return (
-    <div className={styles.root}>
+    <div className={rootClassName}>
       <header className={styles.mobileHeader}>
         <Button
           variant="secondary"
@@ -70,30 +100,48 @@ export function Shell({ children }: { children: React.ReactNode }) {
         <aside
           className={`${styles.sidebar} ${sidebarOpen ? styles.sidebarOpen : ""}`}
           aria-label="Main navigation"
+          aria-expanded={!sidebarCollapsed}
         >
           <div className={styles.sidebarHeader}>
-            <div className={styles.brand}>BCN FiberOps</div>
-            <Badge variant="info" label="Mocked" />
+            <div className={styles.sidebarHeaderMain}>
+              <div className={styles.brand}>BCN FiberOps</div>
+              <Badge variant="info" label="Mocked" className={styles.brandBadge} />
+            </div>
+            <button
+              type="button"
+              className={styles.collapseToggle}
+              onClick={toggleSidebarCollapsed}
+              aria-expanded={!sidebarCollapsed}
+              aria-label={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+              title={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+            >
+              <Icon
+                name={sidebarCollapsed ? "CaretRight" : "CaretLeft"}
+                size="sm"
+                aria-hidden="true"
+              />
+            </button>
           </div>
 
           <SideMenu>
             <SideMenuList>
-              {nav.map((item) => (
+              {sidebarNav.map((item) => (
                 <SideMenuItem
                   key={item.href}
                   href={item.href}
                   linkComponent={Link}
                   className={`${styles.navItem} ${isActive(item.href) ? "is-active" : ""}`}
+                  aria-label={sidebarCollapsed ? item.label : undefined}
                   onClick={() => setSidebarOpen(false)}
                 >
-                  <Icon name={item.icon} className="u-me-2" />
-                  <span>{item.label}</span>
+                  <Icon name={item.icon} className={styles.navIcon} aria-hidden="true" />
+                  <span className={styles.navLabel}>{item.label}</span>
                 </SideMenuItem>
               ))}
             </SideMenuList>
           </SideMenu>
 
-          <SidebarFooter />
+          <SidebarFooter collapsed={sidebarCollapsed} />
         </aside>
 
         <main className={styles.main} id="main-content" tabIndex={-1}>
