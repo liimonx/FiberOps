@@ -1,11 +1,54 @@
 "use client";
 
 import Link from "next/link";
+import type { PhosphorIconsType } from "@shohojdhara/atomix";
 import { ColorModeToggle, Icon } from "@shohojdhara/atomix";
 import { useVisibility } from "../hooks/useVisibility";
+import styles from "./SidebarFooter.module.css";
 
 interface SidebarFooterProps {
   collapsed?: boolean;
+}
+
+const SHORTCUTS = [
+  { key: "⌘K", label: "Quick search" },
+  { key: "?", label: "Show shortcuts" },
+  { key: "Esc", label: "Close panel" },
+] as const;
+
+const SECONDARY_LINKS: ReadonlyArray<{
+  href: string;
+  label: string;
+  icon: PhosphorIconsType;
+  external?: boolean;
+}> = [
+  { href: "/help", label: "Help Center", icon: "Question" },
+  { href: "/feedback", label: "Feedback", icon: "ChatCircleText" },
+  {
+    href: "https://github.com/shohojdhara/atomix",
+    label: "GitHub",
+    icon: "GithubLogo",
+    external: true,
+  },
+];
+
+function ShortcutsPanel({
+  collapsed = false,
+}: {
+  collapsed?: boolean;
+}) {
+  return (
+    <div
+      className={`${styles.shortcutsPanel} ${collapsed ? styles.shortcutsPanelCollapsed : ""} u-animate-slide-down`}
+    >
+      {SHORTCUTS.map((shortcut) => (
+        <div key={shortcut.key} className={styles.shortcutRow}>
+          <kbd className={styles.kbd}>{shortcut.key}</kbd>
+          <span>{shortcut.label}</span>
+        </div>
+      ))}
+    </div>
+  );
 }
 
 export function SidebarFooter({ collapsed = false }: SidebarFooterProps) {
@@ -13,146 +56,134 @@ export function SidebarFooter({ collapsed = false }: SidebarFooterProps) {
 
   if (collapsed) {
     return (
-      <div className="u-flex u-flex-column u-gap-2 u-pt-3 u-border-top u-items-center">
+      <div className={`${styles.root} ${styles.rootCollapsed}`}>
         <button
           type="button"
-          className="u-flex u-items-center u-justify-center u-w-100 u-p-2 u-bg-transparent u-border-none u-cursor-pointer u-rounded u-transition-all hover:u-bg-secondary-subtle"
+          className={`${styles.iconAction} ${showShortcuts ? styles.iconActionActive : ""}`}
           onClick={toggleShortcuts}
           aria-expanded={showShortcuts}
           aria-label="Keyboard shortcuts"
           title="Keyboard shortcuts"
         >
-          <Icon name="Keyboard" size="sm" className="u-text-secondary-emphasis" />
+          <Icon name="Keyboard" size="sm" aria-hidden="true" />
         </button>
 
-        {showShortcuts && (
-          <div className="u-flex u-flex-column u-gap-1 u-p-2 u-bg-secondary-subtle u-rounded u-w-100 u-animate-slide-down">
-            <div className="u-flex u-justify-between u-items-center u-text-xs u-text-secondary-emphasis">
-              <kbd className="u-kbd">⌘K</kbd>
-              <span>Search</span>
-            </div>
-            <div className="u-flex u-justify-between u-items-center u-text-xs u-text-secondary-emphasis">
-              <kbd className="u-kbd">?</kbd>
-              <span>Shortcuts</span>
-            </div>
-            <div className="u-flex u-justify-between u-items-center u-text-xs u-text-secondary-emphasis">
-              <kbd className="u-kbd">Esc</kbd>
-              <span>Close</span>
-            </div>
-          </div>
-        )}
+        {showShortcuts && <ShortcutsPanel collapsed />}
 
-        <div className="u-flex u-items-center u-justify-center u-w-100 u-p-2 u-bg-secondary-subtle u-rounded">
-          <ColorModeToggle defaultValue="dark" />
-        </div>
+        <ColorModeToggle
+          defaultValue="dark"
+          size="sm"
+          showTooltip={false}
+          className={styles.iconAction}
+          aria-label="Toggle color mode"
+        />
 
-        <Link
-          href="/help"
-          className="u-flex u-items-center u-justify-center u-w-100 u-p-2 u-rounded u-text-secondary u-no-underline u-transition-all hover:u-bg-secondary-subtle"
-          aria-label="Help Center"
-          title="Help Center"
-        >
-          <Icon name="Question" size="sm" className="u-text-secondary-emphasis" />
-        </Link>
-        <Link
-          href="/feedback"
-          className="u-flex u-items-center u-justify-center u-w-100 u-p-2 u-rounded u-text-secondary u-no-underline u-transition-all hover:u-bg-secondary-subtle"
-          aria-label="Feedback"
-          title="Feedback"
-        >
-          <Icon name="ChatCircleText" size="sm" className="u-text-secondary-emphasis" />
-        </Link>
-        <a
-          href="https://github.com/shohojdhara/atomix"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="u-flex u-items-center u-justify-center u-w-100 u-p-2 u-rounded u-text-secondary u-no-underline u-transition-all hover:u-bg-secondary-subtle"
-          aria-label="GitHub"
-          title="GitHub"
-        >
-          <Icon name="GithubLogo" size="sm" className="u-text-secondary-emphasis" />
-        </a>
+        <div className={styles.divider} aria-hidden="true" />
+
+        {SECONDARY_LINKS.map((link) => {
+          const className = styles.iconAction;
+          const icon = <Icon name={link.icon} size="sm" aria-hidden="true" />;
+
+          if (link.external) {
+            return (
+              <a
+                key={link.href}
+                href={link.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={className}
+                aria-label={link.label}
+                title={link.label}
+              >
+                {icon}
+              </a>
+            );
+          }
+
+          return (
+            <Link
+              key={link.href}
+              href={link.href}
+              className={className}
+              aria-label={link.label}
+              title={link.label}
+            >
+              {icon}
+            </Link>
+          );
+        })}
       </div>
     );
   }
 
   return (
-    <div className="u-flex u-flex-column u-gap-3 u-pt-3 u-border-top">
-      <div className="u-flex u-flex-column u-gap-2">
+    <div className={`${styles.root} ${styles.rootExpanded}`}>
+      <div className={styles.section}>
         <button
           type="button"
-          className="u-w-100 u-px-3 u-py-2 u-bg-transparent u-border-none u-cursor-pointer u-text-left u-flex u-items-center u-gap-2 u-rounded u-transition-all hover:u-bg-secondary-subtle"
+          className={styles.actionRow}
           onClick={toggleShortcuts}
           aria-expanded={showShortcuts}
           aria-label="Toggle keyboard shortcuts"
         >
-          <Icon name="Keyboard" size="sm" className="u-text-secondary-emphasis" />
-          <span className="u-text-sm u-font-medium u-text-secondary">Shortcuts</span>
+          <Icon name="Keyboard" size="sm" aria-hidden="true" />
+          <span className={styles.actionLabel}>Shortcuts</span>
           <Icon
             name={`Caret${showShortcuts ? "Up" : "Down"}`}
             size="xs"
-            className="u-ml-auto u-text-secondary-emphasis"
+            className={styles.actionCaret}
+            aria-hidden="true"
           />
         </button>
 
-        {showShortcuts && (
-          <div className="u-flex u-flex-column u-gap-1 u-px-3 u-py-2 u-bg-secondary-subtle u-rounded u-animate-slide-down">
-            <div className="u-flex u-justify-between u-items-center u-text-xs u-text-secondary-emphasis">
-              <kbd className="u-kbd">⌘K</kbd>
-              <span>Quick search</span>
-            </div>
-            <div className="u-flex u-justify-between u-items-center u-text-xs u-text-secondary-emphasis">
-              <kbd className="u-kbd">?</kbd>
-              <span>Show shortcuts</span>
-            </div>
-            <div className="u-flex u-justify-between u-items-center u-text-xs u-text-secondary-emphasis">
-              <kbd className="u-kbd">Esc</kbd>
-              <span>Close panel</span>
-            </div>
-          </div>
-        )}
+        {showShortcuts && <ShortcutsPanel />}
       </div>
 
-      <div className="u-flex u-items-center u-justify-between u-px-3 u-py-2 u-bg-secondary-subtle u-rounded">
-        <div className="u-flex u-items-center u-gap-2">
-          <Icon name="Moon" size="sm" className="u-text-secondary-emphasis" />
-          <span className="u-text-sm u-font-medium u-text-secondary">Theme</span>
+      <div className={styles.themeRow}>
+        <div className={styles.themeLabel}>
+          <Icon name="Moon" size="sm" aria-hidden="true" />
+          <span>Theme</span>
         </div>
-        <div className="u-scale-75">
-          <ColorModeToggle defaultValue="dark" />
-        </div>
+        <ColorModeToggle defaultValue="dark" size="sm" showTooltip={false} />
       </div>
 
-      <div className="u-flex u-flex-column u-gap-0.5">
-        <Link
-          href="/help"
-          className="u-flex u-items-center u-gap-2 u-px-3 u-py-1.5 u-rounded u-text-secondary u-text-xs u-no-underline u-transition-all hover:u-bg-secondary-subtle"
-        >
-          <Icon name="Question" size="sm" className="u-text-secondary-emphasis" />
-          <span>Help Center</span>
-        </Link>
-        <Link
-          href="/feedback"
-          className="u-flex u-items-center u-gap-2 u-px-3 u-py-1.5 u-rounded u-text-secondary u-text-xs u-no-underline u-transition-all hover:u-bg-secondary-subtle"
-        >
-          <Icon name="ChatCircleText" size="sm" className="u-text-secondary-emphasis" />
-          <span>Feedback</span>
-        </Link>
-        <a
-          href="https://github.com/shohojdhara/atomix"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="u-flex u-items-center u-gap-2 u-px-3 u-py-1.5 u-rounded u-text-secondary u-text-xs u-no-underline u-transition-all hover:u-bg-secondary-subtle"
-        >
-          <Icon name="GithubLogo" size="sm" className="u-text-secondary-emphasis" />
-          <span>GitHub</span>
-        </a>
+      <div className={styles.section}>
+        {SECONDARY_LINKS.map((link) => {
+          const content = (
+            <>
+              <Icon name={link.icon} size="sm" aria-hidden="true" />
+              <span className={styles.actionLabel}>{link.label}</span>
+            </>
+          );
+
+          if (link.external) {
+            return (
+              <a
+                key={link.href}
+                href={link.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={styles.actionRow}
+              >
+                {content}
+              </a>
+            );
+          }
+
+          return (
+            <Link key={link.href} href={link.href} className={styles.actionRow}>
+              {content}
+            </Link>
+          );
+        })}
       </div>
 
-      <div className="u-flex u-items-center u-justify-center u-gap-1 u-py-1 u-text-xs u-text-secondary-emphasis">
+      <div className={styles.meta}>
         <span>FiberOps v1.0.0</span>
-        <span className="u-opacity-50">•</span>
-        <span className="u-opacity-80">Build 2026.04.28</span>
+        <span className={styles.metaDot} aria-hidden="true">
+          •
+        </span>
+        <span>Build 2026.04.28</span>
       </div>
     </div>
   );
