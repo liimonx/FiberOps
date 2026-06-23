@@ -396,7 +396,12 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({ onMapLoad, onMapError }) =
         return;
       }
       updateMapData(map, nodes, connections, layers);
-      requestAnimationFrame(() => map.resize());
+      requestAnimationFrame(() => {
+        // Safety check: ensure map is still valid before calling resize
+        if (map && typeof map.resize === 'function' && map._canvas) {
+          map.resize();
+        }
+      });
     };
 
     apply();
