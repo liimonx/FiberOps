@@ -64,7 +64,7 @@ export const Tooltip: React.FC<TooltipProps> = ({
           onMouseLeave={hide}
         >
           <Card
-            className="u-px-3 u-py-2 u-bg-gray-900 u-text-white u-shadow-lg u-rounded-md"
+            className="u-px-3 u-py-2 u-bg-gray-900  u-shadow-lg u-rounded-md"
             style={{ minWidth: 'max-content' }}
           >
             {typeof content === 'string' ? (

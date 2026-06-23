@@ -113,7 +113,7 @@ export const LayerControls: React.FC<LayerControlsProps> = ({
         <Accordion.Header>
           <div className={`u-w-100 ${isMobile ? "u-pe-8" : ""}`.trim()}>
             <div className="u-flex u-items-center u-gap-3">
-              <div className="u-rounded-circle u-bg-primary u-text-white u-shadow-lg u-p-2">
+              <div className="u-rounded-circle u-bg-primary  u-shadow-lg u-p-2">
                 <Icon name="Stack" size={20} weight="bold" />
               </div>
               <div className="u-sm-flex u-none u-flex-column u-text-start">

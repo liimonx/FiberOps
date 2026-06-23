@@ -970,10 +970,10 @@
   resolved "https://registry.yarnpkg.com/@rtsao/scc/-/scc-1.1.0.tgz#927dd2fae9bc3361403ac2c7a00c32ddce9ad7e8"
   integrity sha512-zt6OdqaDoOnJ1ZYsCYGt9YmWzDXl4vQdKTyJev62gFhRGKdx7mcT54V9KIjg+d2wi9EXsPvAPKe7i7WjfVWB8g==
 
-"@shohojdhara/atomix@0.6.7":
-  version "0.6.7"
-  resolved "https://registry.yarnpkg.com/@shohojdhara/atomix/-/atomix-0.6.7.tgz#0da445c616a3e9fb449e671f5531ccc5f532a1d6"
-  integrity sha512-RhZUNaFyPX+bGqwy20YJDZNWqMARahLEumncvLRoLGsqd9mRszQAezoG1p6pM6iWawWuraZ3HphyTQL6QllJog==
+"@shohojdhara/atomix@0.6.9":
+  version "0.6.9"
+  resolved "https://registry.yarnpkg.com/@shohojdhara/atomix/-/atomix-0.6.9.tgz#b3835e23ef2ffa1cf11aad3da0b926d0e79727f3"
+  integrity sha512-OsV/YVpJ1P23UCemLUBvJ1nQemsOprDhTPX4m3yiQAm4GN4jmyf0dyImgJlhzUTNwGi2FpMrrExbQ3fy4QFmVw==
   dependencies:
     autoprefixer "^10.4.21"
     boxen "^7.1.0"

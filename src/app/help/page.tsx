@@ -8,16 +8,16 @@ export default function HelpPage() {
     <Container className="u-p-6 u-max-w-4xl">
       <div className="u-mb-8">
         <h1 className="u-text-3xl u-font-bold u-mb-3">Help Center</h1>
-        <p className="u-text-secondary u-text-lg">
+        <p className="u-text-secondary-emphasis u-text-lg">
           Welcome to FiberOps! This comprehensive help center guides you through all features 
           of our telecom network operations dashboard.
         </p>
       </div>
 
-      <Grid className="u-mb-6" gap={4}>
+      <Grid className="u-mb-6">
         <GridCol xs={12}>
           <Card title="Getting Started" appearance="outlined">
-            <p className="u-text-secondary u-mb-4">
+            <p className="u-text-secondary-emphasis u-mb-4">
               Learn the basics of navigating FiberOps and understanding the dashboard layout.
             </p>
             <div className="u-grid u-grid-cols-1 sm:u-grid-cols-2 u-gap-4">
@@ -46,10 +46,10 @@ export default function HelpPage() {
         </GridCol>
       </Grid>
 
-      <Grid className="u-mb-6" gap={4}>
+      <Grid className="u-mb-6">
         <GridCol xs={12} lg={6}>
           <Card title="Network Map" appearance="outlined">
-            <p className="u-text-secondary u-mb-4">
+            <p className="u-text-secondary-emphasis u-mb-4">
               Explore your fiber network infrastructure with our interactive GIS canvas.
             </p>
             <div className="u-flex u-flex-column u-gap-3">
@@ -88,7 +88,7 @@ export default function HelpPage() {
         </GridCol>
         <GridCol xs={12} lg={6}>
           <Card title="Assets Management" appearance="outlined">
-            <p className="u-text-secondary u-mb-4">
+            <p className="u-text-secondary-emphasis u-mb-4">
               Manage your physical network inventory including cabinets, splitters, and passive plant equipment.
             </p>
             <div className="u-flex u-flex-column u-gap-3">
@@ -117,10 +117,10 @@ export default function HelpPage() {
         </GridCol>
       </Grid>
 
-      <Grid className="u-mb-6" gap={4}>
+      <Grid className="u-mb-6">
         <GridCol xs={12} lg={6}>
           <Card title="Customer Management" appearance="outlined">
-            <p className="u-text-secondary u-mb-4">
+            <p className="u-text-secondary-emphasis u-mb-4">
               Manage subscriber accounts, service plans, and monitor customer connection health.
             </p>
             <div className="u-flex u-flex-column u-gap-3">
@@ -149,7 +149,7 @@ export default function HelpPage() {
         </GridCol>
         <GridCol xs={12} lg={6}>
           <Card title="Incident Management" appearance="outlined">
-            <p className="u-text-secondary u-mb-4">
+            <p className="u-text-secondary-emphasis u-mb-4">
               Track, manage, and resolve network incidents and outages efficiently.
             </p>
             <div className="u-flex u-flex-column u-gap-3">
@@ -178,10 +178,10 @@ export default function HelpPage() {
         </GridCol>
       </Grid>
 
-      <Grid className="u-mb-6" gap={4}>
+      <Grid className="u-mb-6">
         <GridCol xs={12} lg={6}>
           <Card title="Work Orders" appearance="outlined">
-            <p className="u-text-secondary u-mb-4">
+            <p className="u-text-secondary-emphasis u-mb-4">
               Coordinate field team activities with comprehensive work order management.
             </p>
             <div className="u-flex u-flex-column u-gap-3">
@@ -210,7 +210,7 @@ export default function HelpPage() {
         </GridCol>
         <GridCol xs={12} lg={6}>
           <Card title="Planning" appearance="outlined">
-            <p className="u-text-secondary u-mb-4">
+            <p className="u-text-secondary-emphasis u-mb-4">
               Plan network expansion, capacity upgrades, and new service deployments.
             </p>
             <div className="u-flex u-flex-column u-gap-3">
@@ -239,10 +239,10 @@ export default function HelpPage() {
         </GridCol>
       </Grid>
 
-      <Grid className="u-mb-6" gap={4}>
+      <Grid className="u-mb-6">
         <GridCol xs={12} lg={6}>
           <Card title="Reports" appearance="outlined">
-            <p className="u-text-secondary u-mb-4">
+            <p className="u-text-secondary-emphasis u-mb-4">
               Generate comprehensive analytics and operational reports for stakeholders.
             </p>
             <div className="u-flex u-flex-column u-gap-3">
@@ -300,14 +300,14 @@ export default function HelpPage() {
         </GridCol>
       </Grid>
 
-      <Grid gap={4}>
+      <Grid>
         <GridCol xs={12}>
           <Card title="Support & Troubleshooting" appearance="outlined">
-            <p className="u-text-secondary u-mb-4">
+            <p className="u-text-secondary-emphasis u-mb-4">
               Get help when you need it and troubleshoot common issues.
             </p>
             
-            <div className="u-bg-warning u-text-white u-p-4 u-rounded u-mb-4">
+            <div className="u-bg-warning  u-p-4 u-rounded u-mb-4">
               <h3 className="u-text-lg u-font-semibold u-mb-2 u-m-0">
                 <Icon name="WarningCircle" className="u-mr-2" />
                 Need Immediate Assistance?
@@ -347,10 +347,10 @@ export default function HelpPage() {
       </Grid>
 
       <div className="u-mt-8 u-pt-6 u-border-top u-border-secondary-subtle u-text-center">
-        <p className="u-text-secondary">
+        <p className="u-text-secondary-emphasis">
           FiberOps v0.1.0 • Production-grade telecom network operations dashboard
         </p>
-        <p className="u-text-secondary u-text-sm u-mt-2">
+        <p className="u-text-secondary-emphasis u-text-sm u-mt-2">
           This is a demo deployment. For production support, contact your system administrator.
         </p>
       </div>
@@ -367,7 +367,7 @@ function HelpItem({ icon, title, description }: { icon: string; title: string; d
       </div>
       <div>
         <h4 className="u-text-base u-font-semibold u-mb-1 u-m-0">{title}</h4>
-        <p className="u-text-secondary u-text-sm u-m-0">{description}</p>
+        <p className="u-text-secondary-emphasis u-text-sm u-m-0">{description}</p>
       </div>
     </div>
   );
