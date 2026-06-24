@@ -32,6 +32,7 @@ import {
 } from "@/modules/network-map/components/MeasurementOverlay";
 import { ToolVisualizations } from "@/modules/network-map/components/ToolVisualizations";
 import { getToolManager } from "@/modules/network-map/tools/toolManager";
+import { useMapAssetDeepLink } from "@/modules/network-map/hooks/useMapAssetDeepLink";
 import { useMapCustomerDeepLink } from "@/modules/network-map/hooks/useMapCustomerDeepLink";
 import {
   useMapPlanningDeepLink,
@@ -56,6 +57,7 @@ function NetworkMapContent() {
 
   const mapInstance = useMapInstance();
   useMapCustomerDeepLink({ nodes, mapInstance });
+  useMapAssetDeepLink({ nodes, mapInstance });
   useMapPlanningDeepLink({ mapInstance });
   usePlanningOverlaysSync();
   const selectedConnection = useConnectionById(selectedNode ? null : selectedElementId);
