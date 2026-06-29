@@ -1,0 +1,11 @@
+.authPage {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 2rem;
+  background: radial-gradient(circle at top, rgba(56, 189, 248, 0.12), transparent 55%);
+}
+
+.card {
+  width: min(100%, 420px);
+}

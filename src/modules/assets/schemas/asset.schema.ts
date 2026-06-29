@@ -33,6 +33,7 @@ export const createAssetSchema = z.object({
   kind: z.enum(assetKinds),
   status: z.enum(assetStatuses),
   location: locationSchema,
+  monitorHost: z.string().trim().optional(),
 });
 
 export type CreateAssetFormValues = z.infer<typeof createAssetSchema>;

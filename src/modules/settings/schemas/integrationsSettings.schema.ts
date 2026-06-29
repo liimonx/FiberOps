@@ -13,6 +13,14 @@ export const integrationUpdateSchema = z.object({
   apiKey: z.string().optional(),
   webhookUrl: z.string().optional(),
   routingKey: z.string().optional(),
+  host: z.string().optional(),
+  port: z.number().optional(),
+  username: z.string().optional(),
+  password: z.string().optional(),
+  useSsl: z.boolean().optional(),
+  verifySsl: z.boolean().optional(),
+  apiMode: z.enum(["rest", "classic"]).optional(),
+  monitoredInterface: z.string().optional(),
 });
 
 export type IntegrationUpdateFormValues = z.infer<
@@ -131,6 +139,14 @@ function normalizeIntegrationValues(
     apiKey: trim(values.apiKey),
     webhookUrl: trim(values.webhookUrl),
     routingKey: trim(values.routingKey),
+    host: trim(values.host),
+    username: trim(values.username),
+    password: trim(values.password),
+    monitoredInterface: trim(values.monitoredInterface),
+    port: values.port,
+    useSsl: values.useSsl,
+    verifySsl: values.verifySsl,
+    apiMode: values.apiMode,
   };
 }
 
@@ -203,6 +219,30 @@ export function validateIntegrationUpdate(
           code: "custom",
           message: "Routing key must be at least 8 characters",
           path: ["routingKey"],
+        });
+      }
+    }
+
+    if (providerId === "mikrotik") {
+      if (needsCredential && !data.host) {
+        issues.push({
+          code: "custom",
+          message: "Router host is required",
+          path: ["host"],
+        });
+      }
+      if (needsCredential && !data.username) {
+        issues.push({
+          code: "custom",
+          message: "API username is required",
+          path: ["username"],
+        });
+      }
+      if (needsCredential && !data.password) {
+        issues.push({
+          code: "custom",
+          message: "API password is required",
+          path: ["password"],
         });
       }
     }

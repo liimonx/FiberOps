@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import styles from "./Shell.module.css";
 import {
@@ -15,6 +15,7 @@ import {
 import { SidebarFooter } from "@/components/SidebarFooter";
 import { usePersistedBoolean } from "@/hooks/usePersistedBoolean";
 import { sidebarNav } from "@/lib/navigation";
+import { useAuthStore } from "@/stores/useAuthStore";
 
 const SIDEBAR_COLLAPSED_KEY = "fiberops:sidebar-collapsed";
 const DESKTOP_BREAKPOINT = 1025;
@@ -33,8 +34,17 @@ function isEditableTarget(target: EventTarget | null): boolean {
   );
 }
 
-export function Shell({ children }: { children: React.ReactNode }) {
+export function Shell({
+  children,
+  useMsw = true,
+}: {
+  children: React.ReactNode;
+  useMsw?: boolean;
+}) {
   const pathname = usePathname();
+  const router = useRouter();
+  const logout = useAuthStore((state) => state.logout);
+  const user = useAuthStore((state) => state.user);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const {
     value: sidebarCollapsed,
@@ -84,7 +94,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
           aria-label="Toggle navigation menu"
         />
         <div className={styles.mobileBrand}>
-          BCN FiberOps <Badge variant="info" label="Mocked" />
+          BCN FiberOps <Badge variant="info" label={useMsw ? "Mocked" : "Live API"} />
         </div>
       </header>
 
@@ -105,7 +115,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
           <div className={styles.sidebarHeader}>
             <div className={styles.sidebarHeaderMain}>
               <div className={styles.brand}>BCN FiberOps</div>
-              <Badge variant="info" label="Mocked" className={styles.brandBadge} />
+              <Badge variant="info" label={useMsw ? "Mocked" : "Live API"} className={styles.brandBadge} />
             </div>
             <button
               type="button"
@@ -121,6 +131,19 @@ export function Shell({ children }: { children: React.ReactNode }) {
                 aria-hidden="true"
               />
             </button>
+            {!useMsw && user ? (
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={async () => {
+                  await logout();
+                  router.push("/login");
+                }}
+                aria-label={`Sign out (${user.name})`}
+              >
+                <Icon name="SignOut" size="sm" aria-hidden="true" />
+              </Button>
+            ) : null}
           </div>
 
           <SideMenu>

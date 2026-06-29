@@ -3,77 +3,43 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { Incident } from "@/types/domain";
 import { networkQueryKeys } from "@/modules/network-map/hooks/useNetworkData";
-import { parseSettingsError } from "@/modules/settings/lib/parseSettingsError";
 import type {
   CreateIncidentFormValues,
   ResolveIncidentFormValues,
   UpdateIncidentFormValues,
 } from "@/modules/incidents/schemas/incident.schema";
-
-async function fetchList<T>(path: string): Promise<T[]> {
-  const res = await fetch(path);
-  if (!res.ok) {
-    throw new Error(`Failed to fetch ${path}`);
-  }
-
-  const body = (await res.json()) as { items: T[] };
-  return body.items;
-}
+import { apiClient } from "@/lib/apiClient";
+import { fetchList } from "@/lib/fetchApi";
 
 async function fetchIncident(id: string): Promise<Incident> {
-  const res = await fetch(`/api/incidents/${id}`);
-  if (!res.ok) {
-    await parseSettingsError(res, "Failed to fetch incident");
-  }
-  return res.json();
+  return apiClient<Incident>(`/api/incidents/${id}`);
 }
 
 async function postIncident(data: CreateIncidentFormValues): Promise<Incident> {
-  const res = await fetch("/api/incidents", {
+  return apiClient<Incident>("/api/incidents", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
   });
-
-  if (!res.ok) {
-    await parseSettingsError(res, "Failed to create incident");
-  }
-
-  return res.json();
 }
 
 async function patchIncident(
   id: string,
   data: UpdateIncidentFormValues
 ): Promise<Incident> {
-  const res = await fetch(`/api/incidents/${id}`, {
+  return apiClient<Incident>(`/api/incidents/${id}`, {
     method: "PATCH",
-    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
   });
-
-  if (!res.ok) {
-    await parseSettingsError(res, "Failed to update incident");
-  }
-
-  return res.json();
 }
 
 async function patchResolveIncident(
   id: string,
   data: ResolveIncidentFormValues
 ): Promise<Incident> {
-  const res = await fetch(`/api/incidents/${id}`, {
+  return apiClient<Incident>(`/api/incidents/${id}`, {
     method: "PATCH",
-    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ ...data, status: "resolved" }),
   });
-
-  if (!res.ok) {
-    await parseSettingsError(res, "Failed to resolve incident");
-  }
-
-  return res.json();
 }
 
 export function useIncidents() {

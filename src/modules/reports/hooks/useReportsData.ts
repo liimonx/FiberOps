@@ -9,7 +9,8 @@ import type {
   UptimeSummary,
 } from "@/types/domain";
 import type { GenerateReportFormValues } from "@/modules/reports/schemas/report.schema";
-import { parseSettingsError } from "@/modules/settings/lib/parseSettingsError";
+import { apiClient } from "@/lib/apiClient";
+import { fetchList } from "@/lib/fetchApi";
 
 export const reportsQueryKeys = {
   all: ["reports"] as const,
@@ -20,84 +21,15 @@ export const reportsQueryKeys = {
   history: () => [...reportsQueryKeys.all, "history"] as const,
 };
 
-async function fetchReportsSummary(): Promise<ReportsSummary> {
-  const res = await fetch("/api/reports/summary");
-  if (!res.ok) {
-    throw new Error("Failed to fetch reports summary");
-  }
-  return res.json();
-}
-
-async function fetchIncidentAnalytics(period: string): Promise<IncidentAnalytics> {
-  const res = await fetch(`/api/reports/incidents/analytics?period=${period}`);
-  if (!res.ok) {
-    throw new Error("Failed to fetch incident analytics");
-  }
-  return res.json();
-}
-
-async function fetchUptimeSummary(period: string): Promise<UptimeSummary> {
-  const res = await fetch(`/api/reports/uptime?period=${period}`);
-  if (!res.ok) {
-    throw new Error("Failed to fetch uptime summary");
-  }
-  return res.json();
-}
-
-async function fetchReportHistory(): Promise<GeneratedReport[]> {
-  const res = await fetch("/api/reports/history");
-  if (!res.ok) {
-    throw new Error("Failed to fetch report history");
-  }
-  const body = (await res.json()) as { items: GeneratedReport[] };
-  return body.items;
-}
-
 type GenerateReportResponse = {
   report: GeneratedReport;
   download: ReportDownloadPayload;
 };
 
-async function readJsonResponse<T>(res: Response): Promise<T> {
-  const contentType = res.headers.get("content-type") ?? "";
-
-  if (!contentType.includes("application/json")) {
-    throw new Error(
-      "The server returned an unexpected response. Refresh the page and try again."
-    );
-  }
-
-  return res.json() as Promise<T>;
-}
-
-async function postGenerateReport(
-  data: GenerateReportFormValues
-): Promise<GenerateReportResponse> {
-  const res = await fetch("/api/reports/generate", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
-  });
-
-  if (!res.ok) {
-    await parseSettingsError(res, "Failed to generate report");
-  }
-
-  return readJsonResponse<GenerateReportResponse>(res);
-}
-
-async function fetchReportDownload(reportId: string): Promise<ReportDownloadPayload> {
-  const res = await fetch(`/api/reports/${reportId}/download`);
-  if (!res.ok) {
-    await parseSettingsError(res, "Failed to download report");
-  }
-  return readJsonResponse<ReportDownloadPayload>(res);
-}
-
 export function useReportsSummary() {
   return useQuery({
     queryKey: reportsQueryKeys.summary(),
-    queryFn: fetchReportsSummary,
+    queryFn: () => apiClient<ReportsSummary>("/api/reports/summary"),
     staleTime: 30_000,
   });
 }
@@ -105,7 +37,10 @@ export function useReportsSummary() {
 export function useIncidentAnalytics(period: string) {
   return useQuery({
     queryKey: reportsQueryKeys.incidentAnalytics(period),
-    queryFn: () => fetchIncidentAnalytics(period),
+    queryFn: () =>
+      apiClient<IncidentAnalytics>(
+        `/api/reports/incidents/analytics?period=${encodeURIComponent(period)}`
+      ),
     staleTime: 30_000,
   });
 }
@@ -113,7 +48,10 @@ export function useIncidentAnalytics(period: string) {
 export function useUptimeSummary(period: string) {
   return useQuery({
     queryKey: reportsQueryKeys.uptime(period),
-    queryFn: () => fetchUptimeSummary(period),
+    queryFn: () =>
+      apiClient<UptimeSummary>(
+        `/api/reports/uptime?period=${encodeURIComponent(period)}`
+      ),
     staleTime: 30_000,
   });
 }
@@ -121,7 +59,7 @@ export function useUptimeSummary(period: string) {
 export function useReportHistory() {
   return useQuery({
     queryKey: reportsQueryKeys.history(),
-    queryFn: fetchReportHistory,
+    queryFn: () => fetchList<GeneratedReport>("/api/reports/history"),
     staleTime: 15_000,
   });
 }
@@ -130,7 +68,11 @@ export function useGenerateReport() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: postGenerateReport,
+    mutationFn: (data: GenerateReportFormValues) =>
+      apiClient<GenerateReportResponse>("/api/reports/generate", {
+        method: "POST",
+        body: JSON.stringify(data),
+      }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: reportsQueryKeys.history() });
       queryClient.invalidateQueries({ queryKey: reportsQueryKeys.summary() });
@@ -140,6 +82,7 @@ export function useGenerateReport() {
 
 export function useDownloadReport() {
   return useMutation({
-    mutationFn: fetchReportDownload,
+    mutationFn: (reportId: string) =>
+      apiClient<ReportDownloadPayload>(`/api/reports/${reportId}/download`),
   });
 }

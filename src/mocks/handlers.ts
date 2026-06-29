@@ -1,4 +1,4 @@
-import { bypass, delay, http, HttpResponse, ws } from "msw";
+import { delay, http, ws } from "msw";
 import { getAssets } from "@/mocks/assetsData";
 import { handleApiRequest } from "@/mocks/apiRouter";
 import { createLogger } from "@/lib/logger";
@@ -15,7 +15,7 @@ async function toHttpResponse(request: Request, delayMs = 0) {
   const response = await handleApiRequest(request);
   const body = await response.text();
 
-  return new HttpResponse(body, {
+  return new Response(body, {
     status: response.status,
     headers: {
       "Content-Type": "application/json",
@@ -45,7 +45,7 @@ export const handlers = [
       const randomNode = assetList[Math.floor(Math.random() * assetList.length)];
       if (!randomNode) return;
 
-      const statuses = ["active", "degraded", "down", "maintenance"];
+      const statuses = ["active", "warning", "error", "inactive"];
       const newStatus = statuses[Math.floor(Math.random() * statuses.length)];
 
       client.send(
@@ -64,22 +64,6 @@ export const handlers = [
       clearInterval(interval);
       log.info("WebSocket disconnected:", client.id);
     });
-  }),
-
-  // Mapbox styles/tiles/fonts must bypass MSW's service-worker passthrough path,
-  // which can throw "TypeError: Failed to fetch" for cross-origin requests.
-  http.all(/https:\/\/([a-z0-9-]+\.)*mapbox\.com(\/|$)/i, async ({ request }) => {
-    const url = new URL(request.url);
-
-    if (
-      request.method === "POST" &&
-      (url.hostname === "events.mapbox.com" ||
-        url.pathname.startsWith("/map-sessions/"))
-    ) {
-      return new HttpResponse(null, { status: 204 });
-    }
-
-    return fetch(bypass(request));
   }),
 
   http.all("/api/*", ({ request }) => toHttpResponse(request, 300)),

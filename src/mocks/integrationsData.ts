@@ -13,6 +13,14 @@ type ProviderCredentials = {
   apiKey?: string;
   webhookUrl?: string;
   routingKey?: string;
+  host?: string;
+  port?: number;
+  username?: string;
+  password?: string;
+  useSsl?: boolean;
+  verifySsl?: boolean;
+  apiMode?: "rest" | "classic";
+  monitoredInterface?: string;
 };
 
 type InternalIntegrationsState = {
@@ -47,6 +55,8 @@ function hasCredentials(
       return Boolean(credentials.webhookUrl);
     case "pagerduty":
       return Boolean(credentials.routingKey);
+    case "mikrotik":
+      return Boolean(credentials.host && credentials.username && credentials.password);
   }
 }
 
@@ -68,13 +78,32 @@ function toPublicIntegration(
 ): Integration {
   const status = deriveStatus(integration.id, integration.enabled, credentials);
   const apiKeyMasked =
-    credentials.apiKey != null
+    integration.id === "mikrotik"
+      ? credentials.password != null
+        ? maskSecret(credentials.password)
+        : undefined
+      : credentials.apiKey != null
       ? maskSecret(credentials.apiKey, integration.id === "stripe" ? "sk-" : "")
       : credentials.webhookUrl != null
         ? maskWebhookUrl(credentials.webhookUrl)
         : credentials.routingKey != null
           ? maskSecret(credentials.routingKey)
           : undefined;
+
+  if (integration.id === "mikrotik") {
+    return {
+      ...integration,
+      status,
+      host: credentials.host,
+      port: credentials.port,
+      username: credentials.username,
+      passwordMasked: apiKeyMasked,
+      useSsl: credentials.useSsl,
+      verifySsl: credentials.verifySsl,
+      apiMode: credentials.apiMode,
+      monitoredInterface: credentials.monitoredInterface,
+    };
+  }
 
   return {
     ...integration,
@@ -124,6 +153,13 @@ export const defaultIntegrationsSettings: IntegrationsSettings = {
       status: "disconnected",
       enabled: false,
     },
+    {
+      id: "mikrotik",
+      name: "Mikrotik",
+      description: "RouterOS PPPoE, interface, and netwatch monitoring.",
+      status: "disconnected",
+      enabled: false,
+    },
   ],
   outboundWebhook: {
     enabled: false,
@@ -145,6 +181,7 @@ const state: InternalIntegrationsState = {
     slack: {},
     pagerduty: {},
     stripe: {},
+    mikrotik: {},
   },
   outboundWebhook: {
     enabled: false,
@@ -181,6 +218,30 @@ export function updateIntegration(
   }
   if (patch.routingKey) {
     credentials.routingKey = patch.routingKey;
+  }
+  if (patch.host) {
+    credentials.host = patch.host;
+  }
+  if (patch.port) {
+    credentials.port = patch.port;
+  }
+  if (patch.username) {
+    credentials.username = patch.username;
+  }
+  if (patch.password) {
+    credentials.password = patch.password;
+  }
+  if (patch.useSsl !== undefined) {
+    credentials.useSsl = patch.useSsl;
+  }
+  if (patch.verifySsl !== undefined) {
+    credentials.verifySsl = patch.verifySsl;
+  }
+  if (patch.apiMode) {
+    credentials.apiMode = patch.apiMode;
+  }
+  if (patch.monitoredInterface !== undefined) {
+    credentials.monitoredInterface = patch.monitoredInterface;
   }
 
   const updatedIntegration: Integration = {
@@ -220,4 +281,22 @@ export function integrationHasExistingCredentials(
 
 export function webhookHasExistingSecret(): boolean {
   return Boolean(state.outboundWebhook.secret);
+}
+
+export function testMikrotikConnection(): {
+  ok: boolean;
+  message: string;
+  identity?: string;
+} {
+  const credentials = state.credentials.mikrotik;
+
+  if (!credentials.host || !credentials.username || !credentials.password) {
+    return { ok: false, message: "Mikrotik credentials are incomplete." };
+  }
+
+  return {
+    ok: true,
+    message: "Connected successfully",
+    identity: credentials.host,
+  };
 }

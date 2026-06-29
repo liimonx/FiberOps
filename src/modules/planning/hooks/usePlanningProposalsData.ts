@@ -3,61 +3,34 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { PlanningProposal } from "@/types/domain";
 import { networkQueryKeys } from "@/modules/network-map/hooks/useNetworkData";
-import { parseSettingsError } from "@/modules/settings/lib/parseSettingsError";
 import type {
   CreateProposalFormValues,
   UpdateProposalFormValues,
 } from "@/modules/planning/schemas/proposal.schema";
-
-async function fetchList<T>(path: string): Promise<T[]> {
-  const res = await fetch(path);
-  if (!res.ok) {
-    throw new Error(`Failed to fetch ${path}`);
-  }
-
-  const body = (await res.json()) as { items: T[] };
-  return body.items;
-}
+import { apiClient } from "@/lib/apiClient";
+import { fetchList } from "@/lib/fetchApi";
 
 async function fetchPlanningProposal(id: string): Promise<PlanningProposal> {
-  const res = await fetch(`/api/planning/proposals/${id}`);
-  if (!res.ok) {
-    await parseSettingsError(res, "Failed to fetch planning proposal");
-  }
-  return res.json();
+  return apiClient<PlanningProposal>(`/api/planning/proposals/${id}`);
 }
 
 async function postPlanningProposal(
   data: CreateProposalFormValues
 ): Promise<PlanningProposal> {
-  const res = await fetch("/api/planning/proposals", {
+  return apiClient<PlanningProposal>("/api/planning/proposals", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
   });
-
-  if (!res.ok) {
-    await parseSettingsError(res, "Failed to create planning proposal");
-  }
-
-  return res.json();
 }
 
 async function patchPlanningProposal(
   id: string,
   data: UpdateProposalFormValues
 ): Promise<PlanningProposal> {
-  const res = await fetch(`/api/planning/proposals/${id}`, {
+  return apiClient<PlanningProposal>(`/api/planning/proposals/${id}`, {
     method: "PATCH",
-    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
   });
-
-  if (!res.ok) {
-    await parseSettingsError(res, "Failed to update planning proposal");
-  }
-
-  return res.json();
 }
 
 export function usePlanningProposals() {

@@ -1,12 +1,10 @@
 import type { Metadata } from "next";
 import "./globals.scss";
-import { Shell } from "@/patterns/Shell";
-import { Providers } from "./providers";
-import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { ClientRoot } from "./ClientRoot";
 
 export const metadata: Metadata = {
   title: "BCN FiberOps",
-  description: "Telecom network operations dashboard (frontend-first, mock-driven).",
+  description: "Telecom network operations dashboard.",
 };
 
 export default function RootLayout({
@@ -20,11 +18,7 @@ export default function RootLayout({
         <a href="#main-content" className="skip-to-main">
           Skip to main content
         </a>
-        <Providers>
-          <ErrorBoundary>
-            <Shell>{children}</Shell>
-          </ErrorBoundary>
-        </Providers>
+        <ClientRoot>{children}</ClientRoot>
       </body>
     </html>
   );

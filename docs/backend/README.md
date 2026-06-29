@@ -9,6 +9,7 @@ Use these docs to scaffold one or more backend services (monolith or microservic
 | Document | Purpose |
 |----------|---------|
 | [Guideline](./guideline.md) | **End-to-end workflow** for building backend features (mirrors frontend E2E pattern) |
+| [Next Tasks](./next-tasks.md) | **Prioritized backlog** — what to build after Mikrotik + Laravel scaffold |
 | [Overview](./overview.md) | System context, service boundaries, tech recommendations |
 | [Domain Models](./domain-models.md) | Entities, enums, relationships, business rules |
 | [API Reference](./api-reference.md) | REST endpoints, request/response shapes, validation |
@@ -30,13 +31,15 @@ Use these docs to scaffold one or more backend services (monolith or microservic
 
 | Area | REST API | WebSocket | Notes |
 |------|----------|-----------|-------|
-| Assets | `GET /api/assets` | `status_broadcast`, `node_update` | Read-only today; status updates are mocked client-side |
-| Customers | Full CRUD (list, get, create, patch) | — | |
-| Incidents | Full CRUD + resolve flow | `incident_alert` (planned) | List polled every 30s |
-| Settings | Organization, integrations, billing, team | — | Multi-tenant by org recommended |
-| Stats | `GET /api/stats/usage` | — | Dashboard chart data |
+| Assets | `GET/POST /api/assets` | `status_broadcast`, `node_update` | PATCH + netwatch via Mikrotik; see [Next Tasks](./next-tasks.md) |
+| Customers | Full CRUD (list, get, create, patch) | `status_broadcast` (PPPoE) | `pppoeUsername` links Mikrotik sessions |
+| Incidents | Full CRUD + resolve flow | `incident_alert` | Query invalidation wired; toasts/map overlay pending |
+| Settings | Organization, integrations, billing, team | — | Mikrotik integration + encrypted credentials |
+| Stats | `GET /api/stats/usage` | — | Live Mikrotik interface samples when configured |
+| Integrations | Mikrotik test + config | — | Slack/Stripe/PagerDuty config-only |
 | Work orders | Full CRUD (list, get, create, patch) | — | Kanban + table at `/work-orders`; list polled every 30s |
-| Network topology | **Derived client-side** | Partial | Backend may expose explicit graph API later |
+| Network topology | **Derived client-side** | Partial | Backend graph API planned — [Next Tasks P2-1](./next-tasks.md#p2-1--explicit-topology-api) |
+| Mikrotik | Settings API + scheduler | Indirect via Redis→WS | See [Next Tasks](./next-tasks.md) for hardening backlog |
 
 ## Source files in this repo
 

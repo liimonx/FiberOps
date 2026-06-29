@@ -58,6 +58,7 @@ import {
 import {
   getIntegrationsSettings,
   integrationHasExistingCredentials,
+  testMikrotikConnection,
   updateIntegration,
   updateOutboundWebhook,
   webhookHasExistingSecret,
@@ -313,6 +314,10 @@ export async function handleApiRequest(request: Request): Promise<Response> {
           if (!parsed.success) return validationError(parsed.error.flatten());
           return json(updateOutboundWebhook(parsed.data));
         }
+        if (segments[2] === "mikrotik" && segments[3] === "test" && method === "POST") {
+          const result = testMikrotikConnection();
+          return json(result, result.ok ? 200 : 422);
+        }
         if (segments.length === 3 && method === "PATCH") {
           const id = segments[2] as IntegrationProviderId;
           const validIds: IntegrationProviderId[] = [
@@ -320,6 +325,7 @@ export async function handleApiRequest(request: Request): Promise<Response> {
             "slack",
             "pagerduty",
             "stripe",
+            "mikrotik",
           ];
           if (!validIds.includes(id)) return notFound("Integration not found");
           const body = (await request.json()) as IntegrationUpdateFormValues;

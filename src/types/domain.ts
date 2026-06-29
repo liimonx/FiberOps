@@ -22,6 +22,7 @@ export type Asset = {
   name: string;
   status: AssetStatus;
   location: LatLng;
+  monitorHost?: string;
 };
 
 export type Customer = {
@@ -31,6 +32,7 @@ export type Customer = {
   status: CustomerStatus;
   billingStatus: BillingStatus;
   relatedOnuId?: string;
+  pppoeUsername?: string;
   email?: string;
   notes?: string;
   location?: { lat: number; lng: number };
@@ -94,7 +96,8 @@ export type IntegrationProviderId =
   | "mapbox"
   | "slack"
   | "pagerduty"
-  | "stripe";
+  | "stripe"
+  | "mikrotik";
 
 export type Integration = {
   id: IntegrationProviderId;
@@ -103,6 +106,14 @@ export type Integration = {
   status: IntegrationStatus;
   enabled: boolean;
   apiKeyMasked?: string;
+  host?: string;
+  port?: number;
+  username?: string;
+  passwordMasked?: string;
+  useSsl?: boolean;
+  verifySsl?: boolean;
+  apiMode?: "rest" | "classic";
+  monitoredInterface?: string;
 };
 
 export type WebhookEvent =

@@ -7,6 +7,7 @@ import { getWebSocketService, WebSocketMessage } from '../services/websocketServ
 import { safeValidateData } from '../utils/validation';
 import { webSocketMessageSchema } from '../schemas/webSocketMessage.schema';
 import { createLogger } from '@/lib/logger';
+import { networkQueryKeys } from "../hooks/useNetworkData";
 
 const log = createLogger('RealTime');
 
@@ -20,6 +21,7 @@ export function useRealTimeUpdates(options: UseRealTimeUpdatesOptions = {}) {
   const { enabled = true, wsUrl, onConnectionChange } = options;
   
   const isConnectedRef = useRef(false);
+  const queryClient = useQueryClient();
   
   // Get store actions
   const updateNode = useNetworkMapStore((state) => state.updateNode);
@@ -50,6 +52,7 @@ export function useRealTimeUpdates(options: UseRealTimeUpdatesOptions = {}) {
           
         case 'incident_alert':
           log.info('New incident alert:', validatedMessage.data);
+          queryClient.invalidateQueries({ queryKey: networkQueryKeys.incidents.all });
           break;
           
         case 'status_broadcast':
@@ -68,7 +71,7 @@ export function useRealTimeUpdates(options: UseRealTimeUpdatesOptions = {}) {
       log.error('Error handling message:', error);
       setError('Failed to process real-time update');
     }
-  }, [updateNode, updateConnection, setConnectionQuality, setError]);
+  }, [updateNode, updateConnection, setConnectionQuality, setError, queryClient]);
 
   // Initialize WebSocket connection
   useEffect(() => {

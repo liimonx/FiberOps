@@ -11,58 +11,33 @@ import type {
   IntegrationUpdateFormValues,
   OutboundWebhookFormValues,
 } from "@/modules/settings/schemas/integrationsSettings.schema";
-import { parseSettingsError } from "@/modules/settings/lib/parseSettingsError";
+import { apiClient } from "@/lib/apiClient";
 import { billingSettingsQueryKey } from "@/modules/settings/hooks/useBillingSettings";
 
 export const integrationsSettingsQueryKey = ["settings", "integrations"] as const;
 
-async function fetchIntegrationsSettings(): Promise<IntegrationsSettings> {
-  const res = await fetch("/api/settings/integrations");
-  if (!res.ok) {
-    throw new Error("Failed to fetch integrations settings");
-  }
-  return res.json();
-}
+type MikrotikTestPayload = {
+  host?: string;
+  port?: number;
+  username?: string;
+  password?: string;
+  useSsl?: boolean;
+  verifySsl?: boolean;
+  apiMode?: "rest" | "classic";
+};
 
-async function patchIntegration(
-  id: IntegrationProviderId,
-  data: IntegrationUpdateFormValues
-): Promise<Integration> {
-  const res = await fetch(`/api/settings/integrations/${id}`, {
-    method: "PATCH",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
-  });
-
-  if (!res.ok) {
-    await parseSettingsError(res, "Failed to update integration");
-  }
-
-  return res.json();
-}
-
-async function patchOutboundWebhook(
-  data: OutboundWebhookFormValues
-): Promise<OutboundWebhook> {
-  const res = await fetch("/api/settings/integrations/webhook", {
-    method: "PATCH",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
-  });
-
-  if (!res.ok) {
-    await parseSettingsError(res, "Failed to update outbound webhook");
-  }
-
-  return res.json();
-}
+type MikrotikTestResult = {
+  ok: boolean;
+  message: string;
+  identity?: string;
+};
 
 export function useIntegrationsSettings() {
   const queryClient = useQueryClient();
 
   const query = useQuery({
     queryKey: integrationsSettingsQueryKey,
-    queryFn: fetchIntegrationsSettings,
+    queryFn: () => apiClient<IntegrationsSettings>("/api/settings/integrations"),
   });
 
   const integrationMutation = useMutation({
@@ -72,7 +47,11 @@ export function useIntegrationsSettings() {
     }: {
       id: IntegrationProviderId;
       values: IntegrationUpdateFormValues;
-    }) => patchIntegration(id, values),
+    }) =>
+      apiClient<Integration>(`/api/settings/integrations/${id}`, {
+        method: "PATCH",
+        body: JSON.stringify(values),
+      }),
     onSuccess: (updatedIntegration) => {
       queryClient.setQueryData<IntegrationsSettings>(
         integrationsSettingsQueryKey,
@@ -98,8 +77,25 @@ export function useIntegrationsSettings() {
     },
   });
 
+  const testConnectionMutation = useMutation({
+    mutationFn: (payload: MikrotikTestPayload) =>
+      apiClient<MikrotikTestResult>("/api/settings/integrations/mikrotik/test", {
+        method: "POST",
+        body: JSON.stringify(payload),
+      }),
+    onSuccess: (result) => {
+      if (result.ok) {
+        queryClient.invalidateQueries({ queryKey: integrationsSettingsQueryKey });
+      }
+    },
+  });
+
   const webhookMutation = useMutation({
-    mutationFn: patchOutboundWebhook,
+    mutationFn: (data: OutboundWebhookFormValues) =>
+      apiClient<OutboundWebhook>("/api/settings/integrations/webhook", {
+        method: "PATCH",
+        body: JSON.stringify(data),
+      }),
     onSuccess: (outboundWebhook) => {
       queryClient.setQueryData<IntegrationsSettings>(
         integrationsSettingsQueryKey,
@@ -131,6 +127,11 @@ export function useIntegrationsSettings() {
     isIntegrationSuccess: integrationMutation.isSuccess,
     integrationSaveError: integrationMutation.error,
     resetIntegrationSaveState: integrationMutation.reset,
+    testMikrotikConnectionAsync: testConnectionMutation.mutateAsync,
+    isTestingConnection: testConnectionMutation.isPending,
+    testConnectionResult: testConnectionMutation.data,
+    testConnectionError: testConnectionMutation.error,
+    resetTestConnectionState: testConnectionMutation.reset,
     updateWebhook: webhookMutation.mutate,
     updateWebhookAsync: webhookMutation.mutateAsync,
     isSavingWebhook: webhookMutation.isPending,

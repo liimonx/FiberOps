@@ -53,6 +53,7 @@ export function RegisterAssetModal({
       kind: "pole",
       status: "active",
       location: defaultLocation,
+      monitorHost: "",
     },
   });
 
@@ -63,6 +64,7 @@ export function RegisterAssetModal({
         kind: "pole",
         status: "active",
         location: defaultLocation,
+        monitorHost: "",
       });
       resetMutation();
     }
@@ -201,6 +203,21 @@ export function RegisterAssetModal({
               )}
             </div>
           </div>
+        </div>
+
+        <div className="u-form-field">
+          <label className="u-form-label" htmlFor="asset-monitor-host">
+            Monitor Host (optional)
+          </label>
+          <Input
+            id="asset-monitor-host"
+            placeholder="192.168.88.1"
+            fullWidth
+            {...register("monitorHost")}
+          />
+          <p className="u-form-help u-mt-1">
+            Mikrotik netwatch target IP for reachability monitoring.
+          </p>
         </div>
 
         {isError && (

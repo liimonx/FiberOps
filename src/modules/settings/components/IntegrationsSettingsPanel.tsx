@@ -6,6 +6,7 @@ import type { IntegrationProviderId } from "@/types/domain";
 import type { IntegrationUpdateFormValues } from "@/modules/settings/schemas/integrationsSettings.schema";
 import { useIntegrationsSettings } from "@/modules/settings/hooks/useIntegrationsSettings";
 import { IntegrationCard } from "@/modules/settings/components/IntegrationCard";
+import { MikrotikIntegrationCard } from "@/modules/settings/components/MikrotikIntegrationCard";
 import { OutboundWebhookForm } from "@/modules/settings/components/OutboundWebhookForm";
 
 const SUCCESS_DISMISS_MS = 4000;
@@ -132,22 +133,41 @@ export function IntegrationsSettingsPanel() {
         <Grid>
           {data.integrations.map((integration) => (
             <GridCol key={integration.id} xs={12} lg={6} className="u-mb-4">
-              <IntegrationCard
-                integration={integration}
-                isSaving={savingIntegrationId === integration.id}
-                isSuccess={
-                  isIntegrationSuccess &&
-                  feedbackIntegrationId === integration.id
-                }
-                saveError={
-                  integrationSaveError &&
-                  feedbackIntegrationId === integration.id
-                    ? integrationSaveError
-                    : null
-                }
-                onSave={handleIntegrationSave}
-                onResetSaveState={resetIntegrationSaveState}
-              />
+              {integration.id === "mikrotik" ? (
+                <MikrotikIntegrationCard
+                  integration={integration}
+                  isSaving={savingIntegrationId === integration.id}
+                  isSuccess={
+                    isIntegrationSuccess &&
+                    feedbackIntegrationId === integration.id
+                  }
+                  saveError={
+                    integrationSaveError &&
+                    feedbackIntegrationId === integration.id
+                      ? integrationSaveError
+                      : null
+                  }
+                  onSave={(values) => handleIntegrationSave(integration.id, values)}
+                  onResetSaveState={resetIntegrationSaveState}
+                />
+              ) : (
+                <IntegrationCard
+                  integration={integration}
+                  isSaving={savingIntegrationId === integration.id}
+                  isSuccess={
+                    isIntegrationSuccess &&
+                    feedbackIntegrationId === integration.id
+                  }
+                  saveError={
+                    integrationSaveError &&
+                    feedbackIntegrationId === integration.id
+                      ? integrationSaveError
+                      : null
+                  }
+                  onSave={handleIntegrationSave}
+                  onResetSaveState={resetIntegrationSaveState}
+                />
+              )}
             </GridCol>
           ))}
         </Grid>

@@ -12,15 +12,7 @@ import {
   generateTopology 
 } from '../utils/dataTransformation';
 
-async function fetchList<T>(path: string): Promise<T[]> {
-  const res = await fetch(path);
-  if (!res.ok) {
-    throw new Error(`Failed to fetch ${path}`);
-  }
-
-  const body = (await res.json()) as { items: T[] };
-  return body.items;
-}
+import { fetchList } from "@/lib/fetchApi";
 
 // Query keys for better organization and cache management
 export const networkQueryKeys = {

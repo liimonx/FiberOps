@@ -6,67 +6,16 @@ import type {
   TeamInviteFormValues,
   TeamMemberUpdateFormValues,
 } from "@/modules/settings/schemas/teamSettings.schema";
-import { parseSettingsError } from "@/modules/settings/lib/parseSettingsError";
+import { apiClient } from "@/lib/apiClient";
 
 export const teamSettingsQueryKey = ["settings", "team"] as const;
-
-async function fetchTeamSettings(): Promise<TeamSettings> {
-  const res = await fetch("/api/settings/team");
-  if (!res.ok) {
-    throw new Error("Failed to fetch team settings");
-  }
-  return res.json();
-}
-
-async function patchTeamMemberRole(
-  memberId: string,
-  data: TeamMemberUpdateFormValues
-): Promise<TeamSettings> {
-  const res = await fetch(`/api/settings/team/members/${memberId}`, {
-    method: "PATCH",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
-  });
-
-  if (!res.ok) {
-    await parseSettingsError(res, "Failed to update team member");
-  }
-
-  return res.json();
-}
-
-async function postTeamInvite(data: TeamInviteFormValues): Promise<TeamSettings> {
-  const res = await fetch("/api/settings/team/invites", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
-  });
-
-  if (!res.ok) {
-    await parseSettingsError(res, "Failed to send invite");
-  }
-
-  return res.json();
-}
-
-async function deleteTeamInvite(inviteId: string): Promise<TeamSettings> {
-  const res = await fetch(`/api/settings/team/invites/${inviteId}`, {
-    method: "DELETE",
-  });
-
-  if (!res.ok) {
-    await parseSettingsError(res, "Failed to revoke invite");
-  }
-
-  return res.json();
-}
 
 export function useTeamSettings() {
   const queryClient = useQueryClient();
 
   const query = useQuery({
     queryKey: teamSettingsQueryKey,
-    queryFn: fetchTeamSettings,
+    queryFn: () => apiClient<TeamSettings>("/api/settings/team"),
   });
 
   const roleMutation = useMutation({
@@ -76,21 +25,32 @@ export function useTeamSettings() {
     }: {
       memberId: string;
       values: TeamMemberUpdateFormValues;
-    }) => patchTeamMemberRole(memberId, values),
+    }) =>
+      apiClient<TeamSettings>(`/api/settings/team/members/${memberId}`, {
+        method: "PATCH",
+        body: JSON.stringify(values),
+      }),
     onSuccess: (data) => {
       queryClient.setQueryData(teamSettingsQueryKey, data);
     },
   });
 
   const inviteMutation = useMutation({
-    mutationFn: postTeamInvite,
+    mutationFn: (data: TeamInviteFormValues) =>
+      apiClient<TeamSettings>("/api/settings/team/invites", {
+        method: "POST",
+        body: JSON.stringify(data),
+      }),
     onSuccess: (data) => {
       queryClient.setQueryData(teamSettingsQueryKey, data);
     },
   });
 
   const revokeMutation = useMutation({
-    mutationFn: deleteTeamInvite,
+    mutationFn: (inviteId: string) =>
+      apiClient<TeamSettings>(`/api/settings/team/invites/${inviteId}`, {
+        method: "DELETE",
+      }),
     onSuccess: (data) => {
       queryClient.setQueryData(teamSettingsQueryKey, data);
     },

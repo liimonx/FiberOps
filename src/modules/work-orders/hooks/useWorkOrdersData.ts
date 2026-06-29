@@ -3,59 +3,32 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { WorkOrder } from "@/types/domain";
 import { networkQueryKeys } from "@/modules/network-map/hooks/useNetworkData";
-import { parseSettingsError } from "@/modules/settings/lib/parseSettingsError";
 import type {
   CreateWorkOrderFormValues,
   UpdateWorkOrderFormValues,
 } from "@/modules/work-orders/schemas/workOrder.schema";
-
-async function fetchList<T>(path: string): Promise<T[]> {
-  const res = await fetch(path);
-  if (!res.ok) {
-    throw new Error(`Failed to fetch ${path}`);
-  }
-
-  const body = (await res.json()) as { items: T[] };
-  return body.items;
-}
+import { apiClient } from "@/lib/apiClient";
+import { fetchList } from "@/lib/fetchApi";
 
 async function fetchWorkOrder(id: string): Promise<WorkOrder> {
-  const res = await fetch(`/api/work-orders/${id}`);
-  if (!res.ok) {
-    await parseSettingsError(res, "Failed to fetch work order");
-  }
-  return res.json();
+  return apiClient<WorkOrder>(`/api/work-orders/${id}`);
 }
 
 async function postWorkOrder(data: CreateWorkOrderFormValues): Promise<WorkOrder> {
-  const res = await fetch("/api/work-orders", {
+  return apiClient<WorkOrder>("/api/work-orders", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
   });
-
-  if (!res.ok) {
-    await parseSettingsError(res, "Failed to create work order");
-  }
-
-  return res.json();
 }
 
 async function patchWorkOrder(
   id: string,
   data: UpdateWorkOrderFormValues
 ): Promise<WorkOrder> {
-  const res = await fetch(`/api/work-orders/${id}`, {
+  return apiClient<WorkOrder>(`/api/work-orders/${id}`, {
     method: "PATCH",
-    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
   });
-
-  if (!res.ok) {
-    await parseSettingsError(res, "Failed to update work order");
-  }
-
-  return res.json();
 }
 
 export function useWorkOrders() {

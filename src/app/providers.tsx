@@ -16,7 +16,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
   );
 
   useEffect(() => {
-    if (process.env.NODE_ENV !== "development") {
+    const useMsw = process.env.NEXT_PUBLIC_USE_MSW !== "false";
+
+    if (process.env.NODE_ENV !== "development" || !useMsw) {
       setTimeout(() => setIsMswReady(true), 0);
       return;
     }
@@ -38,7 +40,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
   // Prevent app from mounting until MSW is ready in development.
   // This avoids race conditions where components attempt WebSocket connections
   // before MSW has intercepted the global WebSocket object.
-  if (!isMswReady && process.env.NODE_ENV === "development") {
+  if (!isMswReady && process.env.NODE_ENV === "development" && process.env.NEXT_PUBLIC_USE_MSW !== "false") {
     return null; // Or a loading spinner if preferred
   }
 

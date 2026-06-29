@@ -14,10 +14,18 @@ Repository interfaces in `src/services/repositories.ts` exist but **most hooks c
 
 ## Step 1 — Run the backend
 
+Clone and start [Fiberops-backend](https://github.com/liimonx/Fiberops-backend) (canonical repo path: `Fiberops-backend/`):
+
+```bash
+cd Fiberops-backend
+cp .env.example .env
+docker compose up -d --build
+```
+
 Expose:
 
-- REST at `http://localhost:<port>/api/*` (or behind a reverse proxy)
-- WebSocket at `ws://localhost:<port>/ws`
+- REST at `http://localhost:8000/api/v1/*`
+- WebSocket at `ws://localhost:8080/ws`
 
 Implement all endpoints in [API Reference](./api-reference.md).
 
@@ -33,7 +41,7 @@ const nextConfig = {
     return [
       {
         source: "/api/:path*",
-        destination: "http://localhost:8080/api/:path*",
+        destination: "http://localhost:8000/api/:path*",
       },
     ];
   },
@@ -65,7 +73,8 @@ Verify network tab shows requests hitting your backend, not service worker mocks
 ```env
 NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN=pk....
 
-# Real backend
+# Laravel backend (see Fiberops-backend/)
+NEXT_PUBLIC_API_URL=http://localhost:8000
 NEXT_PUBLIC_WS_URL=ws://localhost:8080/ws
 
 # Disable mocks when backend is ready
@@ -100,12 +109,13 @@ headers: {
 3. Centralize in a small `apiClient` helper (future refactor)
 4. Handle 401 → redirect to login
 
-Suggested backend endpoints (not yet in UI):
+Suggested backend endpoints (implemented via Next.js rewrites to Laravel `/api/v1`):
 
 ```
-POST /api/auth/login
-POST /api/auth/logout
-GET  /api/auth/me
+POST /api/auth/login    → /api/v1/auth/login
+POST /api/auth/register → /api/v1/auth/register
+POST /api/auth/logout   → /api/v1/auth/logout
+GET  /api/me            → /api/v1/me
 ```
 
 ## Step 6 — Validate contract parity

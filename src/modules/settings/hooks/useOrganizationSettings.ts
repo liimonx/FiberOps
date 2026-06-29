@@ -3,44 +3,24 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { OrganizationSettings } from "@/types/domain";
 import type { OrganizationSettingsFormValues } from "@/modules/settings/schemas/organizationSettings.schema";
-import { parseSettingsError } from "@/modules/settings/lib/parseSettingsError";
+import { apiClient } from "@/lib/apiClient";
 
 export const organizationSettingsQueryKey = ["settings", "organization"] as const;
-
-async function fetchOrganizationSettings(): Promise<OrganizationSettings> {
-  const res = await fetch("/api/settings/organization");
-  if (!res.ok) {
-    throw new Error("Failed to fetch organization settings");
-  }
-  return res.json();
-}
-
-async function patchOrganizationSettings(
-  data: OrganizationSettingsFormValues
-): Promise<OrganizationSettings> {
-  const res = await fetch("/api/settings/organization", {
-    method: "PATCH",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
-  });
-
-  if (!res.ok) {
-    await parseSettingsError(res, "Failed to update organization settings");
-  }
-
-  return res.json();
-}
 
 export function useOrganizationSettings() {
   const queryClient = useQueryClient();
 
   const query = useQuery({
     queryKey: organizationSettingsQueryKey,
-    queryFn: fetchOrganizationSettings,
+    queryFn: () => apiClient<OrganizationSettings>("/api/settings/organization"),
   });
 
   const mutation = useMutation({
-    mutationFn: patchOrganizationSettings,
+    mutationFn: (data: OrganizationSettingsFormValues) =>
+      apiClient<OrganizationSettings>("/api/settings/organization", {
+        method: "PATCH",
+        body: JSON.stringify(data),
+      }),
     onSuccess: (data) => {
       queryClient.setQueryData(organizationSettingsQueryKey, data);
     },

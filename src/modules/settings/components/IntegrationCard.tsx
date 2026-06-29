@@ -13,12 +13,13 @@ import {
 
 const providerIcons: Record<
   IntegrationProviderId,
-  "MapTrifold" | "SlackLogo" | "BellRinging" | "CreditCard"
+  "MapTrifold" | "SlackLogo" | "BellRinging" | "CreditCard" | "WifiHigh"
 > = {
   mapbox: "MapTrifold",
   slack: "SlackLogo",
   pagerduty: "BellRinging",
   stripe: "CreditCard",
+  mikrotik: "WifiHigh",
 };
 
 const statusVariants: Record<
@@ -82,6 +83,13 @@ function getCredentialField(id: IntegrationProviderId): {
         label: "Secret Key",
         inputType: "password",
         placeholder: "sk_…",
+      };
+    case "mikrotik":
+      return {
+        key: "apiKey",
+        label: "Not used",
+        inputType: "password",
+        placeholder: "",
       };
   }
 }

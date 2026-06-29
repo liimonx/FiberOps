@@ -3,59 +3,46 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { Customer } from "@/types/domain";
 import { networkQueryKeys } from "@/modules/network-map/hooks/useNetworkData";
-import { parseSettingsError } from "@/modules/settings/lib/parseSettingsError";
 import type {
   CreateCustomerFormValues,
   UpdateCustomerFormValues,
 } from "@/modules/customers/schemas/customer.schema";
-
-async function fetchList<T>(path: string): Promise<T[]> {
-  const res = await fetch(path);
-  if (!res.ok) {
-    throw new Error(`Failed to fetch ${path}`);
-  }
-
-  const body = (await res.json()) as { items: T[] };
-  return body.items;
-}
+import { apiClient } from "@/lib/apiClient";
+import { fetchList } from "@/lib/fetchApi";
 
 async function fetchCustomer(id: string): Promise<Customer> {
-  const res = await fetch(`/api/customers/${id}`);
-  if (!res.ok) {
-    await parseSettingsError(res, "Failed to fetch customer");
+  try {
+    return await apiClient<Customer>(`/api/customers/${id}`);
+  } catch (error) {
+    throw error instanceof Error ? error : new Error("Failed to fetch customer");
   }
-  return res.json();
 }
 
 async function postCustomer(data: CreateCustomerFormValues): Promise<Customer> {
-  const res = await fetch("/api/customers", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
-  });
-
-  if (!res.ok) {
-    await parseSettingsError(res, "Failed to create customer");
+  try {
+    return await apiClient<Customer>("/api/customers", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  } catch (error) {
+    if (error instanceof Error) throw error;
+    throw new Error("Failed to create customer");
   }
-
-  return res.json();
 }
 
 async function patchCustomer(
   id: string,
   data: UpdateCustomerFormValues
 ): Promise<Customer> {
-  const res = await fetch(`/api/customers/${id}`, {
-    method: "PATCH",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
-  });
-
-  if (!res.ok) {
-    await parseSettingsError(res, "Failed to update customer");
+  try {
+    return await apiClient<Customer>(`/api/customers/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify(data),
+    });
+  } catch (error) {
+    if (error instanceof Error) throw error;
+    throw new Error("Failed to update customer");
   }
-
-  return res.json();
 }
 
 export function useCustomers() {
