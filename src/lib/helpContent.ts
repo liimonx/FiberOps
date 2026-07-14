@@ -355,7 +355,7 @@ export const TROUBLESHOOTING_TOPICS: HelpTopic[] = [
     icon: "MapPin",
     title: "Map not loading",
     description:
-      "Confirm NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN is set in .env.local and restart the dev server after changes.",
+      "Confirm a Mapbox access token is saved under Settings → Integrations (or NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN in .env.local) and restart the dev server after env changes.",
   },
   {
     icon: "DeviceMobile",

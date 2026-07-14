@@ -11,6 +11,7 @@ import {
   useConnections,
 } from "../stores/useNetworkMapStore";
 import { MAPBOX_CONFIG } from "../constants";
+import { useMapboxAccessToken } from "../hooks/useMapboxAccessToken";
 import { createLogger } from "@/lib/logger";
 
 const log = createLogger("MapCanvas");
@@ -44,12 +45,13 @@ interface MapCanvasProps {
 export const MapCanvas: React.FC<MapCanvasProps> = ({ onMapLoad, onMapError }) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
-  const tokenError = !MAPBOX_CONFIG.ACCESS_TOKEN
-    ? "Mapbox access token not configured."
+  const { accessToken, isLoading: isTokenLoading } = useMapboxAccessToken();
+  const tokenError = !isTokenLoading && !accessToken
+    ? "Mapbox access token not configured. Add it under Settings → Integrations or set NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN."
     : null;
 
-  const [mapLoading, setMapLoading] = useState(!tokenError);
-  const [mapError, setMapError] = useState<string | null>(tokenError);
+  const [mapLoading, setMapLoading] = useState(true);
+  const [mapError, setMapError] = useState<string | null>(null);
   const [isReady, setIsReady] = useState(false);
 
   const viewport = useViewport();
@@ -61,7 +63,17 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({ onMapLoad, onMapError }) =
   const setZooming = useNetworkMapStore((state) => state.setZooming);
 
   useEffect(() => {
-    if (tokenError) onMapError?.(new Error(tokenError));
+    if (tokenError) {
+      setMapLoading(false);
+      setMapError(tokenError);
+      onMapError?.(new Error(tokenError));
+      return;
+    }
+
+    // Clear a stale token error so the map container can remount once a token arrives.
+    setMapError((prev) =>
+      prev?.startsWith("Mapbox access token not configured") ? null : prev
+    );
   }, [tokenError, onMapError]);
 
   const createCircleCoordinates = useCallback(
@@ -233,20 +245,22 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({ onMapLoad, onMapError }) =
     [initializeLayers, createCircleCoordinates]
   );
 
-  // Map instance is created once on mount; re-running when viewport/store callbacks
-  // change would tear down and recreate the map on every pan/zoom.
+  // Map instance is created once token is available; re-running when viewport/store
+  // callbacks change would tear down and recreate the map on every pan/zoom.
+  // Read the latest viewport from the store at init time to avoid a stale closure.
   useEffect(() => {
-    if (!mapContainer.current || mapRef.current || tokenError) return;
-    mapboxgl.accessToken = MAPBOX_CONFIG.ACCESS_TOKEN as string;
+    if (!mapContainer.current || mapRef.current || !accessToken || tokenError) return;
+    mapboxgl.accessToken = accessToken;
 
     try {
+      const initialViewport = useNetworkMapStore.getState().viewport;
       const map = new mapboxgl.Map({
         container: mapContainer.current,
         style: MAPBOX_CONFIG.STYLE,
-        center: [viewport.center.lng, viewport.center.lat],
-        zoom: viewport.zoom,
-        bearing: viewport.bearing,
-        pitch: viewport.pitch,
+        center: [initialViewport.center.lng, initialViewport.center.lat],
+        zoom: initialViewport.zoom,
+        bearing: initialViewport.bearing,
+        pitch: initialViewport.pitch,
         minZoom: MAPBOX_CONFIG.MIN_ZOOM,
         maxZoom: MAPBOX_CONFIG.MAX_ZOOM,
         attributionControl: false,
@@ -369,8 +383,7 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({ onMapLoad, onMapError }) =
         setMapLoading(false);
       }, 0);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- intentional mount-only init
-  }, []);
+  }, [accessToken, tokenError]);
 
   useEffect(() => {
     if (!mapContainer.current || !mapRef.current || !isReady) return;

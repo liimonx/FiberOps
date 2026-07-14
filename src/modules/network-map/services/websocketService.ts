@@ -7,6 +7,7 @@ import {
   WebSocketMessageSchema,
 } from "../schemas/webSocketMessage.schema";
 import { createLogger } from "@/lib/logger";
+import { getAuthToken } from "@/lib/apiClient";
 
 const log = createLogger("WebSocket");
 
@@ -49,6 +50,19 @@ export class WebSocketService {
     return WebSocketService.instance;
   }
 
+  private buildAuthenticatedUrl(baseUrl: string): string {
+    try {
+      const url = new URL(baseUrl);
+      const bearer = getAuthToken();
+      if (bearer) {
+        url.searchParams.set("token", bearer);
+      }
+      return url.toString();
+    } catch {
+      return baseUrl;
+    }
+  }
+
   public connect(): Promise<void> {
     return new Promise((resolve, reject) => {
       if (!this.config.url) {
@@ -73,7 +87,9 @@ export class WebSocketService {
       }, 5000);
 
       try {
-        this.ws = new WebSocket(this.config.url);
+        this.ws = new WebSocket(
+          this.buildAuthenticatedUrl(this.config.url)
+        );
 
         this.ws.onopen = () => {
           clearTimeout(connectionTimeout);

@@ -6,6 +6,7 @@ import "mapbox-gl/dist/mapbox-gl.css";
 import Link from "next/link";
 import { Button, Icon } from "@shohojdhara/atomix";
 import { MAPBOX_CONFIG } from "@/modules/network-map/constants";
+import { useMapboxAccessToken } from "@/modules/network-map/hooks/useMapboxAccessToken";
 import { customerStatusColors } from "@/lib/themeColors";
 import type { Customer } from "@/types/domain";
 
@@ -32,9 +33,19 @@ export function CustomerMapPreview({
   const mapContainer = useRef<HTMLDivElement>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const markersRef = useRef<mapboxgl.Marker[]>([]);
-  const [mapError, setMapError] = useState<string | null>(
-    MAPBOX_CONFIG.ACCESS_TOKEN ? null : "Mapbox access token not configured."
-  );
+  const { accessToken, isLoading: isTokenLoading } = useMapboxAccessToken();
+  const [mapError, setMapError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (isTokenLoading) return;
+    if (!accessToken) {
+      setMapError(
+        "Mapbox access token not configured. Add it under Settings → Integrations or set NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN."
+      );
+    } else {
+      setMapError(null);
+    }
+  }, [accessToken, isTokenLoading]);
 
   const markers = useMemo(
     () =>
@@ -52,9 +63,9 @@ export function CustomerMapPreview({
   );
 
   useEffect(() => {
-    if (!mapContainer.current || mapRef.current || mapError) return;
+    if (!mapContainer.current || mapRef.current || mapError || !accessToken) return;
 
-    mapboxgl.accessToken = MAPBOX_CONFIG.ACCESS_TOKEN;
+    mapboxgl.accessToken = accessToken;
 
     const map = new mapboxgl.Map({
       container: mapContainer.current,
@@ -78,7 +89,7 @@ export function CustomerMapPreview({
       map.remove();
       mapRef.current = null;
     };
-  }, [mapError]);
+  }, [mapError, accessToken]);
 
   useEffect(() => {
     const map = mapRef.current;

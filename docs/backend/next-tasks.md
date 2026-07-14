@@ -54,7 +54,14 @@ Use this as the starting line before picking new work.
 
 ## Priority 0 — Production readiness
 
-Do these before exposing the app to real operators.
+### Done in this release pass
+
+- Outbound webhook + Slack/PagerDuty dispatch (Laravel job + MSW dispatcher)
+- Invite accept flow (`POST /auth/accept-invite`, `/invite/[token]` UI)
+- WebSocket gateway token auth + org-scoped Redis fan-out
+- Mapbox token endpoint, team member delete, asset PATCH
+- Customer `pppoeUsername` UI field
+- Incident alert toaster + delivery log UI
 
 ### P0-1 · Retire MSW in staging/production
 

@@ -16,6 +16,8 @@ import {
   countIncidentsResolvedSince,
 } from "@/lib/homeActivity";
 import { getLauncherItemsByGroup } from "@/lib/navigation";
+import { canAccessSettings } from "@/lib/auth/rbac";
+import { useAuthStore } from "@/stores/useAuthStore";
 import {
   getHighPriorityOpenWorkOrderCount,
   getOpenWorkOrderCount,
@@ -34,6 +36,7 @@ function formatCount(value: number): string {
 }
 
 export default function Home() {
+  const user = useAuthStore((state) => state.user);
   const {
     data: customers,
     isLoading: isCustomersLoading,
@@ -66,7 +69,9 @@ export default function Home() {
     isError: isSummaryError,
     refetch: refetchSummary,
   } = useReportsSummary();
-  const { data: teamSettings } = useTeamSettings();
+  const { data: teamSettings } = useTeamSettings({
+    enabled: canAccessSettings(user),
+  });
 
   const orderList = workOrders ?? [];
   const customerList = customers ?? [];
@@ -100,12 +105,12 @@ export default function Home() {
   );
 
   const coreApps = useMemo(
-    () => getLauncherItemsByGroup("core", launcherBadges),
-    [launcherBadges]
+    () => getLauncherItemsByGroup("core", launcherBadges, user?.role),
+    [launcherBadges, user?.role]
   );
   const managementApps = useMemo(
-    () => getLauncherItemsByGroup("management", launcherBadges),
-    [launcherBadges]
+    () => getLauncherItemsByGroup("management", launcherBadges, user?.role),
+    [launcherBadges, user?.role]
   );
 
   const isLoading =

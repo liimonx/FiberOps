@@ -4,27 +4,31 @@ import {
   apiClient,
   clearAuthToken,
   setAuthToken,
+  getAuthToken,
   ApiClientError,
 } from "@/lib/apiClient";
+import type { AuthUser } from "@/types/auth";
 
-export type AuthUser = {
-  id: number;
-  name: string;
-  email: string;
-  role: "admin" | "operator" | "viewer";
-  organizationId?: number;
-};
+export type { AuthUser };
 
 type AuthState = {
   user: AuthUser | null;
   token: string | null;
   isHydrated: boolean;
+  isSessionReady: boolean;
   login: (email: string, password: string) => Promise<void>;
   register: (name: string, email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   fetchMe: () => Promise<void>;
+  bootstrapDemoSession: () => Promise<void>;
   setHydrated: () => void;
+  setSessionReady: (ready: boolean) => void;
 };
+
+async function establishSession(user: AuthUser, token: string) {
+  await setAuthToken(token);
+  return { user, token };
+}
 
 export const useAuthStore = create<AuthState>()(
   persist(
@@ -32,7 +36,9 @@ export const useAuthStore = create<AuthState>()(
       user: null,
       token: null,
       isHydrated: false,
+      isSessionReady: false,
       setHydrated: () => set({ isHydrated: true }),
+      setSessionReady: (ready) => set({ isSessionReady: ready }),
       login: async (email, password) => {
         const data = await apiClient<{ user: AuthUser; token: string }>(
           "/api/auth/login",
@@ -42,8 +48,8 @@ export const useAuthStore = create<AuthState>()(
             skipAuth: true,
           }
         );
-        setAuthToken(data.token);
-        set({ user: data.user, token: data.token });
+        const session = await establishSession(data.user, data.token);
+        set(session);
       },
       register: async (name, email, password) => {
         const data = await apiClient<{ user: AuthUser; token: string }>(
@@ -54,19 +60,18 @@ export const useAuthStore = create<AuthState>()(
             skipAuth: true,
           }
         );
-        setAuthToken(data.token);
-        set({ user: data.user, token: data.token });
+        const session = await establishSession(data.user, data.token);
+        set(session);
       },
       logout: async () => {
-        const { token } = get();
         try {
-          if (token) {
+          if (getAuthToken()) {
             await apiClient("/api/auth/logout", { method: "POST" });
           }
         } catch {
           // ignore logout errors
         } finally {
-          clearAuthToken();
+          await clearAuthToken();
           set({ user: null, token: null });
         }
       },
@@ -74,14 +79,30 @@ export const useAuthStore = create<AuthState>()(
         const data = await apiClient<{ user: AuthUser }>("/api/me");
         set({ user: data.user });
       },
+      bootstrapDemoSession: async () => {
+        if (get().user && getAuthToken()) {
+          return;
+        }
+        const data = await apiClient<{ user: AuthUser; token: string }>(
+          "/api/auth/login",
+          {
+            method: "POST",
+            body: JSON.stringify({
+              email: "alex.morgan@bcn-fiberops.com",
+              password: "password",
+            }),
+            skipAuth: true,
+          }
+        );
+        const session = await establishSession(data.user, data.token);
+        set(session);
+      },
     }),
     {
       name: "fiberops:auth",
-      partialize: (state) => ({ user: state.user, token: state.token }),
+      // Persist identity only — never persist the bearer token (XSS surface).
+      partialize: (state) => ({ user: state.user }),
       onRehydrateStorage: () => (state) => {
-        if (state?.token) {
-          setAuthToken(state.token);
-        }
         state?.setHydrated();
       },
     }

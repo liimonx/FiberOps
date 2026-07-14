@@ -59,3 +59,23 @@ export function createAsset(data: CreateAssetInput): Asset {
   assets = [asset, ...assets];
   return { ...asset };
 }
+
+export function updateAsset(
+  id: string,
+  patch: Partial<Pick<Asset, "name" | "status" | "monitorHost">> & {
+    location?: { lat: number; lng: number };
+  }
+): Asset {
+  const index = assets.findIndex((asset) => asset.id === id);
+  if (index === -1) {
+    throw new Error("Asset not found");
+  }
+
+  const updated: Asset = {
+    ...assets[index]!,
+    ...patch,
+    location: patch.location ?? assets[index]!.location,
+  };
+  assets = [...assets.slice(0, index), updated, ...assets.slice(index + 1)];
+  return { ...updated };
+}

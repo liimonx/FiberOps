@@ -461,7 +461,7 @@ GET /api/settings/integrations
 PATCH /api/settings/integrations/:id
 ```
 
-`:id` ∈ `mapbox` | `slack` | `pagerduty` | `stripe`
+`:id` ∈ `mapbox` | `slack` | `pagerduty` | `stripe` | `mikrotik`
 
 **Request body:**
 
@@ -498,6 +498,52 @@ PATCH /api/settings/integrations/webhook
 ```
 
 **Response 200:** updated `OutboundWebhook` (masked secret in response)
+
+### Test Mikrotik connection
+
+```
+POST /api/settings/integrations/mikrotik/test
+```
+
+**Request body** (optional fields override saved credentials for the probe):
+
+```json
+{
+  "host": "192.168.88.1",
+  "port": 8728,
+  "username": "api",
+  "password": "secret",
+  "useSsl": false,
+  "verifySsl": true,
+  "apiMode": "rest"
+}
+```
+
+Validation rejects loopback and cloud-metadata hosts. Private LAN addresses are allowed for on-prem routers.
+
+**Response 200:**
+
+```json
+{ "ok": true, "message": "Connected successfully", "identity": "192.168.88.1" }
+```
+
+**Response 422:** `{ "ok": false, "message": "..." }`
+
+### Mapbox token for maps (authenticated)
+
+```
+GET /api/maps/mapbox-token
+```
+
+**Auth:** any authenticated user (`viewer+`)
+
+**Response 200:**
+
+```json
+{ "accessToken": "pk....", "source": "integration" }
+```
+
+`source` is `integration` | `env` | `none`. Prefer the enabled Mapbox integration credential; fall back to `NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN`.
 
 ---
 
@@ -607,8 +653,17 @@ PATCH /api/settings/team/members/:id
 { "role": "operator" }
 ```
 
-**Response 200:** updated `TeamMember`  
-**Response 400:** on failure (e.g. last admin demotion — enforce in prod)
+**Response 200:** updated `TeamSettings` (full object after role change)  
+**Response 400:** on failure (e.g. last admin demotion)
+
+### Remove team member
+
+```
+DELETE /api/settings/team/members/:id
+```
+
+**Response 200:** updated `TeamSettings`  
+**Response 400:** on failure (e.g. last admin removal)
 
 ### Create team invite
 
@@ -625,7 +680,8 @@ POST /api/settings/team/invites
 }
 ```
 
-**Response 200:** created `TeamInvite` (mock returns 200; prefer **201** in production)
+**Response 201:** updated `TeamSettings` (full object including the new invite)  
+Self-invite and duplicate member/invite emails are rejected.
 
 ### Revoke team invite
 
@@ -760,12 +816,15 @@ GET /api/reports/:id/download
 | PATCH | `/api/settings/organization` | admin | Implemented |
 | GET | `/api/settings/integrations` | admin | Implemented |
 | PATCH | `/api/settings/integrations/:id` | admin | Implemented |
+| POST | `/api/settings/integrations/mikrotik/test` | admin | Implemented |
 | PATCH | `/api/settings/integrations/webhook` | admin | Implemented |
+| GET | `/api/maps/mapbox-token` | viewer+ | Implemented |
 | GET | `/api/settings/billing` | admin | Implemented |
 | PATCH | `/api/settings/billing` | admin | Implemented |
 | POST | `/api/settings/billing/sync` | admin | Implemented |
 | GET | `/api/settings/team` | admin | Implemented |
 | PATCH | `/api/settings/team/members/:id` | admin | Implemented |
+| DELETE | `/api/settings/team/members/:id` | admin | Implemented |
 | POST | `/api/settings/team/invites` | admin | Implemented |
 | DELETE | `/api/settings/team/invites/:id` | admin | Implemented |
 | GET | `/api/stats/usage` | viewer+ | Implemented |

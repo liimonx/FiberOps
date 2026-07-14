@@ -53,6 +53,13 @@ export function useRealTimeUpdates(options: UseRealTimeUpdatesOptions = {}) {
         case 'incident_alert':
           log.info('New incident alert:', validatedMessage.data);
           queryClient.invalidateQueries({ queryKey: networkQueryKeys.incidents.all });
+          if (typeof window !== "undefined") {
+            window.dispatchEvent(
+              new CustomEvent("fiberops:incident-alert", {
+                detail: validatedMessage.data,
+              })
+            );
+          }
           break;
           
         case 'status_broadcast':

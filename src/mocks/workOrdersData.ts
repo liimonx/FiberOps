@@ -173,6 +173,14 @@ export function createWorkOrder(data: CreateWorkOrderFormValues): WorkOrder {
   };
 
   workOrders = [order, ...workOrders];
+  void import("@/mocks/webhookDispatcher").then(({ dispatchIntegrationEvent }) =>
+    dispatchIntegrationEvent("work_order.updated", {
+      id: order.id,
+      title: order.title,
+      status: order.status,
+      priority: order.priority,
+    })
+  );
   return { ...order };
 }
 
@@ -212,5 +220,13 @@ export function updateWorkOrder(
   };
 
   workOrders[index] = updated;
+  void import("@/mocks/webhookDispatcher").then(({ dispatchIntegrationEvent }) =>
+    dispatchIntegrationEvent("work_order.updated", {
+      id: updated.id,
+      title: updated.title,
+      status: updated.status,
+      priority: updated.priority,
+    })
+  );
   return { ...updated };
 }

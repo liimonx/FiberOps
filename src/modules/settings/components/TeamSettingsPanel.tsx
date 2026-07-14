@@ -22,6 +22,7 @@ import {
   type TeamInviteFormValues,
 } from "@/modules/settings/schemas/teamSettings.schema";
 import { useTeamSettings } from "@/modules/settings/hooks/useTeamSettings";
+import { useAuthStore } from "@/stores/useAuthStore";
 
 const SUCCESS_DISMISS_MS = 4000;
 
@@ -73,8 +74,13 @@ export function TeamSettingsPanel() {
     revokingInviteId,
     revokeError,
     resetRevokeState,
+    removeMemberAsync,
+    removingMemberId,
+    removeMemberError,
+    resetRemoveMemberState,
   } = useTeamSettings();
 
+  const currentUser = useAuthStore((state) => state.user);
   const [feedbackMemberId, setFeedbackMemberId] = useState<string | null>(null);
 
   const {
@@ -139,6 +145,23 @@ export function TeamSettingsPanel() {
     [resetInviteState, resetRevokeState, revokeInviteAsync]
   );
 
+  const handleRemoveMember = useCallback(
+    async (member: TeamMember) => {
+      if (
+        !window.confirm(
+          `Remove ${member.name} from the organization? They will lose access immediately.`
+        )
+      ) {
+        return;
+      }
+      setFeedbackMemberId(member.id);
+      resetRemoveMemberState();
+      resetRoleUpdateState();
+      await removeMemberAsync(member.id);
+    },
+    [removeMemberAsync, resetRemoveMemberState, resetRoleUpdateState]
+  );
+
   const memberColumns: DataTableColumn[] = useMemo(
     () => [
       {
@@ -160,7 +183,7 @@ export function TeamSettingsPanel() {
           <div className="u-flex u-flex-column u-gap-2">
             <Select
               value={val}
-              disabled={updatingMemberId === row.id}
+              disabled={updatingMemberId === row.id || removingMemberId === row.id}
               onChange={(event) => {
                 const role = roleFromSelectEvent(event);
                 if (role) {
@@ -182,8 +205,35 @@ export function TeamSettingsPanel() {
           </span>
         ),
       },
+      {
+        key: "actions",
+        title: "",
+        render: (_: unknown, row: TeamMember) => {
+          const isSelf = currentUser?.email === row.email;
+          return (
+            <Button
+              variant="outline-error"
+              size="sm"
+              disabled={isSelf || removingMemberId === row.id}
+              loading={removingMemberId === row.id}
+              onClick={() => handleRemoveMember(row)}
+              aria-label={
+                isSelf ? "You cannot remove your own account" : `Remove ${row.name}`
+              }
+            >
+              Remove
+            </Button>
+          );
+        },
+      },
     ],
-    [handleRoleChange, updatingMemberId]
+    [
+      currentUser?.email,
+      handleRemoveMember,
+      handleRoleChange,
+      removingMemberId,
+      updatingMemberId,
+    ]
   );
 
   const inviteColumns: DataTableColumn[] = useMemo(
@@ -212,16 +262,34 @@ export function TeamSettingsPanel() {
       {
         key: "actions",
         title: "",
-        render: (_, row: { id: string }) => (
-          <Button
-            variant="outline-secondary"
-            size="sm"
-            disabled={revokingInviteId === row.id}
-            loading={revokingInviteId === row.id}
-            onClick={() => handleRevokeInvite(row.id)}
-          >
-            Revoke
-          </Button>
+        render: (_, row: { id: string; acceptUrl?: string; token?: string }) => (
+          <div className="u-flex u-gap-2">
+            {(row.acceptUrl || row.token) && (
+              <Button
+                variant="outline-secondary"
+                size="sm"
+                onClick={() => {
+                  const path = row.acceptUrl || `/invite/${row.token}`;
+                  const url =
+                    typeof window !== "undefined"
+                      ? `${window.location.origin}${path}`
+                      : path;
+                  void navigator.clipboard?.writeText(url);
+                }}
+              >
+                Copy link
+              </Button>
+            )}
+            <Button
+              variant="outline-secondary"
+              size="sm"
+              disabled={revokingInviteId === row.id}
+              loading={revokingInviteId === row.id}
+              onClick={() => handleRevokeInvite(row.id)}
+            >
+              Revoke
+            </Button>
+          </div>
         ),
       },
     ],
@@ -270,6 +338,14 @@ export function TeamSettingsPanel() {
           <Callout variant="error" title="Role update failed" className="u-mb-4">
             <p className="u-form-help">
               {roleUpdateError.message || "Unable to update member role."}
+            </p>
+          </Callout>
+        )}
+
+        {removeMemberError && feedbackMemberId && (
+          <Callout variant="error" title="Remove member failed" className="u-mb-4">
+            <p className="u-form-help">
+              {removeMemberError.message || "Unable to remove team member."}
             </p>
           </Callout>
         )}

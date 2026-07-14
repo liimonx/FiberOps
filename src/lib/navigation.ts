@@ -11,6 +11,8 @@ export type NavigationItem = {
   showInSidebar: boolean;
   showInLauncher: boolean;
   launcherGroup?: "core" | "management";
+  /** When set, item is only shown to users with this role or higher. */
+  minRole?: "viewer" | "operator" | "admin";
 };
 
 export const navigationItems: NavigationItem[] = [
@@ -116,6 +118,7 @@ export const navigationItems: NavigationItem[] = [
     showInSidebar: true,
     showInLauncher: true,
     launcherGroup: "management",
+    minRole: "admin",
   },
 ];
 
@@ -125,20 +128,37 @@ export type LauncherItem = NavigationItem & {
   badge?: string | number;
 };
 
+export function filterNavigationByRole(
+  items: NavigationItem[],
+  role: "admin" | "operator" | "viewer" | null | undefined
+): NavigationItem[] {
+  const rank = { viewer: 1, operator: 2, admin: 3 } as const;
+  return items.filter((item) => {
+    if (!item.minRole) return true;
+    if (!role) return false;
+    return rank[role] >= rank[item.minRole];
+  });
+}
+
 export function getLauncherItems(
-  badges: Partial<Record<string, string | number>> = {}
+  badges: Partial<Record<string, string | number>> = {},
+  role?: "admin" | "operator" | "viewer" | null
 ): LauncherItem[] {
-  return navigationItems
-    .filter((item) => item.showInLauncher)
-    .map((item) => ({
-      ...item,
-      badge: badges[item.href],
-    }));
+  return filterNavigationByRole(
+    navigationItems.filter((item) => item.showInLauncher),
+    role
+  ).map((item) => ({
+    ...item,
+    badge: badges[item.href],
+  }));
 }
 
 export function getLauncherItemsByGroup(
   group: "core" | "management",
-  badges: Partial<Record<string, string | number>> = {}
+  badges: Partial<Record<string, string | number>> = {},
+  role?: "admin" | "operator" | "viewer" | null
 ): LauncherItem[] {
-  return getLauncherItems(badges).filter((item) => item.launcherGroup === group);
+  return getLauncherItems(badges, role).filter(
+    (item) => item.launcherGroup === group
+  );
 }

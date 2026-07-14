@@ -1,29 +1,46 @@
-const TOKEN_KEY = "fiberops:auth-token";
 const TOKEN_COOKIE = "fiberops-auth";
 
-function setTokenCookie(token: string): void {
-  if (typeof document === "undefined") return;
-  document.cookie = `${TOKEN_COOKIE}=${token}; path=/; max-age=${60 * 60 * 24 * 30}; SameSite=Lax`;
-}
-
-function clearTokenCookie(): void {
-  if (typeof document === "undefined") return;
-  document.cookie = `${TOKEN_COOKIE}=; path=/; max-age=0`;
-}
+/** In-memory bearer token — never persisted to localStorage. */
+let memoryToken: string | null = null;
 
 export function getAuthToken(): string | null {
-  if (typeof window === "undefined") return null;
-  return localStorage.getItem(TOKEN_KEY);
+  return memoryToken;
 }
 
-export function setAuthToken(token: string): void {
-  localStorage.setItem(TOKEN_KEY, token);
-  setTokenCookie(token);
+async function syncHttpOnlySession(token: string): Promise<void> {
+  if (typeof window === "undefined") return;
+  try {
+    await fetch("/api/session", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ token }),
+      credentials: "same-origin",
+    });
+  } catch {
+    // Middleware cookie is best-effort; API still uses in-memory bearer.
+  }
 }
 
-export function clearAuthToken(): void {
-  localStorage.removeItem(TOKEN_KEY);
-  clearTokenCookie();
+async function clearHttpOnlySession(): Promise<void> {
+  if (typeof window === "undefined") return;
+  try {
+    await fetch("/api/session", {
+      method: "DELETE",
+      credentials: "same-origin",
+    });
+  } catch {
+    // ignore
+  }
+}
+
+export async function setAuthToken(token: string): Promise<void> {
+  memoryToken = token;
+  await syncHttpOnlySession(token);
+}
+
+export async function clearAuthToken(): Promise<void> {
+  memoryToken = null;
+  await clearHttpOnlySession();
 }
 
 export type ApiErrorBody = {
@@ -58,6 +75,7 @@ export async function apiClient<T>(
 
   const response = await fetch(path, {
     ...rest,
+    credentials: "same-origin",
     headers: {
       "Content-Type": "application/json",
       ...(token && !skipAuth ? { Authorization: `Bearer ${token}` } : {}),
@@ -66,11 +84,24 @@ export async function apiClient<T>(
   });
 
   if (response.status === 401 && !skipAuth) {
-    clearAuthToken();
+    // Await cookie clear before redirect so middleware cannot treat the session as still valid.
+    await clearAuthToken();
     if (typeof window !== "undefined") {
       window.location.href = "/login";
     }
     throw new ApiClientError("Session expired. Please sign in again.", 401);
+  }
+
+  if (response.status === 403 && !skipAuth) {
+    let message = "You do not have permission to perform this action.";
+    try {
+      const body = (await response.json()) as ApiErrorBody;
+      if (body.error) message = body.error;
+      else if (body.message) message = body.message;
+    } catch {
+      // ignore
+    }
+    throw new ApiClientError(message, 403);
   }
 
   if (!response.ok) {
@@ -95,3 +126,5 @@ export async function apiClient<T>(
 
   return response.json() as Promise<T>;
 }
+
+export { TOKEN_COOKIE };

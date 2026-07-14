@@ -112,12 +112,25 @@ export function useNetworkData() {
 // Mutation: Update asset status
 export function useUpdateAssetStatus() {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
-    mutationFn: async ({ assetId, status }: { assetId: string; status: string }) => {
-      // In a real app, this would be a service call
-      await new Promise(resolve => setTimeout(resolve, 500));
-      return { assetId, status };
+    mutationFn: async ({
+      assetId,
+      status,
+      monitorHost,
+    }: {
+      assetId: string;
+      status?: string;
+      monitorHost?: string;
+    }) => {
+      const { apiClient } = await import("@/lib/apiClient");
+      return apiClient(`/api/assets/${assetId}`, {
+        method: "PATCH",
+        body: JSON.stringify({
+          ...(status ? { status } : {}),
+          ...(monitorHost !== undefined ? { monitorHost } : {}),
+        }),
+      });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: networkQueryKeys.assets.all });

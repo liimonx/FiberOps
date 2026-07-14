@@ -2,6 +2,7 @@
 
 import { Card, Container } from "@shohojdhara/atomix";
 import { SettingsNav } from "@/modules/settings/components/SettingsNav";
+import { SettingsAdminGuard } from "@/modules/settings/components/SettingsAdminGuard";
 
 export default function SettingsLayout({
   children,
@@ -20,8 +21,10 @@ export default function SettingsLayout({
       </div>
 
       <Card className="u-w-100">
-        <SettingsNav />
-        {children}
+        <SettingsAdminGuard>
+          <SettingsNav />
+          {children}
+        </SettingsAdminGuard>
       </Card>
     </Container>
   );

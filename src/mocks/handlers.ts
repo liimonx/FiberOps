@@ -66,5 +66,8 @@ export const handlers = [
     });
   }),
 
+  // Let Next.js set HttpOnly session cookies (MSW cannot apply Set-Cookie).
+  http.all("/api/session", ({ request }) => fetch(request)),
+
   http.all("/api/*", ({ request }) => toHttpResponse(request, 300)),
 ];

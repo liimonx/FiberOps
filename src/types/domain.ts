@@ -173,6 +173,9 @@ export type TeamInvite = {
   email: string;
   role: TeamRole;
   invitedAt: string;
+  token?: string;
+  expiresAt?: string;
+  acceptUrl?: string;
 };
 
 export type TeamSettings = {

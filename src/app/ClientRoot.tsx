@@ -3,9 +3,11 @@
 import { usePathname } from "next/navigation";
 import { Providers } from "./providers";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { AuthSessionBootstrap } from "@/components/AuthSessionBootstrap";
+import { IncidentAlertToaster } from "@/components/IncidentAlertToaster";
 import { Shell } from "@/patterns/Shell";
 
-const authRoutes = ["/login", "/register"];
+const authRoutes = ["/login", "/register", "/invite"];
 
 export function ClientRoot({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -15,10 +17,14 @@ export function ClientRoot({ children }: { children: React.ReactNode }) {
   return (
     <Providers>
       <ErrorBoundary>
+        <AuthSessionBootstrap />
         {isAuthRoute ? (
           children
         ) : (
-          <Shell useMsw={useMsw}>{children}</Shell>
+          <Shell useMsw={useMsw}>
+            {children}
+            <IncidentAlertToaster />
+          </Shell>
         )}
       </ErrorBoundary>
     </Providers>

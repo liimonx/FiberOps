@@ -127,6 +127,7 @@ export type CreateCustomerInput = {
   plan: string;
   status: CustomerStatus;
   email?: string;
+  pppoeUsername?: string;
   relatedOnuId?: string;
   location?: { lat: number; lng: number };
 };
@@ -141,6 +142,7 @@ export function createCustomer(data: CreateCustomerInput): Customer {
     billingStatus: "paid",
     relatedOnuId: data.relatedOnuId,
     email: data.email,
+    pppoeUsername: data.pppoeUsername,
     location: data.location,
     createdAt: now,
     updatedAt: now,
@@ -155,6 +157,7 @@ export type UpdateCustomerInput = {
   status?: CustomerStatus;
   billingStatus?: BillingStatus;
   email?: string;
+  pppoeUsername?: string;
   relatedOnuId?: string;
   notes?: string;
   location?: { lat: number; lng: number };

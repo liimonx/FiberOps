@@ -28,7 +28,8 @@ const nextConfig: NextConfig = {
         destination: `${apiUrl}/api/v1/me`,
       },
       {
-        source: "/api/:path*",
+        // Exclude /api/session so Next.js can set HttpOnly cookies locally.
+        source: "/api/:path((?!session$).*)",
         destination: `${apiUrl}/api/v1/:path*`,
       },
     ];
