@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import styles from "./Shell.module.css";
 import {
   Badge,
@@ -14,7 +14,7 @@ import {
 } from "@shohojdhara/atomix";
 import { SidebarFooter } from "@/components/SidebarFooter";
 import { usePersistedBoolean } from "@/hooks/usePersistedBoolean";
-import { sidebarNav } from "@/lib/navigation";
+import { filterNavigationByRole, sidebarNav } from "@/lib/navigation";
 import { useAuthStore } from "@/stores/useAuthStore";
 
 const SIDEBAR_COLLAPSED_KEY = "fiberops:sidebar-collapsed";
@@ -45,6 +45,11 @@ export function Shell({ children }: { children: React.ReactNode }) {
     toggle: toggleSidebarCollapsed,
     hydrated,
   } = usePersistedBoolean(SIDEBAR_COLLAPSED_KEY, false);
+
+  const visibleNav = useMemo(
+    () => filterNavigationByRole(sidebarNav, user?.role),
+    [user?.role]
+  );
 
   const isActive = (href: string) => {
     if (href === "/") return pathname === "/";
@@ -142,7 +147,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
 
           <SideMenu>
             <SideMenuList>
-              {sidebarNav.map((item) => (
+              {visibleNav.map((item) => (
                 <SideMenuItem
                   key={item.href}
                   href={item.href}

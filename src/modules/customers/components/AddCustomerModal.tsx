@@ -50,6 +50,7 @@ export function AddCustomerModal({
       plan: "Fiber 100Mbps",
       status: "online",
       email: "",
+      pppoeUsername: "",
       relatedOnuId: "",
     },
   });
@@ -61,6 +62,7 @@ export function AddCustomerModal({
         plan: "Fiber 100Mbps",
         status: "online",
         email: "",
+        pppoeUsername: "",
         relatedOnuId: "",
       });
       resetMutation();
@@ -77,6 +79,7 @@ export function AddCustomerModal({
       plan: values.plan,
       status: values.status,
       email: values.email,
+      pppoeUsername: values.pppoeUsername || undefined,
       relatedOnuId: values.relatedOnuId || undefined,
       location: onu?.location,
     };
@@ -191,6 +194,22 @@ export function AddCustomerModal({
             {...register("email")}
           />
           {errors.email && <p className="u-form-error">{errors.email.message}</p>}
+        </div>
+
+        <div className="u-form-field">
+          <label className="u-form-label" htmlFor="customer-pppoe">
+            PPPoE username
+            <span className="u-text-secondary-emphasis u-font-normal"> (optional)</span>
+          </label>
+          <Input
+            id="customer-pppoe"
+            placeholder="user@fiberops"
+            fullWidth
+            {...register("pppoeUsername")}
+          />
+          {errors.pppoeUsername && (
+            <p className="u-form-error">{errors.pppoeUsername.message}</p>
+          )}
         </div>
 
         <div className="u-form-field">

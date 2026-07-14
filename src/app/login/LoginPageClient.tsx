@@ -14,8 +14,8 @@ export default function LoginPageClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const login = useAuthStore((state) => state.login);
-  const [email, setEmail] = useState("test@example.com");
-  const [password, setPassword] = useState("password123");
+  const [email, setEmail] = useState("alex.morgan@bcn-fiberops.com");
+  const [password, setPassword] = useState("password");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -41,7 +41,13 @@ export default function LoginPageClient() {
           <div>
             <h1 className="u-heading-lg">Sign in to FiberOps</h1>
             <p className="u-text-muted u-text-sm">
-              Demo: test@example.com / password123
+              Use your operator credentials to access the network dashboard.
+              {process.env.NEXT_PUBLIC_USE_MSW !== "false" ? (
+                <>
+                  {" "}
+                  Demo admin: alex.morgan@bcn-fiberops.com / password
+                </>
+              ) : null}
             </p>
           </div>
 

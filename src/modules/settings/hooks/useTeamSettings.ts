@@ -10,12 +10,14 @@ import { apiClient } from "@/lib/apiClient";
 
 export const teamSettingsQueryKey = ["settings", "team"] as const;
 
-export function useTeamSettings() {
+export function useTeamSettings(options?: { enabled?: boolean }) {
   const queryClient = useQueryClient();
+  const enabled = options?.enabled ?? true;
 
   const query = useQuery({
     queryKey: teamSettingsQueryKey,
     queryFn: () => apiClient<TeamSettings>("/api/settings/team"),
+    enabled,
   });
 
   const roleMutation = useMutation({
@@ -56,6 +58,16 @@ export function useTeamSettings() {
     },
   });
 
+  const removeMemberMutation = useMutation({
+    mutationFn: (memberId: string) =>
+      apiClient<TeamSettings>(`/api/settings/team/members/${memberId}`, {
+        method: "DELETE",
+      }),
+    onSuccess: (data) => {
+      queryClient.setQueryData(teamSettingsQueryKey, data);
+    },
+  });
+
   return {
     data: query.data,
     isLoading: query.isLoading,
@@ -79,5 +91,11 @@ export function useTeamSettings() {
       : null,
     revokeError: revokeMutation.error,
     resetRevokeState: revokeMutation.reset,
+    removeMemberAsync: removeMemberMutation.mutateAsync,
+    removingMemberId: removeMemberMutation.isPending
+      ? removeMemberMutation.variables ?? null
+      : null,
+    removeMemberError: removeMemberMutation.error,
+    resetRemoveMemberState: removeMemberMutation.reset,
   };
 }

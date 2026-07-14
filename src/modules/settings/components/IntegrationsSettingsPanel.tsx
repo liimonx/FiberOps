@@ -8,6 +8,7 @@ import { useIntegrationsSettings } from "@/modules/settings/hooks/useIntegration
 import { IntegrationCard } from "@/modules/settings/components/IntegrationCard";
 import { MikrotikIntegrationCard } from "@/modules/settings/components/MikrotikIntegrationCard";
 import { OutboundWebhookForm } from "@/modules/settings/components/OutboundWebhookForm";
+import { WebhookDeliveryLog } from "@/modules/settings/components/WebhookDeliveryLog";
 
 const SUCCESS_DISMISS_MS = 4000;
 
@@ -199,6 +200,10 @@ export function IntegrationsSettingsPanel() {
           onResetSaveState={resetWebhookSaveState}
         />
       </section>
+
+      <div className="u-divider-subtle" role="separator" />
+
+      <WebhookDeliveryLog />
     </div>
   );
 }

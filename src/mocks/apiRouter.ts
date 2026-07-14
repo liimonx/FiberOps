@@ -1,9 +1,10 @@
-import { createAsset, getAssets } from "@/mocks/assetsData";
+import { createAsset, getAssets, updateAsset } from "@/mocks/assetsData";
 import {
-  mockLogin,
-  mockLogout,
-  mockMe,
-  mockRegister,
+  authenticateMockUser,
+  getUserByToken,
+  logoutMockToken,
+  registerMockUser,
+  registerSession,
 } from "@/mocks/authData";
 import {
   createCustomer,
@@ -62,24 +63,16 @@ import {
   setOrganizationSettings,
 } from "@/mocks/settingsData";
 import {
-  getIntegrationsSettings,
-  integrationHasExistingCredentials,
-  testMikrotikConnection,
-  updateIntegration,
-  updateOutboundWebhook,
-  webhookHasExistingSecret,
-} from "@/mocks/integrationsData";
-import {
-  getBillingSettingsPayload,
-  setBillingSettings,
-  syncBillingWithStripe,
-} from "@/mocks/billingData";
-import {
+  acceptTeamInvite,
   createTeamInvite,
+  getInviteByToken,
   getTeamSettings,
+  removeTeamMember,
   revokeTeamInvite,
   updateTeamMemberRole,
 } from "@/mocks/teamData";
+import { getWebhookDeliveries } from "@/mocks/webhookDispatcher";
+import { canAccessSettings, roleAtLeast } from "@/lib/auth/rbac";
 import { billingSettingsSchema } from "@/modules/settings/schemas/billingSettings.schema";
 import type { BillingSettingsFormValues } from "@/modules/settings/schemas/billingSettings.schema";
 import { organizationSettingsSchema } from "@/modules/settings/schemas/organizationSettings.schema";
@@ -93,13 +86,30 @@ import type {
 } from "@/modules/settings/schemas/teamSettings.schema";
 import {
   validateIntegrationUpdate,
+  validateMikrotikTest,
   validateOutboundWebhook,
 } from "@/modules/settings/schemas/integrationsSettings.schema";
 import type { IntegrationProviderId } from "@/types/domain";
 import type {
   IntegrationUpdateFormValues,
+  MikrotikTestFormValues,
   OutboundWebhookFormValues,
 } from "@/modules/settings/schemas/integrationsSettings.schema";
+import {
+  getIntegrationsSettings,
+  getMapboxAccessToken,
+  getMikrotikSavedCredentials,
+  integrationHasExistingCredentials,
+  testMikrotikConnection,
+  updateIntegration,
+  updateOutboundWebhook,
+  webhookHasExistingSecret,
+} from "@/mocks/integrationsData";
+import {
+  getBillingSettingsPayload,
+  setBillingSettings,
+  syncBillingWithStripe,
+} from "@/mocks/billingData";
 
 function json(data: unknown, status = 200) {
   return Response.json(data, { status });
@@ -111,6 +121,40 @@ function validationError(issues: unknown) {
 
 function notFound(message: string) {
   return json({ error: message }, 404);
+}
+
+function unauthorized(message = "Authentication required") {
+  return json({ error: message }, 401);
+}
+
+function forbidden(message = "Admin access required") {
+  return json({ error: message }, 403);
+}
+
+function extractBearerToken(request: Request): string | null {
+  const header = request.headers.get("authorization");
+  if (!header) return null;
+  const match = header.match(/^Bearer\s+(.+)$/i);
+  return match?.[1]?.trim() || null;
+}
+
+function requireUser(
+  request: Request
+): { user: NonNullable<ReturnType<typeof getUserByToken>> } | { error: Response } {
+  const user = getUserByToken(extractBearerToken(request));
+  if (!user) return { error: unauthorized() };
+  return { user };
+}
+
+function requireAdmin(
+  request: Request
+): { user: NonNullable<ReturnType<typeof getUserByToken>> } | { error: Response } {
+  const result = requireUser(request);
+  if ("error" in result) return result;
+  if (!canAccessSettings(result.user)) {
+    return { error: forbidden() };
+  }
+  return { user: result.user };
 }
 
 function getUsageStats() {
@@ -141,16 +185,11 @@ export async function handleApiRequest(request: Request): Promise<Response> {
     if (segments[0] === "auth") {
       if (segments[1] === "login" && method === "POST") {
         const body = (await request.json()) as { email?: string; password?: string };
-        if (!body.email || !body.password) {
-          return json({ error: "Email and password are required" }, 400);
+        const result = authenticateMockUser(body.email ?? "", body.password ?? "");
+        if (!result) {
+          return json({ error: "Invalid email or password" }, 401);
         }
-        try {
-          return json(mockLogin(body.email, body.password));
-        } catch (error) {
-          const message =
-            error instanceof Error ? error.message : "Unable to sign in";
-          return json({ error: message }, 401);
-        }
+        return json(result);
       }
       if (segments[1] === "register" && method === "POST") {
         const body = (await request.json()) as {
@@ -158,29 +197,210 @@ export async function handleApiRequest(request: Request): Promise<Response> {
           email?: string;
           password?: string;
         };
-        if (!body.name || !body.email || !body.password) {
-          return json({ error: "Name, email, and password are required" }, 400);
+        const result = registerMockUser(
+          body.name ?? "",
+          body.email ?? "",
+          body.password ?? ""
+        );
+        if ("error" in result) {
+          return json({ error: result.error }, 400);
         }
+        return json(result, 201);
+      }
+      if (segments[1] === "logout" && method === "POST") {
+        logoutMockToken(extractBearerToken(request));
+        return json({ ok: true });
+      }
+      if (segments[1] === "accept-invite" && method === "POST") {
+        const body = (await request.json()) as {
+          token?: string;
+          name?: string;
+          password?: string;
+        };
         try {
-          return json(mockRegister(body.name, body.email, body.password), 201);
+          const result = acceptTeamInvite({
+            token: body.token ?? "",
+            name: body.name ?? "",
+            password: body.password ?? "",
+          });
+          registerSession(result.user, result.token);
+          return json(result, 201);
         } catch (error) {
           const message =
-            error instanceof Error ? error.message : "Unable to register";
+            error instanceof Error ? error.message : "Unable to accept invite";
           return json({ error: message }, 400);
         }
       }
-      if (segments[1] === "logout" && method === "POST") {
-        return json(mockLogout());
+      if (segments[1] === "invite" && segments[2] && method === "GET") {
+        const invite = getInviteByToken(segments[2]);
+        if (!invite) return notFound("Invite not found");
+        if (invite.expiresAt && new Date(invite.expiresAt).getTime() < Date.now()) {
+          return json({ error: "This invite has expired" }, 400);
+        }
+        return json({
+          email: invite.email,
+          role: invite.role,
+          expiresAt: invite.expiresAt,
+        });
       }
     }
 
+    if (segments[0] === "settings" && segments[1] === "integrations" && segments[2] === "deliveries" && method === "GET") {
+      const admin = requireAdmin(request);
+      if ("error" in admin) return admin.error;
+      return json({ items: getWebhookDeliveries() });
+    }
+
     if (segments[0] === "me" && method === "GET") {
-      try {
-        return json(mockMe(request.headers.get("authorization")));
-      } catch (error) {
-        const message =
-          error instanceof Error ? error.message : "Unauthenticated";
-        return json({ error: message }, 401);
+      const auth = requireUser(request);
+      if ("error" in auth) return auth.error;
+      return json({ user: auth.user });
+    }
+
+    if (segments[0] === "maps" && segments[1] === "mapbox-token" && method === "GET") {
+      const auth = requireUser(request);
+      if ("error" in auth) return auth.error;
+      if (!roleAtLeast(auth.user.role, "viewer")) {
+        return forbidden("Insufficient permissions");
+      }
+
+      const integrationToken = getMapboxAccessToken();
+      if (integrationToken) {
+        return json({ accessToken: integrationToken, source: "integration" });
+      }
+
+      const envToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN || "";
+      if (envToken) {
+        return json({ accessToken: envToken, source: "env" });
+      }
+
+      return json({ accessToken: null, source: "none" });
+    }
+
+    if (segments[0] === "settings") {
+      const admin = requireAdmin(request);
+      if ("error" in admin) return admin.error;
+
+      if (segments[1] === "organization") {
+        if (method === "GET") return json(getOrganizationSettings());
+        if (method === "PATCH") {
+          const body = await request.json();
+          const parsed = organizationSettingsSchema.safeParse(body);
+          if (!parsed.success) return validationError(parsed.error.flatten());
+          return json(setOrganizationSettings(parsed.data));
+        }
+      }
+
+      if (segments[1] === "integrations") {
+        if (segments.length === 2 && method === "GET") {
+          return json(getIntegrationsSettings());
+        }
+        if (segments[2] === "webhook" && method === "PATCH") {
+          const body = (await request.json()) as OutboundWebhookFormValues;
+          const parsed = validateOutboundWebhook(body, webhookHasExistingSecret());
+          if (!parsed.success) return validationError(parsed.error.flatten());
+          return json(updateOutboundWebhook(parsed.data));
+        }
+        if (segments[2] === "mikrotik" && segments[3] === "test" && method === "POST") {
+          const body = (await request.json().catch(() => ({}))) as MikrotikTestFormValues;
+          const parsed = validateMikrotikTest(body, getMikrotikSavedCredentials());
+          if (!parsed.success) return validationError(parsed.error.flatten());
+          const result = testMikrotikConnection(parsed.data);
+          return json(result, result.ok ? 200 : 422);
+        }
+        if (segments.length === 3 && method === "PATCH") {
+          const id = segments[2] as IntegrationProviderId;
+          const validIds: IntegrationProviderId[] = [
+            "mapbox",
+            "slack",
+            "pagerduty",
+            "stripe",
+            "mikrotik",
+          ];
+          if (!validIds.includes(id)) return notFound("Integration not found");
+          const body = (await request.json()) as IntegrationUpdateFormValues;
+          const parsed = validateIntegrationUpdate(
+            id,
+            body,
+            integrationHasExistingCredentials(id)
+          );
+          if (!parsed.success) return validationError(parsed.error.flatten());
+          return json(updateIntegration(id, parsed.data));
+        }
+      }
+
+      if (segments[1] === "billing") {
+        if (segments.length === 2 && method === "GET") {
+          return json(getBillingSettingsPayload());
+        }
+        if (segments.length === 2 && method === "PATCH") {
+          const body = (await request.json()) as BillingSettingsFormValues;
+          const parsed = billingSettingsSchema.safeParse(body);
+          if (!parsed.success) return validationError(parsed.error.flatten());
+          return json(setBillingSettings(parsed.data));
+        }
+        if (segments[2] === "sync" && method === "POST") {
+          try {
+            return json(syncBillingWithStripe());
+          } catch (error) {
+            const message =
+              error instanceof Error ? error.message : "Failed to sync billing data";
+            return json({ error: message }, 400);
+          }
+        }
+      }
+
+      if (segments[1] === "team") {
+        if (segments.length === 2 && method === "GET") {
+          return json(getTeamSettings());
+        }
+        if (segments[2] === "members" && segments.length === 4 && method === "PATCH") {
+          const body = (await request.json()) as TeamMemberUpdateFormValues;
+          const parsed = teamMemberUpdateSchema.safeParse(body);
+          if (!parsed.success) return validationError(parsed.error.flatten());
+          try {
+            return json(updateTeamMemberRole(segments[3], parsed.data));
+          } catch (error) {
+            const message =
+              error instanceof Error ? error.message : "Failed to update team member";
+            return json({ error: message }, 400);
+          }
+        }
+        if (segments[2] === "members" && segments.length === 4 && method === "DELETE") {
+          try {
+            return json(removeTeamMember(segments[3]));
+          } catch (error) {
+            const message =
+              error instanceof Error ? error.message : "Failed to remove team member";
+            return json({ error: message }, 400);
+          }
+        }
+        if (segments[2] === "invites") {
+          if (segments.length === 3 && method === "POST") {
+            const body = (await request.json()) as TeamInviteFormValues;
+            const parsed = teamInviteSchema.safeParse(body);
+            if (!parsed.success) return validationError(parsed.error.flatten());
+            try {
+              return json(
+                createTeamInvite(parsed.data, { actorEmail: admin.user.email }),
+                201
+              );
+            } catch (error) {
+              const message =
+                error instanceof Error ? error.message : "Failed to send invite";
+              return json({ error: message }, 400);
+            }
+          }
+          if (segments.length === 4 && method === "DELETE") {
+            try {
+              return json(revokeTeamInvite(segments[3]));
+            } catch (error) {
+              const message =
+                error instanceof Error ? error.message : "Failed to revoke invite";
+              return json({ error: message }, 400);
+            }
+          }
+        }
       }
     }
 
@@ -196,6 +416,24 @@ export async function handleApiRequest(request: Request): Promise<Response> {
       }
     }
 
+    if (segments[0] === "assets" && segments.length === 2 && method === "PATCH") {
+      const body = await request.json();
+      try {
+        return json(
+          updateAsset(segments[1], {
+            name: body.name,
+            status: body.status,
+            monitorHost: body.monitorHost,
+            location: body.location,
+          })
+        );
+      } catch (error) {
+        const message =
+          error instanceof Error ? error.message : "Failed to update asset";
+        return notFound(message);
+      }
+    }
+
     if (segments[0] === "customers") {
       if (segments.length === 1 && method === "GET") {
         return json({ items: getCustomers() });
@@ -204,11 +442,12 @@ export async function handleApiRequest(request: Request): Promise<Response> {
         const body = await request.json();
         const parsed = createCustomerSchema.safeParse(body);
         if (!parsed.success) return validationError(parsed.error.flatten());
-        const { email, relatedOnuId, location, ...rest } = parsed.data;
+        const { email, relatedOnuId, location, pppoeUsername, ...rest } = parsed.data;
         return json(
           createCustomer({
             ...rest,
             email: email || undefined,
+            pppoeUsername: pppoeUsername || undefined,
             relatedOnuId: relatedOnuId || undefined,
             location,
           }),
@@ -225,11 +464,12 @@ export async function handleApiRequest(request: Request): Promise<Response> {
         const parsed = updateCustomerSchema.safeParse(body);
         if (!parsed.success) return validationError(parsed.error.flatten());
         try {
-          const { email, relatedOnuId, ...rest } = parsed.data;
+          const { email, relatedOnuId, pppoeUsername, ...rest } = parsed.data;
           return json(
             updateCustomer(segments[1], {
               ...rest,
               email: email === "" ? undefined : email,
+              pppoeUsername: pppoeUsername === "" ? undefined : pppoeUsername,
               relatedOnuId: relatedOnuId || undefined,
             })
           );
@@ -341,115 +581,6 @@ export async function handleApiRequest(request: Request): Promise<Response> {
               ? error.message
               : "Failed to update planning proposal";
           return notFound(message);
-        }
-      }
-    }
-
-    if (segments[0] === "settings") {
-      if (segments[1] === "organization") {
-        if (method === "GET") return json(getOrganizationSettings());
-        if (method === "PATCH") {
-          const body = await request.json();
-          const parsed = organizationSettingsSchema.safeParse(body);
-          if (!parsed.success) return validationError(parsed.error.flatten());
-          return json(setOrganizationSettings(parsed.data));
-        }
-      }
-
-      if (segments[1] === "integrations") {
-        if (segments.length === 2 && method === "GET") {
-          return json(getIntegrationsSettings());
-        }
-        if (segments[2] === "webhook" && method === "PATCH") {
-          const body = (await request.json()) as OutboundWebhookFormValues;
-          const parsed = validateOutboundWebhook(body, webhookHasExistingSecret());
-          if (!parsed.success) return validationError(parsed.error.flatten());
-          return json(updateOutboundWebhook(parsed.data));
-        }
-        if (segments[2] === "mikrotik" && segments[3] === "test" && method === "POST") {
-          const result = testMikrotikConnection();
-          return json(result, result.ok ? 200 : 422);
-        }
-        if (segments.length === 3 && method === "PATCH") {
-          const id = segments[2] as IntegrationProviderId;
-          const validIds: IntegrationProviderId[] = [
-            "mapbox",
-            "slack",
-            "pagerduty",
-            "stripe",
-            "mikrotik",
-          ];
-          if (!validIds.includes(id)) return notFound("Integration not found");
-          const body = (await request.json()) as IntegrationUpdateFormValues;
-          const parsed = validateIntegrationUpdate(
-            id,
-            body,
-            integrationHasExistingCredentials(id)
-          );
-          if (!parsed.success) return validationError(parsed.error.flatten());
-          return json(updateIntegration(id, parsed.data));
-        }
-      }
-
-      if (segments[1] === "billing") {
-        if (segments.length === 2 && method === "GET") {
-          return json(getBillingSettingsPayload());
-        }
-        if (segments.length === 2 && method === "PATCH") {
-          const body = (await request.json()) as BillingSettingsFormValues;
-          const parsed = billingSettingsSchema.safeParse(body);
-          if (!parsed.success) return validationError(parsed.error.flatten());
-          return json(setBillingSettings(parsed.data));
-        }
-        if (segments[2] === "sync" && method === "POST") {
-          try {
-            return json(syncBillingWithStripe());
-          } catch (error) {
-            const message =
-              error instanceof Error ? error.message : "Failed to sync billing data";
-            return json({ error: message }, 400);
-          }
-        }
-      }
-
-      if (segments[1] === "team") {
-        if (segments.length === 2 && method === "GET") {
-          return json(getTeamSettings());
-        }
-        if (segments[2] === "members" && segments.length === 4 && method === "PATCH") {
-          const body = (await request.json()) as TeamMemberUpdateFormValues;
-          const parsed = teamMemberUpdateSchema.safeParse(body);
-          if (!parsed.success) return validationError(parsed.error.flatten());
-          try {
-            return json(updateTeamMemberRole(segments[3], parsed.data));
-          } catch (error) {
-            const message =
-              error instanceof Error ? error.message : "Failed to update team member";
-            return json({ error: message }, 400);
-          }
-        }
-        if (segments[2] === "invites") {
-          if (segments.length === 3 && method === "POST") {
-            const body = (await request.json()) as TeamInviteFormValues;
-            const parsed = teamInviteSchema.safeParse(body);
-            if (!parsed.success) return validationError(parsed.error.flatten());
-            try {
-              return json(createTeamInvite(parsed.data));
-            } catch (error) {
-              const message =
-                error instanceof Error ? error.message : "Failed to send invite";
-              return json({ error: message }, 400);
-            }
-          }
-          if (segments.length === 4 && method === "DELETE") {
-            try {
-              return json(revokeTeamInvite(segments[3]));
-            } catch (error) {
-              const message =
-                error instanceof Error ? error.message : "Failed to revoke invite";
-              return json({ error: message }, 400);
-            }
-          }
         }
       }
     }

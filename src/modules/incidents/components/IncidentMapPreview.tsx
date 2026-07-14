@@ -6,6 +6,7 @@ import "mapbox-gl/dist/mapbox-gl.css";
 import Link from "next/link";
 import { Button, Icon } from "@shohojdhara/atomix";
 import { MAPBOX_CONFIG } from "@/modules/network-map/constants";
+import { useMapboxAccessToken } from "@/modules/network-map/hooks/useMapboxAccessToken";
 import { incidentSeverityColors } from "@/lib/themeColors";
 import type { Asset, Incident } from "@/types/domain";
 
@@ -35,9 +36,19 @@ export function IncidentMapPreview({
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const markersRef = useRef<mapboxgl.Marker[]>([]);
   const hasFitBoundsRef = useRef(false);
-  const [mapError, setMapError] = useState<string | null>(
-    MAPBOX_CONFIG.ACCESS_TOKEN ? null : "Mapbox access token not configured."
-  );
+  const { accessToken, isLoading: isTokenLoading } = useMapboxAccessToken();
+  const [mapError, setMapError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (isTokenLoading) return;
+    if (!accessToken) {
+      setMapError(
+        "Mapbox access token not configured. Add it under Settings → Integrations or set NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN."
+      );
+    } else {
+      setMapError(null);
+    }
+  }, [accessToken, isTokenLoading]);
 
   const markers = useMemo(() => {
     const assetById = new Map(assets.map((asset) => [asset.id, asset]));
@@ -61,7 +72,7 @@ export function IncidentMapPreview({
 
   useEffect(() => {
     const container = mapContainer.current;
-    if (!container || mapRef.current || mapError) return;
+    if (!container || mapRef.current || mapError || !accessToken) return;
 
     let map: mapboxgl.Map | null = null;
     let resizeObserver: ResizeObserver | null = null;
@@ -73,7 +84,7 @@ export function IncidentMapPreview({
       const { width, height } = container.getBoundingClientRect();
       if (width < 1 || height < 1) return;
 
-      mapboxgl.accessToken = MAPBOX_CONFIG.ACCESS_TOKEN;
+      mapboxgl.accessToken = accessToken;
 
       map = new mapboxgl.Map({
         container,
@@ -117,7 +128,7 @@ export function IncidentMapPreview({
       map?.remove();
       mapRef.current = null;
     };
-  }, [mapError]);
+  }, [mapError, accessToken]);
 
   useEffect(() => {
     const map = mapRef.current;

@@ -74,6 +74,9 @@ export function useIntegrationsSettings() {
       if (updatedIntegration.id === "stripe") {
         queryClient.invalidateQueries({ queryKey: billingSettingsQueryKey });
       }
+      if (updatedIntegration.id === "mapbox") {
+        queryClient.invalidateQueries({ queryKey: ["maps", "mapbox-token"] });
+      }
     },
   });
 

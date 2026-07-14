@@ -178,7 +178,7 @@ Node ids reference either `assets.id` or `customers.id` in the same org.
 ## Settings & integrations
 
 ```sql
-CREATE TYPE integration_provider AS ENUM ('mapbox', 'slack', 'pagerduty', 'stripe');
+CREATE TYPE integration_provider AS ENUM ('mapbox', 'slack', 'pagerduty', 'stripe', 'mikrotik');
 CREATE TYPE integration_status AS ENUM ('connected', 'disconnected', 'error');
 
 CREATE TABLE integrations (

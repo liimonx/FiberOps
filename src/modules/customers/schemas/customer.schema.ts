@@ -31,6 +31,7 @@ export const createCustomerSchema = z.object({
   plan: z.enum(customerPlans),
   status: z.enum(customerStatuses),
   email: z.string().trim().email("Enter a valid email").optional().or(z.literal("")),
+  pppoeUsername: z.string().trim().max(255).optional().or(z.literal("")),
   relatedOnuId: z.string().trim().optional(),
   location: locationSchema.optional(),
 });
@@ -43,6 +44,7 @@ export const updateCustomerSchema = z.object({
   status: z.enum(customerStatuses).optional(),
   billingStatus: z.enum(billingStatuses).optional(),
   email: z.string().trim().email().optional().or(z.literal("")),
+  pppoeUsername: z.string().trim().max(255).optional().or(z.literal("")),
   relatedOnuId: z.string().trim().optional(),
   notes: z.string().trim().optional(),
   location: locationSchema.optional(),

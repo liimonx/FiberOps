@@ -141,6 +141,14 @@ export function createIncident(data: CreateIncidentInput): Incident {
     updatedAt: now,
   };
   incidents = [incident, ...incidents];
+  void import("@/mocks/webhookDispatcher").then(({ dispatchIntegrationEvent }) =>
+    dispatchIntegrationEvent("incident.created", {
+      id: incident.id,
+      title: incident.title,
+      severity: incident.severity,
+      status: incident.status,
+    })
+  );
   return { ...incident };
 }
 
@@ -179,6 +187,18 @@ export function updateIncident(
     updated,
     ...incidents.slice(index + 1),
   ];
+
+  if (patch.status === "resolved" && existing.status !== "resolved") {
+    void import("@/mocks/webhookDispatcher").then(({ dispatchIntegrationEvent }) =>
+      dispatchIntegrationEvent("incident.resolved", {
+        id: updated.id,
+        title: updated.title,
+        severity: updated.severity,
+        status: updated.status,
+      })
+    );
+  }
+
   return { ...updated };
 }
 

@@ -1,17 +1,14 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-const publicPaths = ["/login", "/register"];
+const publicPaths = ["/login", "/register", "/invite"];
+const TOKEN_COOKIE = "fiberops-auth";
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const isPublic = publicPaths.some((path) => pathname.startsWith(path));
-  const token = request.cookies.get("fiberops-auth")?.value;
+  const token = request.cookies.get(TOKEN_COOKIE)?.value;
 
-  if (isPublic) {
-    if (token) {
-      return NextResponse.redirect(new URL("/dashboard", request.url));
-    }
+  if (publicPaths.some((path) => pathname.startsWith(path))) {
     return NextResponse.next();
   }
 
@@ -25,7 +22,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|mockServiceWorker.js|api/).*)",
-  ],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|mockServiceWorker.js|api/).*)"],
 };

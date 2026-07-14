@@ -6,8 +6,12 @@ import type {
   OutboundWebhook,
   WebhookEvent,
 } from "@/types/domain";
-import type { IntegrationUpdateFormValues } from "@/modules/settings/schemas/integrationsSettings.schema";
-import type { OutboundWebhookFormValues } from "@/modules/settings/schemas/integrationsSettings.schema";
+import type {
+  IntegrationUpdateFormValues,
+  MikrotikTestFormValues,
+  OutboundWebhookFormValues,
+} from "@/modules/settings/schemas/integrationsSettings.schema";
+import { sealSecret, unsealSecret } from "@/lib/secretVault";
 
 type ProviderCredentials = {
   apiKey?: string;
@@ -43,20 +47,34 @@ function maskWebhookUrl(url: string): string {
   }
 }
 
+function credentialPlaintext(
+  credentials: ProviderCredentials
+): ProviderCredentials {
+  return {
+    ...credentials,
+    apiKey: unsealSecret(credentials.apiKey),
+    webhookUrl: unsealSecret(credentials.webhookUrl),
+    routingKey: unsealSecret(credentials.routingKey),
+    password: unsealSecret(credentials.password),
+    // host/username are not secrets; secret field sealed separately
+  };
+}
+
 function hasCredentials(
   providerId: IntegrationProviderId,
   credentials: ProviderCredentials
 ): boolean {
+  const plain = credentialPlaintext(credentials);
   switch (providerId) {
     case "mapbox":
     case "stripe":
-      return Boolean(credentials.apiKey);
+      return Boolean(plain.apiKey);
     case "slack":
-      return Boolean(credentials.webhookUrl);
+      return Boolean(plain.webhookUrl);
     case "pagerduty":
-      return Boolean(credentials.routingKey);
+      return Boolean(plain.routingKey);
     case "mikrotik":
-      return Boolean(credentials.host && credentials.username && credentials.password);
+      return Boolean(plain.host && plain.username && plain.password);
   }
 }
 
@@ -76,32 +94,33 @@ function toPublicIntegration(
   integration: Integration,
   credentials: ProviderCredentials
 ): Integration {
+  const plain = credentialPlaintext(credentials);
   const status = deriveStatus(integration.id, integration.enabled, credentials);
   const apiKeyMasked =
     integration.id === "mikrotik"
-      ? credentials.password != null
-        ? maskSecret(credentials.password)
+      ? plain.password != null
+        ? maskSecret(plain.password)
         : undefined
-      : credentials.apiKey != null
-      ? maskSecret(credentials.apiKey, integration.id === "stripe" ? "sk-" : "")
-      : credentials.webhookUrl != null
-        ? maskWebhookUrl(credentials.webhookUrl)
-        : credentials.routingKey != null
-          ? maskSecret(credentials.routingKey)
-          : undefined;
+      : plain.apiKey != null
+        ? maskSecret(plain.apiKey, integration.id === "stripe" ? "sk-" : "")
+        : plain.webhookUrl != null
+          ? maskWebhookUrl(plain.webhookUrl)
+          : plain.routingKey != null
+            ? maskSecret(plain.routingKey)
+            : undefined;
 
   if (integration.id === "mikrotik") {
     return {
       ...integration,
       status,
-      host: credentials.host,
-      port: credentials.port,
-      username: credentials.username,
+      host: plain.host,
+      port: plain.port,
+      username: plain.username,
       passwordMasked: apiKeyMasked,
-      useSsl: credentials.useSsl,
-      verifySsl: credentials.verifySsl,
-      apiMode: credentials.apiMode,
-      monitoredInterface: credentials.monitoredInterface,
+      useSsl: plain.useSsl,
+      verifySsl: plain.verifySsl,
+      apiMode: plain.apiMode,
+      monitoredInterface: plain.monitoredInterface,
     };
   }
 
@@ -115,7 +134,8 @@ function toPublicIntegration(
 function toPublicWebhook(
   webhook: InternalIntegrationsState["outboundWebhook"]
 ): OutboundWebhook {
-  const { secret, ...rest } = webhook;
+  const secret = unsealSecret(webhook.secret);
+  const { secret: _sealed, ...rest } = webhook;
   return {
     ...rest,
     secretMasked: secret ? maskSecret(secret) : undefined,
@@ -177,7 +197,7 @@ const state: InternalIntegrationsState = {
     enabled: integration.enabled,
   })),
   credentials: {
-    mapbox: { apiKey: "pk.test_mapbox_token_abcdef" },
+    mapbox: { apiKey: sealSecret("pk.test_mapbox_token_abcdef") },
     slack: {},
     pagerduty: {},
     stripe: {},
@@ -199,6 +219,28 @@ export function getIntegrationsSettings(): IntegrationsSettings {
   };
 }
 
+export function getMapboxAccessToken(): string | null {
+  const integration = state.integrations.find((item) => item.id === "mapbox");
+  if (!integration?.enabled) {
+    return null;
+  }
+  const token = unsealSecret(state.credentials.mapbox.apiKey);
+  return token || null;
+}
+
+export function getMikrotikSavedCredentials(): {
+  host?: string;
+  username?: string;
+  password?: string;
+} {
+  const plain = credentialPlaintext(state.credentials.mikrotik);
+  return {
+    host: plain.host,
+    username: plain.username,
+    password: plain.password,
+  };
+}
+
 export function updateIntegration(
   id: IntegrationProviderId,
   patch: IntegrationUpdateFormValues
@@ -211,13 +253,13 @@ export function updateIntegration(
   const credentials = { ...state.credentials[id] };
 
   if (patch.apiKey) {
-    credentials.apiKey = patch.apiKey;
+    credentials.apiKey = sealSecret(patch.apiKey);
   }
   if (patch.webhookUrl) {
-    credentials.webhookUrl = patch.webhookUrl;
+    credentials.webhookUrl = sealSecret(patch.webhookUrl);
   }
   if (patch.routingKey) {
-    credentials.routingKey = patch.routingKey;
+    credentials.routingKey = sealSecret(patch.routingKey);
   }
   if (patch.host) {
     credentials.host = patch.host;
@@ -229,7 +271,7 @@ export function updateIntegration(
     credentials.username = patch.username;
   }
   if (patch.password) {
-    credentials.password = patch.password;
+    credentials.password = sealSecret(patch.password);
   }
   if (patch.useSsl !== undefined) {
     credentials.useSsl = patch.useSsl;
@@ -260,7 +302,7 @@ export function updateOutboundWebhook(
 ): OutboundWebhook {
   const nextSecret =
     patch.secret !== undefined
-      ? patch.secret
+      ? sealSecret(patch.secret)
       : state.outboundWebhook.secret;
 
   state.outboundWebhook = {
@@ -280,23 +322,39 @@ export function integrationHasExistingCredentials(
 }
 
 export function webhookHasExistingSecret(): boolean {
-  return Boolean(state.outboundWebhook.secret);
+  return Boolean(unsealSecret(state.outboundWebhook.secret));
 }
 
-export function testMikrotikConnection(): {
+export function getOutboundWebhookSecret(): string | undefined {
+  return unsealSecret(state.outboundWebhook.secret);
+}
+
+export function getIntegrationCredential(
+  providerId: IntegrationProviderId,
+  field: keyof ProviderCredentials
+): string | undefined {
+  const plain = credentialPlaintext(state.credentials[providerId]);
+  const value = plain[field];
+  return typeof value === "string" ? value : undefined;
+}
+
+export function testMikrotikConnection(payload?: MikrotikTestFormValues): {
   ok: boolean;
   message: string;
   identity?: string;
 } {
-  const credentials = state.credentials.mikrotik;
+  const saved = getMikrotikSavedCredentials();
+  const host = payload?.host?.trim() || saved.host;
+  const username = payload?.username?.trim() || saved.username;
+  const password = payload?.password?.trim() || saved.password;
 
-  if (!credentials.host || !credentials.username || !credentials.password) {
+  if (!host || !username || !password) {
     return { ok: false, message: "Mikrotik credentials are incomplete." };
   }
 
   return {
     ok: true,
     message: "Connected successfully",
-    identity: credentials.host,
+    identity: host,
   };
 }

@@ -247,7 +247,7 @@ type Integration = {
   apiKeyMasked?: string;     // never return raw secrets
 };
 
-type IntegrationProviderId = "mapbox" | "slack" | "pagerduty" | "stripe";
+type IntegrationProviderId = "mapbox" | "slack" | "pagerduty" | "stripe" | "mikrotik";
 type IntegrationStatus = "connected" | "disconnected" | "error";
 ```
 
@@ -259,8 +259,9 @@ type IntegrationStatus = "connected" | "disconnected" | "error";
 | `stripe` | `apiKey` (secret key) |
 | `slack` | `webhookUrl` |
 | `pagerduty` | `routingKey` |
+| `mikrotik` | `host`, `port?`, `username`, `password`, `useSsl?`, `verifySsl?`, `apiMode?`, `monitoredInterface?` |
 
-PATCH body uses `IntegrationUpdateFormValues`: `{ enabled, apiKey?, webhookUrl?, routingKey? }`. If credentials already exist, omitting secret fields keeps existing values.
+PATCH body uses `IntegrationUpdateFormValues`. If credentials already exist, omitting secret fields keeps existing values. Outbound webhook and Slack URLs reject private/loopback/metadata targets (SSRF guard). Mikrotik hosts allow private LAN addresses but reject loopback and cloud metadata endpoints.
 
 ### OutboundWebhook
 
