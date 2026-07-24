@@ -5,13 +5,15 @@ const publicPaths = ["/login", "/register"];
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const useMsw = process.env.NEXT_PUBLIC_USE_MSW !== "false";
+  const isPublic = publicPaths.some((path) => pathname.startsWith(path));
+  const token = request.cookies.get("fiberops-auth")?.value;
 
-  if (useMsw || publicPaths.some((path) => pathname.startsWith(path))) {
+  if (isPublic) {
+    if (token) {
+      return NextResponse.redirect(new URL("/dashboard", request.url));
+    }
     return NextResponse.next();
   }
-
-  const token = request.cookies.get("fiberops-auth")?.value;
 
   if (!token) {
     const loginUrl = new URL("/login", request.url);
@@ -23,5 +25,7 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|mockServiceWorker.js).*)"],
+  matcher: [
+    "/((?!_next/static|_next/image|favicon.ico|mockServiceWorker.js|api/).*)",
+  ],
 };

@@ -14,9 +14,7 @@ FiberOps provides an enterprise-grade GIS dashboard for:
 - Planning network expansion with map-based proposals
 - Generating operational reports
 
-The app uses a **frontend-first architecture**: domain types, Zod schemas, repository interfaces, and a mock API layer define the contract. In development, MSW intercepts browser requests; in all environments, Next.js route handlers at `/api` serve the same mock backend via `src/mocks/apiRouter.ts`, so the UI behaves consistently without a separate server.
-
-**Backend implementers:** see [docs/backend/README.md](./docs/backend/README.md) for the full API contract, domain models, WebSocket protocol, database schema, and frontend integration guide.
+The app runs entirely on **mock data**. Domain types, Zod schemas, repository interfaces, and `src/mocks/` define the contract. In development, MSW intercepts browser requests and WebSockets; in all environments, Next.js route handlers at `/api` serve the same mock API via `src/mocks/apiRouter.ts`.
 
 ## Technology Stack
 
@@ -83,7 +81,7 @@ The app uses a **frontend-first architecture**: domain types, Zod schemas, repos
 
    | Variable | Purpose |
    |----------|---------|
-   | `NEXT_PUBLIC_WS_URL` | WebSocket URL for live network map updates (defaults to mock WS in dev) |
+   | `NEXT_PUBLIC_WS_URL` | Mock WebSocket URL (`ws://localhost:8080/ws`) for network map live updates |
    | `NEXT_PUBLIC_ERROR_ENDPOINT` | Remote error reporting endpoint in production |
 
 3. **Start the development server:**
@@ -118,7 +116,7 @@ src/
 └── lib/              # Cross-cutting utilities and mappers
 ```
 
-**Data flow:** UI hooks in `src/modules/*/hooks/` call repository adapters in `src/services/`, which `fetch()` `/api/*`. The catch-all handler at `src/app/api/[...path]/route.ts` delegates to `src/mocks/apiRouter.ts`. Report-specific routes under `src/app/api/reports/` follow the same mock data layer.
+**Data flow:** UI hooks in `src/modules/*/hooks/` call `apiClient` against `/api/*`. The catch-all handler at `src/app/api/[...path]/route.ts` delegates to `src/mocks/apiRouter.ts`. Report-specific routes under `src/app/api/reports/` use the same mock data layer.
 
 **Source of truth for backend contracts:**
 

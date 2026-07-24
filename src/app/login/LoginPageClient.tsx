@@ -41,7 +41,7 @@ export default function LoginPageClient() {
           <div>
             <h1 className="u-heading-lg">Sign in to FiberOps</h1>
             <p className="u-text-muted u-text-sm">
-              Use your operator credentials to access the network dashboard.
+              Demo: test@example.com / password123
             </p>
           </div>
 

@@ -34,13 +34,7 @@ function isEditableTarget(target: EventTarget | null): boolean {
   );
 }
 
-export function Shell({
-  children,
-  useMsw = true,
-}: {
-  children: React.ReactNode;
-  useMsw?: boolean;
-}) {
+export function Shell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const logout = useAuthStore((state) => state.logout);
@@ -94,7 +88,7 @@ export function Shell({
           aria-label="Toggle navigation menu"
         />
         <div className={styles.mobileBrand}>
-          BCN FiberOps <Badge variant="info" label={useMsw ? "Mocked" : "Live API"} />
+          BCN FiberOps <Badge variant="info" label="Mocked" />
         </div>
       </header>
 
@@ -115,7 +109,7 @@ export function Shell({
           <div className={styles.sidebarHeader}>
             <div className={styles.sidebarHeaderMain}>
               <div className={styles.brand}>BCN FiberOps</div>
-              <Badge variant="info" label={useMsw ? "Mocked" : "Live API"} className={styles.brandBadge} />
+              <Badge variant="info" label="Mocked" className={styles.brandBadge} />
             </div>
             <button
               type="button"
@@ -131,7 +125,7 @@ export function Shell({
                 aria-hidden="true"
               />
             </button>
-            {!useMsw && user ? (
+            {user ? (
               <Button
                 variant="secondary"
                 size="sm"

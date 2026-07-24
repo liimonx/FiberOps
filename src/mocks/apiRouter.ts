@@ -1,5 +1,11 @@
 import { createAsset, getAssets } from "@/mocks/assetsData";
 import {
+  mockLogin,
+  mockLogout,
+  mockMe,
+  mockRegister,
+} from "@/mocks/authData";
+import {
   createCustomer,
   getCustomerById,
   getCustomers,
@@ -132,6 +138,52 @@ export async function handleApiRequest(request: Request): Promise<Response> {
   const method = request.method;
 
   try {
+    if (segments[0] === "auth") {
+      if (segments[1] === "login" && method === "POST") {
+        const body = (await request.json()) as { email?: string; password?: string };
+        if (!body.email || !body.password) {
+          return json({ error: "Email and password are required" }, 400);
+        }
+        try {
+          return json(mockLogin(body.email, body.password));
+        } catch (error) {
+          const message =
+            error instanceof Error ? error.message : "Unable to sign in";
+          return json({ error: message }, 401);
+        }
+      }
+      if (segments[1] === "register" && method === "POST") {
+        const body = (await request.json()) as {
+          name?: string;
+          email?: string;
+          password?: string;
+        };
+        if (!body.name || !body.email || !body.password) {
+          return json({ error: "Name, email, and password are required" }, 400);
+        }
+        try {
+          return json(mockRegister(body.name, body.email, body.password), 201);
+        } catch (error) {
+          const message =
+            error instanceof Error ? error.message : "Unable to register";
+          return json({ error: message }, 400);
+        }
+      }
+      if (segments[1] === "logout" && method === "POST") {
+        return json(mockLogout());
+      }
+    }
+
+    if (segments[0] === "me" && method === "GET") {
+      try {
+        return json(mockMe(request.headers.get("authorization")));
+      } catch (error) {
+        const message =
+          error instanceof Error ? error.message : "Unauthenticated";
+        return json({ error: message }, 401);
+      }
+    }
+
     if (segments.length === 1 && segments[0] === "assets") {
       if (method === "GET") {
         return json({ items: getAssets() });

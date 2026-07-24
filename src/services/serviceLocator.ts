@@ -11,19 +11,11 @@ import {
   mockAssetRepository,
   mockCustomerRepository,
   mockIncidentRepository,
+  mockPlanningProposalRepository,
+  mockReportsRepository,
   mockSettingsRepository,
+  mockWorkOrderRepository,
 } from "@/services/mock/mockRepositories";
-import {
-  httpAssetRepository,
-  httpCustomerRepository,
-  httpIncidentRepository,
-  httpPlanningProposalRepository,
-  httpReportsRepository,
-  httpSettingsRepository,
-  httpWorkOrderRepository,
-} from "@/services/http/httpRepositories";
-
-const useMsw = process.env.NEXT_PUBLIC_USE_MSW !== "false";
 
 export type Services = {
   assets: AssetRepository;
@@ -35,12 +27,13 @@ export type Services = {
   reports: ReportsRepository;
 };
 
+/** All repositories use in-memory mock data. */
 export const services: Services = {
-  assets: useMsw ? mockAssetRepository : httpAssetRepository,
-  customers: useMsw ? mockCustomerRepository : httpCustomerRepository,
-  incidents: useMsw ? mockIncidentRepository : httpIncidentRepository,
-  settings: useMsw ? mockSettingsRepository : httpSettingsRepository,
-  workOrders: httpWorkOrderRepository,
-  planning: httpPlanningProposalRepository,
-  reports: httpReportsRepository,
+  assets: mockAssetRepository,
+  customers: mockCustomerRepository,
+  incidents: mockIncidentRepository,
+  settings: mockSettingsRepository,
+  workOrders: mockWorkOrderRepository,
+  planning: mockPlanningProposalRepository,
+  reports: mockReportsRepository,
 };

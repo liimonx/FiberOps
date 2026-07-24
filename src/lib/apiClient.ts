@@ -47,13 +47,16 @@ export class ApiClientError extends Error {
 
 type RequestOptions = RequestInit & {
   skipAuth?: boolean;
+  /** When true, a 401 clears the token but does not navigate to /login. */
+  skipAuthRedirect?: boolean;
 };
 
 export async function apiClient<T>(
   path: string,
   options: RequestOptions = {}
 ): Promise<T> {
-  const { skipAuth = false, headers, ...rest } = options;
+  const { skipAuth = false, skipAuthRedirect = false, headers, ...rest } =
+    options;
   const token = getAuthToken();
 
   const response = await fetch(path, {
@@ -67,7 +70,7 @@ export async function apiClient<T>(
 
   if (response.status === 401 && !skipAuth) {
     clearAuthToken();
-    if (typeof window !== "undefined") {
+    if (!skipAuthRedirect && typeof window !== "undefined") {
       window.location.href = "/login";
     }
     throw new ApiClientError("Session expired. Please sign in again.", 401);

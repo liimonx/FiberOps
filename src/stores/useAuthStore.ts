@@ -71,7 +71,9 @@ export const useAuthStore = create<AuthState>()(
         }
       },
       fetchMe: async () => {
-        const data = await apiClient<{ user: AuthUser }>("/api/me");
+        const data = await apiClient<{ user: AuthUser }>("/api/me", {
+          skipAuthRedirect: true,
+        });
         set({ user: data.user });
       },
     }),
@@ -81,6 +83,8 @@ export const useAuthStore = create<AuthState>()(
       onRehydrateStorage: () => (state) => {
         if (state?.token) {
           setAuthToken(state.token);
+        } else {
+          clearAuthToken();
         }
         state?.setHydrated();
       },

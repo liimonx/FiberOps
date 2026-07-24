@@ -1,8 +1,8 @@
 # FiberOps Backend Documentation
 
-This folder describes the backend contract implied by the FiberOps frontend. The UI is built **frontend-first**: MSW handlers in `src/mocks/handlers.ts` and domain types in `src/types/domain.ts` are the source of truth for what a production API must implement.
+This folder describes the **API contract** implied by the FiberOps frontend mock layer (`src/mocks/`). The Next.js app currently runs **mock-only** (MSW in development + `/api` route handlers). Use these docs if you later scaffold a real backend that replaces the mocks without changing the UI.
 
-Use these docs to scaffold one or more backend services (monolith or microservices) that replace the mock layer without changing the UI.
+> **Note:** Live Laravel rewrites (`NEXT_PUBLIC_USE_MSW=false`) were removed from this frontend. Integration steps in [Frontend Integration](./frontend-integration.md) describe a future wiring path, not the current app behavior.
 
 ## Documents
 

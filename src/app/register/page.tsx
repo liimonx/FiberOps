@@ -40,7 +40,8 @@ export default function RegisterPage() {
           <div>
             <h1 className="u-heading-lg">Create your FiberOps account</h1>
             <p className="u-text-muted u-text-sm">
-              Register to manage your fiber network operations.
+              Create an operator account for this mock environment. Accounts
+              persist in your browser.
             </p>
           </div>
 
