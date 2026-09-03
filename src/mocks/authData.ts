@@ -105,6 +105,8 @@ export function getRoleByToken(token: string | null | undefined): TeamRole | nul
 
 export function logoutMockToken(token: string | null | undefined): void {
   if (!token) return;
+  // Keep demo tokens resolvable so refresh after logout+relogin works;
+  // production would revoke server-side sessions.
   void token;
 }
 

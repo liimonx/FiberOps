@@ -1,6 +1,9 @@
 import type { NextConfig } from "next";
 import path from "path";
 
+const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+const useMsw = process.env.NEXT_PUBLIC_USE_MSW !== "false";
+
 const nextConfig: NextConfig = {
   transpilePackages: ["@shohojdhara/atomix"],
   sassOptions: {
@@ -9,6 +12,27 @@ const nextConfig: NextConfig = {
       path.join(process.cwd(), "node_modules"),
     ],
     silenceDeprecations: ["legacy-js-api", "import"],
+  },
+  async rewrites() {
+    if (useMsw) {
+      return [];
+    }
+
+    return [
+      {
+        source: "/api/auth/:path*",
+        destination: `${apiUrl}/api/v1/auth/:path*`,
+      },
+      {
+        source: "/api/me",
+        destination: `${apiUrl}/api/v1/me`,
+      },
+      {
+        // Exclude /api/session so Next.js can set HttpOnly cookies locally.
+        source: "/api/:path((?!session$).*)",
+        destination: `${apiUrl}/api/v1/:path*`,
+      },
+    ];
   },
 };
 
