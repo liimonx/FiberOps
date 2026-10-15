@@ -30,6 +30,10 @@ interface NetworkMapStore {
   // Viewport state
   viewport: ViewportState;
   setViewport: (viewport: Partial<ViewportState>) => void;
+  offlineMapStyle: "midnight" | "terrain";
+  setOfflineMapStyle: (style: "midnight" | "terrain") => void;
+  offlineBuildingsVisible: boolean;
+  setOfflineBuildingsVisible: (visible: boolean) => void;
   
   // Layers state
   layers: NetworkMapLayer[];
@@ -163,6 +167,12 @@ export const useNetworkMapStore = create<NetworkMapStore>()(
       (set) => ({
         // Initial state
         viewport: initialViewport,
+        offlineMapStyle: "midnight",
+        setOfflineMapStyle: (offlineMapStyle) =>
+          set({ offlineMapStyle }, false, "setOfflineMapStyle"),
+        offlineBuildingsVisible: true,
+        setOfflineBuildingsVisible: (offlineBuildingsVisible) =>
+          set({ offlineBuildingsVisible }, false, "setOfflineBuildingsVisible"),
         layers: DEFAULT_LAYERS,
         interaction: initialInteraction,
         nodes: [],
@@ -638,6 +648,8 @@ export const useNetworkMapStore = create<NetworkMapStore>()(
         reset: () => 
           set({
             viewport: initialViewport,
+            offlineMapStyle: "midnight",
+            offlineBuildingsVisible: true,
             layers: DEFAULT_LAYERS,
             interaction: initialInteraction,
             nodes: [],

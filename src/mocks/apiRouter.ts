@@ -131,11 +131,23 @@ function forbidden(message = "Admin access required") {
   return json({ error: message }, 403);
 }
 
+const SESSION_COOKIE_NAME = "fiberops-auth";
+
 function extractBearerToken(request: Request): string | null {
   const header = request.headers.get("authorization");
   if (!header) return null;
   const match = header.match(/^Bearer\s+(.+)$/i);
-  return match?.[1]?.trim() || null;
+  if (match?.[1]?.trim()) return match[1].trim();
+
+  const cookieHeader = request.headers.get("cookie");
+  if (cookieHeader) {
+    const cookies = cookieHeader.split(";").map((c) => c.trim());
+    const sessionCookie = cookies.find((c) => c.startsWith(`${SESSION_COOKIE_NAME}=`));
+    if (sessionCookie) {
+      return decodeURIComponent(sessionCookie.split("=")[1] || "");
+    }
+  }
+  return null;
 }
 
 function requireUser(

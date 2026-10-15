@@ -42,12 +42,8 @@ export default function LoginPageClient() {
             <h1 className="u-heading-lg">Sign in to FiberOps</h1>
             <p className="u-text-muted u-text-sm">
               Use your operator credentials to access the network dashboard.
-              {process.env.NEXT_PUBLIC_USE_MSW !== "false" ? (
-                <>
-                  {" "}
-                  Demo admin: alex.morgan@bcn-fiberops.com / password
-                </>
-              ) : null}
+              {" "}
+              Demo admin: alex.morgan@bcn-fiberops.com / password
             </p>
           </div>
 

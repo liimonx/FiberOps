@@ -4,6 +4,7 @@ import React, { useCallback, useState, useEffect } from "react";
 import { Button, Card, Icon } from "@shohojdhara/atomix";
 import { useMapInstance } from "../hooks/useMapInstance";
 import { useAccessibilityAnnounce } from "./AccessibilityAnnouncer";
+import { useNetworkMapStore } from "../stores/useNetworkMapStore";
 import {
   BUILDINGS_LAYER_ID,
   updateLayerVisibility,
@@ -27,7 +28,16 @@ export const MapControls: React.FC<MapControlsProps> = ({
   const mapInstance = useMapInstance();
   const { announce } = useAccessibilityAnnounce();
   const [isSatelliteView, setIsSatelliteView] = useState(false);
-  const [showBuildings, setShowBuildings] = useState(true);
+  const showBuildings = useNetworkMapStore((state) => state.offlineBuildingsVisible);
+  const setOfflineBuildingsVisible = useNetworkMapStore(
+    (state) => state.setOfflineBuildingsVisible
+  );
+  const offlineMapStyle = useNetworkMapStore((state) => state.offlineMapStyle);
+  const setOfflineMapStyle = useNetworkMapStore(
+    (state) => state.setOfflineMapStyle
+  );
+  const viewport = useNetworkMapStore((state) => state.viewport);
+  const setViewport = useNetworkMapStore((state) => state.setViewport);
 
   const applyBuildingsVisibility = useCallback(
     (visible: boolean) => {
@@ -51,47 +61,68 @@ export const MapControls: React.FC<MapControlsProps> = ({
 
   const handleToggleBuildings = useCallback(() => {
     const next = !showBuildings;
-    setShowBuildings(next);
+    setOfflineBuildingsVisible(next);
     applyBuildingsVisibility(next);
     announce(next ? "3D buildings shown" : "3D buildings hidden", "polite");
-  }, [showBuildings, applyBuildingsVisibility, announce]);
+  }, [showBuildings, setOfflineBuildingsVisible, applyBuildingsVisibility, announce]);
 
   const handleZoomIn = useCallback(() => {
     if (mapInstance) {
       mapInstance.zoomIn();
-      announce("Map zoomed in", "polite");
+    } else {
+      setViewport({ zoom: Math.min(18, viewport.zoom + 1) });
     }
-  }, [mapInstance, announce]);
+    announce("Map zoomed in", "polite");
+  }, [mapInstance, setViewport, viewport.zoom, announce]);
 
   const handleZoomOut = useCallback(() => {
     if (mapInstance) {
       mapInstance.zoomOut();
-      announce("Map zoomed out", "polite");
+    } else {
+      setViewport({ zoom: Math.max(2, viewport.zoom - 1) });
     }
-  }, [mapInstance, announce]);
+    announce("Map zoomed out", "polite");
+  }, [mapInstance, setViewport, viewport.zoom, announce]);
 
   const handleResetPitch = useCallback(() => {
     if (mapInstance) {
       mapInstance.setPitch(0);
-      announce("Map pitch reset", "polite");
     }
-  }, [mapInstance, announce]);
+    setViewport({ pitch: 0 });
+    announce("Map pitch reset", "polite");
+  }, [mapInstance, setViewport, announce]);
 
   const handleToggleSatellite = useCallback(() => {
-    if (!mapInstance) return;
+    if (mapInstance) {
+      const newStyle = isSatelliteView
+        ? "mapbox://styles/mapbox/dark-v11"
+        : "mapbox://styles/mapbox/satellite-streets-v12";
 
-    const newStyle = isSatelliteView
-      ? "mapbox://styles/mapbox/dark-v11"
-      : "mapbox://styles/mapbox/satellite-streets-v12";
+      mapInstance.setStyle(newStyle);
+      mapInstance.once("style.load", () => applyBuildingsVisibility(showBuildings));
+      setIsSatelliteView(!isSatelliteView);
+      announce(
+        isSatelliteView ? "Switched to dark map view" : "Switched to satellite view",
+        "polite"
+      );
+      return;
+    }
 
-    mapInstance.setStyle(newStyle);
-    mapInstance.once("style.load", () => applyBuildingsVisibility(showBuildings));
-    setIsSatelliteView(!isSatelliteView);
+    const nextStyle = offlineMapStyle === "terrain" ? "midnight" : "terrain";
+    setOfflineMapStyle(nextStyle);
     announce(
-      isSatelliteView ? "Switched to dark map view" : "Switched to satellite view",
+      nextStyle === "terrain" ? "Switched to terrain simulation" : "Switched to midnight simulation",
       "polite"
     );
-  }, [mapInstance, isSatelliteView, showBuildings, applyBuildingsVisibility, announce]);
+  }, [
+    mapInstance,
+    isSatelliteView,
+    showBuildings,
+    applyBuildingsVisibility,
+    offlineMapStyle,
+    setOfflineMapStyle,
+    announce,
+  ]);
 
   return (
     <div className={className}>
@@ -138,15 +169,27 @@ export const MapControls: React.FC<MapControlsProps> = ({
             >
               {showBasemapToggle && (
                 <Button
-                  variant={isSatelliteView ? "primary" : "secondary"}
+                  variant={
+                    mapInstance
+                      ? isSatelliteView ? "primary" : "secondary"
+                      : offlineMapStyle === "terrain" ? "primary" : "secondary"
+                  }
                   size="sm"
-                  iconName={isSatelliteView ? "GlobeHemisphereWest" : "Globe"}
+                  iconName={
+                    mapInstance
+                      ? isSatelliteView ? "GlobeHemisphereWest" : "Globe"
+                      : offlineMapStyle === "terrain" ? "GlobeHemisphereWest" : "Globe"
+                  }
                   iconOnly
                   onClick={handleToggleSatellite}
                   aria-label={
-                    isSatelliteView
-                      ? "Switch to dark map view"
-                      : "Switch to satellite view"
+                    mapInstance
+                      ? isSatelliteView
+                        ? "Switch to dark map view"
+                        : "Switch to satellite view"
+                      : offlineMapStyle === "terrain"
+                        ? "Switch to midnight simulation"
+                        : "Switch to terrain simulation"
                   }
                 />
               )}
@@ -194,6 +237,8 @@ export const MapControls: React.FC<MapControlsProps> = ({
 
 export const CompassControl: React.FC<{ size?: "sm" | "md" }> = ({ size = "md" }) => {
   const mapInstance = useMapInstance();
+  const viewport = useNetworkMapStore((state) => state.viewport);
+  const setViewport = useNetworkMapStore((state) => state.setViewport);
   const [bearing, setBearing] = useState(0);
 
   useEffect(() => {
@@ -208,8 +253,14 @@ export const CompassControl: React.FC<{ size?: "sm" | "md" }> = ({ size = "md" }
     };
   }, [mapInstance]);
 
+  const currentBearing = mapInstance ? bearing : viewport.bearing;
+
   const handleResetBearing = () => {
-    mapInstance?.resetNorth();
+    if (mapInstance) {
+      mapInstance.resetNorth();
+    } else {
+      setViewport({ bearing: 0 });
+    }
   };
 
   return (
@@ -217,10 +268,10 @@ export const CompassControl: React.FC<{ size?: "sm" | "md" }> = ({ size = "md" }
       variant="secondary"
       size={size}
       onClick={handleResetBearing}
-      aria-label={`Reset map orientation, current bearing: ${Math.round(bearing)} degrees`}
+      aria-label={`Reset map orientation, current bearing: ${Math.round(currentBearing)} degrees`}
       iconOnly
       icon={
-        <div style={{ transform: `rotate(${-bearing}deg)` }}>
+        <div style={{ transform: `rotate(${-currentBearing}deg)` }}>
           <Icon name="NavigationArrow" size={16} />
         </div>
       }

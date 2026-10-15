@@ -28,7 +28,6 @@ export async function startMockServiceWorker() {
   const { XMLHttpRequestInterceptor } = await import(
     "@mswjs/interceptors/XMLHttpRequest"
   );
-  const { WebSocketInterceptor } = await import("@mswjs/interceptors/WebSocket");
   const { handlers } = await import("./handlers");
 
   const network = defineNetwork({
@@ -38,7 +37,6 @@ export async function startMockServiceWorker() {
         interceptors: [
           new FetchInterceptor(),
           new XMLHttpRequestInterceptor(),
-          new WebSocketInterceptor(),
         ] as ConstructorParameters<typeof InterceptorSource>[0]["interceptors"],
       }),
     ],

@@ -9,7 +9,7 @@ const authRoutes = ["/login", "/register", "/invite"];
 
 /**
  * Restores an in-memory bearer after reload (token is not persisted) and
- * bootstraps a demo admin session when MSW mode has no active login.
+ * bootstraps a demo admin session through the local mock API when needed.
  */
 export function AuthSessionBootstrap() {
   const pathname = usePathname();
@@ -18,7 +18,6 @@ export function AuthSessionBootstrap() {
   const bootstrapDemoSession = useAuthStore((state) => state.bootstrapDemoSession);
   const setSessionReady = useAuthStore((state) => state.setSessionReady);
   const started = useRef(false);
-  const useMsw = process.env.NEXT_PUBLIC_USE_MSW !== "false";
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -42,16 +41,12 @@ export function AuthSessionBootstrap() {
           try {
             await fetchMe();
           } catch {
-            if (useMsw) {
-              await bootstrapDemoSession();
-            }
+            await bootstrapDemoSession();
           }
           return;
         }
 
-        if (useMsw) {
-          await bootstrapDemoSession();
-        }
+        await bootstrapDemoSession();
       } finally {
         setSessionReady(true);
       }
@@ -62,7 +57,6 @@ export function AuthSessionBootstrap() {
     fetchMe,
     bootstrapDemoSession,
     setSessionReady,
-    useMsw,
   ]);
 
   return null;

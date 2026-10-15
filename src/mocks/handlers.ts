@@ -5,7 +5,9 @@ import { createLogger } from "@/lib/logger";
 
 const log = createLogger("MSW");
 
-const chat = ws.link("ws://localhost:8080/ws");
+// Only mock WebSocket connections to the specific mock server URL
+const MOCK_WS_URL = "ws://localhost:8080/ws";
+const chat = ws.link(MOCK_WS_URL);
 
 async function toHttpResponse(request: Request, delayMs = 0) {
   if (delayMs > 0) {
@@ -24,7 +26,7 @@ async function toHttpResponse(request: Request, delayMs = 0) {
 }
 
 export const handlers = [
-  // WebSocket Mocking
+  // WebSocket Mocking - only for the mock server
   chat.addEventListener("connection", ({ client }) => {
     log.info("WebSocket connected:", client.id);
 
@@ -69,5 +71,6 @@ export const handlers = [
   // Let Next.js set HttpOnly session cookies (MSW cannot apply Set-Cookie).
   http.all("/api/session", ({ request }) => fetch(request)),
 
-  http.all("/api/*", ({ request }) => toHttpResponse(request, 300)),
+  // Handle all API routes with mock data
+  http.all("/api/*", ({ request }) => toHttpResponse(request, 100)),
 ];

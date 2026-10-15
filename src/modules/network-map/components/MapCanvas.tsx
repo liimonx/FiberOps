@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef, useState, useCallback } from "react";
+import React, { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { Card, Button, Icon } from "@shohojdhara/atomix";
@@ -16,6 +16,7 @@ import { createLogger } from "@/lib/logger";
 
 const log = createLogger("MapCanvas");
 import { MapLoader } from "./loading";
+import { OfflineMapCanvas } from "./OfflineMapCanvas";
 import {
   addCustomLayers,
   updateLayerVisibility,
@@ -32,7 +33,6 @@ import {
   isOutagesLayerVisible,
 } from "../utils/layerVisibility";
 import { ConnectionType, NetworkNodeType, NetworkStatus } from "../types";
-import type { NetworkMapLayer } from "../types";
 import type { NetworkNode, NetworkConnection } from "../types";
 
 let globalMapInstance: mapboxgl.Map | null = null;
@@ -62,20 +62,6 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({ onMapLoad, onMapError }) =
   const setDragging = useNetworkMapStore((state) => state.setDragging);
   const setZooming = useNetworkMapStore((state) => state.setZooming);
 
-  useEffect(() => {
-    if (tokenError) {
-      setMapLoading(false);
-      setMapError(tokenError);
-      onMapError?.(new Error(tokenError));
-      return;
-    }
-
-    // Clear a stale token error so the map container can remount once a token arrives.
-    setMapError((prev) =>
-      prev?.startsWith("Mapbox access token not configured") ? null : prev
-    );
-  }, [tokenError, onMapError]);
-
   const createCircleCoordinates = useCallback(
     (lng: number, lat: number, radius: number, points = 32) => {
       const coords = [];
@@ -98,12 +84,64 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({ onMapLoad, onMapError }) =
     }
   }, []);
 
+  const filteredData = useMemo(() => {
+    const nodeTypes = visibleNodeTypesFromLayers(layers);
+    const connTypes = visibleConnectionTypesFromLayers(layers);
+    const nodeTypeSet = new Set(nodeTypes.map(String));
+    const connTypeSet = new Set(connTypes.map(String));
+
+    const filteredNodes =
+      nodeTypes.length === 0
+        ? []
+        : nodes.filter((n) => nodeTypeSet.has(String(n.type)));
+
+    const filteredConnections =
+      connTypes.length === 0
+        ? []
+        : connections.filter((c) => connTypeSet.has(String(c.type)));
+
+    const coverageNodes =
+      isCoverageLayerVisible(layers) && nodeTypes.length > 0
+        ? filteredNodes.filter(
+            (n) =>
+              n.type === NetworkNodeType.CORE_NODE ||
+              n.type === NetworkNodeType.DISTRIBUTION_NODE ||
+              n.type === NetworkNodeType.POP
+          )
+        : [];
+
+    const outageConnections = isOutagesLayerVisible(layers)
+      ? connections.filter((c) => c.status === NetworkStatus.ERROR)
+      : [];
+
+    return {
+      filteredNodes,
+      filteredConnections,
+      coverageNodes,
+      outageConnections,
+      nodeTypes,
+      connTypes,
+      showOutages: isOutagesLayerVisible(layers),
+      showCoverage: isCoverageLayerVisible(layers) && nodeTypes.length > 0,
+    };
+  }, [nodes, connections, layers]);
+
+  type FilteredMapData = {
+    filteredNodes: NetworkNode[];
+    filteredConnections: NetworkConnection[];
+    coverageNodes: NetworkNode[];
+    outageConnections: NetworkConnection[];
+    nodeTypes: NetworkNodeType[];
+    connTypes: ConnectionType[];
+    showOutages: boolean;
+    showCoverage: boolean;
+  };
+
   const updateMapData = useCallback(
     (
       map: mapboxgl.Map,
-      allNodes: NetworkNode[],
-      allConnections: NetworkConnection[],
-      layerState: NetworkMapLayer[]
+      data: FilteredMapData,
+      currentZoom: number
     ) => {
       try {
         if (!map.isStyleLoaded()) return;
@@ -112,29 +150,7 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({ onMapLoad, onMapError }) =
           initializeLayers(map);
         }
 
-        const nodeTypes = visibleNodeTypesFromLayers(layerState);
-        const connTypes = visibleConnectionTypesFromLayers(layerState);
-        const nodeTypeSet = new Set(nodeTypes.map(String));
-
-        const filteredNodes =
-          nodeTypes.length === 0
-            ? []
-            : allNodes.filter((n) => nodeTypeSet.has(String(n.type)));
-
-        const currentZoom = map.getZoom();
-
-        const connTypeSet = new Set(connTypes.map(String));
-        let filteredConnections =
-          connTypes.length === 0
-            ? []
-            : allConnections.filter((c) => connTypeSet.has(String(c.type)));
-
-        // Overview: trunk only — last-mile starbursts wash out the map
-        if (currentZoom < ZOOM_SHOW_CUSTOMER_CONNECTIONS) {
-          filteredConnections = filteredConnections.filter(
-            (c) => c.type === ConnectionType.FIBER_ROUTE
-          );
-        }
+        const { filteredNodes, filteredConnections, coverageNodes, outageConnections, nodeTypes, connTypes, showOutages, showCoverage } = data;
 
         const nodeFeatures = filteredNodes.map(createNodeFeature);
         const nodesSource = map.getSource("network-nodes") as
@@ -152,9 +168,16 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({ onMapLoad, onMapError }) =
         if (nodes3DSource)
           nodes3DSource.setData({ type: "FeatureCollection", features: node3DFeatures });
 
-        const allNodesMap = new Map(allNodes.map((n) => [n.id, n]));
+        const allNodesMap = new Map(nodes.map((n) => [n.id, n]));
 
-        const connectionFeatures = filteredConnections
+        let zoomFilteredConnections = filteredConnections;
+        if (currentZoom < ZOOM_SHOW_CUSTOMER_CONNECTIONS) {
+          zoomFilteredConnections = filteredConnections.filter(
+            (c) => c.type === ConnectionType.FIBER_ROUTE
+          );
+        }
+
+        const connectionFeatures = zoomFilteredConnections
           .map((conn) => createConnectionFeature(conn, allNodesMap))
           .filter((f): f is GeoJSON.Feature => f != null);
         const connectionsSource = map.getSource("network-connections") as
@@ -166,9 +189,6 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({ onMapLoad, onMapError }) =
             features: connectionFeatures,
           });
 
-        const outageConnections = isOutagesLayerVisible(layerState)
-          ? allConnections.filter((c) => c.status === NetworkStatus.ERROR)
-          : [];
         const outageFeatures = outageConnections
           .map((conn) => createConnectionFeature(conn, allNodesMap))
           .filter((f): f is GeoJSON.Feature => f != null);
@@ -178,15 +198,6 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({ onMapLoad, onMapError }) =
         if (outagesSource)
           outagesSource.setData({ type: "FeatureCollection", features: outageFeatures });
 
-        const coverageNodes =
-          isCoverageLayerVisible(layerState) && nodeTypes.length > 0
-            ? filteredNodes.filter(
-                (n) =>
-                  n.type === NetworkNodeType.CORE_NODE ||
-                  n.type === NetworkNodeType.DISTRIBUTION_NODE ||
-                  n.type === NetworkNodeType.POP
-              )
-            : [];
         const coverageFeatures = coverageNodes.map((node) => ({
           type: "Feature" as const,
           geometry: {
@@ -206,7 +217,6 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({ onMapLoad, onMapError }) =
             features: coverageFeatures,
           });
 
-        // Avoid stale Mapbox filters (previously hid all features in GL JS 3)
         const clearFilterIds = [
           "network-nodes-3d-layer",
           "network-connections-layer",
@@ -225,24 +235,16 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({ onMapLoad, onMapError }) =
         updateLayerVisibility(map, "network-connections-layer", connectionsVisible);
 
         if (map.getLayer("network-outages-layer")) {
-          updateLayerVisibility(
-            map,
-            "network-outages-layer",
-            isOutagesLayerVisible(layerState)
-          );
+          updateLayerVisibility(map, "network-outages-layer", showOutages);
         }
         if (map.getLayer("network-coverage-layer")) {
-          updateLayerVisibility(
-            map,
-            "network-coverage-layer",
-            isCoverageLayerVisible(layerState)
-          );
+          updateLayerVisibility(map, "network-coverage-layer", showCoverage);
         }
       } catch (error) {
         log.error("Update failed:", error);
       }
     },
-    [initializeLayers, createCircleCoordinates]
+    [initializeLayers, createCircleCoordinates, nodes]
   );
 
   // Map instance is created once token is available; re-running when viewport/store
@@ -250,6 +252,14 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({ onMapLoad, onMapError }) =
   // Read the latest viewport from the store at init time to avoid a stale closure.
   useEffect(() => {
     if (!mapContainer.current || mapRef.current || !accessToken || tokenError) return;
+
+    // Ensure container has valid dimensions
+    const container = mapContainer.current;
+    if (!container.offsetWidth || !container.offsetHeight) {
+      log.warn("Map container has zero dimensions, skipping initialization");
+      return;
+    }
+
     mapboxgl.accessToken = accessToken;
 
     try {
@@ -285,11 +295,49 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({ onMapLoad, onMapError }) =
         if (!mapRef.current) return;
 
         const currentState = useNetworkMapStore.getState();
+        const currentZoom = map.getZoom();
+        const nodeTypes = visibleNodeTypesFromLayers(currentState.layers);
+        const connTypes = visibleConnectionTypesFromLayers(currentState.layers);
+        const nodeTypeSet = new Set(nodeTypes.map(String));
+        const connTypeSet = new Set(connTypes.map(String));
+
+        const filteredNodes =
+          nodeTypes.length === 0
+            ? []
+            : currentState.nodes.filter((n) => nodeTypeSet.has(String(n.type)));
+
+        const filteredConnections =
+          connTypes.length === 0
+            ? []
+            : currentState.connections.filter((c) => connTypeSet.has(String(c.type)));
+
+        const coverageNodes =
+          isCoverageLayerVisible(currentState.layers) && nodeTypes.length > 0
+            ? filteredNodes.filter(
+                (n) =>
+                  n.type === NetworkNodeType.CORE_NODE ||
+                  n.type === NetworkNodeType.DISTRIBUTION_NODE ||
+                  n.type === NetworkNodeType.POP
+              )
+            : [];
+
+        const outageConnections = isOutagesLayerVisible(currentState.layers)
+          ? currentState.connections.filter((c) => c.status === NetworkStatus.ERROR)
+          : [];
+
         updateMapData(
           map,
-          currentState.nodes,
-          currentState.connections,
-          currentState.layers
+          {
+            filteredNodes,
+            filteredConnections,
+            coverageNodes,
+            outageConnections,
+            nodeTypes,
+            connTypes,
+            showOutages: isOutagesLayerVisible(currentState.layers),
+            showCoverage: isCoverageLayerVisible(currentState.layers) && nodeTypes.length > 0,
+          },
+          currentZoom
         );
         requestAnimationFrame(() => mapRef.current?.resize());
         log.info("Network layers restored after style change");
@@ -399,26 +447,51 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({ onMapLoad, onMapError }) =
   const isZoomedInFor3D = viewport.zoom >= ZOOM_NODES_3D_MIN - 0.5;
   const isOverviewZoom = viewport.zoom < ZOOM_SHOW_CUSTOMER_CONNECTIONS;
 
+  const updateDebounceRef = useRef<number | null>(null);
+  const isMapVisibleRef = useRef(true);
+
+  // Track page visibility to pause updates when tab is hidden
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      isMapVisibleRef.current = !document.hidden;
+    };
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
+  }, []);
+
   useEffect(() => {
     if (!mapRef.current || !isReady) return;
     const map = mapRef.current;
 
-    const apply = () => {
-      if (!map.isStyleLoaded()) {
-        map.once("styledata", apply);
-        return;
-      }
-      updateMapData(map, nodes, connections, layers);
-      requestAnimationFrame(() => {
-        // Safety check: ensure map is still valid before calling resize
-        if (map && typeof map.resize === 'function' && map._canvas) {
-          map.resize();
-        }
-      });
-    };
+    if (updateDebounceRef.current) {
+      clearTimeout(updateDebounceRef.current);
+    }
 
-    apply();
-  }, [nodes, connections, isReady, layers, updateMapData, isZoomedInFor3D, isOverviewZoom]);
+    updateDebounceRef.current = window.setTimeout(() => {
+      // Skip update if map is not visible (tab in background)
+      if (!isMapVisibleRef.current) return;
+
+      const apply = () => {
+        if (!map.isStyleLoaded()) {
+          map.once("styledata", apply);
+          return;
+        }
+        const currentZoom = map.getZoom();
+        updateMapData(map, filteredData, currentZoom);
+      };
+      apply();
+    }, 50);
+
+    return () => {
+      if (updateDebounceRef.current) {
+        clearTimeout(updateDebounceRef.current);
+      }
+    };
+  }, [filteredData, isReady, updateMapData, isZoomedInFor3D, isOverviewZoom]);
+
+  if (!isTokenLoading && !accessToken) {
+    return <OfflineMapCanvas />;
+  }
 
   if (mapError) {
     return (

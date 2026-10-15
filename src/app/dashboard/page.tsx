@@ -139,8 +139,9 @@ export default function DashboardPage() {
   } = useQuery({
     queryKey: ["network-trends"],
     queryFn: fetchUsageStats,
-    staleTime: 30_000,
-    refetchInterval: 60_000,
+    staleTime: 60_000,
+    gcTime: 5 * 60_000,
+    refetchOnWindowFocus: false,
   });
 
   const customerList = customers ?? [];
