@@ -51,6 +51,7 @@ export function useCustomers() {
     queryFn: () => fetchList<Customer>("/api/customers"),
     staleTime: 5 * 60_000,
     gcTime: 20 * 60_000,
+    refetchOnWindowFocus: false,
   });
 }
 

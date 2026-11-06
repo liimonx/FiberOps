@@ -12,7 +12,6 @@ const authRoutes = ["/login", "/register", "/invite"];
 export function ClientRoot({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const isAuthRoute = authRoutes.some((route) => pathname.startsWith(route));
-  const useMsw = process.env.NEXT_PUBLIC_USE_MSW !== "false";
 
   return (
     <Providers>
@@ -21,7 +20,7 @@ export function ClientRoot({ children }: { children: React.ReactNode }) {
         {isAuthRoute ? (
           children
         ) : (
-          <Shell useMsw={useMsw}>
+          <Shell>
             {children}
             <IncidentAlertToaster />
           </Shell>

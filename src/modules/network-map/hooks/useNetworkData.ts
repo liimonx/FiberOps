@@ -77,8 +77,9 @@ export function useActiveIncidents() {
       const items = await fetchList<Incident>('/api/incidents');
       return items.filter((inc) => inc.status !== 'resolved');
     },
-    staleTime: 10_000,
-    refetchInterval: 15_000,
+    staleTime: 30_000,
+    gcTime: 5 * 60_000,
+    refetchOnWindowFocus: false,
   });
 }
 

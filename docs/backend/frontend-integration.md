@@ -1,16 +1,17 @@
 # Frontend Integration Guide
 
-How to connect the FiberOps Next.js app to a real backend and retire MSW mocks.
+Future integration notes for replacing the local mock API with a real backend. These steps are not active in the current mock-only app.
 
 ## Current data flow
 
 ```
 Page / Hook
-    └── fetch('/api/...')     ← same-origin in dev (MSW intercepts)
-    └── WebSocket (optional)  ← NEXT_PUBLIC_WS_URL
+    └── fetch('/api/...')     ← same-origin Next.js route handler
+        └── src/mocks/apiRouter.ts  ← local mock data
+    └── WebSocket (optional)  ← disabled unless explicitly configured
 ```
 
-Repository interfaces in `src/services/repositories.ts` exist but **most hooks call `fetch` directly**. MSW handlers in `src/mocks/handlers.ts` define the live contract.
+Repository interfaces in `src/services/repositories.ts` exist but **most hooks call `fetch` directly**. The route handlers delegate to `src/mocks/apiRouter.ts`; MSW is not part of app startup.
 
 ## Step 1 — Run the backend
 
@@ -54,17 +55,11 @@ WebSocket cannot be rewritten by Next.js — point `NEXT_PUBLIC_WS_URL` directly
 
 Implement `src/app/api/**/route.ts` handlers that proxy to the backend. More control, more maintenance.
 
-## Step 3 — Disable MSW
+## Step 3 — Replace the local mock API
 
-MSW starts from `src/mocks/browser.ts` when enabled in the app layout/provider.
-
-For production backend integration:
-
-1. Set env flag e.g. `NEXT_PUBLIC_USE_MSW=false`
-2. Conditionally skip MSW initialization
-3. Or remove the MSW provider entirely for staging/prod builds
-
-Verify network tab shows requests hitting your backend, not service worker mocks.
+The current app does not start MSW or use an API-mode environment flag. For a
+future backend integration, replace or proxy the `/api` route handlers, then
+verify requests use the backend instead of `src/mocks/apiRouter.ts`.
 
 ## Step 4 — Environment variables
 
@@ -73,12 +68,8 @@ Verify network tab shows requests hitting your backend, not service worker mocks
 ```env
 NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN=pk....
 
-# Laravel backend (see Fiberops-backend/)
-NEXT_PUBLIC_API_URL=http://localhost:8000
+# Optional backend live updates (see Fiberops-backend/)
 NEXT_PUBLIC_WS_URL=ws://localhost:8080/ws
-
-# Disable mocks when backend is ready
-NEXT_PUBLIC_USE_MSW=false
 ```
 
 **Backend CORS** (if frontend and API are on different origins):

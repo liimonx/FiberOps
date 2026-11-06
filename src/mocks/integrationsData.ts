@@ -148,9 +148,8 @@ export const defaultIntegrationsSettings: IntegrationsSettings = {
       id: "mapbox",
       name: "Mapbox",
       description: "GIS basemap and geocoding for the network map.",
-      status: "connected",
-      enabled: true,
-      apiKeyMasked: "pk.••••••••cdef",
+      status: "disconnected",
+      enabled: false,
     },
     {
       id: "slack",
@@ -197,7 +196,7 @@ const state: InternalIntegrationsState = {
     enabled: integration.enabled,
   })),
   credentials: {
-    mapbox: { apiKey: sealSecret("pk.test_mapbox_token_abcdef") },
+    mapbox: {},
     slack: {},
     pagerduty: {},
     stripe: {},

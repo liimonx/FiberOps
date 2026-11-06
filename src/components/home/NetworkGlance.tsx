@@ -36,8 +36,9 @@ export function NetworkGlance({
       if (!res.ok) throw new Error("Failed to fetch usage stats");
       return res.json();
     },
-    staleTime: 30_000,
-    refetchInterval: 60_000,
+    staleTime: 60_000,
+    gcTime: 5 * 60_000,
+    refetchOnWindowFocus: false,
   });
 
   const topIncident = [...activeIncidents].sort(

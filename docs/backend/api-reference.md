@@ -545,6 +545,8 @@ GET /api/maps/mapbox-token
 
 `source` is `integration` | `env` | `none`. Prefer the enabled Mapbox integration credential; fall back to `NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN`.
 
+When `source` is `none`, the network map uses its local animated mock renderer and does not request Mapbox tiles.
+
 ---
 
 ## Settings — Billing

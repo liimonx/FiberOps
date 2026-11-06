@@ -35,9 +35,9 @@ export function useWorkOrders() {
   return useQuery({
     queryKey: networkQueryKeys.workOrders.list(),
     queryFn: () => fetchList<WorkOrder>("/api/work-orders"),
-    staleTime: 30_000,
+    staleTime: 60_000,
     gcTime: 5 * 60_000,
-    refetchInterval: 30_000,
+    refetchOnWindowFocus: false,
   });
 }
 

@@ -1,5 +1,7 @@
 "use client";
 
+import React from "react";
+
 type DashboardChartFrameProps = {
   isLoading?: boolean;
   children: React.ReactNode;

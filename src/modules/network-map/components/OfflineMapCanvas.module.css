@@ -1,0 +1,338 @@
+.canvas {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse at 48% 45%, rgba(13, 47, 64, 0.46), transparent 58%),
+    #07111b;
+  color: #e4edf2;
+  isolation: isolate;
+}
+
+.terrain {
+  background:
+    radial-gradient(ellipse at 25% 75%, rgba(32, 84, 68, 0.32), transparent 42%),
+    radial-gradient(ellipse at 75% 22%, rgba(88, 86, 49, 0.2), transparent 45%),
+    #101c1d;
+}
+
+.map {
+  display: block;
+  width: 100%;
+  height: 100%;
+  cursor: crosshair;
+  touch-action: none;
+}
+
+.ground {
+  fill: #07131e;
+}
+
+.terrain .ground {
+  fill: #101c1d;
+}
+
+.minorGrid {
+  fill: none;
+  stroke: rgba(131, 177, 189, 0.055);
+  stroke-width: 0.7;
+}
+
+.building {
+  fill: rgba(38, 72, 84, 0.43);
+  stroke: rgba(104, 151, 158, 0.17);
+  stroke-width: 1;
+  animation: buildingGlow 6s ease-in-out infinite alternate;
+}
+
+.terrain .building {
+  fill: rgba(62, 86, 66, 0.45);
+  stroke: rgba(157, 162, 115, 0.2);
+}
+
+.streetEdge,
+.arterialEdge,
+.street,
+.arterial,
+.river,
+.riverHighlight {
+  fill: none;
+  vector-effect: non-scaling-stroke;
+}
+
+.streetEdge {
+  stroke: rgba(50, 91, 104, 0.34);
+  stroke-width: 8;
+}
+
+.street {
+  stroke: rgba(100, 156, 169, 0.16);
+  stroke-width: 2;
+}
+
+.arterialEdge {
+  stroke: rgba(77, 121, 132, 0.42);
+  stroke-width: 14;
+}
+
+.arterial {
+  stroke: rgba(145, 184, 178, 0.22);
+  stroke-width: 4;
+  stroke-dasharray: 1 12;
+}
+
+.river {
+  stroke: rgba(30, 133, 157, 0.17);
+  stroke-width: 72;
+}
+
+.riverHighlight {
+  stroke: rgba(47, 167, 186, 0.2);
+  stroke-width: 2;
+  stroke-dasharray: 3 8;
+}
+
+.mapLabel {
+  fill: rgba(158, 188, 193, 0.45);
+  font: 600 10px/1 sans-serif;
+  letter-spacing: 2.4px;
+}
+
+.coverage {
+  fill: rgba(41, 220, 165, 0.055);
+  stroke: rgba(41, 220, 165, 0.24);
+  stroke-width: 1;
+  stroke-dasharray: 4 7;
+  vector-effect: non-scaling-stroke;
+  animation: coverageBreath 5s ease-in-out infinite alternate;
+}
+
+.fiber,
+.drop {
+  fill: none;
+  cursor: pointer;
+  vector-effect: non-scaling-stroke;
+  transition: stroke 180ms ease, opacity 180ms ease;
+}
+
+.fiber {
+  stroke: rgba(65, 226, 185, 0.55);
+  stroke-width: 1.9;
+}
+
+.drop {
+  stroke: rgba(108, 170, 183, 0.38);
+  stroke-width: 1;
+}
+
+.fiber:hover,
+.drop:hover,
+.selectedLink {
+  stroke: #f4d27a;
+  stroke-width: 3;
+  filter: drop-shadow(0 0 5px rgba(244, 210, 122, 0.75));
+}
+
+.errorLink {
+  stroke: #ff5875;
+  stroke-dasharray: 5 5;
+  animation: outageDash 1.2s linear infinite;
+}
+
+.packet {
+  fill: #c2ffe8;
+  filter: drop-shadow(0 0 4px rgba(89, 255, 199, 0.95));
+  animation: packetTravel 4.5s linear infinite;
+  pointer-events: none;
+}
+
+.node {
+  cursor: pointer;
+  outline: none;
+}
+
+.node:focus-visible .coreRing,
+.node:focus-visible > circle:last-child {
+  stroke: #fff;
+  stroke-width: 2;
+}
+
+.coreRing {
+  fill: #0b1a22;
+  stroke: rgba(124, 255, 216, 0.72);
+  stroke-width: 1.5;
+}
+
+.pulse {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: nodePulse 2.8s ease-out infinite;
+}
+
+.selectionRing {
+  fill: none;
+  stroke: #f4d27a;
+  stroke-width: 1.5;
+  stroke-dasharray: 3 3;
+  vector-effect: non-scaling-stroke;
+}
+
+.topLabel,
+.metrics,
+.scale {
+  position: absolute;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  border: 1px solid rgba(133, 178, 189, 0.16);
+  background: rgba(5, 15, 23, 0.78);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.topLabel {
+  top: 20px;
+  left: 20px;
+  gap: 9px;
+  padding: 9px 12px;
+  border-radius: 5px;
+  color: rgba(229, 241, 241, 0.88);
+  font: 600 9px/1.2 sans-serif;
+  letter-spacing: 1.05px;
+}
+
+.liveDot,
+.activeDot,
+.issueDot {
+  display: inline-block;
+  flex: 0 0 auto;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+
+.liveDot {
+  background: #39e7ad;
+  box-shadow: 0 0 9px rgba(57, 231, 173, 0.9);
+  animation: liveBlink 1.8s ease-in-out infinite;
+}
+
+.separator {
+  color: rgba(173, 198, 202, 0.45);
+}
+
+.metrics {
+  right: 20px;
+  bottom: 20px;
+  gap: 15px;
+  padding: 10px 13px;
+  border-radius: 5px;
+  font: 600 9px/1 sans-serif;
+  letter-spacing: 0.75px;
+}
+
+.metrics span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.activeDot {
+  width: 6px;
+  height: 6px;
+  background: #39e7ad;
+}
+
+.issueDot {
+  width: 6px;
+  height: 6px;
+  background: #ff875f;
+}
+
+.networkStatus {
+  color: rgba(163, 184, 193, 0.76);
+}
+
+.scale {
+  bottom: 22px;
+  left: 20px;
+  gap: 7px;
+  padding: 7px 9px;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  color: rgba(218, 233, 233, 0.7);
+  font: 10px/1 sans-serif;
+}
+
+.scale span {
+  width: 40px;
+  height: 5px;
+  border-right: 1px solid currentColor;
+  border-bottom: 1px solid currentColor;
+  border-left: 1px solid currentColor;
+}
+
+@keyframes packetTravel {
+  from { offset-distance: 0%; }
+  to { offset-distance: 100%; }
+}
+
+@keyframes nodePulse {
+  0% { opacity: 0.65; transform: scale(0.45); }
+  75%, 100% { opacity: 0; transform: scale(1.7); }
+}
+
+@keyframes coverageBreath {
+  from { opacity: 0.45; }
+  to { opacity: 1; }
+}
+
+@keyframes liveBlink {
+  50% { opacity: 0.45; }
+}
+
+@keyframes buildingGlow {
+  from { opacity: 0.68; }
+  to { opacity: 1; }
+}
+
+@keyframes outageDash {
+  to { stroke-dashoffset: -20; }
+}
+
+@media (max-width: 680px) {
+  .topLabel {
+    top: 12px;
+    left: 12px;
+    gap: 6px;
+    padding: 8px;
+    font-size: 8px;
+  }
+
+  .metrics {
+    right: 12px;
+    bottom: 12px;
+    gap: 8px;
+    padding: 8px;
+    font-size: 8px;
+  }
+
+  .networkStatus,
+  .scale {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .building,
+  .coverage,
+  .packet,
+  .pulse,
+  .liveDot,
+  .errorLink {
+    animation: none;
+  }
+}

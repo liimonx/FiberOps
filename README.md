@@ -14,7 +14,7 @@ FiberOps provides an enterprise-grade GIS dashboard for:
 - Planning network expansion with map-based proposals
 - Generating operational reports
 
-The app runs entirely on **mock data**. Domain types, Zod schemas, repository interfaces, and `src/mocks/` define the contract. In development, MSW intercepts browser requests and WebSockets; in all environments, Next.js route handlers at `/api` serve the same mock API via `src/mocks/apiRouter.ts`.
+The app runs entirely on **local mock data**. Domain types, Zod schemas, repository interfaces, and `src/mocks/` define the contract. Every `/api` request is handled by the same-origin Next.js route handlers and `src/mocks/apiRouter.ts` in development and production; no external API server or service worker is required. Configured integrations are simulated locally and do not send outbound requests. The network map uses a local animated mock basemap and topology when no Mapbox token is configured; the optional Mapbox basemap requires internet access and a token.
 
 ## Technology Stack
 
@@ -25,9 +25,9 @@ The app runs entirely on **mock data**. Domain types, Zod schemas, repository in
 | UI | `@shohojdhara/atomix`, Sass |
 | State | Zustand |
 | Data fetching | TanStack Query |
-| Maps | Mapbox GL JS |
+| Maps | Local SVG/CSS mock renderer; optional Mapbox GL JS basemap |
 | Forms & validation | React Hook Form + Zod |
-| Mock API | MSW (dev) + Next.js `/api` routes |
+| Mock API | Local Next.js `/api` route handlers (all environments) |
 | Animation | GSAP |
 | Icons | Phosphor Icons (`@phosphor-icons/react`) |
 | Testing | Vitest, Testing Library |
@@ -39,7 +39,7 @@ The app runs entirely on **mock data**. Domain types, Zod schemas, repository in
 |-------|--------|------------|
 | `/` | **Home** | Operations center with key metrics, quick links, and activity feed |
 | `/dashboard` | **Dashboard** | KPI cards, outage feed, technician widget, fiber usage/revenue charts, mini network map |
-| `/network-map` | **Network Map** | Full-viewport GIS canvas with layer controls, asset search, route tracing, heat maps, measurement tools, and planning draw mode |
+| `/network-map` | **Network Map** | Full-viewport network visualization with local mock topology, layer controls, asset search, and map tools; optional Mapbox basemap |
 | `/assets` | **Assets** | Inventory list, asset registration, detail panels, maintenance timelines, and connection graphs |
 | `/customers` | **Customers** | Searchable profiles, signal health, connection path tracing, and incident history |
 | `/incidents` | **Incidents** | Severity filters, map previews, status timelines, and report/resolve flows |
@@ -55,7 +55,6 @@ The app runs entirely on **mock data**. Domain types, Zod schemas, repository in
 
 - Node.js LTS
 - Yarn
-- [Mapbox access token](https://account.mapbox.com/access-tokens/)
 
 ### Installation
 
@@ -65,24 +64,13 @@ The app runs entirely on **mock data**. Domain types, Zod schemas, repository in
    yarn install
    ```
 
-2. **Environment setup:**
+2. **Optional map setup:**
 
-   Copy the example file and add your Mapbox token:
-
-   ```bash
-   cp .env.example .env.local
-   ```
+   Add a Mapbox token only if you want the online basemap in the network map:
 
    ```env
    NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN=your_mapbox_access_token_here
    ```
-
-   Optional variables:
-
-   | Variable | Purpose |
-   |----------|---------|
-   | `NEXT_PUBLIC_WS_URL` | Mock WebSocket URL (`ws://localhost:8080/ws`) for network map live updates |
-   | `NEXT_PUBLIC_ERROR_ENDPOINT` | Remote error reporting endpoint in production |
 
 3. **Start the development server:**
 
@@ -90,7 +78,7 @@ The app runs entirely on **mock data**. Domain types, Zod schemas, repository in
    yarn dev
    ```
 
-   Open [http://localhost:3000](http://localhost:3000). MSW starts automatically in development before the app mounts.
+   Open [http://localhost:3000](http://localhost:3000). The app starts directly; local mock API routes are available immediately.
 
 ### Scripts
 

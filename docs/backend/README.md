@@ -1,8 +1,8 @@
 # FiberOps Backend Documentation
 
-This folder describes the **API contract** implied by the FiberOps frontend mock layer (`src/mocks/`). The Next.js app currently runs **mock-only** (MSW in development + `/api` route handlers). Use these docs if you later scaffold a real backend that replaces the mocks without changing the UI.
+This folder describes the **API contract** implied by the FiberOps frontend mock layer (`src/mocks/`). The Next.js app currently runs **mock-only**: same-origin `/api` route handlers use local mock data in every environment, with no browser service worker or external API server required. Use these docs if you later scaffold a real backend that replaces the mocks without changing the UI.
 
-> **Note:** Live Laravel rewrites (`NEXT_PUBLIC_USE_MSW=false`) were removed from this frontend. Integration steps in [Frontend Integration](./frontend-integration.md) describe a future wiring path, not the current app behavior.
+> **Note:** The frontend always uses the local mock API. Integration steps in [Frontend Integration](./frontend-integration.md) describe a future wiring path, not the current app behavior.
 
 ## Documents
 
@@ -25,7 +25,7 @@ This folder describes the **API contract** implied by the FiberOps frontend mock
 - **Single resource:** entity object (not wrapped)
 - **Validation errors (400):** `{ "error": "Validation failed", "issues": <Zod flatten output> }`
 - **Other errors:** `{ "error": "<message>" }` with appropriate HTTP status
-- **WebSocket:** `ws://<host>/ws` (env: `NEXT_PUBLIC_WS_URL`)
+- **WebSocket:** optional; disabled unless a URL is explicitly configured
 
 ## Implementation status (frontend expectations)
 
@@ -47,7 +47,7 @@ When in doubt, read the frontend source:
 
 - Contract types: `src/types/domain.ts`
 - Repository interfaces: `src/services/repositories.ts`
-- MSW handlers (API behavior): `src/mocks/handlers.ts`
+- API routes and mock behavior: `src/app/api/` and `src/mocks/apiRouter.ts`
 - Zod validation: `src/modules/**/schemas/*.schema.ts`
 - Mock seed data: `src/mocks/*.ts`
 

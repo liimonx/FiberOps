@@ -16,14 +16,13 @@ export function SettingsAdminGuard({
   const user = useAuthStore((state) => state.user);
   const isHydrated = useAuthStore((state) => state.isHydrated);
   const isSessionReady = useAuthStore((state) => state.isSessionReady);
-  const useMsw = process.env.NEXT_PUBLIC_USE_MSW !== "false";
 
   useEffect(() => {
     if (!isHydrated || !isSessionReady) return;
-    if (!user && !useMsw) {
+    if (!user) {
       router.replace(`/login?from=${encodeURIComponent(pathname)}`);
     }
-  }, [isHydrated, isSessionReady, user, useMsw, pathname, router]);
+  }, [isHydrated, isSessionReady, user, pathname, router]);
 
   if (!isHydrated || !isSessionReady) {
     return (

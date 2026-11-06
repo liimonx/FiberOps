@@ -17,7 +17,7 @@ import { usePersistedBoolean } from "@/hooks/usePersistedBoolean";
 import { filterNavigationByRole, sidebarNav } from "@/lib/navigation";
 import { useAuthStore } from "@/stores/useAuthStore";
 
-const SIDEBAR_COLLAPSED_KEY = "fiberops:sidebar-collapsed";
+const SIDEBAR_COLLAPSED_KEY = "fiberops:sidebar-collapsed:v2";
 const DESKTOP_BREAKPOINT = 1025;
 
 function isEditableTarget(target: EventTarget | null): boolean {

@@ -1,7 +1,11 @@
+import { createLogger } from "@/lib/logger";
+
 const TOKEN_COOKIE = "fiberops-auth";
 
 /** In-memory bearer token — never persisted to localStorage. */
 let memoryToken: string | null = null;
+
+const log = createLogger("apiClient");
 
 export function getAuthToken(): string | null {
   return memoryToken;
@@ -76,15 +80,21 @@ export async function apiClient<T>(
     options;
   const token = getAuthToken();
 
+  const requestHeaders: HeadersInit = {
+    "Content-Type": "application/json",
+    ...(token && !skipAuth ? { Authorization: `Bearer ${token}` } : {}),
+    ...headers,
+  };
+
+  log.debug("API Request:", { path, hasToken: !!token, skipAuth });
+
   const response = await fetch(path, {
     ...rest,
     credentials: "same-origin",
-    headers: {
-      "Content-Type": "application/json",
-      ...(token && !skipAuth ? { Authorization: `Bearer ${token}` } : {}),
-      ...headers,
-    },
+    headers: requestHeaders,
   });
+
+  log.debug("API Response:", { path, status: response.status, ok: response.ok });
 
   if (response.status === 401 && !skipAuth) {
     // Await cookie clear before redirect so middleware cannot treat the session as still valid.
@@ -120,6 +130,7 @@ export async function apiClient<T>(
     } catch {
       // ignore parse errors
     }
+    log.error("API Error:", { path, status: response.status, message });
     throw new ApiClientError(message, response.status);
   }
 
